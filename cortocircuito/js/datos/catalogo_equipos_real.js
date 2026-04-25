@@ -302,8 +302,20 @@ var CatalogoEquiposReal = (function() {
         var opciones = [];
 
         for (var marca in CATALOGO) {
+            if (!CATALOGO[marca]) continue;
             for (var modelo in CATALOGO[marca]) {
+                // Saltar propiedades que no son modelos (como 'nombre')
+                if (modelo === 'nombre' || !CATALOGO[marca][modelo] || !CATALOGO[marca][modelo].modelos) {
+                    continue;
+                }
+
                 var data = CATALOGO[marca][modelo];
+
+                // Verificar que data.modelos existe
+                if (!data.modelos || !Array.isArray(data.modelos)) {
+                    console.warn('[CatalogoEquiposReal] Modelos no definidos para', marca, modelo);
+                    continue;
+                }
 
                 data.modelos.forEach(function(modeloData) {
                     // Verificar que frame >= I_diseño
