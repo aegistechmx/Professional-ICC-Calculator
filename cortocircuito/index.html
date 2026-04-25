@@ -234,14 +234,14 @@
                     <div class="card-title"><i class="fas fa-sliders-h"></i> Configuracion del Sistema</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label class="field-label">Modo de calculo</label>
+                            <label class="field-label" for="modo-calculo">Modo de calculo</label>
                             <div class="flex gap-2">
                                 <button class="mode-btn active" id="btn-conocido" onclick="App.setMode('conocido')">Isc conocido</button>
                                 <button class="mode-btn" id="btn-completo" onclick="App.setMode('completo')">Calculo completo</button>
                             </div>
                         </div>
                         <div>
-                            <label class="field-label">Tipo de sistema</label>
+                            <label class="field-label" for="tipo-sistema">Tipo de sistema</label>
                             <div class="flex gap-2">
                                 <button class="mode-btn active" id="btn-3f" onclick="App.setTipo('3f')">Trifasico 3F-4H</button>
                                 <button class="mode-btn" id="btn-1f" onclick="App.setTipo('1f')">Monofasico 1F-3H</button>
@@ -249,7 +249,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="field-label">Tension del sistema (V)</label>
+                        <label class="field-label" for="input-tension">Tension del sistema (V)</label>
                         <div class="flex gap-2 mb-2 flex-wrap">
                             <button class="voltage-btn" onclick="App.setVoltage(480,this)">480</button>
                             <button class="voltage-btn" onclick="App.setVoltage(440,this)">440</button>
@@ -267,7 +267,7 @@
                     <div id="modo-conocido">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="field-label">Isc disponible en el punto (kA)</label>
+                                <label class="field-label" for="input-isc-conocido">Isc disponible en el punto (kA)</label>
                                 <input type="number" id="input-isc-conocido" name="input-isc-conocido" value="10" min="0.01" step="0.01" oninput="App.clearResults()">
                             </div>
                             <div class="flex items-end">
@@ -278,14 +278,14 @@
                     <div id="modo-completo" class="hidden">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                             <div>
-                                <label class="field-label">Zona Eléctrica</label>
+                                <label class="field-label" for="input-zona-electrica">Zona Eléctrica</label>
                                 <select id="input-zona-electrica" name="input-zona-electrica" onchange="App.actualizarIscPorZona()" class="relative">
                                     <option value="">Seleccionar zona...</option>
                                 </select>
                                 <p class="text-xs text-[--text-muted] mt-1">Zona geográfica para cálculo automático de Isc</p>
                             </div>
                             <div>
-                                <label class="field-label">Isc en media tensión (lado primario)</label>
+                                <label class="field-label" for="input-isc-fuente">Isc en media tensión (lado primario)</label>
                                 <input type="number" id="input-isc-fuente" name="input-isc-fuente" value="25" min="0.01" step="0.01" oninput="App.clearResults()" placeholder="Auto por zona" title="Valores típicos de cortocircuito en media tensión. Confirmar con CFE para diseño definitivo.">
                                 <p class="text-xs text-[--text-muted] mt-1">Isc de red en MT (se transformará a BT automáticamente)</p>
                                 <p id="isc-equivalente-bt" class="text-xs text-[--cyan] mt-1 hidden">Isc equivalente en BT: <span id="isc-bt-valor">--</span> kA</p>
@@ -296,7 +296,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="field-label">X/R de la fuente</label>
+                                <label class="field-label" for="input-xr-fuente">X/R de la fuente</label>
                                 <input type="number" id="input-xr-fuente" name="input-xr-fuente" value="15" min="0.5" step="0.5" oninput="App.clearResults()">
                                 <p class="text-xs text-[--text-muted] mt-1">Relación reactancia/resistencia</p>
                             </div>
@@ -304,11 +304,11 @@
                         <div class="separator"></div>
                         <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Transformador</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div><label class="field-label">Capacidad (kVA)</label><select id="input-trafo-kva" name="input-trafo-kva" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative"></select></div>
-                            <div><label class="field-label">% Impedancia</label><input type="number" id="input-trafo-z" name="input-trafo-z" value="5.75" min="0.1" step="0.01" max="15" oninput="App.clearResults(); Motor.actualizarRetornoTierra()"></div>
-                            <div><label class="field-label">V primario (V)</label><input type="number" id="input-trafo-vp" name="input-trafo-vp" value="13200" min="1" step="1" oninput="App.clearResults()"></div>
+                            <div><label class="field-label" for="input-trafo-kva">Capacidad (kVA)</label><select id="input-trafo-kva" name="input-trafo-kva" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative"></select></div>
+                            <div><label class="field-label" for="input-trafo-z">% Impedancia</label><input type="number" id="input-trafo-z" name="input-trafo-z" value="5.75" min="0.1" step="0.01" max="15" oninput="App.clearResults(); Motor.actualizarRetornoTierra()"></div>
+                            <div><label class="field-label" for="input-trafo-vp">V primario (V)</label><input type="number" id="input-trafo-vp" name="input-trafo-vp" value="13200" min="1" step="1" oninput="App.clearResults()"></div>
                             <div>
-                                <label class="field-label">V secundario (V)</label>
+                                <label class="field-label" for="input-trafo-vs">V secundario (V)</label>
                                 <div class="flex gap-2 mb-2 flex-wrap">
                                     <button class="voltage-btn active" onclick="App.setTrafoVs(480,this)">480</button>
                                     <button class="voltage-btn" onclick="App.setTrafoVs(220,this)">220</button>
@@ -319,7 +319,7 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             <div>
-                                <label class="field-label">Configuración X0 (secuencia cero)</label>
+                                <label class="field-label" for="input-x0-config">Configuración X0 (secuencia cero)</label>
                                 <select id="input-x0-config" name="input-x0-config" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
                                     <option value="plano_acero">Cables en plano (acero)</option>
                                     <option value="plano_al">Cables en plano (aluminio)</option>
@@ -329,7 +329,7 @@
                                 <p class="text-xs text-[--text-muted] mt-1">Configuración geométrica de cables para cálculo de impedancia de secuencia cero</p>
                             </div>
                             <div>
-                                <label class="field-label">Tipo de aterrizaje del transformador</label>
+                                <label class="field-label" for="input-trafo-aterr">Tipo de aterrizaje del transformador</label>
                                 <select id="input-trafo-aterr" name="input-trafo-aterr" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
                                     <option value="yg_solido">Yg sólidamente aterrizado</option>
                                     <option value="yg_resistivo">Yg aterrizado por resistencia</option>
@@ -340,7 +340,7 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             <div>
-                                <label class="field-label">Resistencia de retorno a tierra (mΩ)</label>
+                                <label class="field-label" for="input-retorno-tierra">Resistencia de retorno a tierra (mΩ)</label>
                                 <div class="flex gap-2">
                                     <input type="number" id="input-retorno-tierra" name="input-retorno-tierra" value="0" min="0" step="0.1" placeholder="Auto-calculado" oninput="App.clearResults()" title="Valor calculado automáticamente según configuración del sistema">
                                     <button class="btn-sm" onclick="Motor.actualizarRetornoTierra()" title="Calcular automáticamente"><i class="fas fa-calculator text-[0.65rem]"></i></button>
@@ -359,26 +359,26 @@
                     <div class="card-title"><i class="fas fa-shield-alt"></i> Equipo en Punto de Conexion (P0)</div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                            <label class="field-label">Tipo de equipo</label>
+                            <label class="field-label" for="equip-p0-tipo">Tipo de equipo</label>
                             <select id="equip-p0-tipo" name="equip-p0-tipo" onchange="UIEquipos.onTipoChange('p0')">
                                 <option value="">Sin equipo</option>
                             </select>
                             <div id="equip-p0-detalles" class="mt-1 text-xs text-gray-500"></div>
                         </div>
                         <div>
-                            <label class="field-label">I.P / Modelo</label>
+                            <label class="field-label" for="equip-p0-modelo">I.P / Modelo</label>
                             <select id="equip-p0-modelo" name="equip-p0-modelo" onchange="UIEquipos.onModeloChange('p0')">
                                 <option value="">-- Seleccionar modelo --</option>
                             </select>
                         </div>
                         <div>
-                            <label class="field-label">Capacidad interruptiva (kA)</label>
+                            <label class="field-label" for="equip-p0-cap">Capacidad interruptiva (kA)</label>
                             <input type="number" id="equip-p0-cap" name="equip-p0-cap" value="" min="0" step="0.1" placeholder="kA" oninput="App.clearResults()">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div>
-                            <label class="field-label">Amperaje (A)</label>
+                            <label class="field-label" for="equip-p0-amp">Amperaje (A)</label>
                             <input type="number" id="equip-p0-amp" name="equip-p0-amp" value="" min="0" step="1" placeholder="A" oninput="App.clearResults()">
                         </div>
                     </div>
@@ -408,10 +408,10 @@
                         <div class="mt-4">
                             <p class="text-xs text-[--text-muted] mb-3">Parámetros para cálculo de ampacidad corregida según NOM-001-SEDE-2012.</p>
                             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                                <div><label class="field-label">Fcc (Factor carga continua)</label><input type="number" id="cdt-fcc-input" name="cdt-fcc-input" value="1.25" min="0" max="2" step="0.01" placeholder="Default 1.25" onchange="App.calculate()"></div>
-                                <div><label class="field-label">Temp. Ambiente (°C)</label><input type="number" id="cdt-temp-input" name="cdt-temp-input" value="31" min="0" max="100" step="1" placeholder="Default 31°C" onchange="App.calculate()"></div>
-                                <div><label class="field-label">N° Conductores</label><input type="number" id="cdt-conductores-input" name="cdt-conductores-input" value="3" min="1" max="50" step="1" placeholder="Default 3" onchange="App.calculate()"></div>
-                                <div><label class="field-label">F_agrupamiento</label><input type="number" id="cdt-agrupamiento-input" name="cdt-agrupamiento-input" value="" min="0" max="1" step="0.05" placeholder="Auto o manual" onchange="App.calculate()"></div>
+                                <div><label class="field-label" for="cdt-fcc-input">Fcc (Factor carga continua)</label><input type="number" id="cdt-fcc-input" name="cdt-fcc-input" value="1.25" min="0" max="2" step="0.01" placeholder="Default 1.25" onchange="App.calculate()"></div>
+                                <div><label class="field-label" for="cdt-temp-input">Temp. Ambiente (°C)</label><input type="number" id="cdt-temp-input" name="cdt-temp-input" value="31" min="0" max="100" step="1" placeholder="Default 31°C" onchange="App.calculate()"></div>
+                                <div><label class="field-label" for="cdt-conductores-input">N° Conductores</label><input type="number" id="cdt-conductores-input" name="cdt-conductores-input" value="3" min="1" max="50" step="1" placeholder="Default 3" onchange="App.calculate()"></div>
+                                <div><label class="field-label" for="cdt-agrupamiento-input">F_agrupamiento</label><input type="number" id="cdt-agrupamiento-input" name="cdt-agrupamiento-input" value="" min="0" max="1" step="0.05" placeholder="Auto o manual" onchange="App.calculate()"></div>
                             </div>
                         </div>
                     </div>
@@ -442,9 +442,9 @@
                         <div class="mt-4">
                             <p class="text-xs text-[--text-muted] mb-3">Banco de capacitores en paralelo que descarga durante la falla.</p>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div><label class="field-label">Potencia reactiva (kVAr)</label><input type="number" id="input-cap-kvar" name="input-cap-kvar" value="" min="0" step="1" placeholder="0 = sin banco" oninput="App.clearResults()"></div>
-                                <div><label class="field-label">Tension del banco (V)</label><input type="number" id="input-cap-tension" name="input-cap-tension" value="" min="0" step="1" placeholder="Tension nominal" oninput="App.clearResults()"></div>
-                                <div><label class="field-label">Distancia al punto (m)</label><input type="number" id="input-cap-distancia" name="input-cap-distancia" value="" min="0" step="1" placeholder="0 = en el punto" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="input-cap-kvar">Potencia reactiva (kVAr)</label><input type="number" id="input-cap-kvar" name="input-cap-kvar" value="" min="0" step="1" placeholder="0 = sin banco" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="input-cap-tension">Tension del banco (V)</label><input type="number" id="input-cap-tension" name="input-cap-tension" value="" min="0" step="1" placeholder="Tension nominal" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="input-cap-distancia">Distancia al punto (m)</label><input type="number" id="input-cap-distancia" name="input-cap-distancia" value="" min="0" step="1" placeholder="0 = en el punto" oninput="App.clearResults()"></div>
                             </div>
                         </div>
                     </div>
@@ -463,26 +463,26 @@
                             <div class="separator"></div>
                             <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Corrientes de Fase (A)</p>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                <div><label class="field-label">Ia (A)</label><input type="number" id="ctx-ia" name="ctx-ia" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
-                                <div><label class="field-label">Ib (A)</label><input type="number" id="ctx-ib" name="ctx-ib" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
-                                <div><label class="field-label">Ic (A)</label><input type="number" id="ctx-ic" name="ctx-ic" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
-                                <div><label class="field-label">In (A)</label><input type="number" id="ctx-in" name="ctx-in" value="" min="0" step="1" placeholder="Neutro fundamental" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-ia">Ia (A)</label><input type="number" id="ctx-ia" name="ctx-ia" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-ib">Ib (A)</label><input type="number" id="ctx-ib" name="ctx-ib" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-ic">Ic (A)</label><input type="number" id="ctx-ic" name="ctx-ic" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-in">In (A)</label><input type="number" id="ctx-in" name="ctx-in" value="" min="0" step="1" placeholder="Neutro fundamental" oninput="App.clearResults()"></div>
                             </div>
 
                             <div class="separator"></div>
                             <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Armónicos</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div><label class="field-label">In armónicos (A)</label><input type="number" id="ctx-in-harm" name="ctx-in-harm" value="" min="0" step="1" placeholder="0 = sin armónicos" oninput="App.clearResults()"></div>
-                                <div><label class="field-label">THDi (0-1)</label><input type="number" id="ctx-thdi" name="ctx-thdi" value="" min="0" max="1" step="0.01" placeholder="Opcional" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-in-harm">In armónicos (A)</label><input type="number" id="ctx-in-harm" name="ctx-in-harm" value="" min="0" step="1" placeholder="0 = sin armónicos" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-thdi">THDi (0-1)</label><input type="number" id="ctx-thdi" name="ctx-thdi" value="" min="0" max="1" step="0.01" placeholder="Opcional" oninput="App.clearResults()"></div>
                             </div>
 
                             <div class="separator"></div>
                             <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Configuración del Sistema</p>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div><label class="field-label">Desbalance (0-1)</label><input type="number" id="ctx-unbalance" name="ctx-unbalance" value="" min="0" max="1" step="0.01" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
-                                <div><label class="field-label">Fcc (Factor de carga continua)</label><input type="number" id="ctx-fcc" name="ctx-fcc" value="" min="0" max="1" step="0.01" placeholder="Opcional" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-unbalance">Desbalance (0-1)</label><input type="number" id="ctx-unbalance" name="ctx-unbalance" value="" min="0" max="1" step="0.01" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label" for="ctx-fcc">Fcc (Factor de carga continua)</label><input type="number" id="ctx-fcc" name="ctx-fcc" value="" min="0" max="1" step="0.01" placeholder="Opcional" oninput="App.clearResults()"></div>
                                 <div class="flex items-end">
-                                    <label class="flex items-center gap-2 cursor-pointer">
+                                    <label class="flex items-center gap-2 cursor-pointer" for="ctx-single-phase">
                                         <input type="checkbox" id="ctx-single-phase" name="ctx-single-phase" onchange="App.clearResults()">
                                         <span class="text-xs text-[--text]">Tiene cargas monofásicas</span>
                                     </label>
