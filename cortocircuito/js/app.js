@@ -100,7 +100,14 @@ var App = (function() {
             'Semaforo',
             'DebugVisualPro',
             'TCCChartReal',
-            'ExcelExportPro'
+            'ExcelExportPro',
+            'CaidaTension',
+            'CalculoCapacitores',
+            'CalculoMotores',
+            'NOMValidacion',
+            'OptimizadorConductores',
+            'TCCCoordinacion',
+            'Curvas'
         ];
         var dependenciasUI = ['UIAlimentadores', 'UIMotores', 'UIDiagrama', 'UIResultados',
                                'UICoordonograma', 'UIConfiguracion', 'UIEquipos', 'UIToast'];
