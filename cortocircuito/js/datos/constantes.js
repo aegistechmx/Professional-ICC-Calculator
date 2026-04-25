@@ -337,3 +337,7 @@ var CONSTANTES = {
         { calibre: '1000', material: 'cobre', I_tabla: 615, area: 506.7 }
     ]
 };
+
+if (typeof window !== 'undefined') {
+    window.CONSTANTES = CONSTANTES;
+}

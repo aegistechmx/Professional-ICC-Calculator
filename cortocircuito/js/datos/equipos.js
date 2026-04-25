@@ -361,3 +361,7 @@ var EQUIPOS = {
         }
     }
 };
+
+if (typeof window !== 'undefined') {
+    window.EQUIPOS = EQUIPOS;
+}

@@ -71,3 +71,7 @@ var CONDUCTORES_X0 = {
         '400':.043,'500':.041,'600':.039,'750':.036,'1000':.033
     }
 };
+
+if (typeof window !== 'undefined') {
+    window.CONDUCTORES = CONDUCTORES;
+}

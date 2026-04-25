@@ -215,3 +215,8 @@ function getCurvaEquipo(equipTipo, modeloIdx) {
     }
     return null;
 }
+
+if (typeof window !== 'undefined') {
+    window.CURVAS_EQUIPO = CURVAS_EQUIPO;
+    window.getCurvaEquipo = getCurvaEquipo;
+}

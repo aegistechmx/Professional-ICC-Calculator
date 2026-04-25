@@ -202,5 +202,10 @@ function sugerirTodosAlimentadores() {
             resultados.push({ alimIdx: i, icarga: ic, sugerido: null, calibreActual: f.calibre, estado: 'no-aplica' });
         }
     }
+
     return resultados;
+}
+
+if (typeof window !== 'undefined') {
+    window.AMPACIDAD = AMPACIDAD;
 }
