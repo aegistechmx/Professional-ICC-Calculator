@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 11px;
+                line-height: 1.3;
+            }
+
+            /* Ocultar UI innecesaria */
+            button, .no-print, header, footer, .toast-container, #toast-container, .modal, .fixed {
+                display: none !important;
+            }
+
+            /* Mostrar contenido principal */
+            main, .print-content {
+                display: block !important;
+                visibility: visible !important;
+            }
+
+            /* Cada módulo = página */
+            .print-module {
+                display: block !important;
+                page-break-after: always;
+                break-after: page;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                position: relative;
+                min-height: 260mm;
+                padding: 10mm;
+                box-sizing: border-box;
+                background: white !important;
+                border: 1px solid #ccc;
+                margin-bottom: 10mm;
+            }
+
+            /* Último módulo sin salto */
+            .print-module:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+
+            /* Evitar cortes críticos */
+            table, .card, .section, .p-3, .rounded-lg {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Layout limpio (Tailwind grid fix) */
+            .grid, .grid-cols-1, .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+                display: block !important;
+            }
+
+            .grid > div {
+                display: block !important;
+                margin-bottom: 10px;
+                page-break-inside: avoid;
+            }
+
+            /* Flexbox fix */
+            .flex, .flex-row, .flex-col {
+                display: block !important;
+            }
+
+            .flex > div {
+                display: block !important;
+                margin-bottom: 5px;
+            }
+
+            /* Asegurar visibilidad de canvas (gráficas) */
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+                page-break-inside: avoid;
+            }
+
+            /* Tablas */
+            table {
+                width: 100% !important;
+                border-collapse: collapse;
+                margin: 10px 0;
+            }
+
+            table th, table td {
+                border: 1px solid #ddd;
+                padding: 5px;
+                text-align: left;
+            }
+
+            table th {
+                background: #f5f5f5;
+                font-weight: bold;
+            }
+
+            /* Texto y colores */
+            * {
+                color: black !important;
+                background: white !important;
+            }
+
+            .text-[--cyan], .text-[--green], .text-[--red], .text-[--yellow] {
+                color: black !important;
+                font-weight: bold;
+            }
+
+            /* Header */
+            .print-header::before {
+                content: "Memoria de Cálculo de Cortocircuito";
+                display: block;
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 5px;
+            }
+
+            .print-header::after {
+                content: "Sistema eléctrico – Análisis conforme a NOM-001-SEDE-2012";
+                display: block;
+                font-size: 10px;
+                margin-bottom: 10px;
+            }
+
+            /* Footer automático */
+            .print-module::after {
+                content: "Documento técnico | Generado automáticamente";
+                position: absolute;
+                bottom: 5mm;
+                left: 10mm;
+                font-size: 9px;
+            }
+
+            /* Fechas dinámicas */
+            .fecha-print {
+                display: block !important;
+                font-size: 10px;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+    <title>Calculadora de Cortocircuito — NOM-001-SEDE-2012</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['DM Sans','sans-serif'], mono: ['JetBrains Mono','monospace'] } } }
+        }
+    </script>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+    <!-- Toast -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <!-- Modal de Proyectos -->
+    <div id="modal-proyectos" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="UIProyectos.cerrarModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg">
+            <div class="card border-[--amber]/20 shadow-2xl shadow-black/40">
+                <div class="card-title"><i class="fas fa-folder-open"></i> Gestion de Proyectos</div>
+                <div id="proyectos-lista" class="space-y-2 max-h-60 overflow-y-auto mb-4"></div>
+                <div class="flex gap-2">
+                    <button class="btn-sm flex-1" onclick="UIProyectos.guardar()"><i class="fas fa-save mr-1"></i> Guardar actual</button>
+                    <button class="btn-sm flex-1" onclick="UIProyectos.exportarJSON()"><i class="fas fa-download mr-1"></i> Exportar JSON</button>
+                    <button class="btn-sm flex-1" onclick="UIProyectos.cerrarModal()"><i class="fas fa-times mr-1"></i> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="border-b border-[--border] bg-[--surface]/80 backdrop-blur-sm sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-[--amber-dim] flex items-center justify-center border border-[--amber]/20">
+                    <i class="fas fa-bolt text-[--amber]"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-tight">Calculadora de Cortocircuito</h1>
+                    <p class="text-[0.65rem] text-[--text-muted] tracking-wide">NOM-001-SEDE-2012</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="UIProyectos.abrirModal()" class="btn-sm" title="Proyectos">
+                    <i class="fas fa-folder text-[0.65rem]"></i> <span class="hidden sm:inline">Proyectos</span>
+                </button>
+                <label class="btn-sm cursor-pointer" title="Importar JSON">
+                    <i class="fas fa-upload text-[0.65rem]"></i> <span class="hidden sm:inline">Importar</span>
+                    <input type="file" accept=".json" class="hidden" onchange="UIProyectos.importarJSON(event)">
+                </label>
+                <button onclick="UIExportar.resumenEjecutivo()" class="btn-sm" title="Resumen Ejecutivo">
+                    <i class="fas fa-file-alt text-[0.65rem]"></i>
+                </button>
+                <button onclick="UIExportar.csv()" class="btn-sm" title="Exportar CSV">
+                    <i class="fas fa-file-csv text-[0.65rem]"></i>
+                </button>
+                <button onclick="App.saveProfile()" class="btn-sm" title="Guardar como perfil por defecto">
+                    <i class="fas fa-user-cog text-[0.65rem]"></i> <span class="hidden sm:inline">Guardar Perfil</span>
+                </button>
+                <button onclick="App.resetProfile()" class="btn-sm" title="Restablecer perfil a valores por defecto">
+                    <i class="fas fa-undo text-[0.65rem]"></i> <span class="hidden sm:inline">Reset Perfil</span>
+                </button>
+                <button onclick="App.imprimirModulos()" class="btn-sm" title="PDF de interfaz completa">
+                    <i class="fas fa-file-pdf text-[0.65rem]"></i> <span class="hidden sm:inline">PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-7xl mx-auto px-4 py-6" id="app">
+        <div class="print-module">
+            <div class="print-header"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+            <!-- ===================== COLUMNA IZQUIERDA ===================== -->
+            <div class="lg:col-span-7 space-y-4">
+
+                <!-- Configuración del Sistema -->
+                <section class="card">
+                    <div class="card-title"><i class="fas fa-sliders-h"></i> Configuracion del Sistema</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="field-label">Modo de calculo</label>
+                            <div class="flex gap-2">
+                                <button class="mode-btn active" id="btn-conocido" onclick="App.setMode('conocido')">Isc conocido</button>
+                                <button class="mode-btn" id="btn-completo" onclick="App.setMode('completo')">Calculo completo</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="field-label">Tipo de sistema</label>
+                            <div class="flex gap-2">
+                                <button class="mode-btn active" id="btn-3f" onclick="App.setTipo('3f')">Trifasico 3F-4H</button>
+                                <button class="mode-btn" id="btn-1f" onclick="App.setTipo('1f')">Monofasico 1F-3H</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">Tension del sistema (V)</label>
+                        <div class="flex gap-2 mb-2 flex-wrap">
+                            <button class="voltage-btn" onclick="App.setVoltage(480,this)">480</button>
+                            <button class="voltage-btn" onclick="App.setVoltage(440,this)">440</button>
+                            <button class="voltage-btn active" onclick="App.setVoltage(220,this)">220</button>
+                            <button class="voltage-btn" onclick="App.setVoltage(208,this)">208</button>
+                            <button class="voltage-btn" onclick="App.setVoltage(127,this)">127</button>
+                        </div>
+                        <input type="number" id="input-tension" value="220" min="1" step="1" oninput="App.clearResults()">
+                    </div>
+                </section>
+
+                <!-- Datos de Fuente -->
+                <section class="card">
+                    <div class="card-title"><i class="fas fa-plug"></i> Datos de Fuente</div>
+                    <div id="modo-conocido">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="field-label">Isc disponible en el punto (kA)</label>
+                                <input type="number" id="input-isc-conocido" value="10" min="0.01" step="0.01" oninput="App.clearResults()">
+                            </div>
+                            <div class="flex items-end">
+                                <p class="text-xs text-[--text-muted] leading-relaxed">Corriente de cortocircuito simetrica proporcionada por CFE o medida en el punto de conexion.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="modo-completo" class="hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="field-label">Zona Eléctrica</label>
+                                <select id="input-zona-electrica" onchange="App.actualizarIscPorZona()" class="relative">
+                                    <option value="">Seleccionar zona...</option>
+                                </select>
+                                <p class="text-xs text-[--text-muted] mt-1">Zona geográfica para cálculo automático de Isc</p>
+                            </div>
+                            <div>
+                                <label class="field-label">Isc en media tensión (lado primario)</label>
+                                <input type="number" id="input-isc-fuente" value="25" min="0.01" step="0.01" oninput="App.clearResults()" placeholder="Auto por zona" title="Valores típicos de cortocircuito en media tensión. Confirmar con CFE para diseño definitivo.">
+                                <p class="text-xs text-[--text-muted] mt-1">Isc de red en MT (se transformará a BT automáticamente)</p>
+                                <p id="isc-equivalente-bt" class="text-xs text-[--cyan] mt-1 hidden">Isc equivalente en BT: <span id="isc-bt-valor">--</span> kA</p>
+                                <div id="fault-types-display" class="mt-2 p-2 bg-[--bg-secondary] rounded hidden">
+                                    <p class="text-xs font-semibold text-[--text-muted] mb-1">Análisis de Fallas (IEEE Std 399):</p>
+                                    <p class="text-xs text-[--text]">3F: <span id="fault-3f">--</span> kA | L-G: <span id="fault-lg">--</span> kA</p>
+                                    <p class="text-xs text-[--text]">L-L: <span id="fault-ll">--</span> kA | L-L-G: <span id="fault-llg">--</span> kA</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="field-label">X/R de la fuente</label>
+                                <input type="number" id="input-xr-fuente" value="15" min="0.5" step="0.5" oninput="App.clearResults()">
+                                <p class="text-xs text-[--text-muted] mt-1">Relación reactancia/resistencia</p>
+                            </div>
+                        </div>
+                        <div class="separator"></div>
+                        <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Transformador</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div><label class="field-label">Capacidad (kVA)</label><select id="input-trafo-kva" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative"></select></div>
+                            <div><label class="field-label">% Impedancia</label><input type="number" id="input-trafo-z" value="5.75" min="0.1" step="0.01" max="15" oninput="App.clearResults(); Motor.actualizarRetornoTierra()"></div>
+                            <div><label class="field-label">V primario (V)</label><input type="number" id="input-trafo-vp" value="13200" min="1" step="1" oninput="App.clearResults()"></div>
+                            <div>
+                                <label class="field-label">V secundario (V)</label>
+                                <div class="flex gap-2 mb-2 flex-wrap">
+                                    <button class="voltage-btn active" onclick="App.setTrafoVs(480,this)">480</button>
+                                    <button class="voltage-btn" onclick="App.setTrafoVs(220,this)">220</button>
+                                    <button class="voltage-btn" onclick="App.setTrafoVs(127,this)">127</button>
+                                </div>
+                                <input type="number" id="input-trafo-vs" value="480" min="1" step="1" oninput="App.clearResults()">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="field-label">Configuración X0 (secuencia cero)</label>
+                                <select id="input-x0-config" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
+                                    <option value="plano_acero">Cables en plano (acero)</option>
+                                    <option value="plano_al">Cables en plano (aluminio)</option>
+                                    <option value="triangular_acero">Cables en triángulo (acero)</option>
+                                    <option value="triangular_al">Cables en triángulo (aluminio)</option>
+                                </select>
+                                <p class="text-xs text-[--text-muted] mt-1">Configuración geométrica de cables para cálculo de impedancia de secuencia cero</p>
+                            </div>
+                            <div>
+                                <label class="field-label">Tipo de aterrizaje del transformador</label>
+                                <select id="input-trafo-aterr" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
+                                    <option value="yg_solido">Yg sólidamente aterrizado</option>
+                                    <option value="yg_resistivo">Yg aterrizado por resistencia</option>
+                                    <option value="delta">Delta (no aterrizado)</option>
+                                </select>
+                                <p class="text-xs text-[--text-muted] mt-1">Conexión del neutro del transformador para falla fase-tierra</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="field-label">Resistencia de retorno a tierra (mΩ)</label>
+                                <div class="flex gap-2">
+                                    <input type="number" id="input-retorno-tierra" value="0" min="0" step="0.1" placeholder="Auto-calculado" oninput="App.clearResults()" title="Valor calculado automáticamente según configuración del sistema">
+                                    <button class="btn-sm" onclick="Motor.actualizarRetornoTierra()" title="Calcular automáticamente"><i class="fas fa-calculator text-[0.65rem]"></i></button>
+                                </div>
+                                <p class="text-xs text-[--text-muted] mt-1">Resistencia del camino de retorno a tierra (opcional) - Calcular valor automáticamente</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-[--text-muted] mt-4">Para cálculos avanzados de falla fase-tierra</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Equipo P0 -->
+                <section class="card">
+                    <div class="card-title"><i class="fas fa-shield-alt"></i> Equipo en Punto de Conexion (P0)</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="field-label">Tipo de equipo</label>
+                            <select id="equip-p0-tipo" onchange="UIEquipos.onTipoChange('p0')">
+                                <option value="">Sin equipo</option>
+                            </select>
+                            <div id="equip-p0-detalles" class="mt-1 text-xs text-gray-500"></div>
+                        </div>
+                        <div>
+                            <label class="field-label">I.P / Modelo</label>
+                            <select id="equip-p0-modelo" onchange="UIEquipos.onModeloChange('p0')">
+                                <option value="">-- Seleccionar modelo --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="field-label">Capacidad interruptiva (kA)</label>
+                            <input type="number" id="equip-p0-cap" value="" min="0" step="0.1" placeholder="kA" oninput="App.clearResults()">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="field-label">Amperaje (A)</label>
+                            <input type="number" id="equip-p0-amp" value="" min="0" step="1" placeholder="A" oninput="App.clearResults()">
+                        </div>
+                    </div>
+                    <div id="equip-p0-info" class="mt-4"></div>
+                </section>
+
+                <!-- Alimentadores y Equipos -->
+                <section class="card">
+                    <div class="card-title flex justify-between">
+                        <span class="flex items-center gap-2"><i class="fas fa-route"></i> Alimentadores y Equipos</span>
+                        <button class="btn-sm" onclick="App.addFeeder()"><i class="fas fa-plus text-[0.6rem]"></i> Agregar</button>
+                    </div>
+                    <div id="feeders-container"></div>
+                    <p class="text-xs text-[--text-muted] mt-2">
+                        <i class="fas fa-info-circle text-[--cyan]"></i>
+                        Cada tramo incluye el conductor, datos de carga y el equipo en el punto destino.
+                    </p>
+                </section>
+
+                <!-- C.D.T. (Capacidad de Diseño Térmico) — Parámetros -->
+                <section class="card" id="section-cdt">
+                    <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('cdt-content',this)">
+                        <div class="card-title mb-0"><i class="fas fa-thermometer-half"></i> C.D.T. (Capacidad de Diseño Térmico) <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Parámetros</span></div>
+                        <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="cdt-content" class="collapsible-content">
+                        <div class="mt-4">
+                            <p class="text-xs text-[--text-muted] mb-3">Parámetros para cálculo de ampacidad corregida según NOM-001-SEDE-2012.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                <div><label class="field-label">Fcc (Factor carga continua)</label><input type="number" id="cdt-fcc-input" value="1.25" min="0" max="2" step="0.01" placeholder="Default 1.25" onchange="App.calculate()"></div>
+                                <div><label class="field-label">Temp. Ambiente (°C)</label><input type="number" id="cdt-temp-input" value="31" min="0" max="100" step="1" placeholder="Default 31°C" onchange="App.calculate()"></div>
+                                <div><label class="field-label">N° Conductores</label><input type="number" id="cdt-conductores-input" value="3" min="1" max="50" step="1" placeholder="Default 3" onchange="App.calculate()"></div>
+                                <div><label class="field-label">F_agrupamiento</label><input type="number" id="cdt-agrupamiento-input" value="" min="0" max="1" step="0.05" placeholder="Auto o manual" onchange="App.calculate()"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Motores (aporte en falla) — Sección 4 -->
+                <section class="card" id="section-motores">
+                    <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('motores-content',this)">
+                        <div class="card-title mb-0"><i class="fas fa-cogs"></i> Aporte de Motores en Falla <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional</span></div>
+                        <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="motores-content" class="collapsible-content">
+                        <div class="mt-4" id="motores-container">
+                            <p class="text-xs text-[--text-muted] mb-3">Agregue grupos de motores que aportan corriente de falla. Vacio = sin aporte.</p>
+                            <div id="motores-lista"></div>
+                            <button class="btn-sm mt-2" onclick="UIMotores.agregar()"><i class="fas fa-plus text-[0.6rem] mr-1"></i> Agregar grupo de motores</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Capacitores — Sección 8 -->
+                <section class="card" id="section-capacitores">
+                    <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('capacitores-content',this)">
+                        <div class="card-title mb-0"><i class="fas fa-bolt"></i> Banco de Capacitores <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional</span></div>
+                        <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="capacitores-content" class="collapsible-content">
+                        <div class="mt-4">
+                            <p class="text-xs text-[--text-muted] mb-3">Banco de capacitores en paralelo que descarga durante la falla.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div><label class="field-label">Potencia reactiva (kVAr)</label><input type="number" id="input-cap-kvar" value="" min="0" step="1" placeholder="0 = sin banco" oninput="App.clearResults()"></div>
+                                <div><label class="field-label">Tension del banco (V)</label><input type="number" id="input-cap-tension" value="" min="0" step="1" placeholder="Tension nominal" oninput="App.clearResults()"></div>
+                                <div><label class="field-label">Distancia al punto (m)</label><input type="number" id="input-cap-distancia" value="" min="0" step="1" placeholder="0 = en el punto" oninput="App.clearResults()"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Contexto de Carga (Cuadros) -->
+                <section class="card" id="section-load-context">
+                    <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('load-context-content',this)">
+                        <div class="card-title mb-0"><i class="fas fa-balance-scale"></i> Contexto de Carga Real <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional - Desde Cuadros</span></div>
+                        <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="load-context-content" class="collapsible-content">
+                        <div class="mt-4">
+                            <p class="text-xs text-[--text-muted] mb-3">Ingrese datos de operación reales del sistema. Sin datos = condición ideal balanceada.</p>
+                            
+                            <div class="separator"></div>
+                            <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Corrientes de Fase (A)</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div><label class="field-label">Ia (A)</label><input type="number" id="ctx-ia" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label">Ib (A)</label><input type="number" id="ctx-ib" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label">Ic (A)</label><input type="number" id="ctx-ic" value="" min="0" step="1" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label">In (A)</label><input type="number" id="ctx-in" value="" min="0" step="1" placeholder="Neutro fundamental" oninput="App.clearResults()"></div>
+                            </div>
+
+                            <div class="separator"></div>
+                            <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Armónicos</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="field-label">In armónicos (A)</label><input type="number" id="ctx-in-harm" value="" min="0" step="1" placeholder="0 = sin armónicos" oninput="App.clearResults()"></div>
+                                <div><label class="field-label">THDi (0-1)</label><input type="number" id="ctx-thdi" value="" min="0" max="1" step="0.01" placeholder="Opcional" oninput="App.clearResults()"></div>
+                            </div>
+
+                            <div class="separator"></div>
+                            <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Configuración del Sistema</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div><label class="field-label">Desbalance (0-1)</label><input type="number" id="ctx-unbalance" value="" min="0" max="1" step="0.01" placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                <div><label class="field-label">Fcc (Factor de carga continua)</label><input type="number" id="ctx-fcc" value="" min="0" max="1" step="0.01" placeholder="Opcional" oninput="App.clearResults()"></div>
+                                <div class="flex items-end">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" id="ctx-single-phase" onchange="App.clearResults()">
+                                        <span class="text-xs text-[--text]">Tiene cargas monofásicas</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-3 bg-[--surface] rounded-lg border border-[--border]">
+                                <div id="load-context-status" class="flex items-center gap-2">
+                                    <span class="text-xs text-[--text-muted]">Sin contexto: modo ideal balanceado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Calcular -->
+                <div class="flex justify-center gap-3 pt-2 pb-4">
+                    <button class="btn-primary pulse-glow" onclick="App.calculate()">
+                        <i class="fas fa-calculator mr-2"></i> Calcular Cortocircuito
+                    </button>
+                    <button class="btn-secondary" onclick="App.autoCorregir()">
+                        <i class="fas fa-magic mr-2"></i> Auto-Corregir
+                    </button>
+                    <button class="btn-secondary" onclick="App.autoCorregirTotal()">
+                        <i class="fas fa-robot mr-2"></i> Auto-Corregir Total
+                    </button>
+                    <button class="btn-secondary" id="btn-autocorregir" onclick="App.toggleAutocorreccion()">
+                        <i class="fas fa-sync-alt mr-2"></i> Autocorregir: OFF
+                    </button>
+                    <button class="btn-secondary" onclick="App.autoCorregirInteligente()">
+                        <i class="fas fa-brain mr-2"></i> Auto-Corregir (Modo Ingeniero)
+                    </button>
+                    <button class="btn-secondary" onclick="TestEngine.run()">
+                        <i class="fas fa-flask mr-2"></i> Ejecutar Pruebas
+                    </button>
+                    <button class="btn-secondary" onclick="DebugVisualPro.toggleDebug(); if(DebugVisualPro.isDebugMode()) App.calculate(); else DebugVisualPro.ocultarDebug();">
+                        <i class="fas fa-bug mr-2"></i> Debug Pro
+                    </button>
+                    <button class="btn-secondary" onclick="App.exportarExcel()">
+                        <i class="fas fa-file-excel mr-2"></i> Exportar Excel
+                    </button>
+                </div>
+
+                <!-- Test Results -->
+                <div id="test-results" class="mt-4"></div>
+
+                <!-- TCC Chart -->
+                <div id="tcc-chart-section" class="mt-4 hidden">
+                    <div class="card">
+                        <div class="card-title mb-3"><i class="fas fa-chart-line mr-2"></i>Gráfica TCC (Time-Current Curve)</div>
+                        <canvas id="tccChart" width="600" height="400" class="w-full"></canvas>
+                        <div id="tcc-cruces" class="mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- TCC Digitalizer -->
+                <section class="card mt-4">
+                    <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('tcc-calibracion-content',this)">
+                        <div class="card-title mb-0"><i class="fas fa-crosshairs"></i> Digitalización de Curvas TCC</div>
+                        <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="tcc-calibracion-content" class="collapsible-content">
+                        <div id="tcc-calibracion-container" class="mt-4"></div>
+                    </div>
+                </section>
+
+                <!-- Metodología -->
+                <section class="card">
+                    <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('metodo-content',this)">
+                        <div class="card-title mb-0"><i class="fas fa-book"></i> Metodologia y Normatividad</div>
+                        <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="metodo-content" class="collapsible-content">
+                        <div class="mt-4 text-xs text-[--text-muted] leading-relaxed space-y-3">
+                            <p><strong class="text-[--text]">Metodo de impedancias</strong> — Se calcula la impedancia equivalente del sistema desde la fuente hasta cada punto de interes.</p>
+                            <div class="bg-[--surface] rounded-lg p-3 font-mono text-[0.7rem] space-y-1 text-[--cyan]">
+                                <p>Z_fuente = V / (sqrt(3) x Isc)  [trifasico]</p>
+                                <p>Z_trafo = (%Z/100) x V^2_sec / S_trafo</p>
+                                <p>Z_alim = sqrt(R^2 + X^2) x L / 1000</p>
+                                <p>Isc = V / (sqrt(3) x Z_total)</p>
+                                <p>I_pico = Isc x sqrt(2) x (1 + e^(-pi*R/X))</p>
+                            </div>
+                            <p><strong class="text-[--text]">Art. 110.9:</strong> "Los equipos de interrupcion deberan tener una capacidad interruptiva no menor a la corriente de cortocircuito disponible en sus terminales de linea."</p>
+                            <p><strong class="text-[--text]">Art. 110.10:</strong> "Se debera marcar en los equipos la capacidad de cortocircuito disponible en el punto de instalacion."</p>
+                            <p><strong class="text-[--text]">Art. 240.83:</strong> La capacidad interruptiva de interruptores termomagneticos debe ser igual o mayor a la corriente de cortocircuito disponible.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            </div>
+            </div>
+
+        <!-- Diagrama Unifilar (Separate print module) -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card">
+                <div class="card-title"><i class="fas fa-project-diagram"></i> Diagrama Unifilar</div>
+                <div id="diagram-container"><canvas id="diagram"></canvas></div>
+            </section>
+        </div>
+
+        <!-- Resultados Principales (Separate print module) -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="results-section">
+                        <div class="card-title"><i class="fas fa-table"></i> Resultados y Verificacion de Equipos</div>
+                        <div class="overflow-x-auto rounded-lg border border-[--border]">
+                            <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        success: '#22c55e',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        info: '#3b82f6',
+                        surface: '#1e293b',
+                        border: '#334155',
+                        background: '#0f172a',
+                        text: '#f1f5f9',
+                        muted: '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+                                <table class="results-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Punto / Equipo</th>
+                                            <th>Isc (kA)</th>
+                                            <th>Ipico (kA)</th>
+                                            <th>X/R</th>
+                                            <th>Cap. Equipo</th>
+                                            <th>Cap. Min</th>
+                                            <th>Verif.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="results-tbody"></tbody>
+                                </table>
+                            </div>
+                    </section>
+
+            <!-- Contexto de Carga -->
+            <div id="load-context-results" class="mt-4"></div>
+
+            <!-- Panel de Diagnóstico Global (Semáforo) -->
+            <section class="card hidden mt-4" id="diagnostico-section">
+                <div class="card-title"><i class="fas fa-traffic-light"></i> Diagnóstico Global</div>
+                <div id="diagnostico-panel"></div>
+            </section>
+
+            <!-- C.D.T. (Capacidad de Diseño Térmico) -->
+            <section class="card hidden" id="ampacidad-real-section">
+                <div class="card-title"><i class="fas fa-thermometer-half"></i> C.D.T. (Capacidad de Diseño Térmico)</div>
+                <div id="ampacidad-real-content"></div>
+            </section>
+        </div>
+
+        <!-- Caida de Tensión -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="caida-section">
+                <div class="card-title"><i class="fas fa-arrow-down"></i> Caida de Tension por Alimentador</div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Alim.</th>
+                                <th>I carga (A)</th>
+                                <th>FP</th>
+                                <th>Caida (V)</th>
+                                <th>Caida (%)</th>
+                                <th>Limite</th>
+                            </tr>
+                        </thead>
+                        <tbody id="caida-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Falla Mínima -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="falla-min-section">
+                <div class="card-title"><i class="fas fa-low-vision"></i> Falla Minima (Sensibilidad)</div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Punto</th>
+                                <th>Isc max (kA)</th>
+                                <th>Isc min (kA)</th>
+                                <th>I disparo (A)</th>
+                                <th>Sensib.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="falla-min-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Falla Fase-Tierra -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="fase-tierra-section">
+                <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Falla Fase-Tierra (Secuencia Cero)</div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Punto</th>
+                                <th>I 3F (kA)</th>
+                                <th>I F-T (kA)</th>
+                                <th>Ratio %</th>
+                                <th>Z0 (mOhm)</th>
+                                <th>Z1 (mOhm)</th>
+                                <th>I disparo (A)</th>
+                                <th>Sensibilidad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fase-tierra-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Coordonograma -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="coordonograma-section">
+                <div class="card-title"><i class="fas fa-chart-line"></i> Coordinacion de Protecciones</div>
+                <div id="coordonograma-container" class="bg-[--surface] rounded-lg border border-[--border] overflow-hidden">
+                    <canvas id="coordonograma"></canvas>
+                </div>
+                <p class="text-[0.65rem] text-[--text-muted] mt-2">Curvas tiempo-corriente de los equipos seleccionados. Eje vertical: tiempo (s), eje horizontal: corriente (A). Escala logaritmica.</p>
+            </section>
+        </div>
+
+        <!-- Diagnóstico -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="recomendaciones-section">
+                <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Diagnostico y Recomendaciones</div>
+                <div id="recomendaciones-content" class="text-sm text-[--text-muted] space-y-2"></div>
+            </section>
+        </div>
+
+        <!-- Impedancias -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="impedancias-section">
+                <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('impedancias-content',this)">
+                    <div class="card-title mb-0"><i class="fas fa-microscope"></i> Detalle de Impedancias</div>
+                    <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="impedancias-content" class="collapsible-content">
+                    <div class="overflow-x-auto mt-4 rounded-lg border border-[--border]">
+                        <table class="results-table">
+                            <thead><tr><th>Punto</th><th>R (mOhm)</th><th>X (mOhm)</th><th>Z (mOhm)</th><th>V fase (V)</th></tr></thead>
+                            <tbody id="impedancias-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="border-t border-[--border] mt-12 py-6 no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-[--text-muted]">
+            <p>Herramienta orientativa para ingenieria electrica. Verifique con un profesional certificado.</p>
+            <p class="mt-1">NOM-001-SEDE-2012 — Instalaciones Electricas (Utilizacion). DOF 28/11/2012.</p>
+        </div>
+    </footer>
+
+    <!-- ========== SCRIPTS: Orden estricto de dependencias ========== -->
+    <!-- Datos -->
+    <script src="js/datos/constantes.js?v=26"></script>
+    <script src="js/datos/conductores.js"></script>
+    <script src="js/datos/equipos.js"></script>
+    <script src="js/datos/ampacidad.js?v=2"></script>
+    <script src="js/datos/curvas_equipo.js?v=2"></script>
+    <!-- Calculo -->
+    <script src="js/calculo/secuencia.js?v=3"></script>
+    <script src="js/calculo/fault_analysis.js"></script>
+    <script src="js/calculo/impedancias.js"></script>
+    <script src="js/calculo/agrupamiento_nom.js"></script>
+    <script src="js/calculo/ampacidad_real.js?v=1"></script>
+    <script src="js/calculo/validador_sistema.js?v=1"></script>
+    <script src="js/calculo/motor_falla_tierra.js?v=1"></script>
+    <script src="js/calculo/motor_validacion_inteligente.js"></script>
+    <script src="js/calculo/motor_autocorreccion.js"></script>
+    <script src="js/calculo/motor_consistencia.js"></script>
+    <script src="js/calculo/motor_diagnostico.js"></script>
+    <script src="js/calculo/motor_protecciones.js"></script>
+    <script src="js/calculo/debug_visual_pro.js"></script>
+    <script src="js/calculo/tcc_chart_real.js"></script>
+    <script src="js/calculo/excel_export_pro.js"></script>
+    <script src="js/calculo/motor_autocorreccion_total.js?v=1"></script>
+    <script src="js/calculo/semaforo.js"></script>
+    <script src="js/calculo/motor_inteligente_ccc.js"></script>
+    <script src="js/calculo/motor_diseno_automatico.js?v=4"></script>
+    <script src="js/datos/catalogo_equipos_real.js"></script>
+    <script src="js/calculo/motor_coordinacion_real.js"></script>
+    <script src="js/calculo/test_coordinacion_real.js"></script>
+    <script src="js/calculo/solver_electrico.js"></script>
+    <script src="js/calculo/tcc_digitalizer.js"></script>
+    <script src="js/calculo/motor.js?v=40"></script>
+    <script src="js/app.js?v=35"></script>
+    <!-- Utilidades -->
+    <script src="js/units.js"></script>
+    <script src="js/profile.js"></script>
+    <!-- UI -->
+    <script src="js/ui/toast.js?v=2"></script>
+    <script src="js/ui/configuracion.js"></script>
+    <script src="js/ui/alimentadores.js?v=15"></script>
+    <script src="js/ui/equipos.js?v=16"></script>
+    <script src="js/ui/diagrama.js?v=3"></script>
+    <script src="js/ui/exportar.js?v=16"></script>
+    <script src="js/ui/resultados.js?v=22"></script>
+    <script src="js/ui/proyectos.js?v=15"></script>
+    <script src="js/ui/coordonograma.js?v=6"></script>
+    <script src="js/ui/tcc_viewer.js?v=2"></script>
+    <script src="js/ui/tcc_viewer_interactivo.js"></script>
+    <script src="js/ui/simulacion_fallas.js?v=3"></script>
+    <script src="js/ui/reporte_pdf.js?v=15"></script>
+    <script src="js/ui/reporte_visual.js"></script>
+    <script src="js/ui/motores_ui.js?v=5"></script>
+    <script src="js/ui/tcc_calibracion_ui.js"></script>
+    <!-- API Client -->
+    <script src="js/api.js"></script>
+    <!-- App (siempre ultimo) -->
+    <script src="js/app.js"></script>
+    <!-- Verificación de módulos -->
+    <script>
+        window.addEventListener('load', function() {
+            var modulosRequeridos = [
+                'CONSTANTES', 'CONDUCTORES', 'EQUIPOS', 'AMPACIDAD', 'CURVAS_EQUIPO',
+                'Secuencia', 'FaultAnalysis', 'Impedancias', 'Motor', 'CaidaTension',
+                'CalculoCapacitores', 'CalculoMotores', 'NOMValidacion', 'OptimizadorConductores', 'TCCCoordinacion', 'Curvas',
+                'Units', 'Profile',
+                'UIToast', 'UIConfiguracion', 'UIAlimentadores', 'UIEquipos', 'UIDiagrama', 'UIResultados', 'UIProyectos', 'UICoordonograma', 'UIReportePDF', 'UIExportar', 'UIMotores',
+                'App'
+            ];
+            var modulosOpcionales = [
+                'ValidadorSistema',
+                'MotorValidacionInteligente',
+                'MotorAutocorreccionTotal',
+                'DebugVisualPro',
+                'TCCChartReal',
+                'ExcelExportPro'
+            ];
+            var errores = [];
+            modulosRequeridos.forEach(function(mod) {
+                if (typeof window[mod] === 'undefined') {
+                    errores.push(mod);
+                }
+            });
+            if (errores.length > 0) {
+                console.error('Módulos no cargados:', errores);
+                alert('Error: No se cargaron los módulos: ' + errores.join(', '));
+            }
+            var opcionalesFaltantes = [];
+            modulosOpcionales.forEach(function(mod) {
+                if (typeof window[mod] === 'undefined') {
+                    opcionalesFaltantes.push(mod);
+                }
+            });
+            if (opcionalesFaltantes.length > 0) {
+                console.warn('Módulos opcionales no cargados:', opcionalesFaltantes);
+            }
+        });
+    </script>
+    <script src="js/testEngine.js?v=1"></script>
+</body>
+</html>
