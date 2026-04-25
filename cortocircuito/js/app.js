@@ -126,6 +126,9 @@ var App = (function() {
 
         if (faltantesCalculo.length > 0) {
             console.error('Módulos de cálculo faltantes:', faltantesCalculo);
+            faltantesCalculo.forEach(function(dep) {
+                console.error('  -', dep, 'typeof:', typeof window[dep]);
+            });
             return false;
         }
 
