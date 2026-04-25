@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Cortocircuito — NOM-001-SEDE-2012</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['DM Sans','sans-serif'], mono: ['JetBrains Mono','monospace'] } } }
+        }
+    </script>
+    <style>
+        :root {
+            --bg:#0a0c12;--surface:#11141c;--card:#161a26;--card-hover:#1c2030;
+            --border:#232840;--border-light:#2e3450;--text:#e2e5ed;--text-muted:#6c7293;
+            --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.12);--amber-glow:rgba(245,158,11,0.25);
+            --cyan:#22d3ee;--cyan-dim:rgba(34,211,238,0.10);
+            --green:#34d399;--red:#f87171;--yellow:#facc15;--orange:#fb923c;
+        }
+        *{box-sizing:border-box}
+        body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;margin:0;min-height:100vh}
+        body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;z-index:0}
+        main,header,footer{position:relative;z-index:1}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .3s}
+        .card:hover{border-color:var(--border-light)}
+        .card-title{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+        .card-title i{font-size:.75rem}
+        label.field-label{display:block;font-size:.7rem;font-weight:500;color:var(--text-muted);margin-bottom:3px}
+        input,select{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:.8rem;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
+        input:focus,select:focus{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-dim)}
+        select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7293' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:28px}
+        .btn-primary{background:linear-gradient(135deg,#d97706,#f59e0b);color:#0a0c12;font-weight:700;font-size:.95rem;padding:12px 32px;border:none;border-radius:10px;cursor:pointer;transition:transform .15s,box-shadow .3s;font-family:'DM Sans',sans-serif}
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 24px var(--amber-glow)}
+        .btn-primary:active{transform:translateY(0)}
+        .btn-sm{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);font-size:.75rem;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+        .btn-sm:hover{border-color:var(--amber);color:var(--amber)}
+        .btn-sm.danger:hover{border-color:var(--red);color:var(--red)}
+        .voltage-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .2s}
+        .voltage-btn:hover,.voltage-btn.active{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+        .mode-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);font-size:.8rem;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;flex:1;text-align:center}
+        .mode-btn.active{border-color:var(--amber);color:var(--amber);background:var(--amber-dim);font-weight:600}
+        .feeder-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;animation:slideIn .25s ease-out}
+        .feeder-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(245,158,11,.04);border-bottom:1px solid var(--border)}
+        .feeder-header-tag{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:600;color:var(--amber);background:var(--amber-dim);padding:2px 8px;border-radius:4px}
+        .feeder-body{padding:14px}
+        .feeder-grid{display:grid;grid-template-columns:1fr 1fr 1fr 80px 50px;gap:8px;margin-bottom:12px}
+        .equip-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+        @media(max-width:768px){.feeder-grid{grid-template-columns:1fr 1fr;gap:6px}.equip-grid{grid-template-columns:1fr 1fr;gap:6px}}
+        .equip-divider{height:1px;background:var(--border);margin:0 0 12px 0;position:relative}
+        .equip-divider-label{position:absolute;top:-8px;left:12px;background:var(--surface);padding:0 6px;font-size:.65rem;color:var(--cyan);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+        @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeIn .4s ease-out}
+        .results-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.8rem}
+        .results-table thead th{background:var(--surface);color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;font-size:.62rem;padding:10px 5px;text-align:center;border-bottom:1px solid var(--border);position:sticky;top:0}
+        .results-table thead th:first-child{border-radius:8px 0 0 0;text-align:left}
+        .results-table thead th:last-child{border-radius:0 8px 0 0}
+        .results-table tbody td{padding:9px 5px;text-align:center;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.76rem;vertical-align:middle}
+        .results-table tbody td:first-child{text-align:left;font-family:'DM Sans',sans-serif;font-weight:500}
+        .results-table tbody tr:last-child td{border-bottom:none}
+        .results-table tbody tr:hover{background:rgba(245,158,11,.04)}
+        .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:20px;font-size:.62rem;font-weight:600;white-space:nowrap}
+        .badge-ok{background:rgba(52,211,153,.12);color:var(--green)}
+        .badge-warn{background:rgba(250,204,21,.12);color:var(--yellow)}
+        .badge-danger{background:rgba(248,113,113,.12);color:var(--red)}
+        .badge-none{background:rgba(108,114,147,.12);color:var(--text-muted)}
+        .toast{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:.85rem;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:toastIn .3s ease-out;min-width:280px}
+        .toast-error{border-left:3px solid var(--red)}.toast-success{border-left:3px solid var(--green)}.toast-info{border-left:3px solid var(--cyan)}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+        .separator{height:1px;background:var(--border);margin:16px 0}
+        #diagram-container{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+        #diagram{display:block;width:100%}
+        .collapsible-content{max-height:0;overflow:hidden;transition:max-height .3s ease-out}
+        .collapsible-content.open{max-height:3000px}
+        ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+        .pulse-glow{animation:pulseGlow 2s ease-in-out infinite}
+        @keyframes pulseGlow{0%,100%{box-shadow:0 0 8px var(--amber-dim)}50%{box-shadow:0 0 20px var(--amber-glow)}}
+        @media print{body{background:#fff;color:#111}body::before{display:none}.no-print{display:none!important}.card{background:#fff;border:1px solid #ddd;break-inside:avoid}.results-table thead th{background:#f3f4f6;color:#374151}.results-table tbody td{color:#111;border-bottom-color:#ddd}.badge-ok{background:#d1fae5;color:#065f46}.badge-warn{background:#fef3c7;color:#92400e}.badge-danger{background:#fee2e2;color:#991b1b}.badge-none{background:#e5e7eb;color:#6b7280}#diagram-container{border:1px solid #ccc}}
+    </style>
+</head>
+<body>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+<header class="border-b border-[--border] bg-[--surface]/80 backdrop-blur-sm sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-[--amber-dim] flex items-center justify-center border border-[--amber]/20">
+                <i class="fas fa-bolt text-[--amber]"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight">Calculadora de Cortocircuito</h1>
+                <p class="text-[0.65rem] text-[--text-muted] tracking-wide">NOM-001-SEDE-2012 &middot; Arts. 110.9, 110.10, 240.83</p>
+            </div>
+        </div>
+        <button onclick="printResults()" class="btn-sm flex items-center gap-1 no-print" title="Imprimir">
+            <i class="fas fa-print text-[0.65rem]"></i> <span class="hidden sm:inline">Imprimir</span>
+        </button>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <div class="lg:col-span-7 space-y-4 no-print">
+
+            <section class="card">
+                <div class="card-title"><i class="fas fa-sliders-h"></i> Configuracion del Sistema</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="field-label">Modo de calculo</label>
+                        <div class="flex gap-2">
+                            <button class="mode-btn active" id="btn-conocido" onclick="setMode('conocido')">Isc conocido</button>
+                            <button class="mode-btn" id="btn-completo" onclick="setMode('completo')">Calculo completo</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">Tipo de sistema</label>
+                        <div class="flex gap-2">
+                            <button class="mode-btn active" id="btn-3f" onclick="setTipo('3f')">Trifasico</button>
+                            <button class="mode-btn" id="btn-1f" onclick="setTipo('1f')">Monofasico</button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="field-label">Tension del sistema (V)</label>
+                    <div class="flex gap-2 mb-2 flex-wrap">
+                        <button class="voltage-btn active" onclick="setVoltage(480,this)">480</button>
+                        <button class="voltage-btn" onclick="setVoltage(440,this)">440</button>
+                        <button class="voltage-btn" onclick="setVoltage(220,this)">220</button>
+                        <button class="voltage-btn" onclick="setVoltage(208,this)">208</button>
+                        <button class="voltage-btn" onclick="setVoltage(127,this)">127</button>
+                    </div>
+                    <input type="number" id="input-tension" value="480" min="1" step="1" oninput="clearResults()">
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-title"><i class="fas fa-plug"></i> Datos de Fuente</div>
+                <div id="modo-conocido">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="field-label">Isc disponible en el punto (kA)</label>
+                            <input type="number" id="input-isc-conocido" value="10" min="0.01" step="0.01" oninput="clearResults()">
+                        </div>
+                        <div class="flex items-end">
+                            <p class="text-xs text-[--text-muted] leading-relaxed">Corriente de cortocircuito simetrica proporcionada por CFE o medida en el punto de conexion.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="modo-completo" class="hidden">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                        <div><label class="field-label">Isc fuente (kA)</label><input type="number" id="input-isc-fuente" value="25" min="0.01" step="0.01" oninput="clearResults()"></div>
+                        <div><label class="field-label">o MVA de cortocircuito</label><input type="number" id="input-mva-fuente" value="" min="0.01" step="0.01" placeholder="Opcional" oninput="clearResults()"></div>
+                        <div><label class="field-label">X/R de la fuente</label><input type="number" id="input-xr-fuente" value="15" min="0.5" step="0.5" oninput="clearResults()"></div>
+                    </div>
+                    <div class="separator"></div>
+                    <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Transformador</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div><label class="field-label">Capacidad (kVA)</label><input type="number" id="input-trafo-kva" value="500" min="1" step="1" oninput="clearResults()"></div>
+                        <div><label class="field-label">% Impedancia</label><input type="number" id="input-trafo-z" value="5.75" min="0.1" step="0.01" max="15" oninput="clearResults()"></div>
+                        <div><label class="field-label">V primario (V)</label><input type="number" id="input-trafo-vp" value="13200" min="1" step="1" oninput="clearResults()"></div>
+                        <div><label class="field-label">V secundario (V)</label><input type="number" id="input-trafo-vs" value="480" min="1" step="1" oninput="clearResults()"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-title"><i class="fas fa-shield-alt"></i> Equipo en Punto de Conexion (P0)</div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="field-label">Tipo de equipo</label>
+                        <select id="equip-p0-tipo" onchange="onEquipTipoChange('p0')">
+                            <option value="">Sin equipo</option>
+                            <option value="icb">Interruptor en caja moldeada (ICB/MCCB)</option>
+                            <option value="acb">Interruptor en aire (ACB)</option>
+                            <option value="mcb">Interruptor termomagnetico (MCB)</option>
+                            <option value="fusible">Fusible</option>
+                            <option value="contactor">Contactor</option>
+                            <option value="tablero">Tablero de distribucion</option>
+                            <option value="cuchilla">Cuchilla seccionadora</option>
+                            <option value="otro">Otro (manual)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="field-label">Modelo / referencia</label>
+                        <select id="equip-p0-modelo" onchange="onEquipModeloChange('p0')">
+                            <option value="">-- Seleccionar tipo --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="field-label">Capacidad interruptiva (kA)</label>
+                        <input type="number" id="equip-p0-cap" value="" min="0" step="0.1" placeholder="kA" oninput="clearResults()">
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-title flex justify-between">
+                    <span class="flex items-center gap-2"><i class="fas fa-route"></i> Alimentadores y Equipos</span>
+                    <button class="btn-sm" onclick="addFeeder()"><i class="fas fa-plus text-[0.6rem]"></i> Agregar</button>
+                </div>
+                <div id="feeders-container"></div>
+                <p class="text-xs text-[--text-muted] mt-2">
+                    <i class="fas fa-info-circle text-[--cyan]"></i>
+                    Cada tramo incluye el conductor y el equipo en el punto destino. Seleccione un modelo para llenar automaticamente la capacidad interruptiva.
+                </p>
+            </section>
+
+            <div class="flex justify-center pt-2 pb-4">
+                <button class="btn-primary pulse-glow" onclick="calculate()">
+                    <i class="fas fa-calculator mr-2"></i> Calcular Cortocircuito
+                </button>
+            </div>
+
+            <section class="card">
+                <button class="w-full text-left flex items-center justify-between" onclick="toggleCollapse('metodo-content',this)">
+                    <div class="card-title mb-0"><i class="fas fa-book"></i> Metodologia y Normatividad</div>
+                    <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="metodo-content" class="collapsible-content">
+                    <div class="mt-4 text-xs text-[--text-muted] leading-relaxed space-y-3">
+                        <p><strong class="text-[--text]">Metodo de impedancias</strong> — Se calcula la impedancia equivalente del sistema desde la fuente hasta cada punto de interes.</p>
+                        <div class="bg-[--surface] rounded-lg p-3 font-mono text-[0.7rem] space-y-1 text-[--cyan]">
+                            <p>Z_fuente = V / (sqrt(3) x Isc)  [trifasico]</p>
+                            <p>Z_trafo = (%Z/100) x V^2_sec / S_trafo</p>
+                            <p>Z_alim = sqrt(R^2 + X^2) x L / 1000</p>
+                            <p>Isc = V / (sqrt(3) x Z_total)</p>
+                            <p>I_pico = Isc x sqrt(2) x (1 + e^(-pi*R/X))</p>
+                        </div>
+                        <p><strong class="text-[--text]">Art. 110.9:</strong> "Los equipos de interrupcion deberan tener una capacidad interruptiva no menor a la corriente de cortocircuito disponible en sus terminales de linea."</p>
+                        <p><strong class="text-[--text]">Art. 110.10:</strong> "Se debera marcar en los equipos la capacidad de cortocircuito disponible en el punto de instalacion."</p>
+                        <p><strong class="text-[--text]">Art. 240.83:</strong> La capacidad interruptiva de interruptores termomagneticos debe ser igual o mayor a la corriente de cortocircuito disponible.</p>
+                        <p><strong class="text-[--text]">Equipos listados:</strong> Las capacidades corresponden a valores nominales de fabricantes comunes en Mexico. Siempre verifique con la placa de datos del equipo.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="lg:col-span-5 space-y-4">
+            <section class="card">
+                <div class="card-title"><i class="fas fa-project-diagram"></i> Diagrama Unifilar</div>
+                <div id="diagram-container"><canvas id="diagram"></canvas></div>
+            </section>
+
+            <section class="card hidden" id="results-section">
+                <div class="card-title"><i class="fas fa-table"></i> Resultados y Verificacion de Equipos</div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Punto / Equipo</th>
+                                <th>Isc (kA)</th>
+                                <th>Ipico (kA)</th>
+                                <th>X/R</th>
+                                <th>Cap. Equipo</th>
+                                <th>Cap. Min</th>
+                                <th>Verif.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card hidden" id="recomendaciones-section">
+                <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Diagnostico y Recomendaciones</div>
+                <div id="recomendaciones-content" class="text-sm text-[--text-muted] space-y-2"></div>
+            </section>
+
+            <section class="card hidden" id="impedancias-section">
+                <button class="w-full text-left flex items-center justify-between" onclick="toggleCollapse('impedancias-content',this)">
+                    <div class="card-title mb-0"><i class="fas fa-microscope"></i> Detalle de Impedancias</div>
+                    <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="impedancias-content" class="collapsible-content">
+                    <div class="overflow-x-auto mt-4 rounded-lg border border-[--border]">
+                        <table class="results-table">
+                            <thead><tr><th>Punto</th><th>R (mOhm)</th><th>X (mOhm)</th><th>Z (mOhm)</th><th>V fase (V)</th></tr></thead>
+                            <tbody id="impedancias-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<footer class="border-t border-[--border] mt-12 py-6 no-print">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-[--text-muted]">
+        <p>Herramienta orientativa para ingenieria electrica. Verifique con un profesional certificado y las placas de datos de los equipos.</p>
+        <p class="mt-1">NOM-001-SEDE-2012 — Instalaciones Electricas (Utilizacion). DOF 28/11/2012.</p>
+    </div>
+</footer>
+
+<script>
+/* ================================================================
+   BASE DE DATOS DE CONDUCTORES — R y X en Ohm/km, 75C, 60Hz
+   ================================================================ */
+const CONDUCTORES = {
+    cobre: {
+        acero: {
+            '14':{R:8.28,X:.187},'12':{R:5.21,X:.176},'10':{R:3.28,X:.164},
+            '8':{R:2.06,X:.154},'6':{R:1.30,X:.143},'4':{R:.815,X:.134},
+            '2':{R:.513,X:.125},'1':{R:.407,X:.120},'1/0':{R:.323,X:.116},
+            '2/0':{R:.256,X:.113},'3/0':{R:.203,X:.110},'4/0':{R:.161,X:.107},
+            '250':{R:.138,X:.105},'300':{R:.115,X:.103},'350':{R:.099,X:.101},
+            '400':{R:.087,X:.100},'500':{R:.069,X:.098},'600':{R:.058,X:.096},
+            '750':{R:.046,X:.094},'1000':{R:.035,X:.092}
+        },
+        pvc: {
+            '14':{R:8.28,X:.159},'12':{R:5.21,X:.148},'10':{R:3.28,X:.137},
+            '8':{R:2.06,X:.127},'6':{R:1.30,X:.117},'4':{R:.815,X:.109},
+            '2':{R:.513,X:.102},'1':{R:.407,X:.097},'1/0':{R:.323,X:.094},
+            '2/0':{R:.256,X:.091},'3/0':{R:.203,X:.088},'4/0':{R:.161,X:.086},
+            '250':{R:.138,X:.084},'300':{R:.115,X:.082},'350':{R:.099,X:.081},
+            '400':{R:.087,X:.080},'500':{R:.069,X:.078},'600':{R:.058,X:.077},
+            '750':{R:.046,X:.075},'1000':{R:.035,X:.073}
+        }
+    },
+    aluminio: { acero: {}, pvc: {} }
+};
+const FA = 1.64;
+for (const t of ['acero','pvc'])
+    for (const c in CONDUCTORES.cobre[t]) {
+        const d = CONDUCTORES.cobre[t][c];
+        CONDUCTORES.aluminio[t][c] = { R: +(d.R * FA).toFixed(4), X: d.X };
+    }
+
+/* ================================================================
+   BASE DE DATOS DE EQUIPOS DE PROTECCION
+   Capacidad interruptiva simetrica en kA
+   ================================================================ */
+const EQUIPOS = {
+    icb: {
+        nombre: 'Interruptor en caja moldeada (ICB/MCCB)',
+        modelos: [
+            {nombre:'ICB 100A — 10kA @240V',cap:10},{nombre:'ICB 100A — 18kA @240V',cap:18},
+            {nombre:'ICB 150A — 25kA @240V',cap:25},{nombre:'ICB 250A — 25kA @240V',cap:25},
+            {nombre:'ICB 250A — 35kA @240V',cap:35},{nombre:'ICB 250A — 42kA @240V',cap:42},
+            {nombre:'ICB 400A — 35kA @240V',cap:35},{nombre:'ICB 400A — 50kA @240V',cap:50},
+            {nombre:'ICB 600A — 42kA @240V',cap:42},{nombre:'ICB 600A — 65kA @240V',cap:65},
+            {nombre:'ICB 800A — 65kA @240V',cap:65},{nombre:'ICB 800A — 85kA @240V',cap:85},
+            {nombre:'ICB 1000A — 65kA @480V',cap:65},{nombre:'ICB 1000A — 85kA @480V',cap:85},
+            {nombre:'ICB 1200A — 85kA @480V',cap:85},{nombre:'ICB 1600A — 100kA @480V',cap:100},
+            {nombre:'ICB 2000A — 100kA @480V',cap:100},{nombre:'ICB 2500A — 100kA @480V',cap:100},
+            {nombre:'ICB 3200A — 150kA @480V',cap:150}
+        ]
+    },
+    acb: {
+        nombre: 'Interruptor en aire (ACB)',
+        modelos: [
+            {nombre:'ACB 2000A — 50kA @480V',cap:50},{nombre:'ACB 2000A — 65kA @480V',cap:65},
+            {nombre:'ACB 2500A — 65kA @480V',cap:65},{nombre:'ACB 3200A — 85kA @480V',cap:85},
+            {nombre:'ACB 4000A — 85kA @480V',cap:85},{nombre:'ACB 4000A — 100kA @480V',cap:100},
+            {nombre:'ACB 5000A — 100kA @480V',cap:100},{nombre:'ACB 6300A — 150kA @480V',cap:150}
+        ]
+    },
+    mcb: {
+        nombre: 'Interruptor termomagnetico (MCB)',
+        modelos: [
+            {nombre:'MCB 1P 15A — 5kA @127V',cap:5},{nombre:'MCB 1P 20A — 5kA @127V',cap:5},
+            {nombre:'MCB 1P 30A — 10kA @127V',cap:10},{nombre:'MCB 2P 20A — 5kA @240V',cap:5},
+            {nombre:'MCB 2P 30A — 10kA @240V',cap:10},{nombre:'MCB 2P 50A — 10kA @240V',cap:10},
+            {nombre:'MCB 2P 60A — 10kA @240V',cap:10},{nombre:'MCB 3P 20A — 10kA @440V',cap:10},
+            {nombre:'MCB 3P 30A — 10kA @440V',cap:10},{nombre:'MCB 3P 50A — 18kA @440V',cap:18},
+            {nombre:'MCB 3P 60A — 18kA @440V',cap:18},{nombre:'MCB 3P 100A — 18kA @440V',cap:18}
+        ]
+    },
+    fusible: {
+        nombre: 'Fusible',
+        modelos: [
+            {nombre:'Fusible clase CC 30A — 200kA',cap:200},{nombre:'Fusible clase J 200A — 200kA',cap:200},
+            {nombre:'Fusible clase J 400A — 200kA',cap:200},{nombre:'Fusible clase J 600A — 200kA',cap:200},
+            {nombre:'Fusible clase T 100A — 200kA',cap:200},{nombre:'Fusible clase T 200A — 200kA',cap:200},
+            {nombre:'Fusible clase T 400A — 200kA',cap:200},{nombre:'Fusible clase L 800A — 200kA',cap:200},
+            {nombre:'Fusible clase L 1200A — 200kA',cap:200},{nombre:'Fusible clase L 1600A — 200kA',cap:200},
+            {nombre:'Fusible clase L 2000A — 200kA',cap:200},{nombre:'Fusible gG 30A — 100kA',cap:100},
+            {nombre:'Fusible gG 60A — 100kA',cap:100},{nombre:'Fusible gG 100A — 80kA',cap:80},
+            {nombre:'Fusible gG 200A — 80kA',cap:80},{nombre:'Fusible gG 400A — 50kA',cap:50}
+        ]
+    },
+    contactor: {
+        nombre: 'Contactor',
+        modelos: [
+            {nombre:'Contactor 9A — 5kA',cap:5},{nombre:'Contactor 12A — 5kA',cap:5},
+            {nombre:'Contactor 18A — 6kA',cap:6},{nombre:'Contactor 25A — 6kA',cap:6},
+            {nombre:'Contactor 32A — 10kA',cap:10},{nombre:'Contactor 40A — 10kA',cap:10},
+            {nombre:'Contactor 65A — 10kA',cap:10},{nombre:'Contactor 95A — 18kA',cap:18},
+            {nombre:'Contactor 115A — 18kA',cap:18},{nombre:'Contactor 150A — 25kA',cap:25},
+            {nombre:'Contactor 185A — 25kA',cap:25},{nombre:'Contactor 265A — 25kA',cap:25},
+            {nombre:'Contactor 300A — 36kA',cap:36},{nombre:'Contactor 400A — 50kA',cap:50}
+        ]
+    },
+    tablero: {
+        nombre: 'Tablero de distribucion',
+        modelos: [
+            {nombre:'Tablero 100A — 10kA',cap:10},{nombre:'Tablero 100A — 18kA',cap:18},
+            {nombre:'Tablero 100A — 22kA',cap:22},{nombre:'Tablero 225A — 25kA',cap:25},
+            {nombre:'Tablero 225A — 42kA',cap:42},{nombre:'Tablero 400A — 42kA',cap:42},
+            {nombre:'Tablero 400A — 65kA',cap:65},{nombre:'Tablero 600A — 65kA',cap:65},
+            {nombre:'Tablero 600A — 85kA',cap:85},{nombre:'Tablero 800A — 85kA',cap:85},
+            {nombre:'Tablero 800A — 100kA',cap:100},{nombre:'Tablero 1200A — 100kA',cap:100},
+            {nombre:'Tablero 1600A — 100kA',cap:100},{nombre:'Tablero 2000A — 150kA',cap:150},
+            {nombre:'Tablero 2500A — 150kA',cap:150},{nombre:'Tablero 3000A — 200kA',cap:200}
+        ]
+    },
+    cuchilla: {
+        nombre: 'Cuchilla seccionadora',
+        modelos: [
+            {nombre:'Cuchilla 200A — 10kA',cap:10},{nombre:'Cuchilla 400A — 14kA',cap:14},
+            {nombre:'Cuchilla 600A — 18kA',cap:18},{nombre:'Cuchilla 800A — 25kA',cap:25},
+            {nombre:'Cuchilla 1200A — 25kA',cap:25},{nombre:'Cuchilla 1600A — 35kA',cap:35},
+            {nombre:'Cuchilla 2000A — 42kA',cap:42},{nombre:'Cuchilla 3000A — 65kA',cap:65}
+        ]
+    },
+    otro: {
+        nombre: 'Otro (capacidad manual)',
+        modelos: [{nombre:'Ingresar manualmente',cap:0}]
+    }
+};
+
+const CALIBRES = ['14','12','10','8','6','4','2','1','1/0','2/0','3/0','4/0','250','300','350','400','500','600','750','1000'];
+const CAPACIDADES_KA = [5,10,14,18,22,25,30,35,42,50,65,85,100,125,150,200];
+
+/* ================================================================
+   ESTADO
+   ================================================================ */
+let modo = 'conocido', tipoSistema = '3f', resultados = null;
+let feeders = [
+    { calibre:'4/0', material:'cobre', canalizacion:'acero', longitud:30, paralelo:1,
+      equipTipo:'', equipModelo:'', equipCap:'' }
+];
+
+/* ================================================================
+   INTERFAZ GENERAL
+   ================================================================ */
+function setMode(m) {
+    modo = m;
+    document.getElementById('btn-conocido').classList.toggle('active', m==='conocido');
+    document.getElementById('btn-completo').classList.toggle('active', m==='completo');
+    document.getElementById('modo-conocido').classList.toggle('hidden', m!=='conocido');
+    document.getElementById('modo-completo').classList.toggle('hidden', m!=='completo');
+    clearResults();
+}
+function setTipo(t) {
+    tipoSistema = t;
+    document.getElementById('btn-3f').classList.toggle('active', t==='3f');
+    document.getElementById('btn-1f').classList.toggle('active', t==='1f');
+    clearResults();
+}
+function setVoltage(v, btn) {
+    document.getElementById('input-tension').value = v;
+    document.querySelectorAll('.voltage-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    clearResults();
+}
+function toggleCollapse(id, btn) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+    const ic = btn.querySelector('.fa-chevron-down');
+    if (ic) ic.style.transform = el.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+/* ================================================================
+   EQUIPOS — Cascada tipo -> modelo -> capacidad
+   ================================================================ */
+function onEquipTipoChange(prefix) {
+    const tipo = document.getElementById('equip-' + prefix + '-tipo').value;
+    const mSel = document.getElementById('equip-' + prefix + '-modelo');
+    const cInp = document.getElementById('equip-' + prefix + '-cap');
+    mSel.innerHTML = '<option value="">-- Seleccionar --</option>';
+    cInp.value = '';
+    if (tipo && EQUIPOS[tipo]) {
+        EQUIPOS[tipo].modelos.forEach(function(m, i) {
+            const o = document.createElement('option');
+            o.value = i; o.textContent = m.nombre;
+            mSel.appendChild(o);
+        });
+    }
+    clearResults();
+}
+
+function onEquipModeloChange(prefix) {
+    const tipo = document.getElementById('equip-' + prefix + '-tipo').value;
+    const mIdx = document.getElementById('equip-' + prefix + '-modelo').value;
+    const cInp = document.getElementById('equip-' + prefix + '-cap');
+    if (tipo && mIdx !== '' && EQUIPOS[tipo]) {
+        const m = EQUIPOS[tipo].modelos[parseInt(mIdx)];
+        cInp.value = m.cap > 0 ? m.cap : '';
+        if (tipo === 'otro') cInp.focus();
+    }
+    clearResults();
+}
+
+function getEquip(prefix) {
+    const tipo = document.getElementById('equip-' + prefix + '-tipo')?.value || '';
+    const mIdx = document.getElementById('equip-' + prefix + '-modelo')?.value || '';
+    const cap = parseFloat(document.getElementById('equip-' + prefix + '-cap')?.value) || 0;
+    let nombre = '';
+    if (tipo && EQUIPOS[tipo]) {
+        if (mIdx !== '' && EQUIPOS[tipo].modelos[parseInt(mIdx)])
+            nombre = EQUIPOS[tipo].modelos[parseInt(mIdx)].nombre;
+        else
+            nombre = EQUIPOS[tipo].nombre;
+    }
+    return { tipo: tipo, nombre: nombre, cap: cap };
+}
+
+/* ================================================================
+   ALIMENTADORES
+   ================================================================ */
+function renderFeeders() {
+    const container = document.getElementById('feeders-container');
+    container.innerHTML = '';
+    feeders.forEach(function(f, i) {
+        const block = document.createElement('div');
+        block.className = 'feeder-block';
+
+        // Construir opciones de modelos si hay tipo seleccionado
+        let modeloOpts = '<option value="">-- Seleccionar tipo --</option>';
+        if (f.equipTipo && EQUIPOS[f.equipTipo]) {
+            EQUIPOS[f.equipTipo].modelos.forEach(function(m, mi) {
+                modeloOpts += '<option value="' + mi + '"' + (f.equipModelo == mi ? ' selected' : '') + '>' + m.nombre + '</option>';
+            });
+        }
+
+        // Construir opciones de tipo
+        let tipoOpts = '<option value="">Sin equipo</option>';
+        Object.keys(EQUIPOS).forEach(function(k) {
+            tipoOpts += '<option value="' + k + '"' + (f.equipTipo === k ? ' selected' : '') + '>' + EQUIPOS[k].nombre + '</option>';
+        });
+
+        block.innerHTML =
+            '<div class="feeder-header">' +
+                '<div class="flex items-center gap-2">' +
+                    '<span class="feeder-header-tag">Alim. ' + (i+1) + '</span>' +
+                    '<span class="text-[0.65rem] text-[--text-muted]">\u2192 P' + (i+1) + '</span>' +
+                '</div>' +
+                '<button class="btn-sm danger" onclick="removeFeeder(' + i + ')" title="Eliminar"' +
+                    (feeders.length <= 1 ? ' disabled style="opacity:.3;pointer-events:none"' : '') + '>' +
+                    '<i class="fas fa-times text-[0.6rem]"></i>' +
+                '</button>' +
+            '</div>' +
+            '<div class="feeder-body">' +
+                '<div class="feeder-grid">' +
+                    '<div><label class="field-label">Calibre</label>' +
+                        '<select onchange="updateFeeder(' + i + ',\'calibre\',this.value);clearResults()">' +
+                            CALIBRES.map(function(c){ return '<option value="'+c+'"'+(c===f.calibre?' selected':'')+'>'+c+'</option>'; }).join('') +
+                        '</select></div>' +
+                    '<div><label class="field-label">Material</label>' +
+                        '<select onchange="updateFeeder(' + i + ',\'material\',this.value);clearResults()">' +
+                            '<option value="cobre"' + (f.material==='cobre'?' selected':'') + '>Cobre</option>' +
+                            '<option value="aluminio"' + (f.material==='aluminio'?' selected':'') + '>Aluminio</option>' +
+                        '</select></div>' +
+                    '<div><label class="field-label">Canalizacion</label>' +
+                        '<select onchange="updateFeeder(' + i + ',\'canalizacion\',this.value);clearResults()">' +
+                            '<option value="acero"' + (f.canalizacion==='acero'?' selected':'') + '>Acero (mag)</option>' +
+                            '<option value="pvc"' + (f.canalizacion==='pvc'?' selected':'') + '>PVC (no mag)</option>' +
+                        '</select></div>' +
+                    '<div><label class="field-label">Long. (m)</label>' +
+                        '<input type="number" value="' + f.longitud + '" min="0.1" step="0.1"' +
+                            ' onchange="updateFeeder(' + i + ',\'longitud\',parseFloat(this.value))"' +
+                            ' oninput="clearResults()"></div>' +
+                    '<div><label class="field-label">Paral.</label>' +
+                        '<input type="number" value="' + f.paralelo + '" min="1" max="8" step="1"' +
+                            ' onchange="updateFeeder(' + i + ',\'paralelo\',parseInt(this.value))"' +
+                            ' oninput="clearResults()"></div>' +
+                '</div>' +
+                '<div class="equip-divider"><span class="equip-divider-label"><i class="fas fa-shield-alt mr-1"></i> Equipo en P' + (i+1) + '</span></div>' +
+                '<div class="equip-grid">' +
+                    '<div><label class="field-label">Tipo de equipo</label>' +
+                        '<select id="equip-f' + i + '-tipo" onchange="onEquipTipoChange(\'f' + i + '\')">' + tipoOpts + '</select></div>' +
+                    '<div><label class="field-label">Modelo / referencia</label>' +
+                        '<select id="equip-f' + i + '-modelo" onchange="onEquipModeloChange(\'f' + i + '\')">' + modeloOpts + '</select></div>' +
+                    '<div><label class="field-label">Cap. interruptiva (kA)</label>' +
+                        '<input type="number" id="equip-f' + i + '-cap" value="' + f.equipCap + '" min="0" step="0.1" placeholder="kA" oninput="clearResults()"></div>' +
+                '</div>' +
+            '</div>';
+        container.appendChild(block);
+    });
+}
+
+function addFeeder() {
+    if (feeders.length >= 8) { showToast('Maximo 8 tramos de alimentador', 'error'); return; }
+    feeders.push({ calibre:'4/0', material:'cobre', canalizacion:'acero', longitud:20, paralelo:1, equipTipo:'', equipModelo:'', equipCap:'' });
+    renderFeeders();
+    clearResults();
+}
+function removeFeeder(i) {
+    if (feeders.length <= 1) return;
+    feeders.splice(i, 1);
+    renderFeeders();
+    clearResults();
+}
+function updateFeeder(i, field, value) { feeders[i][field] = value; }
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+function showToast(msg, type) {
+    type = type || 'info';
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast toast-' + type;
+    const icons = {error:'fa-times-circle',success:'fa-check-circle',info:'fa-info-circle'};
+    const cols = {error:'var(--red)',success:'var(--green)',info:'var(--cyan)'};
+    t.innerHTML = '<i class="fas ' + icons[type] + '" style="color:' + cols[type] + '"></i><span>' + msg + '</span>';
+    c.appendChild(t);
+    setTimeout(function(){ t.style.animation='toastOut .3s ease-in forwards'; setTimeout(function(){ t.remove(); },300); },3500);
+}
+
+/* ================================================================
+   MOTOR DE CALCULO
+   ================================================================ */
+function calcZ(R, X) { return Math.sqrt(R * R + X * X); }
+
+function calculate() {
+    const tension = parseFloat(document.getElementById('input-tension').value);
+    if (!tension || tension <= 0) { showToast('Ingrese una tension valida', 'error'); return; }
+
+    let R_source = 0, X_source = 0, hasTransformer = false;
+
+    if (modo === 'conocido') {
+        const iscConocido = parseFloat(document.getElementById('input-isc-conocido').value);
+        if (!iscConocido || iscConocido <= 0) { showToast('Ingrese un valor valido de Isc', 'error'); return; }
+        const factor = tipoSistema === '3f' ? Math.sqrt(3) : 2;
+        const Z_src = tension / (factor * iscConocido * 1000);
+        R_source = Z_src / Math.sqrt(1 + 225); // X/R = 15
+        X_source = R_source * 15;
+    } else {
+        const mvaStr = document.getElementById('input-mva-fuente').value;
+        let iscFuente;
+        if (mvaStr && parseFloat(mvaStr) > 0) {
+            const factor = tipoSistema === '3f' ? Math.sqrt(3) : 2;
+            iscFuente = (parseFloat(mvaStr) * 1000) / (factor * tension);
+        } else {
+            iscFuente = parseFloat(document.getElementById('input-isc-fuente').value);
+        }
+        if (!iscFuente || iscFuente <= 0) { showToast('Ingrese Isc o MVA de la fuente', 'error'); return; }
+        const xrFuente = parseFloat(document.getElementById('input-xr-fuente').value) || 15;
+        const factor = tipoSistema === '3f' ? Math.sqrt(3) : 2;
+        const Z_src = tension / (factor * iscFuente * 1000);
+        R_source = Z_src / Math.sqrt(1 + xrFuente * xrFuente);
+        X_source = R_source * xrFuente;
+
+        const trafoKva = parseFloat(document.getElementById('input-trafo-kva').value);
+        const trafoZ = parseFloat(document.getElementById('input-trafo-z').value);
+        const trafoVs = parseFloat(document.getElementById('input-trafo-vs').value);
+        if (!trafoKva || !trafoZ || !trafoVs || trafoKva <= 0 || trafoZ <= 0 || trafoVs <= 0) {
+            showToast('Complete los datos del transformador', 'error'); return;
+        }
+        const Z_trafo = (trafoZ / 100) * (trafoVs * trafoVs) / (trafoKva * 1000);
+        const xrTrafo = trafoKva <= 500 ? 5 : trafoKva <= 1500 ? 7 : 10;
+        R_source += Z_trafo / Math.sqrt(1 + xrTrafo * xrTrafo);
+        X_source += (Z_trafo / Math.sqrt(1 + xrTrafo * xrTrafo)) * xrTrafo;
+        hasTransformer = true;
+        document.getElementById('input-tension').value = trafoVs;
+    }
+
+    for (let i = 0; i < feeders.length; i++) {
+        const f = feeders[i];
+        if (!CONDUCTORES[f.material] || !CONDUCTORES[f.material][f.canalizacion] || !CONDUCTORES[f.material][f.canalizacion][f.calibre]) {
+            showToast('Alim. ' + (i+1) + ': calibre no valido', 'error'); return;
+        }
+        if (!f.longitud || f.longitud <= 0) { showToast('Alim. ' + (i+1) + ': longitud invalida', 'error'); return; }
+    }
+
+    const V = parseFloat(document.getElementById('input-tension').value);
+    const factor = tipoSistema === '3f' ? Math.sqrt(3) : 2;
+    const puntos = [];
+    let R_acc = R_source, X_acc = X_source;
+
+    // P0
+    let Z_acc = calcZ(R_acc, X_acc);
+    let isc = V / (factor * Z_acc);
+    let xr = X_acc > 1e-6 ? X_acc / R_acc : 999;
+    let ipeak = isc * Math.SQRT2 * (1 + Math.exp(-Math.PI / Math.min(xr, 500)));
+    puntos.push({
+        nombre: hasTransformer ? 'Sec. Transformador' : 'Punto de conexion',
+        R: R_acc, X: X_acc, Z: Z_acc,
+        isc: isc * 1000, ipeak: ipeak * 1000, xr: xr,
+        equip: getEquip('p0')
+    });
+
+    for (let i = 0; i < feeders.length; i++) {
+        const f = feeders[i];
+        const d = CONDUCTORES[f.material][f.canalizacion][f.calibre];
+        const n = Math.max(1, f.paralelo || 1);
+        const L = Math.max(0, f.longitud || 0);
+        R_acc += (d.R * L / 1000) / n;
+        X_acc += (d.X * L / 1000) / n;
+        Z_acc = calcZ(R_acc, X_acc);
+        isc = V / (factor * Z_acc);
+        xr = X_acc > 1e-6 ? X_acc / R_acc : 999;
+        ipeak = isc * Math.SQRT2 * (1 + Math.exp(-Math.PI / Math.min(xr, 500)));
+        puntos.push({
+            nombre: 'Tras alim. ' + (i + 1),
+            R: R_acc, X: X_acc, Z: Z_acc,
+            isc: isc * 1000, ipeak: ipeak * 1000, xr: xr,
+            equip: getEquip('f' + i)
+        });
+    }
+
+    resultados = puntos;
+    showResults();
+    drawDiagram();
+    showToast('Calculo completado correctamente', 'success');
+}
+
+/* ================================================================
+   RESULTADOS
+   ================================================================ */
+function getCapacidadMinima(isc) {
+    for (let i = 0; i < CAPACIDADES_KA.length; i++) if (CAPACIDADES_KA[i] >= isc) return CAPACIDADES_KA[i];
+    return 200;
+}
+
+function getVerificacion(isc, capEquipo) {
+    if (!capEquipo || capEquipo <= 0) return { cls:'badge-none', icon:'fa-minus-circle', text:'Sin equipo' };
+    if (capEquipo >= isc) {
+        const pct = (isc / capEquipo * 100).toFixed(0);
+        if (pct <= 90) return { cls:'badge-ok', icon:'fa-check', text:'Cumple (' + pct + '%)' };
+        return { cls:'badge-warn', icon:'fa-exclamation', text:'Margen bajo (' + pct + '%)' };
+    }
+    const deficit = ((isc - capEquipo) / isc * 100).toFixed(0);
+    return { cls:'badge-danger', icon:'fa-times-circle', text:'NO CUMPLE (-' + deficit + '%)' };
+}
+
+function getColorForCurrent(isc) {
+    if (isc < 10) return 'var(--green)';
+    if (isc < 25) return 'var(--yellow)';
+    if (isc < 50) return 'var(--amber)';
+    if (isc < 85) return 'var(--orange)';
+    return 'var(--red)';
+}
+
+function showResults() {
+    if (!resultados) return;
+    const section = document.getElementById('results-section');
+    const tbody = document.getElementById('results-tbody');
+    section.classList.remove('hidden');
+    section.classList.add('fade-in');
+    tbody.innerHTML = '';
+
+    resultados.forEach(function(p, i) {
+        const capMin = getCapacidadMinima(p.isc);
+        const verif = getVerificacion(p.isc, p.equip.cap);
+        const hasEquip = p.equip.tipo && p.equip.cap > 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td><span class="text-[--amber] font-mono text-xs">P' + i + '</span>' +
+                '<span class="block text-[0.6rem] text-[--text-muted] max-w-[180px] truncate" title="' + (p.equip.nombre || p.nombre) + '">' + (p.equip.nombre || p.nombre) + '</span></td>' +
+            '<td class="font-semibold" style="color:' + getColorForCurrent(p.isc) + '">' + p.isc.toFixed(2) + '</td>' +
+            '<td>' + p.ipeak.toFixed(2) + '</td>' +
+            '<td>' + (p.xr > 100 ? '>100' : p.xr.toFixed(1)) + '</td>' +
+            '<td class="' + (hasEquip ? (verif.cls === 'badge-danger' ? 'text-[--red]' : 'text-[--text]') : 'text-[--text-muted]') + ' font-semibold">' +
+                (hasEquip ? p.equip.cap.toFixed(1) : '\u2014') + '</td>' +
+            '<td class="text-[--cyan]">' + capMin + '</td>' +
+            '<td><span class="badge ' + verif.cls + '"><i class="fas ' + verif.icon + '" style="font-size:0.5rem"></i> ' + verif.text + '</span></td>';
+        tbody.appendChild(tr);
+    });
+
+    // Impedancias
+    const impSection = document.getElementById('impedancias-section');
+    const impTbody = document.getElementById('impedancias-tbody');
+    impSection.classList.remove('hidden');
+    impSection.classList.add('fade-in');
+    impTbody.innerHTML = '';
+    const V = parseFloat(document.getElementById('input-tension').value);
+    const Vfase = tipoSistema === '3f' ? V / Math.sqrt(3) : V;
+    resultados.forEach(function(p, i) {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td><span class="text-[--amber] font-mono text-xs">P' + i + '</span></td>' +
+            '<td>' + (p.R * 1000).toFixed(3) + '</td>' +
+            '<td>' + (p.X * 1000).toFixed(3) + '</td>' +
+            '<td class="font-semibold text-[--cyan]">' + (p.Z * 1000).toFixed(3) + '</td>' +
+            '<td>' + Vfase.toFixed(1) + '</td>';
+        impTbody.appendChild(tr);
+    });
+
+    showRecomendaciones();
+}
+
+function showRecomendaciones() {
+    const section = document.getElementById('recomendaciones-section');
+    const content = document.getElementById('recomendaciones-content');
+    section.classList.remove('hidden');
+    section.classList.add('fade-in');
+    const recs = [];
+    const iscMax = Math.max.apply(null, resultados.map(function(r){ return r.isc; }));
+    const iscMin = Math.min.apply(null, resultados.map(function(r){ return r.isc; }));
+    const ipeakMax = Math.max.apply(null, resultados.map(function(r){ return r.ipeak; }));
+
+    recs.push('<p><i class="fas fa-bolt text-[--amber] mr-1"></i> Isc maximo: <strong class="text-[--text]">' + iscMax.toFixed(2) + ' kA</strong> (P0). Isc minimo: <strong class="text-[--text]">' + iscMin.toFixed(2) + ' kA</strong> (P' + (resultados.length - 1) + ').</p>');
+    recs.push('<p><i class="fas fa-wave-square text-[--yellow] mr-1"></i> Corriente pico asimetrica maxima: <strong class="text-[--text]">' + ipeakMax.toFixed(2) + ' kA</strong>.</p>');
+
+    const noCumplen = resultados.filter(function(p){ return p.equip.cap > 0 && p.equip.cap < p.isc; });
+    const margenBajo = resultados.filter(function(p){ return p.equip.cap > 0 && p.equip.cap >= p.isc && (p.isc / p.equip.cap) > 0.9; });
+    const sinEquipo = resultados.filter(function(p){ return !p.equip.tipo || p.equip.cap <= 0; });
+
+    if (noCumplen.length > 0) {
+        recs.push('<p class="text-[--red]"><i class="fas fa-exclamation-triangle mr-1"></i> <strong>ALERTA \u2014 ' + noCumplen.length + ' equipo(s) NO CUMPLEN:</strong></p>');
+        noCumplen.forEach(function(p) {
+            const idx = resultados.indexOf(p);
+            recs.push('<p class="ml-5 text-[--red] text-xs">P' + idx + ' (' + p.equip.nombre + '): Cap. ' + p.equip.cap + ' kA &lt; Isc ' + p.isc.toFixed(2) + ' kA \u2014 <strong>Requiere reemplazo inmediato</strong> (Art. 110.9).</p>');
+        });
+    }
+    if (margenBajo.length > 0) {
+        recs.push('<p class="text-[--yellow]"><i class="fas fa-exclamation mr-1"></i> <strong>PRECAUCION \u2014 ' + margenBajo.length + ' equipo(s) con margen bajo (&gt;90%):</strong></p>');
+        margenBajo.forEach(function(p) {
+            const idx = resultados.indexOf(p);
+            recs.push('<p class="ml-5 text-[--yellow] text-xs">P' + idx + ' (' + p.equip.nombre + '): ' + (p.isc / p.equip.cap * 100).toFixed(0) + '% de utilizacion. Considere actualizar.</p>');
+        });
+    }
+    if (sinEquipo.length > 0) {
+        recs.push('<p class="text-[--text-muted]"><i class="fas fa-info-circle mr-1"></i> ' + sinEquipo.length + ' punto(s) sin equipo asignado. Cap. minima recomendada: ' + getCapacidadMinima(iscMax) + ' kA (P0).</p>');
+    }
+    if (noCumplen.length === 0 && margenBajo.length === 0 && resultados.some(function(p){ return p.equip.cap > 0; })) {
+        recs.push('<p class="text-[--green]"><i class="fas fa-check-circle mr-1"></i> Todos los equipos asignados <strong>cumplen</strong> con la capacidad interruptiva requerida segun NOM-001-SEDE-2012.</p>');
+    }
+    const reduccion = ((iscMax - iscMin) / iscMax * 100);
+    if (reduccion > 30) {
+        recs.push('<p class="text-[--cyan]"><i class="fas fa-arrow-down mr-1"></i> La impedancia de los alimentadores reduce el cortocircuito en ' + reduccion.toFixed(0) + '%, permitiendo equipos con menor capacidad aguas abajo.</p>');
+    }
+    recs.push('<p class="text-xs border-t border-[--border] pt-2 mt-2"><i class="fas fa-gavel text-[--text-muted] mr-1"></i> <strong>Art. 110.9:</strong> Capacidad interruptiva no menor a la corriente de cortocircuito disponible. <strong>Art. 110.10:</strong> Marcar el equipo con la capacidad de cortocircuito disponible.</p>');
+    content.innerHTML = recs.join('');
+}
+
+function clearResults() {
+    resultados = null;
+    document.getElementById('results-section').classList.add('hidden');
+    document.getElementById('recomendaciones-section').classList.add('hidden');
+    document.getElementById('impedancias-section').classList.add('hidden');
+    drawDiagram();
+}
+
+/* ================================================================
+   DIAGRAMA UNIFILAR (Canvas)
+   ================================================================ */
+function drawDiagram() {
+    const canvas = document.getElementById('diagram');
+    const ctx = canvas.getContext('2d');
+    const container = canvas.parentElement;
+    const dpr = window.devicePixelRatio || 1;
+    const hasTransformer = modo === 'completo';
+    const numPuntos = resultados ? resultados.length : Math.max(1, feeders.length + 1);
+    const width = container.clientWidth;
+    const spacing = 95;
+    const headerH = 28;
+    const height = headerH + 50 + numPuntos * spacing + 30;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.scale(dpr, dpr);
+
+    ctx.fillStyle = '#0e1018';
+    ctx.fillRect(0, 0, width, height);
+    ctx.strokeStyle = 'rgba(255,255,255,0.018)';
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x < width; x += 20) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
+    for (let y = 0; y < height; y += 20) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
+
+    const cx = width * 0.32;
+    let y = headerH + 25;
+
+    // Fuente
+    var bw = 48, bh = 26;
+    ctx.fillStyle = '#1a1e2a'; ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(cx - bw/2, y - bh/2, bw, bh, 4); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (var si = -14; si <= 14; si++) { var px = cx + si, py = y + Math.sin(si * 0.35) * 4.5; si === -14 ? ctx.moveTo(px, py) : ctx.lineTo(px, py); }
+    ctx.stroke();
+    ctx.font = '600 8px "DM Sans"'; ctx.fillStyle = '#f59e0b'; ctx.textAlign = 'center';
+    ctx.fillText('FUENTE', cx, y + bh/2 + 11);
+    y += 35;
+
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(cx, y + 15); ctx.stroke();
+    y += 15;
+
+    if (hasTransformer) {
+        var r = 11;
+        ctx.strokeStyle = '#6c7293'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(cx - 5, y + 15, r, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx + 5, y + 15, r, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, y + 15 - r - 6); ctx.lineTo(cx, y + 15 - r); ctx.stroke();
+        ctx.font = '500 7px "DM Sans"'; ctx.fillStyle = '#6c7293'; ctx.textAlign = 'center';
+        ctx.fillText('TRAFO', cx, y + 15 + r + 11);
+        if (modo === 'completo') {
+            var kva = document.getElementById('input-trafo-kva').value;
+            var zt = document.getElementById('input-trafo-z').value;
+            ctx.font = '400 7px "JetBrains Mono"'; ctx.fillStyle = '#4a5070';
+            ctx.fillText(kva + 'kVA ' + zt + '%Z', cx, y + 15 + r + 20);
+        }
+        y += 50;
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(cx, y + 15); ctx.stroke();
+        y += 15;
+    }
+
+    var tension = parseFloat(document.getElementById('input-tension').value) || 480;
+
+    for (var i = 0; i < numPuntos; i++) {
+        // Barra
+        var barW = Math.min(width * 0.38, 160);
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(cx - barW/2, y); ctx.lineTo(cx + barW/2, y); ctx.stroke();
+        ctx.lineCap = 'butt';
+
+        var punto = resultados ? resultados[i] : null;
+        var hasEquip = punto && punto.equip.tipo && punto.equip.cap > 0;
+
+        // Simbolo de equipo
+        if (hasEquip) {
+            var et = punto.equip.tipo;
+            var ss = 8;
+            ctx.save();
+            if (et === 'icb' || et === 'mcb' || et === 'acb') {
+                ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 1.2;
+                ctx.strokeRect(cx - ss, y - ss - 14, ss * 2, ss * 2);
+                ctx.beginPath(); ctx.moveTo(cx - ss, y - ss - 14); ctx.lineTo(cx + ss, y + ss - 14); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx + ss, y - ss - 14); ctx.lineTo(cx - ss, y + ss - 14); ctx.stroke();
+            } else if (et === 'fusible') {
+                ctx.strokeStyle = '#facc15'; ctx.lineWidth = 1.2;
+                ctx.strokeRect(cx - ss - 2, y - ss/2 - 14, ss * 2 + 4, ss);
+                ctx.beginPath(); ctx.moveTo(cx - 3, y - ss/2 - 14); ctx.lineTo(cx + 3, y + ss/2 - 14); ctx.stroke();
+            } else if (et === 'contactor') {
+                ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.arc(cx, y - 14, ss, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx - ss, y - ss - 14); ctx.lineTo(cx + ss, y + ss - 14); ctx.stroke();
+            } else if (et === 'tablero') {
+                ctx.strokeStyle = '#34d399'; ctx.lineWidth = 1.2;
+                ctx.strokeRect(cx - ss, y - ss/2 - 14, ss * 2, ss);
+                ctx.strokeRect(cx - ss + 2, y - ss/2 - 12, ss * 2 - 4, ss - 4);
+            } else if (et === 'cuchilla') {
+                ctx.strokeStyle = '#6c7293'; ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.moveTo(cx, y - ss - 14); ctx.lineTo(cx - ss, y + ss/2 - 14); ctx.lineTo(cx + ss, y + ss/2 - 14); ctx.closePath(); ctx.stroke();
+            } else {
+                ctx.strokeStyle = '#4a5070'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(cx, y - 14, 4, 0, Math.PI * 2); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        // Datos del punto
+        if (punto) {
+            var color = getColorForCurrent(punto.isc);
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(cx, y, 4, 0, Math.PI * 2); ctx.fill();
+
+            var dataX = cx + 55;
+            var maxW = width - dataX - 12;
+
+            if (maxW > 140) {
+                ctx.font = '600 12px "JetBrains Mono"';
+                ctx.fillStyle = color; ctx.textAlign = 'left';
+                ctx.fillText(punto.isc.toFixed(2) + ' kA', dataX, y + 1);
+
+                ctx.font = '400 9px "JetBrains Mono"';
+                ctx.fillStyle = '#6c7293';
+                ctx.fillText('Ip=' + punto.ipeak.toFixed(1) + 'kA  ' + (punto.xr > 100 ? 'X/R>100' : 'X/R=' + punto.xr.toFixed(1)), dataX, y + 14);
+
+                if (hasEquip) {
+                    var verif = getVerificacion(punto.isc, punto.equip.cap);
+                    ctx.font = '500 9px "JetBrains Mono"';
+                    ctx.fillStyle = verif.cls === 'badge-danger' ? '#f87171' : verif.cls === 'badge-warn' ? '#facc15' : '#34d399';
+                    ctx.fillText(punto.equip.cap + 'kA \u2014 ' + verif.text, dataX, y + 27);
+                } else {
+                    ctx.font = '400 9px "JetBrains Mono"';
+                    ctx.fillStyle = '#4a5070';
+                    ctx.fillText('Cap min: ' + getCapacidadMinima(punto.isc) + ' kA', dataX, y + 27);
+                }
+            } else if (maxW > 80) {
+                ctx.font = '600 11px "JetBrains Mono"';
+                ctx.fillStyle = color; ctx.textAlign = 'left';
+                ctx.fillText(punto.isc.toFixed(1) + 'kA', dataX, y + 1);
+                if (hasEquip) {
+                    var verif2 = getVerificacion(punto.isc, punto.equip.cap);
+                    ctx.font = '400 9px "JetBrains Mono"';
+                    ctx.fillStyle = verif2.cls === 'badge-danger' ? '#f87171' : '#34d399';
+                    ctx.fillText(punto.equip.cap + 'kA', dataX, y + 13);
+                }
+            }
+
+            ctx.font = '600 11px "JetBrains Mono"';
+            ctx.fillStyle = 'rgba(245,158,11,0.8)'; ctx.textAlign = 'right';
+            ctx.fillText('P' + i, cx - 32, y + 4);
+            ctx.font = '400 8px "DM Sans"'; ctx.fillStyle = '#4a5070';
+            var shortName = (punto.equip.nombre ? punto.equip.nombre.split('\u2014')[0].trim().substring(0, 18) : punto.nombre.substring(0, 18));
+            ctx.fillText(shortName, cx - 32, y + 15);
+        } else {
+            ctx.fillStyle = '#4a5070';
+            ctx.beginPath(); ctx.arc(cx, y, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.font = '600 11px "JetBrains Mono"';
+            ctx.fillStyle = '#4a5070'; ctx.textAlign = 'right';
+            ctx.fillText('P' + i, cx - 32, y + 4);
+        }
+
+        y += 25;
+
+        // Linea al siguiente punto
+        if (i < numPuntos - 1) {
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#3a4060'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(cx, y + spacing - 50); ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (feeders[i]) {
+                var f = feeders[i];
+                var label = f.calibre + ' ' + (f.material === 'cobre' ? 'Cu' : 'Al') + ' \u00b7 ' + f.longitud + 'm';
+                var label2 = f.paralelo > 1 ? f.paralelo + ' en paralelo' : '';
+                ctx.font = '400 9px "DM Sans"';
+                ctx.fillStyle = '#6c7293'; ctx.textAlign = 'left';
+                ctx.fillText(label, cx + 10, y + (spacing - 50) / 2 - (label2 ? 4 : 0));
+                if (label2) { ctx.fillStyle = '#4a5070'; ctx.fillText(label2, cx + 10, y + (spacing - 50) / 2 + 10); }
+            }
+            y += spacing - 50;
+        }
+    }
+
+    ctx.font = '500 9px "JetBrains Mono"';
+    ctx.fillStyle = '#4a5070'; ctx.textAlign = 'right';
+    ctx.fillText(tension + 'V ' + (tipoSistema === '3f' ? '3\u03c6' : '1\u03c6'), width - 10, 16);
+}
+
+/* ================================================================
+   IMPRIMIR
+   ================================================================ */
+function printResults() {
+    if (!resultados) { showToast('Primero debe realizar un calculo', 'info'); return; }
+    window.print();
+}
+
+/* ================================================================
+   POLYFILL roundRect
+   ================================================================ */
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        if (typeof r === 'number') r = [r, r, r, r];
+        var tl = r[0], tr = r[1], br = r[2], bl = r[3];
+        this.moveTo(x + tl, y); this.lineTo(x + w - tr, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + tr);
+        this.lineTo(x + w, y + h - br);
+        this.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
+        this.lineTo(x + bl, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - bl);
+        this.lineTo(x, y + tl);
+        this.quadraticCurveTo(x, y, x + tl, y);
+        this.closePath();
+    };
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+    renderFeeders();
+    drawDiagram();
+    var rt;
+    window.addEventListener('resize', function() { clearTimeout(rt); rt = setTimeout(drawDiagram, 150); });
+});
+</script>
+</body>
+</html>
