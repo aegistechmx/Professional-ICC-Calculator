@@ -73,11 +73,11 @@ var TCCCalibracionUI = (function() {
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <div>
                                         <label class="text-xs">Punto 1 I (A):</label>
-                                        <input type="number" id="tcc-x1-i" class="w-full p-1 border rounded text-sm" placeholder="Ej: 1">
+                                        <input type="number" id="tcc-x1-i" name="tcc-x1-i" class="w-full p-1 border rounded text-sm" placeholder="Ej: 1">
                                     </div>
                                     <div>
                                         <label class="text-xs">Punto 2 I (A):</label>
-                                        <input type="number" id="tcc-x2-i" class="w-full p-1 border rounded text-sm" placeholder="Ej: 10000">
+                                        <input type="number" id="tcc-x2-i" name="tcc-x2-i" class="w-full p-1 border rounded text-sm" placeholder="Ej: 10000">
                                     </div>
                                 </div>
                             </div>
@@ -89,11 +89,11 @@ var TCCCalibracionUI = (function() {
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <div>
                                         <label class="text-xs">Punto 1 t (s):</label>
-                                        <input type="number" id="tcc-y1-t" class="w-full p-1 border rounded text-sm" placeholder="Ej: 10000">
+                                        <input type="number" id="tcc-y1-t" name="tcc-y1-t" class="w-full p-1 border rounded text-sm" placeholder="Ej: 10000">
                                     </div>
                                     <div>
                                         <label class="text-xs">Punto 2 t (s):</label>
-                                        <input type="number" id="tcc-y2-t" class="w-full p-1 border rounded text-sm" placeholder="Ej: 0.01">
+                                        <input type="number" id="tcc-y2-t" name="tcc-y2-t" class="w-full p-1 border rounded text-sm" placeholder="Ej: 0.01">
                                     </div>
                                 </div>
                             </div>
@@ -118,15 +118,15 @@ var TCCCalibracionUI = (function() {
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="text-xs">Marca:</label>
-                                    <input type="text" id="tcc-marca" class="w-full p-1 border rounded text-sm" placeholder="Ej: ABB">
+                                    <input type="text" id="tcc-marca" name="tcc-marca" class="w-full p-1 border rounded text-sm" placeholder="Ej: ABB">
                                 </div>
                                 <div>
                                     <label class="text-xs">Modelo:</label>
-                                    <input type="text" id="tcc-modelo" class="w-full p-1 border rounded text-sm" placeholder="Ej: Tmax T4">
+                                    <input type="text" id="tcc-modelo" name="tcc-modelo" class="w-full p-1 border rounded text-sm" placeholder="Ej: Tmax T4">
                                 </div>
                                 <div>
                                     <label class="text-xs">Frame (A):</label>
-                                    <input type="number" id="tcc-frame" class="w-full p-1 border rounded text-sm" placeholder="Ej: 250">
+                                    <input type="number" id="tcc-frame" name="tcc-frame" class="w-full p-1 border rounded text-sm" placeholder="Ej: 250">
                                 </div>
                             </div>
                         </div>
