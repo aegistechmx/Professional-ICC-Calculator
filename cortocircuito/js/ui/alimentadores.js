@@ -230,19 +230,19 @@ var UIAlimentadores = (function() {
             '<div class="grid grid-cols-4 gap-2 text-[0.7rem]">' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">Calibre</label>' +
-            '<select class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'calibre\', this.value)">' +
+            '<select id="feeder-' + nodo.id + '-calibre" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'calibre\', this.value)">' +
             calOpts +
             '</select>' +
             '</div>' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">Material</label>' +
-            '<select class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'material\', this.value)">' +
+            '<select id="feeder-' + nodo.id + '-material" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'material\', this.value)">' +
             materialOpts +
             '</select>' +
             '</div>' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">Canalización</label>' +
-            '<select class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'canalizacion\', this.value)">' +
+            '<select id="feeder-' + nodo.id + '-canalizacion" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'canalizacion\', this.value)">' +
             canalOpts +
             '</select>' +
             '</div>' +
@@ -266,7 +266,7 @@ var UIAlimentadores = (function() {
             '<div class="grid grid-cols-4 gap-2 text-[0.7rem] mt-2 pt-2 border-t border-[--border]">' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">Tipo Equipo</label>' +
-            '<select class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.onEquipTipoChange(\'' + nodo.id + '\', this.value)">' +
+            '<select id="feeder-' + nodo.id + '-equiptipo" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.onEquipTipoChange(\'' + nodo.id + '\', this.value)">' +
             '<option value="">Sin equipo</option>' +
             '<option value="int_principal"' + ((nodo.equip && nodo.equip.tipo === 'int_principal') ? ' selected' : '') + '>Int. Principal</option>' +
             '<option value="iline_400a"' + ((nodo.equip && nodo.equip.tipo === 'iline_400a') ? ' selected' : '') + '>I-Line 400A</option>' +

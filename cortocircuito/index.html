@@ -199,7 +199,7 @@
                 </button>
                 <label class="btn-sm cursor-pointer" title="Importar JSON">
                     <i class="fas fa-upload text-[0.65rem]"></i> <span class="hidden sm:inline">Importar</span>
-                    <input type="file" accept=".json" class="hidden" onchange="UIProyectos.importarJSON(event)">
+                    <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="UIProyectos.importarJSON(event)">
                 </label>
                 <button onclick="UIExportar.resumenEjecutivo()" class="btn-sm" title="Resumen Ejecutivo">
                     <i class="fas fa-file-alt text-[0.65rem]"></i>
