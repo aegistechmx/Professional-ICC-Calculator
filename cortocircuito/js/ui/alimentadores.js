@@ -220,7 +220,7 @@ var UIAlimentadores = (function() {
             '<div class="flex items-center gap-2">' +
             (tieneHijos ? '<button onclick="UIAlimentadores.toggleExpand(\'' + nodo.id + '\')" class="text-[--text-muted] hover:text-[--text] p-1"><i class="fas ' + expandIcon + ' text-[0.7rem]"></i></button>' : '<span class="w-6"></span>') +
             '<span class="font-semibold text-[--amber] text-sm">' + nodo.id + '</span>' +
-            '<input type="text" class="text-[0.7rem] text-[--text-muted] bg-transparent border-none p-0 w-32 focus:outline-none focus:text-[--text]" value="' + (nodo.nombre || nodo.id) + '" onchange="UIAlimentadores.actualizarNombre(\'' + nodo.id + '\', this.value)" placeholder="Nombre del tablero">' +
+            '<input type="text" id="feeder-' + nodo.id + '-nombre" class="text-[0.7rem] text-[--text-muted] bg-transparent border-none p-0 w-32 focus:outline-none focus:text-[--text]" value="' + (nodo.nombre || nodo.id) + '" onchange="UIAlimentadores.actualizarNombre(\'' + nodo.id + '\', this.value)" placeholder="Nombre del tablero">' +
             '</div>' +
             '<div class="flex gap-1">' +
             '<button onclick="UIAlimentadores.agregarHijo(\'' + nodo.id + '\')" class="px-2 py-1 text-[0.65rem] bg-[--cyan] text-black rounded hover:bg-[--cyan]/80 transition-colors" title="Agregar derivación">+ Rama</button>' +
@@ -248,19 +248,19 @@ var UIAlimentadores = (function() {
             '</div>' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">Longitud (m)</label>' +
-            '<input type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.longitud || 0) + '" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'longitud\', this.value)">' +
+            '<input type="number" id="feeder-' + nodo.id + '-longitud" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.longitud || 0) + '" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'longitud\', this.value)">' +
             '</div>' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">Paralelo</label>' +
-            '<input type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.paralelo || 1) + '" min="1" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'paralelo\', this.value)">' +
+            '<input type="number" id="feeder-' + nodo.id + '-paralelo" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.paralelo || 1) + '" min="1" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'paralelo\', this.value)">' +
             '</div>' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">I Carga (A)</label>' +
-            '<input type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.cargaA || 0) + '" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'cargaA\', this.value)">' +
+            '<input type="number" id="feeder-' + nodo.id + '-cargaa" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.cargaA || 0) + '" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'cargaA\', this.value)">' +
             '</div>' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">FP</label>' +
-            '<input type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.cargaFP || 0.9) + '" step="0.01" min="0" max="1" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'cargaFP\', this.value)">' +
+            '<input type="number" id="feeder-' + nodo.id + '-cargafp" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.cargaFP || 0.9) + '" step="0.01" min="0" max="1" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'cargaFP\', this.value)">' +
             '</div>' +
             '</div>' +
             '<div class="grid grid-cols-4 gap-2 text-[0.7rem] mt-2 pt-2 border-t border-[--border]">' +

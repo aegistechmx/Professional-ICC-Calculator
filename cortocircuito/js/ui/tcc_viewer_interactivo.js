@@ -357,7 +357,7 @@ var TCCViewerInteractivo = (function() {
             html += '<label class="text-sm font-medium">Pickup (A)</label>';
             html += '<span id="pickup-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + tcc.pickup.toFixed(0) + '</span>';
             html += '</div>';
-            html += '<input type="range" min="50" max="2000" step="10" value="' + tcc.pickup + '" ' +
+            html += '<input type="range" id="pickup-slider-' + index + '" min="50" max="2000" step="10" value="' + tcc.pickup + '" ' +
                    'class="w-full h-2 bg-[--bg] rounded-lg appearance-none cursor-pointer accent-[--cyan]" ' +
                    'oninput="TCCViewerInteractivo.updateParametro(' + index + ', \'pickup\', this.value); document.getElementById(\'pickup-val-' + index + '\').textContent = this.value">';
             html += '</div>';
@@ -368,7 +368,7 @@ var TCCViewerInteractivo = (function() {
             html += '<label class="text-sm font-medium">Long Delay (s)</label>';
             html += '<span id="longdelay-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + tcc.longDelay.toFixed(1) + '</span>';
             html += '</div>';
-            html += '<input type="range" min="0.5" max="10" step="0.1" value="' + tcc.longDelay + '" ' +
+            html += '<input type="range" id="longdelay-slider-' + index + '" min="0.5" max="10" step="0.1" value="' + tcc.longDelay + '" ' +
                    'class="w-full h-2 bg-[--bg] rounded-lg appearance-none cursor-pointer accent-[--cyan]" ' +
                    'oninput="TCCViewerInteractivo.updateParametro(' + index + ', \'longDelay\', this.value); document.getElementById(\'longdelay-val-' + index + '\').textContent = this.value">';
             html += '</div>';
@@ -379,7 +379,7 @@ var TCCViewerInteractivo = (function() {
             html += '<label class="text-sm font-medium">Short Delay (s)</label>';
             html += '<span id="shortdelay-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + tcc.shortDelay.toFixed(2) + '</span>';
             html += '</div>';
-            html += '<input type="range" min="0.01" max="1" step="0.01" value="' + tcc.shortDelay + '" ' +
+            html += '<input type="range" id="shortdelay-slider-' + index + '" min="0.01" max="1" step="0.01" value="' + tcc.shortDelay + '" ' +
                    'class="w-full h-2 bg-[--bg] rounded-lg appearance-none cursor-pointer accent-[--cyan]" ' +
                    'oninput="TCCViewerInteractivo.updateParametro(' + index + ', \'shortDelay\', this.value); document.getElementById(\'shortdelay-val-' + index + '\').textContent = this.value">';
             html += '</div>';
@@ -390,7 +390,7 @@ var TCCViewerInteractivo = (function() {
             html += '<label class="text-sm font-medium">Instantaneous (A)</label>';
             html += '<span id="inst-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + (tcc.instantaneous === 'OFF' ? 'OFF' : tcc.instantaneous.toFixed(0)) + '</span>';
             html += '</div>';
-            html += '<input type="range" min="100" max="10000" step="50" value="' + (tcc.instantaneous === 'OFF' ? 10000 : tcc.instantaneous) + '" ' +
+            html += '<input type="range" id="inst-slider-' + index + '" min="100" max="10000" step="50" value="' + (tcc.instantaneous === 'OFF' ? 10000 : tcc.instantaneous) + '" ' +
                    'class="w-full h-2 bg-[--bg] rounded-lg appearance-none cursor-pointer accent-[--cyan]" ' +
                    'oninput="TCCViewerInteractivo.updateParametro(' + index + ', \'instantaneous\', this.value); document.getElementById(\'inst-val-' + index + '\').textContent = this.value">';
             html += '</div>';
