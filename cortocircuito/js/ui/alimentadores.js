@@ -296,7 +296,7 @@ var UIAlimentadores = (function() {
             '</div>' +
             '<div>' +
             '<label class="block text-[--text-muted] mb-1">I Disparo (A)</label>' +
-            '<input type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + ((nodo.equip && nodo.equip.iDisparo) || 0) + '" step="1" min="0" onchange="UIAlimentadores.actualizarEquip(\'' + nodo.id + '\', \'iDisparo\', this.value)">' +
+            '<input id="equip-' + nodo.id + '-idisparo" type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + ((nodo.equip && nodo.equip.iDisparo) || 0) + '" step="1" min="0" onchange="UIAlimentadores.actualizarEquip(\'' + nodo.id + '\', \'iDisparo\', this.value)">' +
             '</div>' +
             '</div>' +
             generarSugerenciaCalibre(f, nodo.id, tempAmbiente) +

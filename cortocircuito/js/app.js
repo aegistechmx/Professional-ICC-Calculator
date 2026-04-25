@@ -261,7 +261,7 @@ var App = (function() {
                 idDiv.innerHTML =
                     '<div class="equip-divider"><span class="equip-divider-label"><i class="fas fa-bolt mr-1"></i> Disparo instantaneo</span></div>' +
                     '<div class="carga-grid">' +
-                        '<div><label class="field-label">I disparo (A)</label><input type="number" id="equip-p0-idisparo" value="" min="0" step="1" placeholder="0 = sin dato" oninput="App.clearResults()"></div>' +
+                        '<div><label class="field-label">I disparo (A)</label><input type="number" name="equip-p0-idisparo" value="" min="0" step="1" placeholder="0 = sin dato" oninput="App.clearResults()"></div>' +
                         '<div class="flex items-end col-span-2"><p class="text-[0.65rem] text-[--text-muted] leading-relaxed">Corriente de disparo instantaneo. Se compara contra falla minima para verificar sensibilidad.</p></div>' +
                     '</div>';
                 p0Parent.parentElement.appendChild(idDiv);
