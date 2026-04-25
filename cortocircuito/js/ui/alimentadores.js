@@ -229,43 +229,43 @@ var UIAlimentadores = (function() {
             '</div>' +
             '<div class="grid grid-cols-4 gap-2 text-[0.7rem]">' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">Calibre</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-calibre">Calibre</label>' +
             '<select id="feeder-' + nodo.id + '-calibre" name="feeder-' + nodo.id + '-calibre" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'calibre\', this.value)">' +
             calOpts +
             '</select>' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">Material</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-material">Material</label>' +
             '<select id="feeder-' + nodo.id + '-material" name="feeder-' + nodo.id + '-material" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'material\', this.value)">' +
             materialOpts +
             '</select>' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">Canalización</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-canalizacion">Canalización</label>' +
             '<select id="feeder-' + nodo.id + '-canalizacion" name="feeder-' + nodo.id + '-canalizacion" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'canalizacion\', this.value)">' +
             canalOpts +
             '</select>' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">Longitud (m)</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-longitud">Longitud (m)</label>' +
             '<input type="number" id="feeder-' + nodo.id + '-longitud" name="feeder-' + nodo.id + '-longitud" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.longitud || 0) + '" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'longitud\', this.value)">' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">Paralelo</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-paralelo">Paralelo</label>' +
             '<input type="number" id="feeder-' + nodo.id + '-paralelo" name="feeder-' + nodo.id + '-paralelo" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.paralelo || 1) + '" min="1" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'paralelo\', this.value)">' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">I Carga (A)</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-cargaa">I Carga (A)</label>' +
             '<input type="number" id="feeder-' + nodo.id + '-cargaa" name="feeder-' + nodo.id + '-cargaa" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.cargaA || 0) + '" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'cargaA\', this.value)">' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">FP</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-cargafp">FP</label>' +
             '<input type="number" id="feeder-' + nodo.id + '-cargafp" name="feeder-' + nodo.id + '-cargafp" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + (f.cargaFP || 0.9) + '" step="0.01" min="0" max="1" onchange="UIAlimentadores.actualizarFeeder(\'' + nodo.id + '\', \'cargaFP\', this.value)">' +
             '</div>' +
             '</div>' +
             '<div class="grid grid-cols-4 gap-2 text-[0.7rem] mt-2 pt-2 border-t border-[--border]">' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">Tipo Equipo</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="feeder-' + nodo.id + '-equiptipo">Tipo Equipo</label>' +
             '<select id="feeder-' + nodo.id + '-equiptipo" name="feeder-' + nodo.id + '-equiptipo" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.onEquipTipoChange(\'' + nodo.id + '\', this.value)">' +
             '<option value="">Sin equipo</option>' +
             '<option value="int_principal"' + ((nodo.equip && nodo.equip.tipo === 'int_principal') ? ' selected' : '') + '>Int. Principal</option>' +
@@ -285,17 +285,17 @@ var UIAlimentadores = (function() {
             '</select>' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">I.P / Modelo</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="equip-' + nodo.id + '-modelo">I.P / Modelo</label>' +
             '<select id="equip-' + nodo.id + '-modelo" name="equip-' + nodo.id + '-modelo" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" onchange="UIAlimentadores.onEquipModeloChange(\'' + nodo.id + '\', this.value)" disabled>' +
             '<option value="">-- Seleccionar modelo --</option>' +
             '</select>' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">Capacidad (kA)</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="equip-' + nodo.id + '-cap">Capacidad (kA)</label>' +
             '<input id="equip-' + nodo.id + '-cap" name="equip-' + nodo.id + '-cap" type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + ((nodo.equip && nodo.equip.cap) || 0) + '" step="0.1" min="0" readonly>' +
             '</div>' +
             '<div>' +
-            '<label class="block text-[--text-muted] mb-1">I Disparo (A)</label>' +
+            '<label class="block text-[--text-muted] mb-1" for="equip-' + nodo.id + '-idisparo">I Disparo (A)</label>' +
             '<input id="equip-' + nodo.id + '-idisparo" name="equip-' + nodo.id + '-idisparo" type="number" class="w-full bg-[--bg] border border-[--border] rounded px-2 py-1 text-[--text]" value="' + ((nodo.equip && nodo.equip.iDisparo) || 0) + '" step="1" min="0" onchange="UIAlimentadores.actualizarEquip(\'' + nodo.id + '\', \'iDisparo\', this.value)">' +
             '</div>' +
             '</div>' +
