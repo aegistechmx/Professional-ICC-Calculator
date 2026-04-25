@@ -46,7 +46,7 @@ var TCCCalibracionUI = (function() {
                     <div>
                         <div class="mb-4">
                             <label class="block text-sm font-semibold mb-2">Cargar PDF de Curva TCC</label>
-                            <input type="file" id="tcc-pdf-input" accept=".pdf" class="w-full p-2 border rounded">
+                            <input type="file" id="tcc-pdf-input" name="tcc-pdf-input" accept=".pdf" class="w-full p-2 border rounded">
                         </div>
                         
                         <div class="relative border rounded bg-gray-100" style="height: 500px;">
