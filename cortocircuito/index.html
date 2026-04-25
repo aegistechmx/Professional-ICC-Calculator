@@ -279,7 +279,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                             <div>
                                 <label class="field-label">Zona Eléctrica</label>
-                                <select id="input-zona-electrica" onchange="App.actualizarIscPorZona()" class="relative">
+                                <select id="input-zona-electrica" name="input-zona-electrica" onchange="App.actualizarIscPorZona()" class="relative">
                                     <option value="">Seleccionar zona...</option>
                                 </select>
                                 <p class="text-xs text-[--text-muted] mt-1">Zona geográfica para cálculo automático de Isc</p>
@@ -304,7 +304,7 @@
                         <div class="separator"></div>
                         <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">Transformador</p>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div><label class="field-label">Capacidad (kVA)</label><select id="input-trafo-kva" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative"></select></div>
+                            <div><label class="field-label">Capacidad (kVA)</label><select id="input-trafo-kva" name="input-trafo-kva" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative"></select></div>
                             <div><label class="field-label">% Impedancia</label><input type="number" id="input-trafo-z" name="input-trafo-z" value="5.75" min="0.1" step="0.01" max="15" oninput="App.clearResults(); Motor.actualizarRetornoTierra()"></div>
                             <div><label class="field-label">V primario (V)</label><input type="number" id="input-trafo-vp" name="input-trafo-vp" value="13200" min="1" step="1" oninput="App.clearResults()"></div>
                             <div>
@@ -320,7 +320,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             <div>
                                 <label class="field-label">Configuración X0 (secuencia cero)</label>
-                                <select id="input-x0-config" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
+                                <select id="input-x0-config" name="input-x0-config" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
                                     <option value="plano_acero">Cables en plano (acero)</option>
                                     <option value="plano_al">Cables en plano (aluminio)</option>
                                     <option value="triangular_acero">Cables en triángulo (acero)</option>
@@ -330,7 +330,7 @@
                             </div>
                             <div>
                                 <label class="field-label">Tipo de aterrizaje del transformador</label>
-                                <select id="input-trafo-aterr" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
+                                <select id="input-trafo-aterr" name="input-trafo-aterr" onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
                                     <option value="yg_solido">Yg sólidamente aterrizado</option>
                                     <option value="yg_resistivo">Yg aterrizado por resistencia</option>
                                     <option value="delta">Delta (no aterrizado)</option>
@@ -360,14 +360,14 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="field-label">Tipo de equipo</label>
-                            <select id="equip-p0-tipo" onchange="UIEquipos.onTipoChange('p0')">
+                            <select id="equip-p0-tipo" name="equip-p0-tipo" onchange="UIEquipos.onTipoChange('p0')">
                                 <option value="">Sin equipo</option>
                             </select>
                             <div id="equip-p0-detalles" class="mt-1 text-xs text-gray-500"></div>
                         </div>
                         <div>
                             <label class="field-label">I.P / Modelo</label>
-                            <select id="equip-p0-modelo" onchange="UIEquipos.onModeloChange('p0')">
+                            <select id="equip-p0-modelo" name="equip-p0-modelo" onchange="UIEquipos.onModeloChange('p0')">
                                 <option value="">-- Seleccionar modelo --</option>
                             </select>
                         </div>
