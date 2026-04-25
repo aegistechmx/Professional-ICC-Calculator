@@ -251,9 +251,9 @@ var App = (function() {
         UIMotores.init();
         UIDiagrama.dibujar();
 
-        // Campo I disparo para P0
+        // Campo I disparo para P0 (solo si no existe)
         var p0Cap = document.getElementById('equip-p0-cap');
-        if (p0Cap) {
+        if (p0Cap && !document.querySelector('[name="equip-p0-idisparo"]')) {
             var p0Parent = p0Cap.parentElement;
             if (p0Parent && p0Parent.parentElement) {
                 var idDiv = document.createElement('div');
