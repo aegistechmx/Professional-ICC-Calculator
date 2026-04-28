@@ -1,0 +1,26 @@
+# Curva TCC Digitalizada - Schneider NSX400
+# Fuente: WebPlotDigitizer de PDF de fabricante
+# Escala: Log-Log
+# Formato: corriente(A),tiempo(s)
+
+corriente,tiempo
+160,100
+240,50
+320,30
+480,15
+640,8
+800,4
+960,2
+1280,1
+1600,0.5
+2400,0.2
+3200,0.1
+4800,0.05
+6400,0.03
+8000,0.02
+12000,0.02
+16000,0.02
+24000,0.02
+32000,0.02
+50000,0.02
+80000,0.02

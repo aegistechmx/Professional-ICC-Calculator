@@ -1,0 +1,203 @@
+{
+  "name": "IEEE 9-Bus System",
+  "description": "Standard IEEE 9-bus (WSCC 3-machine) test system",
+  "reference": "IEEE Standard Test Systems",
+  "baseMVA": 100,
+  "baseKV": 13.8,
+  "expectedResults": {
+    "bus5_voltage": 1.012,
+    "bus7_voltage": 1.025,
+    "bus9_voltage": 1.016
+  },
+  "buses": [
+    {
+      "id": "bus1",
+      "type": "Slack",
+      "baseKV": 16.5,
+      "voltage": { "magnitude": 1.04, "angle": 0 },
+      "generation": { "P": 250, "Q": 100 }
+    },
+    {
+      "id": "bus2",
+      "type": "PV",
+      "baseKV": 18,
+      "voltage": { "magnitude": 1.025, "angle": 0 },
+      "generation": { "P": 163, "Q": 50 }
+    },
+    {
+      "id": "bus3",
+      "type": "PV",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.025, "angle": 0 },
+      "generation": { "P": 85, "Q": 30 }
+    },
+    {
+      "id": "bus4",
+      "type": "PQ",
+      "baseKV": 230,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 50, "Q": 18 }
+    },
+    {
+      "id": "bus5",
+      "type": "PQ",
+      "baseKV": 230,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 90, "Q": 30 }
+    },
+    {
+      "id": "bus6",
+      "type": "PQ",
+      "baseKV": 230,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 100, "Q": 35 }
+    },
+    {
+      "id": "bus7",
+      "type": "PQ",
+      "baseKV": 230,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 0, "Q": 0 }
+    },
+    {
+      "id": "bus8",
+      "type": "PQ",
+      "baseKV": 230,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 0, "Q": 0 }
+    },
+    {
+      "id": "bus9",
+      "type": "PQ",
+      "baseKV": 230,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 125, "Q": 50 }
+    }
+  ],
+  "generators": [
+    {
+      "id": "gen1",
+      "bus": "bus1",
+      "type": "synchronous",
+      "mva": 250,
+      "P": 250,
+      "Q": 100,
+      "Pmax": 300,
+      "Pmin": 0,
+      "xd": 1.8,
+      "xd_prime": 0.3,
+      "H": 5
+    },
+    {
+      "id": "gen2",
+      "bus": "bus2",
+      "type": "synchronous",
+      "mva": 163,
+      "P": 163,
+      "Q": 50,
+      "Pmax": 200,
+      "Pmin": 0,
+      "xd": 1.8,
+      "xd_prime": 0.3,
+      "H": 4
+    },
+    {
+      "id": "gen3",
+      "bus": "bus3",
+      "type": "synchronous",
+      "mva": 85,
+      "P": 85,
+      "Q": 30,
+      "Pmax": 100,
+      "Pmin": 0,
+      "xd": 1.8,
+      "xd_prime": 0.3,
+      "H": 3
+    }
+  ],
+  "transformers": [
+    {
+      "id": "xfm1",
+      "fromBus": "bus1",
+      "toBus": "bus4",
+      "primaryKV": 16.5,
+      "secondaryKV": 230,
+      "mva": 250,
+      "impedance": 0.0576
+    },
+    {
+      "id": "xfm2",
+      "fromBus": "bus2",
+      "toBus": "bus7",
+      "primaryKV": 18,
+      "secondaryKV": 230,
+      "mva": 163,
+      "impedance": 0.0625
+    },
+    {
+      "id": "xfm3",
+      "fromBus": "bus3",
+      "toBus": "bus9",
+      "primaryKV": 13.8,
+      "secondaryKV": 230,
+      "mva": 85,
+      "impedance": 0.0586
+    }
+  ],
+  "lines": [
+    {
+      "id": "line1",
+      "fromBus": "bus4",
+      "toBus": "bus5",
+      "r": 0.01,
+      "x": 0.085,
+      "b": 0.088,
+      "thermalLimit": 200
+    },
+    {
+      "id": "line2",
+      "fromBus": "bus5",
+      "toBus": "bus6",
+      "r": 0.017,
+      "x": 0.092,
+      "b": 0.079,
+      "thermalLimit": 200
+    },
+    {
+      "id": "line3",
+      "fromBus": "bus6",
+      "toBus": "bus7",
+      "r": 0.032,
+      "x": 0.161,
+      "b": 0.153,
+      "thermalLimit": 150
+    },
+    {
+      "id": "line4",
+      "fromBus": "bus7",
+      "toBus": "bus8",
+      "r": 0.0085,
+      "x": 0.072,
+      "b": 0.0745,
+      "thermalLimit": 150
+    },
+    {
+      "id": "line5",
+      "fromBus": "bus8",
+      "toBus": "bus9",
+      "r": 0.0119,
+      "x": 0.1008,
+      "b": 0.1045,
+      "thermalLimit": 150
+    },
+    {
+      "id": "line6",
+      "fromBus": "bus8",
+      "toBus": "bus6",
+      "r": 0.039,
+      "x": 0.17,
+      "b": 0.179,
+      "thermalLimit": 150
+    }
+  ]
+}

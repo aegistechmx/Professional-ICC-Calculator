@@ -1,0 +1,16 @@
+# Dependencias (esto es MUY importante, suele ser la causa)
+node_modules/
+.venv/
+venv/
+__pycache__/
+
+# Carpetas compiladas o de salida
+dist/
+build/
+out/
+*.log
+
+# Sistema
+.git/
+.vscode/
+.idea/

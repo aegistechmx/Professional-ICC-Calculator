@@ -2,14 +2,7 @@
 .netlify
 node_modules
 
-# Backend/frontend dependencies should remain ignored
-backend/node_modules/
-frontend/node_modules/
-
 # Environment variables
-node_modules/
-dist/
-build/
 .env
 .env.local
 .env.*.local
@@ -17,7 +10,6 @@ build/
 # Build outputs
 dist
 build
-coverage/
 *.log
 
 # OS files
@@ -39,20 +31,7 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Allow project directories
-!backend/
-!backend/**
-!frontend/
-!frontend/**
-
 # Package manager
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
-npm-debug.log*
-
-# Include application source directories
-!backend/
-!backend/**
-!frontend/
-!frontend/**

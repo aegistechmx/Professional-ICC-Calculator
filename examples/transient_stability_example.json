@@ -1,0 +1,112 @@
+{
+  "name": "Transient Stability Example",
+  "description": "Multi-machine system for transient stability analysis",
+  "baseMVA": 100,
+  "baseKV": 13.8,
+  "buses": [
+    {
+      "id": "bus1",
+      "type": "Slack",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.05, "angle": 0 }
+    },
+    {
+      "id": "bus2",
+      "type": "PV",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 }
+    },
+    {
+      "id": "bus3",
+      "type": "PV",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 }
+    },
+    {
+      "id": "bus4",
+      "type": "PQ",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 150, "Q": 75 }
+    }
+  ],
+  "lines": [
+    {
+      "id": "line1",
+      "fromBus": "bus1",
+      "toBus": "bus2",
+      "r": 0.01,
+      "x": 0.1,
+      "b": 0.0,
+      "thermalLimit": 200
+    },
+    {
+      "id": "line2",
+      "fromBus": "bus2",
+      "toBus": "bus3",
+      "r": 0.015,
+      "x": 0.12,
+      "b": 0.0,
+      "thermalLimit": 150
+    },
+    {
+      "id": "line3",
+      "fromBus": "bus3",
+      "toBus": "bus4",
+      "r": 0.02,
+      "x": 0.15,
+      "b": 0.0,
+      "thermalLimit": 100
+    }
+  ],
+  "generators": [
+    {
+      "id": "gen1",
+      "bus": "bus1",
+      "type": "synchronous",
+      "mva": 100,
+      "P": 100,
+      "Q": 50,
+      "Pmax": 150,
+      "Pmin": 0,
+      "xd": 1.8,
+      "xd_prime": 0.3,
+      "xd_double_prime": 0.2,
+      "H": 5
+    },
+    {
+      "id": "gen2",
+      "bus": "bus2",
+      "type": "synchronous",
+      "mva": 100,
+      "P": 50,
+      "Q": 25,
+      "Pmax": 100,
+      "Pmin": 0,
+      "xd": 1.8,
+      "xd_prime": 0.3,
+      "xd_double_prime": 0.2,
+      "H": 4
+    },
+    {
+      "id": "gen3",
+      "bus": "bus3",
+      "type": "synchronous",
+      "mva": 100,
+      "P": 50,
+      "Q": 25,
+      "Pmax": 100,
+      "Pmin": 0,
+      "xd": 1.8,
+      "xd_prime": 0.3,
+      "xd_double_prime": 0.2,
+      "H": 3
+    }
+  ],
+  "faultConfig": {
+    "faultBus": "bus3",
+    "faultType": "3P",
+    "faultImpedance": 0,
+    "clearingTime": 0.1
+  }
+}

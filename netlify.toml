@@ -1,0 +1,73 @@
+[build]
+  # Build command for the frontend
+  command = "cd frontend && npm install && npm run build"
+  publish = "frontend/dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Redirect API calls to backend functions
+[[redirects]]
+  from = "/calculo/*"
+  to = "/.netlify/functions/api/calculo/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/proyectos/*"
+  to = "/.netlify/functions/api/proyectos/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/proteccion/*"
+  to = "/.netlify/functions/api/proteccion/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/reporte/*"
+  to = "/.netlify/functions/api/reporte/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/coord/*"
+  to = "/.netlify/functions/api/coord/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/sqd-real/*"
+  to = "/.netlify/functions/api/sqd-real/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/simulacion/*"
+  to = "/.netlify/functions/api/simulacion/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/auth/*"
+  to = "/.netlify/functions/api/auth/:splat"
+  status = 200
+
+# Redirect all other routes to index.html for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Backend functions configuration
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Headers for security and caching
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

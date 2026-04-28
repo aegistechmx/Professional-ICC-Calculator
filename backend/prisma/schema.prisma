@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  nombre    String?
+  plan      String   @default("free") // free, pro, enterprise
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  proyectos Proyecto[]
+}
+
+model Proyecto {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  nodes       String   // Store ReactFlow nodes as JSON string
+  edges       String   // Store ReactFlow edges as JSON string
+  metadata    String?  // Additional project metadata as JSON string
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  templateId  Int?
+  template    Template? @relation(fields: [templateId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([templateId])
+}
+
+model Template {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @unique
+  descripcion String?
+  categoria   String   // substation, panel, industrial, etc.
+  nodes       String   // Template nodes as JSON string
+  edges       String   // Template edges as JSON string
+  thumbnail   String?  // URL to thumbnail image
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  proyectos   Proyecto[]
+
+  @@index([categoria])
+}
+
+model SimulationJob {
+  id          Int      @id @default(autoincrement())
+  projectId   Int
+  type        String   // icc, tcc, coordination
+  status      String   @default("pending") // pending, processing, completed, failed
+  result      String?  // Result as JSON string
+  error       String?
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([projectId])
+  @@index([status])
+}
