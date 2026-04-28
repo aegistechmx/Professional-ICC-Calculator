@@ -1,0 +1,111 @@
+name: 🔍 System Audit - Electrical Simulator
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+
+jobs:
+
+  lint-and-format:
+    name: 🧹 Lint & Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+
+      - name: ESLint
+        run: |
+          cd frontend && npx eslint .
+          cd ../backend && npx eslint .
+
+  security-scan:
+    name: 🔐 Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: npm audit
+        run: |
+          cd frontend && npm audit --audit-level=high
+          cd ../backend && npm audit --audit-level=high
+
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          cd backend && npm test
+
+  electrical-validation:
+    name: ⚡ Electrical Engine Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run powerflow test
+        run: |
+          node backend/src/core/electrical/SimulationTest.js
+
+  fault-simulation:
+    name: 💥 Fault & Cascade Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run cascade simulation test
+        run: |
+          node backend/src/core/electrical/SimulationTest.js --mode=cascade
+
+  performance-test:
+    name: 🚀 Performance Benchmark
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Benchmark solver
+        run: |
+          node backend/src/core/electrical/SimulationTest.js --mode=benchmark
+
+  build-check:
+    name: 🏗️ Build Frontend & Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build frontend
+        run: |
+          cd frontend && npm ci && npm run build
+
+      - name: Build backend
+        run: |
+          cd backend && npm ci
+
+  api-contract:
+    name: 🔗 API Contract Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start server & test endpoints
+        run: |
+          cd backend
+          npm ci
+          node src/server.js &
+          sleep 5
+          curl -f http://localhost:3002/api/powerflow/validate

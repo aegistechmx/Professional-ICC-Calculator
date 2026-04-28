@@ -10,7 +10,6 @@ exports.generarPDF = async (req, res) => {
     await reporteService.generarReporteCompleto(req.body, res);
 
   } catch (err) {
-    console.error('Error al generar PDF:', err);
     if (!res.headersSent) {
       res.status(500).json({ error: 'Error interno al generar el reporte' });
     }

@@ -26,7 +26,7 @@ function cargarCurvas() {
   if (!curvasCargadas) {
     curvasCache = loadCurvesFromDirectory(CURVAS_DIR);
     curvasCargadas = true;
-    console.log(`Curvas SQD cargadas: ${Object.keys(curvasCache).join(', ')}`);
+    // SQD curves loaded - logging removed for production
   }
   return curvasCache;
 }

@@ -2,6 +2,38 @@
  * app.js — FASE 8 — Con todas las mejoras integradas
  */
 
+// Conditional logging utility
+var Debug = (function() {
+    var isDevelopment = true; // Set to false in production
+
+    function log() {
+        if (isDevelopment && typeof console !== 'undefined') {
+            console.log.apply(console, arguments);
+        }
+    }
+
+    function warn() {
+        if (typeof console !== 'undefined') {
+            console.warn.apply(console, arguments);
+        }
+    }
+
+    function error() {
+        if (typeof console !== 'undefined') {
+            console.error.apply(console, arguments);
+        }
+    }
+
+    return {
+        log: log,
+        warn: warn,
+        error: error,
+        setDevelopmentMode: function(mode) {
+            isDevelopment = mode;
+        }
+    };
+})();
+
 /**
  * Clase de error tipificado para cálculos
  * Permite diferenciar tipos de error para manejo específico
@@ -76,27 +108,22 @@ var App = (function() {
             }
         ],
         resultados: null,
-        autocorregirActivo: false
+        autocorregirActivo: false,
+        usarMotorUnificado: false, // FIX: Desactivar temporalmente para debugging - usar legacy motor
+        usarMotorV2: true // FIX: Habilitar MotorElectricoV2 (single pipeline, never breaks)
     };
 
     function verificarDependencias() {
         // Separar dependencias de cálculo de UI
-        var dependenciasCalculo = ['Motor', 'CONSTANTES', 'LoadContext', 'AmpacidadReal', 'Convert', 'Impedancias'];
+        // FIX: AmpacidadReal reemplazado por MotorAmpacidadNOM (core architecture)
+        // FIX: MotorElectricoUnificado agregado como motor unificado (single source of truth)
+        // FIX: MotorElectricoV2 agregado como motor V2 (single pipeline, never breaks)
+        var dependenciasCalculo = ['Motor', 'CONSTANTES', 'LoadContext', 'MotorAmpacidadNOM', 'MotorElectricoUnificado', 'MotorElectricoV2', 'Convert', 'Impedancias'];
         var dependenciasCalculoOpcionales = [
             'ValidadorSistema',
-            'MotorValidacionInteligente',
-            'MotorAutocorreccionTotal',
-            'MotorAutocorreccion',
-            'MotorConsistencia',
-            'MotorDiagnostico',
-            'MotorProtecciones',
-            'MotorInteligenteCCC',
-            'MotorDisenoAutomatico',
             'CatalogoEquiposReal',
-            'MotorCoordinacionReal',
             'SolverElectrico',
             'TCCDigitalizer',
-            'AgrupamientoNOM',
             'Semaforo',
             'DebugVisualPro',
             'TCCChartReal',
@@ -105,7 +132,6 @@ var App = (function() {
             'CalculoCapacitores',
             'CalculoMotores',
             'NOMValidacion',
-            'OptimizadorConductores',
             'TCCCoordinacion',
             'Curvas'
         ];
@@ -179,6 +205,11 @@ var App = (function() {
             
             statusDiv.innerHTML = '<span class="text-xs text-[--green]"><i class="fas fa-check-circle mr-1"></i>Datos de operación real aplicados</span>' +
                 '<span class="text-xs text-[--text-muted] ml-2">Ia: ' + ctx.phases.Ia + 'A, Ib: ' + ctx.phases.Ib + 'A, Ic: ' + ctx.phases.Ic + 'A, In: ' + ctx.phases.In + 'A | Desbalance: ' + unbalancePct + '%</span>';
+
+            // [Normativa] Si el THDi es alto, actualizar automáticamente los conductores en los alimentadores
+            if (typeof UIAlimentadores !== 'undefined' && UIAlimentadores.verificarYActualizarConductoresPorTHDi) {
+                UIAlimentadores.verificarYActualizarConductoresPorTHDi();
+            }
         } catch (e) {
             statusDiv.innerHTML = '<span class="text-xs text-[--red]"><i class="fas fa-times-circle mr-1"></i>Error: ' + e.message + '</span>';
         }
@@ -261,7 +292,7 @@ var App = (function() {
                 idDiv.innerHTML =
                     '<div class="equip-divider"><span class="equip-divider-label"><i class="fas fa-bolt mr-1"></i> Disparo instantaneo</span></div>' +
                     '<div class="carga-grid">' +
-                        '<div><label class="field-label">I disparo (A)</label><input type="number" name="equip-p0-idisparo" value="" min="0" step="1" placeholder="0 = sin dato" oninput="App.clearResults()"></div>' +
+                        '<div><label class="field-label" for="equip-p0-idisparo">I disparo (A)</label><input type="number" id="equip-p0-idisparo" name="equip-p0-idisparo" value="" min="0" step="1" placeholder="0 = sin dato" oninput="App.clearResults()"></div>' +
                         '<div class="flex items-end col-span-2"><p class="text-[0.65rem] text-[--text-muted] leading-relaxed">Corriente de disparo instantaneo. Se compara contra falla minima para verificar sensibilidad.</p></div>' +
                     '</div>';
                 p0Parent.parentElement.appendChild(idDiv);
@@ -460,29 +491,153 @@ var App = (function() {
                     throw new CalculoError(CalculoError.CODES.DEPENDENCIA, 'Motor module no cargado');
                 }
                 
-                // Temporalmente usar el snapshot para el cálculo
-                var estadoOriginal = estado;
-                estado = estadoSnapshot;
+                // FIX: Usar MotorElectricoUnificado si está disponible (single source of truth)
+                var resultado;
                 
-                var resultado = Motor.ejecutar();
+                // FIX: Usar MotorElectricoV2 si está disponible (single pipeline, never breaks)
+                if (typeof MotorElectricoV2 !== 'undefined' && estado.usarMotorV2) {
+                    const motorV2 = new MotorElectricoV2.MotorElectricoV2();
+                    
+                    var input = {
+                        I_carga: estadoSnapshot.cargaA || 0,
+                        V: estadoSnapshot.voltaje || 480,
+                        calibre: estadoSnapshot.calibre || '350',
+                        F_temp: 1,
+                        F_agrup: 1,
+                        paralelos: estadoSnapshot.paralelos || 1,
+                        Icu: 25
+                    };
+                    
+                    var res = motorV2.ejecutar(input);
+                    
+                    // Mapear resultado V2 a formato esperado (puntos array)
+                    resultado = {
+                        puntos: [{
+                            id: 'P0',
+                            isc: res.resultado.falla ? res.resultado.falla.Icc_3F : 0,
+                            ipeak: res.resultado.falla ? res.resultado.falla.Icc_3F * 2.5 : 0,
+                            xr: res.resultado.falla ? res.resultado.falla.X_R : 0,
+                            equip: {
+                                cap: res.resultado.proteccion ? res.resultado.proteccion.Icu : 0,
+                                iDisparo: res.resultado.proteccion ? res.resultado.proteccion.breaker : 0
+                            },
+                            CDT: {
+                                I_diseño: res.resultado.carga ? res.resultado.carga.I_diseno : 0,
+                                I_final: res.resultado.conductor ? res.resultado.conductor.I_corregida : 0,
+                                I_corregida: res.resultado.conductor ? res.resultado.conductor.I_corregida : 0,
+                                I_terminal: res.resultado.conductor ? res.resultado.conductor.I_terminal : 0,
+                                violacionTerminal: false
+                            },
+                            decision: {
+                                estadoGlobal: res.ok ? 'PASS' : 'FAIL',
+                                errores: res.resultado.errores,
+                                warnings: res.resultado.warnings
+                            }
+                        }],
+                        estadoGlobal: res.ok ? 'PASS' : 'FAIL',
+                        erroresGlobales: res.resultado.errores
+                    };
+                }
                 
-                // Restaurar estado original y guardar resultados
-                estado = estadoOriginal;
-                if (!resultado || !resultado.puntos || resultado.puntos.length === 0) {
+                // FIX: Usar MotorElectricoUnificado si está disponible (single source of truth)
+                if (!resultado && typeof MotorElectricoUnificado !== 'undefined' && estado.usarMotorUnificado) {
+                    // Usar motor unificado (nueva arquitectura)
+                    var input = {
+                        id: 'nodo_1',
+                        I_carga: estadoSnapshot.cargaA || 0,
+                        voltaje: estadoSnapshot.voltaje || 480,
+                        tipoSistema: estadoSnapshot.tipoSistema || '3F',
+                        calibre: estadoSnapshot.calibre || '350',
+                        material: estadoSnapshot.material || 'cobre',
+                        tempAislamiento: estadoSnapshot.tempAislamiento || 75,
+                        tempAmbiente: estadoSnapshot.tempAmbiente || 30,
+                        nConductores: estadoSnapshot.nConductores || 3,
+                        paralelos: estadoSnapshot.paralelos || 1,
+                        tempTerminal: 75,
+                        longitud: estadoSnapshot.longitud || 0,
+                        proteccion: {
+                            tipo: 'MCCB',
+                            In: estadoSnapshot.breaker || 400
+                        },
+                        impedancia: {
+                            R: 0.01,
+                            X: 0.02
+                        }
+                    };
+                    
+                    var ctx = MotorElectricoUnificado.ejecutar(input, { autocorregir: true, maxIntentos: 5 });
+                    
+                    // FIX: Validar que ctx exista y no tenga errores críticos
+                    if (!ctx || ctx.errores.some(e => e.severidad === 'CRITICO' && e.codigo === 'MOTOR_ERROR')) {
+                        console.warn('MotorElectricoUnificado falló, usando motor legacy');
+                        if (ctx && ctx.errores.length > 0) {
+                            console.warn('Errores:', ctx.errores);
+                        }
+                        estado.usarMotorUnificado = false; // Desactivar motor unificado
+                    } else {
+                        var solverResult = MotorElectricoUnificado.solver(ctx);
+                        
+                        // Mapear contexto a formato esperado (puntos array)
+                        // FIX: Acceder propiedades directamente de ctx, no ctx.resultados
+                        resultado = {
+                            puntos: [{
+                                id: 'P0',
+                                isc: ctx.falla ? ctx.falla.Isc_3F : 0,
+                                ipeak: ctx.falla ? ctx.falla.Isc_3F * 2.5 : 0,
+                                xr: ctx.falla ? ctx.falla.X_R : 0,
+                                equip: {
+                                    cap: ctx.proteccion ? ctx.proteccion.Icu : 0,
+                                    iDisparo: ctx.proteccion ? ctx.proteccion.Ii : 0
+                                },
+                                CDT: {
+                                    I_diseño: ctx.carga ? ctx.carga.I_diseño : 0,
+                                    I_final: ctx.conductor ? ctx.conductor.I_final : 0,
+                                    I_corregida: ctx.conductor ? ctx.conductor.I_corregida : 0,
+                                    I_terminal: ctx.conductor ? ctx.conductor.I_terminal : 0,
+                                    violacionTerminal: ctx.conductor ? ctx.conductor.I_corregida > ctx.conductor.I_terminal : false
+                                },
+                                decision: {
+                                    estadoGlobal: solverResult.status === 'OK' ? 'PASS' : 'FAIL',
+                                    errores: solverResult.errores,
+                                    warnings: solverResult.warnings
+                                }
+                            }],
+                            estadoGlobal: solverResult.status,
+                            erroresGlobales: solverResult.errores
+                        };
+                    }
+                }
+                
+                // Si motor V2 o unificado falló o no está disponible, usar legacy
+                if (!resultado) {
+                    // Usar motor legacy (compatibilidad)
+                    var estadoOriginal = estado;
+                    estado = estadoSnapshot;
+                    
+                    resultado = Motor.ejecutar();
+                    
+                    // Restaurar estado original
+                    estado = estadoOriginal;
+                }
+                
+                // FIX: Motor.ejecutar() returns { resultados: { puntos: [...] } }
+                var puntos = resultado.resultados ? resultado.resultados.puntos : resultado.puntos;
+                if (!puntos || puntos.length === 0) {
                     throw new CalculoError(CalculoError.CODES.CALCULO, 'No se obtuvieron resultados del cálculo');
                 }
-                estado.resultados = resultado.puntos;
-                UIResultados.mostrar(resultado.puntos);
-                UICoordonograma.dibujar(resultado.puntos);
+                estado.resultados = puntos;
+                UIResultados.mostrar(puntos);
+                UICoordonograma.dibujar(puntos);
                 UIDiagrama.dibujar();
 
                 // Mostrar validación inteligente si está disponible
-                if (resultado.puntos.validacionInteligente) {
-                    UIResultados.mostrarValidacionInteligente(resultado.puntos.validacionInteligente);
+                if (puntos.validacionInteligente) {
+                    UIResultados.mostrarValidacionInteligente(puntos.validacionInteligente);
                 }
 
                 // 🚦 Mostrar semáforo del sistema si está disponible
-                if (resultado.puntos.semaforo && typeof Semaforo !== 'undefined') {
+                // FIX: semaforo está en puntos (del Motor), no en resultado (del solver)
+                if (puntos.semaforo && typeof Semaforo !== 'undefined') {
                     var semaforoSection = document.getElementById('semaforo-section');
                     if (!semaforoSection) {
                         // Crear sección si no existe
@@ -971,11 +1126,20 @@ var App = (function() {
                 UIToast.mostrar('Error: UIAlimentadores no cargado. Recargue la página.', 'error');
                 return;
             }
+            
+            // Check if nodos array exists
+            if (!App.estado || !App.estado.nodos) {
+                UIToast.mostrar('Error: Estado del sistema no inicializado. Recargue la página.', 'error');
+                console.error('Estado no inicializado:', App.estado);
+                return;
+            }
+            
             // Add child to root node (P0)
             UIAlimentadores.agregarHijo('P0');
         } catch (e) {
             console.error('Error en addFeeder:', e);
-            UIToast.mostrar('Error al agregar alimentador', 'error');
+            console.error('Stack trace:', e.stack);
+            UIToast.mostrar('Error al agregar alimentador: ' + (e.message || 'Error desconocido'), 'error');
         }
     }
     function removeFeeder(nodoId) {
@@ -1340,6 +1504,25 @@ var App = (function() {
         }
     }
 
+    function actualizarAgrupamientoAuto() {
+        var numConductores = parseInt(document.getElementById('cdt-conductores-input')?.value) || 3;
+        var agrupamientoInput = document.getElementById('cdt-agrupamiento-input');
+        
+        // Calcular factor de agrupamiento según NOM-001-SEDE-2012
+        var factor = 1.0;
+        if (numConductores <= 3) factor = 1.0;
+        else if (numConductores <= 6) factor = 0.80;
+        else if (numConductores <= 9) factor = 0.70;
+        else if (numConductores <= 20) factor = 0.50;
+        else if (numConductores <= 30) factor = 0.45;
+        else if (numConductores <= 40) factor = 0.40;
+        else factor = 0.35;
+        
+        if (agrupamientoInput) {
+            agrupamientoInput.value = factor.toFixed(2);
+        }
+    }
+
     function actualizarCDT() {
         if (!estado.resultados || estado.resultados.length === 0) return;
         
@@ -1386,7 +1569,22 @@ var App = (function() {
             F_agrupamiento: fAgrupamientoManual // Usar valor manual si se proporciona
         };
         
-        var resultado = AmpacidadReal.verificarAmpacidad(load, cable, { temperaturaTerminal: 75 });
+        // FIX: Usar MotorAmpacidadNOM en lugar de AmpacidadReal (core architecture)
+        var resultado;
+        if (typeof MotorAmpacidadNOM !== 'undefined') {
+            resultado = MotorAmpacidadNOM.calcularAmpacidadNOM({
+                calibre: cable.calibre,
+                material: cable.material,
+                tempAislamiento: cable.temperaturaAislamiento,
+                tempAmbiente: cable.temperaturaAmbiente,
+                nConductores: cable.numConductores,
+                paralelos: cable.paralelos,
+                tempTerminal: 75
+            });
+        } else {
+            console.error("MotorAmpacidadNOM no está disponible");
+            return;
+        }
         
         // Actualizar CDT en el resultado
         estado.resultados[0].CDT = {
@@ -1394,8 +1592,8 @@ var App = (function() {
             I_diseño: resultado.I_diseño,
             I_tabla: resultado.I_tabla,
             F_temp: resultado.F_temp,
-            F_agrupamiento: resultado.F_agrupamiento,
-            status: resultado.status,
+            F_agrupamiento: resultado.F_agrup,
+            status: resultado.valido ? 'PASS' : 'FAIL',
             margen: resultado.margen,
             deficit: resultado.deficit
         };
@@ -1509,7 +1707,7 @@ var App = (function() {
         });
 
         if (cambiosAplicados) {
-            console.log('Autocorrección aplicada:', logTotal);
+            Debug.log('Autocorrección aplicada:', logTotal);
             UIToast.mostrar('Autocorrección aplicada: ' + logTotal.length + ' cambios', 'success');
         }
     }
@@ -1603,6 +1801,7 @@ var App = (function() {
         poblarDropdownZonas: poblarDropdownZonas,
         poblarDropdownCapacidadesTrafo: poblarDropdownCapacidadesTrafo,
         actualizarIscPorZona: actualizarIscPorZona,
+        actualizarAgrupamientoAuto: actualizarAgrupamientoAuto,
         actualizarCDT: actualizarCDT,
         imprimirModulos: imprimirModulos,
         exportarExcel: exportarExcel,

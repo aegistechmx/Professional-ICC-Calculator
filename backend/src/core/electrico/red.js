@@ -54,43 +54,43 @@ function crearElemento(node) {
   const params = data.parameters || {};
 
   switch (type) {
-    case 'transformer':
-      return new Transformador(node.id, type, {
-        V: params.secundario || 480,
-        S: params.kVA * 1000, // Convert kVA to VA
-        uk: params.Z || 5.75,
-        XR: 8 // Default X/R ratio
-      });
+  case 'transformer':
+    return new Transformador(node.id, type, {
+      V: params.secundario || 480,
+      S: params.kVA * 1000, // Convert kVA to VA
+      uk: params.Z || 5.75,
+      XR: 8 // Default X/R ratio
+    });
 
-    case 'breaker':
-      return new Breaker(node.id, type, {
-        In: params.In || 100,
-        Icu: params.Icu || 25000
-      });
+  case 'breaker':
+    return new Breaker(node.id, type, {
+      In: params.In || 100,
+      Icu: params.Icu || 25000
+    });
 
-    case 'motor':
-      return new Motor(node.id, type, {
-        hp: params.hp || 75,
-        V: params.voltaje || 480,
-        eficiencia: params.eficiencia || 0.92,
-        fp: 0.85 // Default power factor
-      });
+  case 'motor':
+    return new Motor(node.id, type, {
+      hp: params.hp || 75,
+      V: params.voltaje || 480,
+      eficiencia: params.eficiencia || 0.92,
+      fp: 0.85 // Default power factor
+    });
 
-    case 'panel':
-      return new Panel(node.id, type, {
-        tension: params.tension || 480,
-        fases: params.fases || 3
-      });
+  case 'panel':
+    return new Panel(node.id, type, {
+      tension: params.tension || 480,
+      fases: params.fases || 3
+    });
 
-    case 'load':
-      return new Carga(node.id, type, {
-        potencia_kW: params.potencia_kW || 50,
-        fp: params.fp || 0.85
-      });
+  case 'load':
+    return new Carga(node.id, type, {
+      potencia_kW: params.potencia_kW || 50,
+      fp: params.fp || 0.85
+    });
 
-    default:
-      // Treat unknown types as panels (negligible impedance)
-      return new Panel(node.id, type, {});
+  default:
+    // Treat unknown types as panels (negligible impedance)
+    return new Panel(node.id, type, {});
   }
 }
 

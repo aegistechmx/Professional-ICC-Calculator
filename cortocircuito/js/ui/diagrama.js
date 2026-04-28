@@ -44,9 +44,19 @@ var UIDiagrama = (function() {
             // Fase 9: Dibujar árbol de nodos
             var nodosOrdenados = Impedancias.ordenarPorNivel(nodos);
             var posiciones = {}; // Store positions for drawing connections
+            var idsVistos = new Set();
 
             nodosOrdenados.forEach(function(nodo, idx) {
-                var profundidad = Impedancias.obtenerCamino(nodo.id, nodos).length - 1;
+                if (idsVistos.has(nodo.id)) return;
+                idsVistos.add(nodo.id);
+
+                var camino = Impedancias.obtenerCamino(nodo.id, nodos);
+                var profundidad = camino.length - 1;
+
+                // Detección de integridad: un camino válido debe llegar a una raíz real (!parentId)
+                var nodoRaiz = camino.length > 0 ? nodos.find(function(n) { return n.id === camino[0]; }) : null;
+                var tieneCiclo = !nodoRaiz || !!nodoRaiz.parentId;
+
                 var offsetX = profundidad * 80; // Horizontal offset for depth
 
                 barra(ctx, cx + offsetX, cy, width);
@@ -56,6 +66,12 @@ var UIDiagrama = (function() {
                 var equipCap = (nodo.equip && nodo.equip.cap) ? nodo.equip.cap : 0;
                 var hasEquip = nodo.equip && nodo.equip.tipo && equipCap > 0;
                 if (hasEquip) dibujarSimboloEquipo(ctx, cx + offsetX, cy - 14, nodo.equip.tipo);
+
+                if (tieneCiclo) {
+                    ctx.fillStyle = '#ef4444'; // Rojo advertencia
+                    ctx.font = 'italic 7px "DM Sans"';
+                    ctx.fillText('⚠ Error: Ciclo en jerarquía', cx + offsetX + 45, cy + 24);
+                }
 
                 if (punto) {
                     var color = colorPorCorriente(punto.isc || 0);

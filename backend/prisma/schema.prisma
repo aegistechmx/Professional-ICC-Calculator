@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -22,9 +22,9 @@ model Proyecto {
   id          Int      @id @default(autoincrement())
   nombre      String
   descripcion String?
-  nodes       Json     // Store ReactFlow nodes
-  edges       Json     // Store ReactFlow edges
-  metadata    Json?    // Additional project metadata
+  nodes       String   // Store ReactFlow nodes as JSON string
+  edges       String   // Store ReactFlow edges as JSON string
+  metadata    String?  // Additional project metadata as JSON string
   userId      Int
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   templateId  Int?
@@ -37,15 +37,15 @@ model Proyecto {
 }
 
 model Template {
-  id          Int        @id @default(autoincrement())
-  nombre      String
+  id          Int      @id @default(autoincrement())
+  nombre      String   @unique
   descripcion String?
-  categoria   String     // substation, panel, industrial, etc.
-  nodes       Json       // Template nodes
-  edges       Json       // Template edges
-  thumbnail   String?    // URL to thumbnail image
-  isPublic    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
+  categoria   String   // substation, panel, industrial, etc.
+  nodes       String   // Template nodes as JSON string
+  edges       String   // Template edges as JSON string
+  thumbnail   String?  // URL to thumbnail image
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   proyectos   Proyecto[]
 
   @@index([categoria])
@@ -56,7 +56,7 @@ model SimulationJob {
   projectId   Int
   type        String   // icc, tcc, coordination
   status      String   @default("pending") // pending, processing, completed, failed
-  result      Json?
+  result      String?  // Result as JSON string
   error       String?
   createdAt   DateTime @default(now())
   completedAt DateTime?

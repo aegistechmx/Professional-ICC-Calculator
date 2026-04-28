@@ -166,47 +166,47 @@ var DebugVisualPro = (function() {
 
         // Terminal en 0
         if (debug.terminal.I_terminal === 0) {
-            errores.push('🔥 BUG CRÍTICO: terminal en 0 - lookup falló');
+            errores.push('[X] BUG CRÍTICO: terminal en 0 - lookup falló');
         }
 
         // Ampacidad inflada
         if (debug.ampacidad.I_corregida > debug.ampacidad.I_tabla * 2) {
-            errores.push('⚠️ Ampacidad inflada (paralelos mal aplicados): I_corr=' + debug.ampacidad.I_corregida + ' > 2×I_tabla=' + (debug.ampacidad.I_tabla * 2));
+            errores.push('[!] Ampacidad inflada (paralelos mal aplicados): I_corr=' + debug.ampacidad.I_corregida + ' > 2×I_tabla=' + (debug.ampacidad.I_tabla * 2));
         }
 
         // Agrupamiento extremo
         if (debug.ampacidad.F_agrupamiento < 0.5) {
-            warnings.push('⚠️ Agrupamiento extremo: F=' + debug.ampacidad.F_agrupamiento);
+            warnings.push('[!] Agrupamiento extremo: F=' + debug.ampacidad.F_agrupamiento);
         }
 
         // I_tabla en 0
         if (debug.ampacidad.I_tabla === 0) {
-            errores.push('🔥 BUG: I_tabla en 0 - calibre no encontrado');
+            errores.push('[X] BUG: I_tabla en 0 - calibre no encontrado');
         }
 
         // F_temp inválido
         if (debug.ampacidad.F_temp <= 0 || debug.ampacidad.F_temp > 1.5) {
-            errores.push('🔥 BUG: F_temp inválido: ' + debug.ampacidad.F_temp);
+            errores.push('[X] BUG: F_temp inválido: ' + debug.ampacidad.F_temp);
         }
 
         // I_final > I_corregida (físicamente imposible)
         if (debug.final.I_final > debug.ampacidad.I_corregida + 1) {
-            errores.push('🔥 BUG: I_final > I_corregida (físicamente imposible)');
+            errores.push('[X] BUG: I_final > I_corregida (físicamente imposible)');
         }
 
         // If-tierra > 3×Isc (irreal)
         if (debug.cortocircuito.If_tierra > debug.cortocircuito.Isc * 3) {
-            errores.push('🔥 BUG: If-tierra irreal (>3×Isc)');
+            errores.push('[X] BUG: If-tierra irreal (>3×Isc)');
         }
 
         // If-tierra < 1% de Isc (ridículamente baja)
         if (debug.cortocircuito.Isc > 0 && debug.cortocircuito.If_tierra < 0.01 * debug.cortocircuito.Isc) {
-            warnings.push('⚠️ If-tierra ridículamente baja (<1% de Isc)');
+            warnings.push('[!] If-tierra ridículamente baja (<1% de Isc)');
         }
 
         // X/R extremo
         if (debug.cortocircuito.X_R < 0.1 || debug.cortocircuito.X_R > 100) {
-            warnings.push('⚠️ X/R extremo: ' + debug.cortocircuito.X_R);
+            warnings.push('[!] X/R extremo: ' + debug.cortocircuito.X_R);
         }
 
         return { errores: errores, warnings: warnings };

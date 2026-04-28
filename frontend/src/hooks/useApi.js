@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:3000';
+import React, { useState, useCallback } from 'react';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
 
 /**
  * Custom hook for API calls with loading and error states
@@ -6,13 +8,13 @@ const API_BASE = 'http://localhost:3000';
  * @returns {Object} Object with data, loading, error, and execute function
  */
 export function useApi(endpoint) {
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     data: null,
     loading: false,
     error: null,
   });
 
-  const execute = React.useCallback(
+  const execute = useCallback(
     async (options = {}) => {
       setState({ data: null, loading: true, error: null });
 
@@ -72,7 +74,7 @@ export function usePost(endpoint) {
 export function useGet(endpoint) {
   const { data, loading, error, execute } = useApi(endpoint);
 
-  const get = React.useCallback(async () => {
+  const get = useCallback(async () => {
     return execute({ method: 'GET' });
   }, [execute]);
 

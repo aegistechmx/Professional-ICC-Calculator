@@ -5,29 +5,25 @@
 
 const router = require('express').Router();
 const ctrl = require('../controllers/simulacion.controller');
-const auth = require('../middlewares/auth.middleware');
+const auth = require('../middleware/auth.middleware');
+const { apiLimiter } = require('../middleware/rateLimiter.middleware');
 
-// Auth optional for development
-const optionalAuth = (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-};
+// Apply rate limiting to simulation endpoints
+router.use(apiLimiter);
 
-// Simulación ICC vs tiempo
-router.post('/icc-tiempo', optionalAuth, ctrl.simularICC);
+// All simulation routes require authentication
+router.post('/icc-tiempo', auth, ctrl.simularICC);
 
 // Simulación con gráfica
-router.post('/icc-tiempo/grafica', optionalAuth, ctrl.simularICCConGrafica);
+router.post('/icc-tiempo/grafica', auth, ctrl.simularICCConGrafica);
 
 // Múltiples escenarios
-router.post('/escenarios', optionalAuth, ctrl.simularEscenarios);
+router.post('/escenarios', auth, ctrl.simularEscenarios);
 
 // Verificar capacidad de breaker
-router.post('/verificar-capacidad', optionalAuth, ctrl.verificarCapacidad);
+router.post('/verificar-capacidad', auth, ctrl.verificarCapacidad);
 
 // Live simulation for real-time editor
-router.post('/live', optionalAuth, ctrl.liveSimulation);
+router.post('/live', auth, ctrl.liveSimulation);
 
 module.exports = router;

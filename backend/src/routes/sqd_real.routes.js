@@ -5,32 +5,18 @@
 
 const router = require('express').Router();
 const ctrl = require('../controllers/sqd_real.controller');
-const auth = require('../middlewares/auth.middleware');
+const auth = require('../middleware/auth.middleware');
+const { apiLimiter } = require('../middleware/rateLimiter.middleware');
 
-// Auth optional for development
-const optionalAuth = (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-};
+// Apply rate limiting to SQD endpoints
+router.use(apiLimiter);
 
-// Listar curvas disponibles
-router.get('/curvas', optionalAuth, ctrl.listarCurvas);
-
-// Obtener curva específica
-router.get('/curva/:nombre', optionalAuth, ctrl.obtenerCurva);
-
-// Calcular tiempo de disparo
-router.post('/tiempo-disparo', optionalAuth, ctrl.tiempoDisparo);
-
-// Evaluar coordinación entre dos curvas
-router.post('/coordinacion', optionalAuth, ctrl.evaluarCoordinacion);
-
-// Analizar cascada de curvas
-router.post('/cascada', optionalAuth, ctrl.analizarCascada);
-
-// Comparar curvas (genera gráfica)
-router.post('/comparar', optionalAuth, ctrl.compararCurvas);
+// All SQD routes require authentication
+router.get('/curvas', auth, ctrl.listarCurvas);
+router.get('/curva/:nombre', auth, ctrl.obtenerCurva);
+router.post('/tiempo-disparo', auth, ctrl.tiempoDisparo);
+router.post('/coordinacion', auth, ctrl.evaluarCoordinacion);
+router.post('/cascada', auth, ctrl.analizarCascada);
+router.post('/comparar', auth, ctrl.compararCurvas);
 
 module.exports = router;

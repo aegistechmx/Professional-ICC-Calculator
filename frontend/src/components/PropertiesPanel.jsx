@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useStore } from '../store/useStore';
 
 export default function PropertiesPanel() {
@@ -6,11 +7,13 @@ export default function PropertiesPanel() {
   const [localParams, setLocalParams] = useState({});
   const [simulating, setSimulating] = useState(false);
   const [simulationResults, setSimulationResults] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (selectedNode) {
       setLocalParams(selectedNode.data.parameters || {});
       setSimulationResults(null);
+      setError(null); // Clear error when node changes
     }
   }, [selectedNode]);
 
@@ -19,6 +22,34 @@ export default function PropertiesPanel() {
       <div className="w-80 bg-white border-l border-gray-200 p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Propiedades</h3>
         <p className="text-sm text-gray-500">Selecciona un elemento para ver sus propiedades</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-80 bg-white border-l border-gray-200 p-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Propiedades</h3>
+        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded mb-4">
+          {error}
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setError(null)}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            Cerrar error
+          </button>
+          <button
+            onClick={() => {
+              setError(null);
+              // Continue to show properties panel
+            }}
+            className="text-sm text-gray-600 hover:text-gray-800"
+          >
+            Continuar
+          </button>
+        </div>
       </div>
     );
   }
@@ -59,12 +90,14 @@ export default function PropertiesPanel() {
 
   const handleSimulate = async () => {
     setSimulating(true);
+    setError(null); // Clear previous error
     try {
       const results = await calculateICC();
       setSimulationResults(results);
     } catch (error) {
       console.error('Simulation error:', error);
-      alert('Error al simular: ' + error.message);
+      // Use proper error handling instead of alert
+      setError('Error al simular: ' + error.message);
     } finally {
       setSimulating(false);
     }
@@ -311,3 +344,7 @@ export default function PropertiesPanel() {
     </div>
   );
 }
+
+PropertiesPanel.propTypes = {
+  // No props - uses Zustand store
+};

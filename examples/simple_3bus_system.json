@@ -1,0 +1,58 @@
+{
+  "name": "Simple 3-Bus System",
+  "description": "A basic 3-bus system for testing power flow analysis",
+  "baseMVA": 100,
+  "baseKV": 13.8,
+  "buses": [
+    {
+      "id": "bus1",
+      "type": "Slack",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "generation": { "P": 100, "Q": 50 }
+    },
+    {
+      "id": "bus2",
+      "type": "PV",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "generation": { "P": 50, "Q": 25 }
+    },
+    {
+      "id": "bus3",
+      "type": "PQ",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 80, "Q": 40 }
+    }
+  ],
+  "lines": [
+    {
+      "id": "line1",
+      "fromBus": "bus1",
+      "toBus": "bus2",
+      "r": 0.01,
+      "x": 0.1,
+      "b": 0.0,
+      "thermalLimit": 100
+    },
+    {
+      "id": "line2",
+      "fromBus": "bus2",
+      "toBus": "bus3",
+      "r": 0.015,
+      "x": 0.12,
+      "b": 0.0,
+      "thermalLimit": 80
+    },
+    {
+      "id": "line3",
+      "fromBus": "bus1",
+      "toBus": "bus3",
+      "r": 0.02,
+      "x": 0.15,
+      "b": 0.0,
+      "thermalLimit": 120
+    }
+  ]
+}

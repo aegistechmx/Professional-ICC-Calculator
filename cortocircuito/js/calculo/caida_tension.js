@@ -43,7 +43,7 @@ var CaidaTension = (function() {
 
         // Componentes de potencia
         var cosFi = Math.min(1, Math.max(0, fp));
-        var sinFi = Math.sqrt(Math.max(0, 1 - cosFi * cosFi));
+        var sinFi = Math.sqrt(Math.max(0, 1 - Math.pow(cosFi, 2)));
 
         // Factor multiplicador segun tipo de sistema
         var factor = tipo === '3f' ? Math.sqrt(3) : 2;
@@ -72,31 +72,39 @@ var CaidaTension = (function() {
 
     /**
      * Calcula la caida acumulada hasta cada punto (suma de caidas parciales)
-     * @param {Array} feeders     - Lista de alimentadores con datos de carga
+     * @param {Array} nodos       - Estructura de nodos en árbol
      * @param {number} V          - Tension del sistema
      * @param {string} tipo       - '3f' o '1f'
      * @returns {Array} Array de objetos con caida acumulada por punto
      */
-    function calcularAcumulada(feeders, V, tipo) {
+    function calcularAcumulada(nodos, V, tipo) {
         var resultados = [];
-        var caidaAcumV = 0;
 
-        // P0 siempre tiene 0
-        resultados.push({ caidaV: 0, caidaPct: 0, ok: true, limite: CONSTANTES.CAIDA_MAXIMA_TOTAL });
+        (nodos || []).forEach(function(nodo) {
+            var camino = Impedancias.obtenerCamino(nodo.id, nodos);
+            var totalV = 0;
+            var ultimoParcial = { caidaV: 0, caidaPct: 0 };
 
-        for (var i = 0; i < feeders.length; i++) {
-            var f = feeders[i];
-            var parcial = calcular(f, f.cargaA || 0, f.cargaFP || 0, V, tipo);
-            caidaAcumV += parcial.caidaV;
-            var caidaAcumPct = (caidaAcumV / V) * 100;
-            resultados.push({
-                caidaV: caidaAcumV,
-                caidaPct: caidaAcumPct,
-                ok: caidaAcumPct <= CONSTANTES.CAIDA_MAXIMA_TOTAL,
-                limite: CONSTANTES.CAIDA_MAXIMA_TOTAL,
-                parcial: parcial
+            camino.forEach(function(id) {
+                var n = nodos.find(function(item) { return item.id === id; });
+                if (n && n.feeder && n.parentId) {
+                    var p = calcular(n.feeder, n.feeder.cargaA || 0, n.feeder.cargaFP || 0, V, tipo);
+                    totalV += p.caidaV;
+                    ultimoParcial = p;
+                }
             });
-        }
+
+            var pct = (totalV / V) * 100;
+            resultados.push({
+                id: nodo.id,
+                caidaV: totalV,
+                caidaPct: pct,
+                ok: pct <= CONSTANTES.CAIDA_MAXIMA_TOTAL,
+                limite: CONSTANTES.CAIDA_MAXIMA_TOTAL,
+                parcial: ultimoParcial
+            });
+        });
+
         return resultados;
     }
 

@@ -141,11 +141,11 @@ var MotorDiagnostico = (function() {
 
         var estadoGlobal;
         if (criticos > 0) {
-            estadoGlobal = "🔴 CRÍTICO";
+            estadoGlobal = "[X] CRÍTICO";
         } else if (advertencias > 0) {
-            estadoGlobal = "🟡 ADVERTENCIAS";
+            estadoGlobal = "[!] ADVERTENCIAS";
         } else {
-            estadoGlobal = "🟢 SISTEMA ÓPTIMO";
+            estadoGlobal = "[OK] SISTEMA ÓPTIMO";
         }
 
         return {
@@ -166,14 +166,14 @@ var MotorDiagnostico = (function() {
         var html = '<div class="panel-semaforo">';
         html += '<h2>' + resumen.estadoGlobal + '</h2>';
         html += '<div class="stats">';
-        html += '🔴 ' + resumen.criticos + ' críticos<br>';
-        html += '🟡 ' + resumen.advertencias + ' advertencias';
+        html += '[X] ' + resumen.criticos + ' críticos<br>';
+        html += '[!] ' + resumen.advertencias + ' advertencias';
         html += '</div>';
 
         if (issues.length > 0) {
             html += '<div class="issues-list">';
             issues.forEach(function(i) {
-                var icono = i.nivel === "CRITICO" ? "🔴" : "🟡";
+                var icono = i.nivel === "CRITICO" ? "[X]" : "[!]";
                 var clase = i.nivel === "CRITICO" ? "issue-critico" : "issue-advertencia";
                 html += '<div class="issue ' + clase + '">';
                 html += '<b>' + icono + ' ' + i.tipo + ' - ' + i.nodo + '</b>';

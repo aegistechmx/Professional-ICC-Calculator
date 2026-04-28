@@ -45,7 +45,7 @@ var TCCCalibracionUI = (function() {
                     <!-- Panel izquierdo: PDF -->
                     <div>
                         <div class="mb-4">
-                            <label class="block text-sm font-semibold mb-2">Cargar PDF de Curva TCC</label>
+                            <label class="block text-sm font-semibold mb-2" for="tcc-pdf-input">Cargar PDF de Curva TCC</label>
                             <input type="file" id="tcc-pdf-input" name="tcc-pdf-input" accept=".pdf" class="w-full p-2 border rounded">
                         </div>
                         
@@ -186,7 +186,11 @@ var TCCCalibracionUI = (function() {
             actualizarInfoPagina();
         } catch (error) {
             console.error('[TCCCalibracionUI] Error cargando PDF:', error);
-            alert('Error al cargar el PDF');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('Error al cargar el PDF', 'error');
+            } else {
+                console.error('Error al cargar el PDF');
+            }
         }
     }
 
@@ -337,7 +341,11 @@ var TCCCalibracionUI = (function() {
      */
     function calibrarEjes() {
         if (estado.puntosEjeX.length !== 2 || estado.puntosEjeY.length !== 2) {
-            alert('Debes seleccionar 2 puntos en cada eje');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('Debes seleccionar 2 puntos en cada eje', 'error');
+            } else {
+                console.error('Debes seleccionar 2 puntos en cada eje');
+            }
             return;
         }
         
@@ -347,7 +355,11 @@ var TCCCalibracionUI = (function() {
         var y2T = parseFloat(document.getElementById('tcc-y2-t').value);
         
         if (!x1I || !x2I || !y1T || !y2T) {
-            alert('Debes ingresar los valores de calibración');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('Debes ingresar los valores de calibración', 'error');
+            } else {
+                console.error('Debes ingresar los valores de calibración');
+            }
             return;
         }
         
@@ -362,8 +374,12 @@ var TCCCalibracionUI = (function() {
             t2: y2T
         };
         
-        console.log('[TCCCalibracionUI] Calibración:', estado.calibracion);
-        alert('Ejes calibrados correctamente');
+        // Calibration completed
+        if (typeof UIToast !== 'undefined') {
+            UIToast.mostrar('Ejes calibrados correctamente', 'success');
+        } else if (typeof Debug !== 'undefined') {
+            Debug.log('Ejes calibrados correctamente');
+        }
     }
 
     /**
@@ -380,17 +396,29 @@ var TCCCalibracionUI = (function() {
      */
     async function digitalizarCurva() {
         if (!estado.calibracion) {
-            alert('Debes calibrar los ejes primero');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('Debes calibrar los ejes primero', 'error');
+            } else {
+                console.error('Debes calibrar los ejes primero');
+            }
             return;
         }
         
         if (estado.puntosCurva.length < 2) {
-            alert('Debes seleccionar al menos 2 puntos de la curva');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('Debes seleccionar al menos 2 puntos de la curva', 'error');
+            } else {
+                console.error('Debes seleccionar al menos 2 puntos de la curva');
+            }
             return;
         }
         
         if (typeof TCCDigitalizer === 'undefined') {
-            alert('Módulo TCCDigitalizer no disponible');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('Módulo TCCDigitalizer no disponible', 'error');
+            } else {
+                console.error('Módulo TCCDigitalizer no disponible');
+            }
             return;
         }
         
@@ -413,7 +441,11 @@ var TCCCalibracionUI = (function() {
             mostrarResultados(resultado);
         } catch (error) {
             console.error('[TCCCalibracionUI] Error digitalizando:', error);
-            alert('Error al digitalizar la curva');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('Error al digitalizar la curva', 'error');
+            } else {
+                console.error('Error al digitalizar la curva');
+            }
         }
     }
 
@@ -424,6 +456,7 @@ var TCCCalibracionUI = (function() {
         var container = document.getElementById('tcc-curva-resultados');
         
         if (!resultado.curva || resultado.curva.length === 0) {
+            // Note: innerHTML is safe here as content is static, not from user input
             container.innerHTML = '<div class="text-red-500">No se pudo digitalizar la curva</div>';
             return;
         }
@@ -437,11 +470,11 @@ var TCCCalibracionUI = (function() {
         });
         
         html += '</table>';
-        html += `<div class="mt-2 ${resultado.valida ? 'text-green-600' : 'text-red-600'}">`;
-        html += resultado.valida ? 'Curva válida' : 'Curva inválida';
-        html += '</div>';
-        
+        // Note: innerHTML is safe here as html is generated internally from state
         container.innerHTML = html;
+        container.innerHTML += `<div class="mt-2 ${resultado.valida ? 'text-green-600' : 'text-red-600'}">`;
+        container.innerHTML += resultado.valida ? 'Curva válida' : 'Curva inválida';
+        container.innerHTML += '</div>';
     }
 
     /**
@@ -449,13 +482,19 @@ var TCCCalibracionUI = (function() {
      */
     function guardarCurva() {
         if (!estado.curvaDigitalizada || !estado.curvaDigitalizada.valida) {
-            alert('No hay una curva válida para guardar');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('No hay una curva válida para guardar', 'error');
+            } else {
+                console.error('No hay una curva válida para guardar');
+            }
             return;
         }
         
-        // TODO: Implementar guardado en base de datos o local storage
-        console.log('[TCCCalibracionUI] Guardando curva:', estado.curvaDigitalizada);
-        alert('Curva guardada (implementación pendiente)');
+        if (typeof UIToast !== 'undefined') {
+            UIToast.mostrar('Curva guardada (implementación pendiente)', 'warning');
+        } else if (typeof Debug !== 'undefined') {
+            Debug.log('Curva guardada (implementación pendiente)');
+        }
     }
 
     return {
@@ -468,5 +507,7 @@ var TCCCalibracionUI = (function() {
 
 if (typeof window !== 'undefined') {
     window.TCCCalibracionUI = TCCCalibracionUI;
-    console.log('[TCCCalibracionUI] Módulo cargado correctamente');
+    if (typeof Debug !== 'undefined') {
+        Debug.log('[TCCCalibracionUI] Módulo cargado correctamente');
+    }
 }

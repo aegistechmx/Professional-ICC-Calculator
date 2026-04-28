@@ -1,13 +1,11 @@
 import React, { useCallback, useRef } from 'react';
 import ReactFlow, {
   addEdge,
-  Background,
   Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
-  ReactFlowProvider,
-  useReactFlow
+  ReactFlowProvider
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -20,6 +18,7 @@ import PropertiesPanel from './PropertiesPanel';
 import GridBackground from './GridBackground';
 import { useStore } from '../store/useStore';
 import { snap } from '../utils/snap';
+import { validateConnection } from '../utils/validation';
 
 const nodeTypes = {
   breaker: BreakerNode,
@@ -42,9 +41,9 @@ function Editor() {
 
       if (sourceNode && targetNode) {
         // Validate connection
-        const { validateConnection } = require('../utils/validation');
         if (!validateConnection(sourceNode.type, targetNode.type)) {
-          alert(`Conexión inválida: ${sourceNode.type} → ${targetNode.type}`);
+          // eslint-disable-next-line no-console
+          console.error(`Conexión inválida: ${sourceNode.type} → ${targetNode.type}`);
           return;
         }
       }
@@ -161,20 +160,30 @@ function Editor() {
 
 function getDefaultParameters(type) {
   switch (type) {
-    case 'breaker':
+    case 'breaker': {
       return { In: 100, Icu: 25000, tipo: 'molded_case' };
-    case 'transformer':
+    }
+    case 'transformer': {
       return { kVA: 500, primario: 13800, secundario: 480, Z: 5.75 };
-    case 'panel':
+    }
+    case 'panel': {
       return { tension: 480, fases: 3 };
-    case 'load':
+    }
+    case 'load': {
       return { potencia_kW: 50, potencia_kVAR: 25, fp: 0.85, voltaje: 480 };
-    case 'motor':
+    }
+    case 'motor': {
       return { hp: 75, voltaje: 480, eficiencia: 0.92, fp: 0.85 };
-    default:
+    }
+    default: {
       return {};
+    }
   }
 }
+
+Editor.propTypes = {
+  // No props - uses Zustand store
+};
 
 export default function EditorWithProvider() {
   return (

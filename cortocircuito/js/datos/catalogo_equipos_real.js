@@ -400,11 +400,13 @@ var CatalogoEquiposReal = (function() {
         for (var marca in CATALOGO) {
             for (var modelo in CATALOGO[marca]) {
                 var data = CATALOGO[marca][modelo];
-                data.frames.forEach(function(f) {
-                    if (todosLosFrames.indexOf(f) === -1) {
-                        todosLosFrames.push(f);
-                    }
-                });
+                if (data.frames && Array.isArray(data.frames)) {
+                    data.frames.forEach(function(f) {
+                        if (todosLosFrames.indexOf(f) === -1) {
+                            todosLosFrames.push(f);
+                        }
+                    });
+                }
             }
         }
 

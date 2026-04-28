@@ -9,6 +9,16 @@ var UIAlimentadores = (function() {
     var MAX_NODOS = 50;
     var nodoExpandido = {}; // Track which nodes are expanded
 
+    /**
+     * Helper: Escapa caracteres HTML para prevenir XSS
+     * @param {string} unsafe - Cadena a escapar
+     * @returns {string} Cadena escapada
+     */
+    function escapeHtml(unsafe) {
+        return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+
     // Helper function to get nodos safely
     function getNodos() {
         return (typeof App !== 'undefined' && App.estado && App.estado.nodos) ? App.estado.nodos : [];
@@ -23,6 +33,9 @@ var UIAlimentadores = (function() {
     
     // Función para obtener ampacidad sugerida (NOM-001-SEDE-2012)
     function getAmpacidadSugerida(material, calibre, carga, tempAmbiente, canalizacion, paralelo, fc, ft, numConductores) {
+        var thdi = (typeof App !== 'undefined' && App.estado && App.estado.ctx && App.estado.ctx.harmonics) ? App.estado.ctx.harmonics.THDi : 0;
+        var tieneArmonicos = thdi > 0.15;
+
         // Determinar temperatura de conductor según NOM-001: <100A usa 60°C, >=100A usa 75°C
         var tempConductor = (carga < CONSTANTES.TEMP_CONDUCTOR_POR_CORRIENTE) ? '60' : '75';
 
@@ -48,7 +61,7 @@ var UIAlimentadores = (function() {
                 sistema: '3f',
                 tieneNeutro: true,
                 neutroContado: false,
-                tieneArmonicos: false,
+                tieneArmonicos: tieneArmonicos,
                 paralelos: paralelo || 1
             });
             factorConductores = agrupamiento.F;
@@ -103,6 +116,16 @@ var UIAlimentadores = (function() {
         }
         
         var sugerencia = getAmpacidadSugerida(f.material, f.calibre, icarga, tempAmbiente, f.canalizacion, f.paralelo, f.fc, f.ft, f.numConductores);
+        var thdi = (typeof App !== 'undefined' && App.estado && App.estado.ctx && App.estado.ctx.harmonics) ? App.estado.ctx.harmonics.THDi : 0;
+        var warningNeutro = '';
+
+        // Validación NOM: Si THDi > 15%, el neutro se considera portador de corriente (Art. 310-15 B 5 c)
+        if (thdi > 0.15 && (f.numConductores || 3) <= 3) {
+            warningNeutro = '<div class="flex items-center gap-2 mt-1 px-3 py-1 rounded border border-[--orange]/30 bg-[--orange]/5">' +
+                '<i class="fas fa-exclamation-triangle text-[--orange] text-[0.65rem]"></i>' +
+                '<span class="text-[0.65rem] text-[--orange]">THDi > 15%: El neutro es portador de corriente (NOM Art. 310). Considere 4 conductores.</span>' +
+                '</div>';
+        }
         
         if (!sugerencia) {
             return '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
@@ -112,21 +135,21 @@ var UIAlimentadores = (function() {
         }
         
         if (sugerencia.ok) {
-            return '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
+            return warningNeutro + '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
                 '<i class="fas fa-check-circle text-[--green] text-[0.7rem]"></i>' +
                 '<span class="text-[0.7rem] text-[--green]">Calibre ' + f.calibre + ' OK (amp: ' + sugerencia.ampAjustada.toFixed(0) + 'A, margen +' + sugerencia.margen.toFixed(0) + '%)</span>' +
                 '</div>';
         }
         
         if (sugerencia.subdimensionado && sugerencia.calibreSugerido) {
-            return '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
+            return warningNeutro + '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
                 '<i class="fas fa-exclamation-triangle text-[--red] text-[0.7rem]"></i>' +
                 '<span class="text-[0.7rem] text-[--red]">¡ADVERTENCIA! Calibre ' + f.calibre + ' insuficiente. Usar mínimo ' + sugerencia.calibreSugerido + ' (' + sugerencia.ampAjustada.toFixed(0) + 'A para ' + icarga + 'A)</span>' +
                 '</div>';
         }
         
         if (sugerencia.sobredimensionado && sugerencia.calibreSugerido) {
-            return '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
+            return warningNeutro + '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
                 '<i class="fas fa-arrow-down text-[--yellow] text-[0.7rem]"></i>' +
                 '<span class="text-[0.7rem] text-[--yellow]">Calibre sobredimensionado. Sugerencia: ' + sugerencia.calibreSugerido + ' (' + sugerencia.ampAjustada.toFixed(0) + 'A, margen ' + sugerencia.margen.toFixed(0) + '%)</span>' +
                 '</div>';
@@ -153,11 +176,22 @@ var UIAlimentadores = (function() {
         // Renderizar árbol recursivamente desde la raíz
         var nodosRaiz = (getNodos() || []).filter(function(n) { return !n.parentId; });
         nodosRaiz.forEach(function(nodo) {
-            container.appendChild(renderizarNodoRecursivo(nodo, getNodos(), tempAmbiente, 0));
+            container.appendChild(renderizarNodoRecursivo(nodo, getNodos(), tempAmbiente, 0, new Set()));
         });
     }
 
-    function renderizarNodoRecursivo(nodo, nodos, tempAmbiente, profundidad) {
+    function renderizarNodoRecursivo(nodo, nodos, tempAmbiente, profundidad, visitados) {
+        if (!visitados) visitados = new Set();
+
+        if (visitados.has(nodo.id)) {
+            console.error('Ciclo detectado en la UI de alimentadores para el nodo:', nodo.id);
+            var errorMsg = document.createElement('div');
+            errorMsg.className = 'p-2 mb-2 rounded border border-[--red] bg-[--red]/10 text-[--red] text-[0.65rem]';
+            errorMsg.textContent = '⚠ Error: Ciclo en jerarquía (' + nodo.id + ')';
+            return errorMsg;
+        }
+        visitados.add(nodo.id);
+
         var wrapper = document.createElement('div');
         wrapper.className = 'nodo-wrapper';
         wrapper.style.marginLeft = (profundidad * 20) + 'px';
@@ -165,6 +199,7 @@ var UIAlimentadores = (function() {
         var block = document.createElement('div');
         block.className = 'nodo-block';
         var tempDiv = document.createElement('div');
+        // Note: innerHTML is safe here as construirHTMLNodo generates HTML internally from node data
         tempDiv.innerHTML = construirHTMLNodo(nodo, tempAmbiente);
         while (tempDiv.firstChild) {
             block.appendChild(tempDiv.firstChild);
@@ -175,7 +210,7 @@ var UIAlimentadores = (function() {
         if (nodoExpandido[nodo.id]) {
             var hijos = Impedancias.obtenerHijos(nodo.id, nodos);
             hijos.forEach(function(hijo) {
-                wrapper.appendChild(renderizarNodoRecursivo(hijo, nodos, tempAmbiente, profundidad + 1));
+                wrapper.appendChild(renderizarNodoRecursivo(hijo, nodos, tempAmbiente, profundidad + 1, new Set(visitados)));
             });
         }
 
@@ -219,8 +254,8 @@ var UIAlimentadores = (function() {
             '<div class="flex items-center justify-between mb-2">' +
             '<div class="flex items-center gap-2">' +
             (tieneHijos ? '<button onclick="UIAlimentadores.toggleExpand(\'' + nodo.id + '\')" class="text-[--text-muted] hover:text-[--text] p-1"><i class="fas ' + expandIcon + ' text-[0.7rem]"></i></button>' : '<span class="w-6"></span>') +
-            '<span class="font-semibold text-[--amber] text-sm">' + nodo.id + '</span>' +
-            '<input type="text" id="feeder-' + nodo.id + '-nombre" name="feeder-' + nodo.id + '-nombre" class="text-[0.7rem] text-[--text-muted] bg-transparent border-none p-0 w-32 focus:outline-none focus:text-[--text]" value="' + (nodo.nombre || nodo.id) + '" onchange="UIAlimentadores.actualizarNombre(\'' + nodo.id + '\', this.value)" placeholder="Nombre del tablero">' +
+            '<span class="font-semibold text-[--amber] text-sm">' + escapeHtml(nodo.id) + '</span>' +
+            '<input type="text" id="feeder-' + nodo.id + '-nombre" name="feeder-' + nodo.id + '-nombre" class="text-[0.7rem] text-[--text-muted] bg-transparent border-none p-0 w-32 focus:outline-none focus:text-[--text]" value="' + escapeHtml(nodo.nombre || nodo.id) + '" onchange="UIAlimentadores.actualizarNombre(\'' + nodo.id + '\', this.value)" placeholder="Nombre del tablero">' +
             '</div>' +
             '<div class="flex gap-1">' +
             '<button onclick="UIAlimentadores.agregarHijo(\'' + nodo.id + '\')" class="px-2 py-1 text-[0.65rem] bg-[--cyan] text-black rounded hover:bg-[--cyan]/80 transition-colors" title="Agregar derivación">+ Rama</button>' +
@@ -479,44 +514,65 @@ var UIAlimentadores = (function() {
     }
 
     function agregarHijo(parentId) {
-        if (!getNodos() || getNodos().length >= MAX_NODOS) {
-            if (getNodos() && getNodos().length >= MAX_NODOS) {
-                UIToast.mostrar('Máximo de nodos alcanzado (' + MAX_NODOS + ')', 'error');
+        try {
+            if (!getNodos() || getNodos().length >= MAX_NODOS) {
+                if (getNodos() && getNodos().length >= MAX_NODOS) {
+                    UIToast.mostrar('Máximo de nodos alcanzado (' + MAX_NODOS + ')', 'error');
+                } else {
+                    UIToast.mostrar('Error: No hay nodos inicializados', 'error');
+                }
+                return;
             }
-            return;
+
+            var nuevoId = generarNuevoId();
+            var nuevoNodo = {
+                id: nuevoId,
+                parentId: parentId,
+                nombre: 'Punto ' + (nuevoId && nuevoId.length > 1 ? nuevoId.substring(1) : nuevoId),
+                feeder: {
+                    calibre: '4/0',
+                    material: 'cobre',
+                    canalizacion: 'pvc',
+                    longitud: 30,
+                    paralelo: 1,
+                    cargaA: 0,
+                    cargaFP: 0.9
+                },
+                equip: {
+                    tipo: '',
+                    modelo: '',
+                    cap: 0,
+                    iDisparo: 0,
+                    nombre: ''
+                }
+            };
+
+            if (!getNodos()) {
+                UIToast.mostrar('Error: No se pueden obtener los nodos', 'error');
+                return;
+            }
+            
+            var nodos = getNodos();
+            nodos.push(nuevoNodo);
+            setNodos(nodos);
+            nodoExpandido[parentId] = true;
+            
+            if (typeof App !== 'undefined' && App.clearResults) { 
+                App.clearResults(); 
+            }
+            
+            renderizar();
+            
+            if (typeof UIDiagrama !== 'undefined' && UIDiagrama.dibujar) {
+                UIDiagrama.dibujar();
+            } else {
+                console.warn('UIDiagrama no disponible para dibujar');
+            }
+        } catch (e) {
+            console.error('Error en agregarHijo:', e);
+            console.error('Stack trace:', e.stack);
+            UIToast.mostrar('Error al agregar alimentador: ' + (e.message || 'Error desconocido'), 'error');
         }
-
-        var nuevoId = generarNuevoId();
-        var nuevoNodo = {
-            id: nuevoId,
-            parentId: parentId,
-            nombre: 'Punto ' + (nuevoId && nuevoId.length > 1 ? nuevoId.substring(1) : nuevoId),
-            feeder: {
-                calibre: '4/0',
-                material: 'cobre',
-                canalizacion: 'pvc',
-                longitud: 30,
-                paralelo: 1,
-                cargaA: 0,
-                cargaFP: 0.9
-            },
-            equip: {
-                tipo: '',
-                modelo: '',
-                cap: 0,
-                iDisparo: 0,
-                nombre: ''
-            }
-        };
-
-        if (!getNodos()) return;
-        var nodos = getNodos();
-        nodos.push(nuevoNodo);
-        setNodos(nodos);
-        nodoExpandido[parentId] = true;
-        if (typeof App !== 'undefined' && App.clearResults) { App.clearResults(); }
-        renderizar();
-        UIDiagrama.dibujar();
     }
 
     function eliminarNodo(nodoId) {
@@ -641,6 +697,35 @@ var UIAlimentadores = (function() {
         return feeders;
     }
 
+    /**
+     * Verifica si el THDi actual requiere aumentar el número de conductores (CCC)
+     * de 3 a 4 según NOM-001 Art. 310-15(B)(5)(c).
+     */
+    function verificarYActualizarConductoresPorTHDi() {
+        var thdi = (typeof App !== 'undefined' && App.estado && App.estado.ctx && App.estado.ctx.harmonics) ? App.estado.ctx.harmonics.THDi : 0;
+        
+        if (thdi > 0.15) {
+            var nodos = getNodos();
+            var cambios = 0;
+            
+            nodos.forEach(function(nodo) {
+                // Si tiene 3 conductores (fases) y detectamos armónicos altos, el neutro ahora cuenta como CCC.
+                if (nodo.feeder && (nodo.feeder.numConductores || 3) === 3) {
+                    nodo.feeder.numConductores = 4;
+                    cambios++;
+                }
+            });
+            
+            if (cambios > 0) {
+                setNodos(nodos);
+                renderizar();
+                if (typeof UIToast !== 'undefined') {
+                    UIToast.mostrar('Ajuste Normativo: ' + cambios + ' alimentadores actualizados a 4 conductores por THDi > 15%', 'warning');
+                }
+            }
+        }
+    }
+
     return {
         renderizar: renderizar,
         actualizarFeeder: actualizarFeeder,
@@ -651,13 +736,18 @@ var UIAlimentadores = (function() {
         agregarHijo: agregarHijo,
         eliminarNodo: eliminarNodo,
         actualizarNombre: actualizarNombre,
-        init: init
+        init: init,
+        verificarYActualizarConductoresPorTHDi: verificarYActualizarConductoresPorTHDi
     };
 })();
 
 if (typeof window !== 'undefined') {
     window.UIAlimentadores = UIAlimentadores;
+    /**
+     * Helper: Escapa caracteres HTML para prevenir XSS
+     */
+    function escapeHtml(unsafe) {
+        return String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
 }
-
-
-

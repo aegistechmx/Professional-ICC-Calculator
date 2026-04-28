@@ -1,6 +1,6 @@
 const calculoService = require('../services/calculo.service');
 const { iccMotoresSchema } = require('../validators/calculo.schema');
-const { success, error } = require('../utils/apiResponse');
+const { success } = require('../utils/apiResponse');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 exports.iccSimple = asyncHandler(async (req, res) => {

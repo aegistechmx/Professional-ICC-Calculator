@@ -38,7 +38,16 @@ class ApiError extends Error {
  * @param {import('express').NextFunction} next - Express next function
  */
 const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
+  // Safe error logging to avoid circular reference issues
+  try {
+    console.error('Error:', err.message || err);
+    if (process.env.NODE_ENV === 'development' && err.stack) {
+      console.error('Stack:', err.stack);
+    }
+  } catch (logError) {
+    // If logging fails, continue without crashing
+    console.error('Error logging failed');
+  }
 
   // Handle known API errors
   if (err instanceof ApiError) {
@@ -73,7 +82,7 @@ const errorHandler = (err, req, res, next) => {
   // Default error response
   const statusCode = err.statusCode || 500;
   const message = process.env.NODE_ENV === 'development' 
-    ? err.message 
+    ? (err.message || 'Internal server error')
     : 'Internal server error';
 
   res.status(statusCode).json({

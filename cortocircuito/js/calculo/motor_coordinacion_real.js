@@ -52,8 +52,8 @@ var MotorCoordinacionReal = (function() {
                 breaker: mejor || null,
                 tcc: mejor ? {
                     pickup: mejor.frame,
-                    longDelay: 2.0,
-                    shortDelay: 0.1,
+                    longDelay: 6.0,
+                    shortDelay: 0.3,
                     instantaneous: mejor.frame * 10
                 } : null
             });
@@ -327,8 +327,8 @@ var MotorCoordinacionReal = (function() {
         // Estado global
         var estadoColor = resultado.estadoFinal === 'COORDINADO' ? 'text-green-400' : 
                          (resultado.estadoFinal === 'PARCIAL_COORDINADO' ? 'text-yellow-400' : 'text-red-400');
-        var estadoIcono = resultado.estadoFinal === 'COORDINADO' ? '🟢' : 
-                         (resultado.estadoFinal === 'PARCIAL_COORDINADO' ? '🟡' : '🔴');
+        var estadoIcono = resultado.estadoFinal === 'COORDINADO' ? '[OK]' : 
+                         (resultado.estadoFinal === 'PARCIAL_COORDINADO' ? '[!]' : '[X]');
         
         html += '<div class="p-4 rounded bg-[--border] mb-4">';
         html += '<span class="font-bold ' + estadoColor + '">' + estadoIcono + ' ' + resultado.estadoFinal + '</span>';
@@ -375,11 +375,11 @@ var MotorCoordinacionReal = (function() {
                 html += '<div class="space-y-1">';
                 resultado.validacionFinal.cruces.forEach(function(c) {
                     var color = c.severidad === 'CRITICO' ? 'text-[--red]' : 'text-[--yellow]';
-                    html += '<div class="text-xs ' + color + '">❌ ' + c.par + ' @ ' + c.corriente.toFixed(0) + 'A: ratio=' + c.ratio.toFixed(2) + ' < ' + c.selectividadMinima + '</div>';
+                    html += '<div class="text-xs ' + color + '">[X] ' + c.par + ' @ ' + c.corriente.toFixed(0) + 'A: ratio=' + c.ratio.toFixed(2) + ' < ' + c.selectividadMinima + '</div>';
                 });
                 html += '</div>';
             } else {
-                html += '<div class="text-xs text-[--green]">✅ No se detectaron cruces de coordinación</div>';
+                html += '<div class="text-xs text-[--green]">[OK] No se detectaron cruces de coordinación</div>';
             }
             
             html += '</div>';

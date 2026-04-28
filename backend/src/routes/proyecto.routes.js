@@ -1,20 +1,13 @@
 const router = require('express').Router();
 const ctrl = require('../controllers/proyecto.controller');
-const auth = require('../middlewares/auth.middleware');
+const auth = require('../middleware/auth.middleware');
+const { apiLimiter } = require('../middleware/rateLimiter.middleware');
 
-// Auth optional for development
-router.post('/', (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-}, ctrl.create);
+// Apply rate limiting to project endpoints
+router.use(apiLimiter);
 
-router.get('/', (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-}, ctrl.getAll);
+// Require authentication for all project routes
+router.post('/', auth, ctrl.create);
+router.get('/', auth, ctrl.getAll);
 
 module.exports = router;

@@ -77,7 +77,7 @@ var Profile = (function() {
                 return normalized;
             }
         } catch (e) {
-            console.warn('Error al leer perfil:', e);
+            console.error('Error parsing profile from localStorage:', e);
         }
         return Object.assign({}, defaultProfile);
     }

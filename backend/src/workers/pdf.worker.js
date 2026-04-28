@@ -3,8 +3,16 @@ const IORedis = require('ioredis');
 const prisma = require('../config/db');
 const pdfService = require('../services/reporte/pdf.service');
 
-// Create Redis connection
+// Create Redis connection with error handling
 const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379');
+
+connection.on('error', (err) => {
+  console.error('Redis connection error:', err);
+});
+
+connection.on('connect', () => {
+  // Redis connected - logging removed for production
+});
 
 // Create PDF generation worker
 const pdfWorker = new Worker(
@@ -27,7 +35,7 @@ const pdfWorker = new Worker(
         where: { id: job.id },
         data: {
           status: 'completed',
-          result: { pdfSize: pdfBuffer.length },
+          result: JSON.stringify({ pdfSize: pdfBuffer.length }),
           completedAt: new Date()
         }
       });
@@ -54,7 +62,7 @@ const pdfWorker = new Worker(
 
 // Handle worker events
 pdfWorker.on('completed', (job) => {
-  console.log(`PDF generation completed for job ${job.id}`);
+  // PDF generation completed - logging removed for production
 });
 
 pdfWorker.on('failed', (job, err) => {

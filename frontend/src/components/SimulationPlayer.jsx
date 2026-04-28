@@ -6,7 +6,7 @@ import { useSimStore } from '../store/simStore';
  * Controls playback of time-based simulation (0-200ms)
  */
 export default function SimulationPlayer({ simulationData }) {
-  const { tiempo, isPlaying, playbackSpeed, setTiempo, setPlaying, setPlaybackSpeed, reset } = useSimStore();
+  const { tiempo, isPlaying, playbackSpeed, setTiempo, setPlaying, setPlaybackSpeed, reset, setSimulationData } = useSimStore();
   const [localTime, setLocalTime] = useState(0);
 
   useEffect(() => {

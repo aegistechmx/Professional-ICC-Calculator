@@ -27,7 +27,7 @@ export function useAutoSave(projectId, delay = 2000) {
       isSavingRef.current = true;
       try {
         await saveSystem(`Project-${projectId}`);
-        console.log('Auto-saved project', projectId);
+        // Auto-save completed
       } catch (error) {
         console.error('Auto-save failed:', error);
       } finally {

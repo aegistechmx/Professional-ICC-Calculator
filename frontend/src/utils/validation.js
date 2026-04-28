@@ -121,7 +121,7 @@ export function validateLoops(nodes, edges) {
     return {
       isValid: false,
       errors: [
-        `Ciclos detectados en el sistema. Los sistemas eléctricos no deben tener ciclos cerrados.`
+        'Ciclos detectados en el sistema. Los sistemas eléctricos no deben tener ciclos cerrados.'
       ]
     };
   }

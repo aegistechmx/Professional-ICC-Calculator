@@ -20,7 +20,6 @@ exports.listarCurvas = async (req, res) => {
       mensaje: 'Curvas cargadas desde datos digitalizados de fabricante'
     });
   } catch (err) {
-    console.error('Error listando curvas:', err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -47,7 +46,6 @@ exports.obtenerCurva = async (req, res) => {
       curva
     });
   } catch (err) {
-    console.error('Error obteniendo curva:', err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -75,7 +73,6 @@ exports.tiempoDisparo = async (req, res) => {
       unidad: 's'
     });
   } catch (err) {
-    console.error('Error calculando tiempo:', err);
     res.status(400).json({ error: err.message });
   }
 };
@@ -90,7 +87,6 @@ exports.evaluarCoordinacion = async (req, res) => {
     
     res.json(resultado);
   } catch (err) {
-    console.error('Error evaluando coordinación:', err);
     res.status(400).json({ error: err.message });
   }
 };
@@ -113,7 +109,6 @@ exports.analizarCascada = async (req, res) => {
     
     res.json(resultado);
   } catch (err) {
-    console.error('Error analizando cascada:', err);
     res.status(400).json({ error: err.message });
   }
 };
@@ -158,7 +153,6 @@ exports.compararCurvas = async (req, res) => {
     res.set('Content-Type', 'image/png');
     res.send(graficaBuffer);
   } catch (err) {
-    console.error('Error comparando curvas:', err);
     res.status(500).json({ error: err.message });
   }
 };

@@ -38,23 +38,60 @@ var MotorDisenoAutomatico = (function() {
     }
 
     /**
-     * Obtener siguiente frame estándar (escalón)
+     * Obtiene el siguiente frame estándar (escalón)
      * @param {number} frameActual - Frame actual
-     * @returns {number} Siguiente frame
+     * @returns {number} Siguiente frame estándar
      */
     function siguienteFrame(frameActual) {
-        for (var i = 0; i < FRAMES_BREAKERS.length - 1; i++) {
-            if (FRAMES_BREAKERS[i] === frameActual) {
-                return FRAMES_BREAKERS[i + 1];
-            }
+        var idx = FRAMES_BREAKERS.indexOf(frameActual);
+        if (idx === -1 || idx === FRAMES_BREAKERS.length - 1) {
+            return frameActual;
         }
-        return frameActual; // Ya está en el máximo
+        return FRAMES_BREAKERS[idx + 1];
+    }
+
+    /**
+     * Normaliza parámetros TCC para asegurar configuración físicamente válida
+     * @param {Object} tcc - Objeto TCC con { longDelay, shortDelay, instantaneous, pickup }
+     * @param {number} In - Corriente nominal del breaker
+     * @returns {Object} TCC normalizado
+     */
+    function normalizarTCC(tcc, In) {
+        var tccNormalizado = Object.assign({}, tcc);
+        
+        // Long Delay: mínimo 5s para protección térmica real
+        if (!tccNormalizado.longDelay || tccNormalizado.longDelay <= 0) {
+            tccNormalizado.longDelay = 6; // 6s default para selectividad
+        } else if (tccNormalizado.longDelay < 5) {
+            tccNormalizado.longDelay = 5; // Mínimo físico
+        }
+        
+        // Short Delay: mínimo 0.2s para zona de coordinación
+        if (!tccNormalizado.shortDelay || tccNormalizado.shortDelay <= 0) {
+            tccNormalizado.shortDelay = 0.3; // 300ms default
+        } else if (tccNormalizado.shortDelay < 0.2) {
+            tccNormalizado.shortDelay = 0.2; // Mínimo físico
+        }
+        
+        // Instantaneous: mínimo 6x In para evitar disparos falsos
+        if (!tccNormalizado.instantaneous || tccNormalizado.instantaneous === 'OFF') {
+            tccNormalizado.instantaneous = In * 10; // 10x In default
+        } else if (typeof tccNormalizado.instantaneous === 'number' && tccNormalizado.instantaneous < In * 3) {
+            tccNormalizado.instantaneous = In * 6; // Mínimo 6x In
+        }
+        
+        // Pickup: debe ser >= In
+        if (!tccNormalizado.pickup || tccNormalizado.pickup < In) {
+            tccNormalizado.pickup = In;
+        }
+        
+        return tccNormalizado;
     }
 
     /**
      * PASO 1 — Escalonamiento automático de breakers
-     * Crea jerarquía real desde downstream hacia upstream
-     * @param {Array} nodos - Array de nodos ordenados (P0 upstream, Pn downstream)
+     * Crea jerarquía real analizando hijos y padres (Tree-Aware)
+     * @param {Array} nodos - Array de nodos del sistema
      * @returns {Object} Resultado del escalonamiento
      */
     function escalarBreakers(nodos) {
@@ -64,20 +101,28 @@ var MotorDisenoAutomatico = (function() {
             estado: 'OK'
         };
 
-        // Recorrer de downstream a upstream
-        for (var i = nodos.length - 1; i >= 0; i--) {
-            var nodo = nodos[i];
+        // Ordenar por nivel (hojas primero para escalonar hacia arriba)
+        var nodosProcesar = Impedancias.ordenarPorNivel(nodos).reverse();
+
+        nodosProcesar.forEach(function(nodo, i) {
             var breakerActual = (nodo.equip && nodo.equip.cap) ? nodo.equip.cap * 1000 : 0; // kA a A
             var I_diseño = nodo.CDT ? nodo.CDT.I_diseño : (nodo.feeder ? nodo.feeder.cargaA * 1.25 : 0);
             var breakerNuevo;
 
-            if (i === nodos.length - 1) {
-                // Downstream más lejano: redondear a I_diseño
+            var hijos = Impedancias.obtenerHijos(nodo.id, nodos);
+
+            if (hijos.length === 0) {
+                // Nodo hoja: redondear a I_diseño
                 breakerNuevo = redondearBreaker(I_diseño);
             } else {
-                // Upstream: siguiente frame del downstream
-                var downstream = resultado.nodos[i + 1];
-                breakerNuevo = siguienteFrame(downstream.breakerIn);
+                // Nodo padre: debe ser al menos un escalón mayor que el mayor de sus hijos
+                var maxFrameHijo = 0;
+                hijos.forEach(function(h) {
+                    var resHijo = resultado.nodos.find(function(rn) { return rn.id === h.id; });
+                    if (resHijo && resHijo.breakerIn > maxFrameHijo) maxFrameHijo = resHijo.breakerIn;
+                });
+
+                breakerNuevo = Math.max(redondearBreaker(I_diseño), siguienteFrame(maxFrameHijo));
             }
 
             // Detectar cambio
@@ -90,13 +135,13 @@ var MotorDisenoAutomatico = (function() {
                 });
             }
 
-            resultado.nodos.unshift({
+            resultado.nodos.push({
                 id: nodo.id,
                 breakerIn: breakerNuevo,
                 I_diseño: I_diseño,
                 breakerActual: breakerActual
             });
-        }
+        });
 
         // Validar si hubo cambios significativos
         if (resultado.cambios.length > 0) {
@@ -153,6 +198,168 @@ var MotorDisenoAutomatico = (function() {
     }
 
     /**
+     * PASO 2.5 — Optimización Arc Flash (multi-objetivo)
+     * Balancea reducción de energía incidente con selectividad
+     * @param {Array} nodos - Array de nodos con TCC
+     * @returns {Object} Resultado de optimización arc flash
+     */
+    function optimizarArcFlash(nodos) {
+        var resultado = {
+            nodos: JSON.parse(JSON.stringify(nodos)),
+            energiaAntes: 0,
+            energiaDespues: 0,
+            ajustes: [],
+            estado: 'OK'
+        };
+
+        // Calcular energía incidente inicial
+        for (var i = 0; i < resultado.nodos.length; i++) {
+            resultado.energiaAntes += calcularEnergiaIncidente(resultado.nodos[i]);
+        }
+
+        // Variaciones controladas para reducir arc flash
+        var variaciones = [
+            { tipo: 'inst', factor: 0.8 },
+            { tipo: 'inst', factor: 0.9 },
+            { tipo: 'shortDelay', delta: -0.1 },
+            { tipo: 'shortDelay', delta: -0.05 }
+        ];
+
+        var mejor = JSON.parse(JSON.stringify(resultado.nodos));
+        var mejorEnergia = resultado.energiaAntes;
+
+        for (var v = 0; v < variaciones.length; v++) {
+            var variacion = variaciones[v];
+            var test = JSON.parse(JSON.stringify(resultado.nodos));
+
+            // Aplicar variación
+            for (var i = 0; i < test.length; i++) {
+                if (!test[i].tcc) continue;
+
+                if (variacion.tipo === 'inst' && test[i].tcc.instantaneous) {
+                    var antes = test[i].tcc.instantaneous;
+                    test[i].tcc.instantaneous *= variacion.factor;
+                    resultado.ajustes.push({
+                        nodo: test[i].id,
+                        tipo: 'instantaneous',
+                        antes: antes,
+                        despues: test[i].tcc.instantaneous
+                    });
+                }
+
+                if (variacion.tipo === 'shortDelay' && test[i].tcc.shortDelay) {
+                    var antes = test[i].tcc.shortDelay;
+                    test[i].tcc.shortDelay += variacion.delta;
+                    if (test[i].tcc.shortDelay < 0.05) test[i].tcc.shortDelay = 0.05;
+                    resultado.ajustes.push({
+                        nodo: test[i].id,
+                        tipo: 'shortDelay',
+                        antes: antes,
+                        despues: test[i].tcc.shortDelay
+                    });
+                }
+            }
+
+            // Recalcular energía
+            var energiaTest = 0;
+            for (var i = 0; i < test.length; i++) {
+                energiaTest += calcularEnergiaIncidente(test[i]);
+            }
+
+            // Validar selectividad
+            var selectividadOK = true;
+            for (var i = 0; i < test.length - 1; i++) {
+                var up = test[i];
+                var down = test[i + 1];
+                if (!validarSelectividadArcFlash(up, down)) {
+                    selectividadOK = false;
+                    break;
+                }
+            }
+
+            // Si mejora energía y mantiene selectividad
+            if (energiaTest < mejorEnergia && selectividadOK) {
+                mejor = test;
+                mejorEnergia = energiaTest;
+            }
+        }
+
+        resultado.nodos = mejor;
+        resultado.energiaDespues = mejorEnergia;
+
+        if (resultado.energiaDespues < resultado.energiaAntes) {
+            resultado.estado = 'MEJORADO';
+            resultado.reduccion = ((resultado.energiaAntes - resultado.energiaDespues) / resultado.energiaAntes * 100).toFixed(1) + '%';
+        }
+
+        return resultado;
+    }
+
+    /**
+     * Calcula energía incidente de arco (simplificado)
+     * E ∝ I^1.2 × t
+     * @param {Object} nodo - Nodo del sistema
+     * @returns {number} Energía incidente relativa
+     */
+    function calcularEnergiaIncidente(nodo) {
+        if (!nodo || !nodo.tcc) return 0;
+
+        var Iarc = 0.85 * (nodo.isc || 0);
+        var In = nodo.breakerIn || 300;
+        var t = calcularTiempoArcFlash(Iarc, nodo.tcc, In);
+
+        return Math.pow(Iarc, 1.2) * t;
+    }
+
+    /**
+     * Calcula tiempo de disparo para arc flash
+     * @param {number} I - Corriente de falla
+     * @param {Object} tcc - Parámetros TCC
+     * @param {number} In - Corriente nominal
+     * @returns {number} Tiempo en segundos
+     */
+    function calcularTiempoArcFlash(I, tcc, In) {
+        if (!tcc || I <= 0) return 10;
+
+        var Ipu = I / In;
+
+        if (Ipu >= (tcc.instantaneous / In || 10)) {
+            return 0.01;
+        }
+
+        if (Ipu >= 5) {
+            return tcc.shortDelay || 0.3;
+        }
+
+        if (Ipu >= 1) {
+            return tcc.longDelay || 5;
+        }
+
+        return 10;
+    }
+
+    /**
+     * Valida selectividad para arc flash
+     * @param {Object} up - Nodo upstream
+     * @param {Object} down - Nodo downstream
+     * @returns {boolean} Selectiva
+     */
+    function validarSelectividadArcFlash(up, down) {
+        if (!up.tcc || !down.tcc) return true;
+
+        // Verificar que upstream tenga tiempos mayores
+        if (up.tcc.shortDelay && down.tcc.shortDelay) {
+            if (up.tcc.shortDelay <= down.tcc.shortDelay) return false;
+        }
+
+        if (up.tcc.instantaneous && down.tcc.instantaneous) {
+            if (up.tcc.instantaneous <= down.tcc.instantaneous) return false;
+        }
+
+        return true;
+    }
+
+    /**
      * PASO 2 — Ajuste TCC automático
      * Ajusta retardos y pickups para selectividad
      * @param {Array} nodos - Array de nodos ordenados
@@ -184,6 +391,10 @@ var MotorDisenoAutomatico = (function() {
                 instantaneous: (down.breakerIn || 0) * 10
             };
 
+            // Normalizar TCC para asegurar configuración físicamente válida
+            tccUp = normalizarTCC(tccUp, up.breakerIn || 400);
+            tccDown = normalizarTCC(tccDown, down.breakerIn || 400);
+
             // Ajustar upstream basado en downstream
             var tccUpNuevo = {
                 longDelay: tccDown.longDelay + 0.4,    // +400ms para selectividad térmica
@@ -209,14 +420,17 @@ var MotorDisenoAutomatico = (function() {
         // Agregar último nodo (downstream más lejano) sin cambios
         if (nodos.length > 0) {
             var ultimo = nodos[nodos.length - 1];
+            var tccUltimo = ultimo.tcc || {
+                longDelay: 0,
+                shortDelay: 0,
+                pickup: ultimo.breakerIn || 0,
+                instantaneous: (ultimo.breakerIn || 0) * 10
+            };
+            // Normalizar TCC del último nodo
+            tccUltimo = normalizarTCC(tccUltimo, ultimo.breakerIn || 400);
             resultado.nodos.push({
                 id: ultimo.id,
-                tcc: ultimo.tcc || {
-                    longDelay: 0,
-                    shortDelay: 0,
-                    pickup: ultimo.breakerIn || 0,
-                    instantaneous: (ultimo.breakerIn || 0) * 10
-                }
+                tcc: tccUltimo
             });
         }
 
@@ -392,8 +606,11 @@ var MotorDisenoAutomatico = (function() {
         // PASO 3: Coordinación TCC
         resultado.coordinacionTCC = coordinarTCC(resultado.escalonamiento.nodos);
 
+        // PASO 3.5: Optimización Arc Flash (multi-objetivo)
+        resultado.arcFlash = optimizarArcFlash(resultado.coordinacionTCC.nodos);
+
         // PASO 4: Bloqueo de instantáneo
-        resultado.bloqueoInstantaneo = bloquearInstantaneo(resultado.coordinacionTCC.nodos);
+        resultado.bloqueoInstantaneo = bloquearInstantaneo(resultado.arcFlash.nodos);
 
         // PASO 5: Validación de selectividad
         for (var i = 0; i < resultado.bloqueoInstantaneo.nodos.length - 1; i++) {
@@ -539,6 +756,7 @@ var MotorDisenoAutomatico = (function() {
         FRAMES_BREAKERS: FRAMES_BREAKERS,
         redondearBreaker: redondearBreaker,
         siguienteFrame: siguienteFrame,
+        normalizarTCC: normalizarTCC,
         escalarBreakers: escalarBreakers,
         detectarCurvasIguales: detectarCurvasIguales,
         coordinarTCC: coordinarTCC,

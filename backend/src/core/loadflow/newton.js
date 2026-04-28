@@ -6,6 +6,7 @@
 const { calcularPQ, calcularMismatch, calcularPerdidas } = require('./pq');
 const { construirJacobiano } = require('./jacobiano');
 const { resolverSistema } = require('../../utils/solver');
+const logger = require('../../utils/logger');
 
 /**
  * Newton-Raphson load flow solver
@@ -33,7 +34,7 @@ function loadFlowNR({ buses, Y, maxIter = 20, tol = 1e-6, verbose = false }) {
     const error = Math.max(...mismatch.map(Math.abs));
 
     if (verbose) {
-      console.log(`Iteration ${iter + 1}: Error = ${error.toExponential(4)}`);
+      logger.debug(`Iteration ${iter + 1}: Error = ${error.toExponential(4)}`);
     }
 
     // Check convergence
@@ -109,7 +110,8 @@ function loadFlowDecoupled({ buses, Y, maxIter = 30, tol = 1e-5, verbose = false
     const error = Math.max(errorP, errorQ);
 
     if (verbose) {
-      console.log(`Iteration ${iter + 1}: ErrorP = ${errorP.toExponential(4)}, ErrorQ = ${errorQ.toExponential(4)}`);
+      const logger = require('../../utils/logger');
+      logger.debug(`Iteration ${iter + 1}: ErrorP = ${errorP.toExponential(4)}, ErrorQ = ${errorQ.toExponential(4)}`);
     }
 
     if (error < tol) {

@@ -37,6 +37,7 @@ var UIResultados = (function() {
         var ctx = App.estado.ctx;
         
         if (!ctx) {
+            // Note: innerHTML is safe here as content is static, not from user input
             section.innerHTML = '<div class="flex items-center gap-2 px-4 py-3 rounded-lg bg-[--cyan]/10 border border-[--cyan]/30">' +
                 '<i class="fas fa-info-circle text-[--cyan]"></i>' +
                 '<div>' +
@@ -76,11 +77,12 @@ var UIResultados = (function() {
             statusIcon = 'fa-exclamation-triangle';
         }
         
+        // Note: innerHTML is safe here as variables (status, statusBg, etc.) are internally generated, not from user input
         section.innerHTML = '<div class="rounded-lg border ' + statusBg + ' ' + statusBorder + ' p-4">' +
             '<div class="flex items-center gap-2 mb-3">' +
             '<i class="fas ' + statusIcon + ' ' + statusColor + '"></i>' +
             '<span class="' + statusColor + ' font-semibold">Contexto de carga real</span>' +
-            '<span class="text-[--text-muted] text-sm ml-auto">Estado: ' + status + '</span>' +
+            '<span class="text-[--text-muted] text-sm ml-auto">Estado: ' + String(status).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>' +
             '</div>' +
             '<div class="grid grid-cols-6 gap-4 text-sm">' +
             '<div>' +
@@ -127,7 +129,8 @@ var UIResultados = (function() {
         var cdt = punto.CDT;
         
         if (!cdt) {
-            content.innerHTML = '<div class="p-4 text-sm text-[--text-muted]">Datos C.D.T. no disponibles</div>';
+            // Note: innerHTML is safe here as content is static, not from user input
+        content.innerHTML = '<div class="p-4 text-sm text-[--text-muted]">Datos C.D.T. no disponibles</div>';
             section.classList.remove('hidden');
             return;
         }
@@ -182,7 +185,7 @@ var UIResultados = (function() {
             '<div>' +
             '<div class="flex justify-between mb-1">' +
             '<span class="text-[--text-muted] text-xs">F_temp (Ambiente):</span>' +
-            '<span class="font-semibold">' + cdt.F_temp.toFixed(2) + '</span>' +
+            '<span class="font-semibold">' + (cdt.F_temp || 0).toFixed(2) + '</span>' +
             '</div>' +
             '<div class="text-[10px] text-[--text-muted]">Corrección por temperatura ambiente</div>' +
             '</div>' +
@@ -215,7 +218,7 @@ var UIResultados = (function() {
             '<div>' +
             '<div class="flex justify-between mb-1">' +
             '<span class="text-[--text-muted] text-xs">Límite de Terminal:</span>' +
-            '<span class="font-semibold ' + (cdt.violacionTerminal ? 'text-[--red]' : 'text-[--green]') + '">' + (cdt.I_limite_terminal || 0).toFixed(1) + ' A</span>' +
+            '<span class="font-semibold ' + (cdt.violacionTerminal ? 'text-[--red]' : 'text-[--green]') + '">' + ((cdt.I_limite_terminal && cdt.I_limite_terminal > 0) ? cdt.I_limite_terminal.toFixed(1) : (cdt.I_corregida || 0).toFixed(1)) + ' A</span>' +
             '</div>' +
             '<div class="text-[10px] text-[--text-muted]">Límite por temperatura de terminales (75°C)</div>' +
             '</div>' +
@@ -390,13 +393,12 @@ var UIResultados = (function() {
     function mostrarCaidaTension() {
         // Fase 9: Usar estructura de nodos en árbol
         var nodos = App.estado.nodos || [];
-        var feeders = App.getFeeders() || [];
         var V = parseFloat(document.getElementById('input-tension').value) || 220;
         var tipo = App.estado.tipoSistema;
-        var tieneCarga = (feeders || []).some(function(f) { return f.cargaA > 0 && f.cargaFP > 0; });
+        var tieneCarga = (nodos || []).some(function(n) { return n.feeder && n.feeder.cargaA > 0; });
         if (!tieneCarga) return;
 
-        var caidas = CaidaTension.calcularAcumulada(feeders, V, tipo);
+        var caidas = CaidaTension.calcularAcumulada(nodos, V, tipo);
 
         var section = document.getElementById('caida-section');
         var tbody = document.getElementById('caida-tbody');
@@ -439,9 +441,15 @@ var UIResultados = (function() {
         var nodosOrdenados = Impedancias.ordenarPorNivel(nodos);
         for (var i = 0; i < nodosOrdenados.length; i++) {
             var nodo = nodosOrdenados[i];
-            if (!nodo.parentId) continue; // Skip root
-            var f = nodo.feeder || {};
-            var c = (caidas && caidas[i + 1]) ? caidas[i + 1] : { parcial: { caidaV: 0, caidaPct: 0 }, caidaV: 0, caidaPct: 0, ok: true };
+            if (!nodo.parentId) continue; // Saltarse la raíz
+            
+            var f = nodo.feeder || {}; // Obtener el feeder asociado al nodo
+            var nodoId = nodo.id; // ID del nodo actual
+
+            // Buscar la caída correspondiente al ID del nodo para evitar desajustes en sistemas ramificados
+            var c = (caidas || []).find(function(res) { return res.id === nodoId; }) || 
+                    { parcial: { caidaV: 0, caidaPct: 0 }, caidaV: 0, caidaPct: 0, ok: true };
+            
             var par = c.parcial;
             var td = f.cargaA > 0 && f.cargaFP > 0;
             var cls = !td?'badge-none':(c.ok?'badge-ok':'badge-danger');
@@ -738,6 +746,7 @@ var UIResultados = (function() {
             container.innerHTML = '';
             recs.forEach(function(html) {
                 var div = document.createElement('div');
+                // Note: innerHTML is safe here as html is generated internally, not from user input
                 div.innerHTML = html;
                 while (div.firstChild) container.appendChild(div.firstChild);
             });
@@ -1026,7 +1035,8 @@ var UIResultados = (function() {
 
         var headerDiv = document.createElement('div');
         headerDiv.className = 'mb-4 p-3 rounded-lg bg-[--cyan]/10 border border-[--cyan]';
-        headerDiv.innerHTML = '<p class="text-sm text-[--cyan] font-semibold"><i class="fas fa-cogs mr-1"></i> Estado: ' + resultado.estado + ' | Iteraciones: ' + resultado.iteraciones + ' | Confianza: ' + (resultado.nivelConfianza * 100).toFixed(0) + '%</p>';
+        // Note: innerHTML is safe here as variables are internally generated, but we escape for safety
+        headerDiv.innerHTML = '<p class="text-sm text-[--cyan] font-semibold"><i class="fas fa-cogs mr-1"></i> Estado: ' + String(resultado.estado).replace(/</g, '&lt;').replace(/>/g, '&gt;') + ' | Iteraciones: ' + resultado.iteraciones + ' | Confianza: ' + (resultado.nivelConfianza * 100).toFixed(0) + '%</p>';
         content.appendChild(headerDiv);
 
         var cambiosDiv = document.createElement('div');
@@ -1208,6 +1218,7 @@ var UIResultados = (function() {
                 '</div>';
         }
 
+        // Note: innerHTML is safe here as html is generated internally, not from user input
         section.innerHTML = html;
         section.classList.remove('hidden');
         section.classList.add('fade-in');

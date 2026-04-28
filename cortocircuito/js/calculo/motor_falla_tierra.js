@@ -1,8 +1,101 @@
 /**
  * motor_falla_tierra.js — Motor de falla fase-tierra nivel industrial
  * Modelo físico completo con secuencia Z1/Z2/Z0, retorno dinámico, detección automática
+ * VALIDACIÓN DE PROTECCIÓN DE FALLA A TIERRA SEGÚN NOM
  */
 var MotorFallaTierra = (function() {
+
+    /**
+     * Validar protección de falla a tierra según NOM-001-SEDE-2012
+     * Requiere: I_falla ≥ 1.25 × I_disparo (protección de tierra)
+     * @param {Object} resultado - Resultado del cálculo de falla a tierra
+     * @param {Object} proteccion - Configuración de protección (pickup, tipo)
+     * @returns {Object} { ok, mensaje, recomendacion }
+     */
+    function validarProteccionFallaTierra(resultado, proteccion) {
+        var I_falla = resultado.I_ft || 0; // Corriente de falla a tierra en A
+        var I_disparo = proteccion.pickupTierra || proteccion.pickup || 0;
+        var tipoProteccion = proteccion.tipo || 'breaker';
+
+        // Si no hay pickup definido, usar instantáneo del breaker
+        if (I_disparo === 0 && proteccion.instantaneo) {
+            I_disparo = proteccion.instantaneo;
+        }
+
+        // Validación NOM: I_falla ≥ 1.25 × I_disparo
+        var margen = I_disparo > 0 ? I_falla / I_disparo : 0;
+        var cumple = margen >= 1.25;
+
+        var validacion = {
+            ok: cumple,
+            I_falla: I_falla,
+            I_disparo: I_disparo,
+            margen: margen,
+            tipoProteccion: tipoProteccion,
+            mensaje: '',
+            recomendacion: ''
+        };
+
+        if (I_disparo === 0) {
+            validacion.mensaje = '⚠️ Pickup de protección a tierra no definido';
+            validacion.recomendacion = 'Definir pickup de protección a tierra (ground fault)';
+            validacion.ok = false;
+            return validacion;
+        }
+
+        if (cumple) {
+            validacion.mensaje = '✅ Protección de falla a tierra cumple NOM (margen: ' + margen.toFixed(2) + ')';
+        } else {
+            validacion.mensaje = '❌ Protección de falla a tierra NO cumple NOM';
+            validacion.recomendacion = 'I_falla (' + I_falla.toFixed(0) + 'A) < 1.25 × I_disparo (' + I_disparo.toFixed(0) + 'A)';
+            
+            // Recomendación específica
+            if (tipoProteccion === 'breaker') {
+                validacion.recomendacion += '. Considerar relay de falla a tierra con pickup ≤ ' + (I_falla / 1.25).toFixed(0) + 'A';
+            } else {
+                validacion.recomendacion += '. Ajustar pickup a ≤ ' + (I_falla / 1.25).toFixed(0) + 'A';
+            }
+        }
+
+        return validacion;
+    }
+
+    /**
+     * Recomendar relay de falla a tierra si breaker no es suficiente
+     * @param {Object} resultado - Resultado del cálculo de falla a tierra
+     * @param {Object} breaker - Configuración del breaker
+     * @returns {Object} { necesitaRelay, pickupRecomendado, opciones }
+     */
+    function recomendarRelayFallaTierra(resultado, breaker) {
+        var I_falla = resultado.I_ft || 0;
+        var I_instantaneo = breaker ? (breaker.instantaneo || breaker.In * 10) : 0;
+
+        // Si falla a tierra es < 50% del instantáneo, necesita relay
+        var necesitaRelay = I_falla < (I_instantaneo * 0.5);
+        var pickupRecomendado = I_falla / 1.25;
+
+        var opciones = [];
+
+        if (necesitaRelay) {
+            opciones.push({
+                tipo: 'Relay 50G/51G',
+                pickup: pickupRecomendado,
+                descripcion: 'Relay de falla a tierra con pickup ajustable'
+            });
+            opciones.push({
+                tipo: 'Relay residuales',
+                pickup: pickupRecomendado,
+                descripcion: 'Relay con TC residuales para detección sensible'
+            });
+        }
+
+        return {
+            necesitaRelay: necesitaRelay,
+            pickupRecomendado: pickupRecomendado,
+            opciones: opciones,
+            razon: 'I_falla (' + I_falla.toFixed(0) + 'A) es muy baja para instantáneo breaker (' + I_instantaneo.toFixed(0) + 'A)'
+        };
+    }
 
     /**
      * Auto-detección del tipo de sistema de puesta a tierra
@@ -207,7 +300,9 @@ var MotorFallaTierra = (function() {
         autoDetectarSistemaTierra: autoDetectarSistemaTierra,
         calcularRetornoDinamico: calcularRetornoDinamico,
         calcularFallaTierraCompleta: calcularFallaTierraCompleta,
-        corregirFallaTierra: corregirFallaTierra
+        corregirFallaTierra: corregirFallaTierra,
+        validarProteccionFallaTierra: validarProteccionFallaTierra,
+        recomendarRelayFallaTierra: recomendarRelayFallaTierra
     };
 })();
 

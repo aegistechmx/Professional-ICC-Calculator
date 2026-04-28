@@ -74,8 +74,8 @@ var UIReportePDF = (function() {
                 doc.setFont('helvetica', 'bold');
                 doc.text(titulo, ml + 3, y + 4.2);
                 y += 10;
-
-                doc.autoTable({
+                
+                var configTabla = {
                     startY: y,
                     margin: { left: ml, right: mr, bottom: 15 },
                     tableWidth: cw,
@@ -98,9 +98,18 @@ var UIReportePDF = (function() {
                             fillColor: [26, 29, 40],
                             textColor: [190, 195, 210]
                         }
-                    },
-                    ...opciones
-                });
+                    }
+                };
+
+                if (opciones) {
+                    for (var key in opciones) {
+                        if (Object.prototype.hasOwnProperty.call(opciones, key)) {
+                            configTabla[key] = opciones[key];
+                        }
+                    }
+                }
+
+                doc.autoTable(configTabla);
 
                 var finalY = doc.lastAutoTable.finalY;
                 y = finalY + 8;

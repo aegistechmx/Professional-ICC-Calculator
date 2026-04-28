@@ -409,13 +409,31 @@ var MotorAutocorreccion = (function() {
         // Orden tipo ingeniero (seguridad primero)
         criticos.sort(prioridadIngenieria);
 
-        for (let i = 0; i < criticos.length; i++) {
-            aplicarCorreccion(sistema, criticos[i], log);
+        if (criticos.length > 0) {
+            for (let i = 0; i < criticos.length; i++) {
+                aplicarCorreccion(sistema, criticos[i], log);
+            }
+        } else {
+            log.push("🟢 Sistema limpio");
         }
 
+        // Formatear la solución para que MotorIA.aprender pueda consumirla
+        const mejorSolucionFormateada = sistema.nodos.map(node => ({
+            calibre: node.feeder?.calibre,
+            paralelos: node.feeder?.paralelo,
+            breaker: node.equip, // Assuming node.equip contains the breaker info
+            ajustes: node.ajustesLSIG, // If LSIG adjustments are part of the node
+            iDisparo: node.equip?.iDisparo // The corrected ground fault pickup
+        }));
+
+        // Definir un score y validez para el aprendizaje
+        const score = issues.length === 0 ? 1.0 : (1.0 / (issues.length + 1)); // Higher score for fewer issues
+        const valido = issues.length === 0; // Valid if no issues remain
+
         return {
-            sistema: sistema,
-            log: log
+            mejorSolucion: mejorSolucionFormateada,
+            eval: { score, valido },
+            log: log // Keep log for debugging/reporting
         };
     }
 
@@ -458,9 +476,27 @@ var MotorAutocorreccion = (function() {
                 break;
 
             case "PROTECCION":
-                if (nodo.equip && nodo.equip.iDisparo) {
-                    nodo.equip.iDisparo = nodo.equip.iDisparo * 0.6;
-                    log.push("Fix Tierra: " + issue.nodo + " → pickup ↓ 40%");
+                if (nodo.equip) {
+                    // Prioridad: Usar corriente de falla real (ajustada por desbalance si existe)
+                    const iftA = (nodo.faseTierra ? (nodo.faseTierra.iscFt_ajustado || nodo.faseTierra.iscFt || 0) : 0) * 1000;
+                    
+                    if (iftA > 0) {
+                        const factorSensibilidad = 1.25; // Margen requerido por Art. 230.95 / IEEE
+                        const antes = nodo.equip.iDisparo || 0;
+                        // Calculamos el pickup máximo que vería la falla con seguridad
+                        let nuevoPickup = Math.floor(iftA / factorSensibilidad);
+                        
+                        // Mantener un suelo de 100A para evitar disparos por desbalances menores de carga
+                        nuevoPickup = Math.max(100, nuevoPickup);
+                        
+                        nodo.equip.iDisparo = nuevoPickup;
+                        log.push(`Fix Tierra: ${issue.nodo} → pickup ${antes.toFixed(0)}A -> ${nuevoPickup}A (Sensibilidad para If=${iftA.toFixed(0)}A)`);
+                    } else if (nodo.equip.iDisparo) {
+                        // Fallback heurístico si el issue se reportó sin datos de cálculo (blind fix)
+                        const antes = nodo.equip.iDisparo;
+                        nodo.equip.iDisparo = antes * 0.5;
+                        log.push(`Fix Tierra: ${issue.nodo} → pickup ↓ 50% (Ajuste ciego)`);
+                    }
                 }
                 break;
 

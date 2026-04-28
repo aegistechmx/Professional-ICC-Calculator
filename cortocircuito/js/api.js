@@ -4,7 +4,7 @@
  */
 
 var API = (function() {
-    var BASE_URL = 'http://localhost:3000';
+    var BASE_URL = window.API_BASE_URL || 'http://localhost:3002';
     
     /**
      * Realiza una petición HTTP al backend

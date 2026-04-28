@@ -14,6 +14,7 @@ var UIProyectos = (function() {
         try {
             return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         } catch (e) {
+            console.error('Error parsing proyectos from localStorage:', e);
             return {};
         }
     }
@@ -77,6 +78,81 @@ var UIProyectos = (function() {
     }
 
     /**
+     * Valida la estructura del proyecto usando Zod.
+     * Requiere que la librería 'z' esté disponible globalmente.
+     */
+    function validarEsquemaProyecto(data) {
+        if (typeof z === 'undefined') {
+            console.warn('Zod no detectado. Saltando validación de esquema.');
+            return { success: true, data: data };
+        }
+
+        var schema = z.object({
+            modo: z.string().optional(),
+            tipoSistema: z.string().optional(),
+            tension: z.number().optional(),
+            fuente: z.object({
+                iscConocido: z.number().optional(),
+                iscFuente: z.number().optional(),
+                xrFuente: z.number().optional(),
+                trafoKva: z.number().optional(),
+                trafoZ: z.number().optional(),
+                trafoVp: z.number().optional(),
+                trafoVs: z.number().optional()
+            }).optional(),
+            equipP0: z.object({
+                tipo: z.string().optional(),
+                modelo: z.string().optional(),
+                cap: z.number().optional()
+            }).optional(),
+            nodos: z.array(z.object({
+                id: z.string(),
+                parentId: z.string().nullable().optional(),
+                nombre: z.string().optional(),
+                feeder: z.object({
+                    calibre: z.string().optional(),
+                    material: z.string().optional(),
+                    canalizacion: z.string().optional(),
+                    longitud: z.number().optional(),
+                    paralelo: z.number().optional(),
+                    cargaA: z.number().optional(),
+                    cargaFP: z.number().optional(),
+                    fc: z.number().optional(),
+                    ft: z.number().optional(),
+                    numConductores: z.number().optional()
+                }).passthrough().optional(),
+                equip: z.any().optional()
+            })).optional(),
+            fcConfig: z.array(z.any()).optional(),
+            feeders: z.array(z.any()).optional(), // Soporte para versiones anteriores
+            fechaGuardado: z.string().optional()
+        });
+
+        return schema.safeParse(data);
+    }
+
+    /**
+     * Limpia ciclos de forma destructiva (convirtiendo el nodo en raíz)
+     * @param {Array} nodos - Estructura de nodos
+     * @returns {boolean} True si se limpió algún ciclo
+     */
+    function limpiarCiclos(nodos) {
+        var huboCambios = false;
+        if (!nodos || !Array.isArray(nodos) || typeof Impedancias === 'undefined') return false;
+
+        var idCiclo;
+        // Iteramos mientras sigan existiendo ciclos tras las desconexiones
+        while ((idCiclo = Impedancias.detectarCiclos(nodos)) !== null) {
+            var nodo = nodos.find(function(n) { return n.id === idCiclo; });
+            if (nodo) {
+                nodo.parentId = null; // Convertir en nodo raíz
+                huboCambios = true;
+            } else { break; }
+        }
+        return huboCambios;
+    }
+
+    /**
      * Restaura el estado de la app desde un objeto serializado
      */
     function restaurarEstado(data) {
@@ -112,11 +188,16 @@ var UIProyectos = (function() {
         if (data.equipP0) {
             document.getElementById('equip-p0-tipo').value = data.equipP0.tipo || '';
             UIEquipos.onTipoChange('p0');
-            setTimeout(function() {
-                document.getElementById('equip-p0-modelo').value = data.equipP0.modelo || '';
+            
+            // En lugar de un timeout fijo, intentamos asignar valores de forma inmediata
+            // Si el modelo depende de la carga asíncrona de un catálogo, 
+            // asegúrate de que UIEquipos exponga una promesa.
+            var elModelo = document.getElementById('equip-p0-modelo');
+            if (elModelo) {
+                elModelo.value = data.equipP0.modelo || '';
                 UIEquipos.onModeloChange('p0');
-                document.getElementById('equip-p0-cap').value = data.equipP0.cap || '';
-            }, 50);
+            }
+            document.getElementById('equip-p0-cap').value = data.equipP0.cap || '';
         }
 
         // Nodos / Feeders (Fase 9: Support both old and new structure)
@@ -296,6 +377,14 @@ var UIProyectos = (function() {
             }
 
             var estado = serializarEstado();
+
+            // Validar integridad jerárquica antes de guardar
+            var idCiclo = Impedancias.detectarCiclos(estado.nodos);
+            if (idCiclo) {
+                UIToast.mostrar('No se puede guardar: Error de jerarquía circular en ' + idCiclo, 'error');
+                return;
+            }
+
             proyectos[nombre] = estado;
             escribirTodos(proyectos);
             renderLista();
@@ -375,8 +464,18 @@ var UIProyectos = (function() {
         lector.onload = function(e) {
             try {
                 var data = JSON.parse(e.target.result);
-                // Fase 9: Accept both nodos (new) and feeders (legacy)
-                if (!data.nodos && !data.feeders) { UIToast.mostrar('Archivo no valido: no contiene datos de nodos o alimentadores', 'error'); return; }
+                
+                // Validación de esquema con Zod
+                var result = validarEsquemaProyecto(data);
+                
+                if (!result.success) {
+                    console.error('Error de validación:', result.error.format());
+                    UIToast.mostrar('El archivo JSON tiene un formato inválido o está corrupto', 'error');
+                    return;
+                }
+
+                data = result.data;
+
                 var exito = restaurarEstado(data);
                 if (exito) {
                     UIToast.mostrar('Proyecto importado: ' + archivo.name, 'success');
@@ -423,5 +522,3 @@ var UIProyectos = (function() {
 if (typeof window !== 'undefined') {
     window.UIProyectos = UIProyectos;
 }
-
-

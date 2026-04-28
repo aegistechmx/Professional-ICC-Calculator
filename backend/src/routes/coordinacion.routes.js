@@ -5,31 +5,15 @@
 
 const router = require('express').Router();
 const ctrl = require('../controllers/coordinacion.controller');
-const auth = require('../middlewares/auth.middleware');
+const auth = require('../middleware/auth.middleware');
+const { apiLimiter } = require('../middleware/rateLimiter.middleware');
 
-// Endpoint principal: análisis completo con auto-ajuste
-router.post('/coordinacion-tablero', (req, res, next) => {
-  // Make auth optional for development
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-}, ctrl.analizarTablero);
+// Apply rate limiting to coordination endpoints
+router.use(apiLimiter);
 
-// Evaluación simple sin ajuste
-router.post('/coordinacion-evaluar', (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-}, ctrl.evaluarSolo);
-
-// Aplicar auto-ajuste manualmente
-router.post('/coordinacion-ajustar', (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-}, ctrl.aplicarAjuste);
+// All coordination routes require authentication
+router.post('/coordinacion-tablero', auth, ctrl.analizarTablero);
+router.post('/coordinacion-evaluar', auth, ctrl.evaluarSolo);
+router.post('/coordinacion-ajustar', auth, ctrl.aplicarAjuste);
 
 module.exports = router;

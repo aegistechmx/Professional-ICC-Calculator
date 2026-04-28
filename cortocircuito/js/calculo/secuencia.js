@@ -96,37 +96,28 @@ var Secuencia = (function() {
             // Delta: z0Trafo permanece en 0 (no hay camino a tierra)
         }
 
-        // Acumular Z0 por punto
-        var R0_acc = z0Fuente / Math.sqrt(2); // Aproximar Z0_f = R_f/sqrt(2) + j*X_f/sqrt(2)
-        var X0_acc = z0Fuente / Math.sqrt(2);
-        R0_acc += z0Trafo / Math.sqrt(2);
-        X0_acc += z0Trafo / Math.sqrt(2);
-
-        // Agregar retorno por tierra (resistivo, solo R)
-        // 🔥 FIX CRÍTICO: Factor 3 obligatorio en modelo simétrico
-        // Z0_total = Z0_fuente + Z0_trafo + Z0_linea + 3 × Z_retorno
-        if (tipoAter !== 'delta') {
-            R0_acc += 3 * zRetornoOhms;
-        }
-
         var resultados = [];
+        puntosMax.forEach(function(p) {
+            var R0_p = 0, X0_p = 0;
+            var z0f = opciones.Z0_fuente || puntosMax[0].Z;
+            R0_p += z0f / Math.sqrt(2); X0_p += z0f / Math.sqrt(2);
+            R0_p += z0Trafo / Math.sqrt(2); X0_p += z0Trafo / Math.sqrt(2);
 
-        // P0
-        var Z0_total = Impedancias.magnitud(R0_acc, X0_acc);
-        var Z1_total = (puntosMax[0] && puntosMax[0].Z) ? puntosMax[0].Z : 0;
-        var iscFt = calcularIscFt(V, Z1_total, Z0_total, factor, opciones.tipoSistema);
-        resultados.push({ iscFt: iscFt, Z0_total: Z0_total, Z1_total: Z1_total });
+            if (tipoAter !== 'delta') R0_p += 3 * zRetornoOhms;
 
-        // Puntos subsiguientes
-        for (var i = 0; i < feeders.length; i++) {
-            var z0c = impedanciaCero(feeders[i], x0Config);
-            R0_acc += z0c.R0;
-            X0_acc += z0c.X0;
-            Z0_total = Impedancias.magnitud(R0_acc, X0_acc);
-            Z1_total = (puntosMax[i + 1] && puntosMax[i + 1].Z) ? puntosMax[i + 1].Z : 0;
-            iscFt = calcularIscFt(V, Z1_total, Z0_total, factor, opciones.tipoSistema);
-            resultados.push({ iscFt: iscFt, Z0_total: Z0_total, Z1_total: Z1_total });
-        }
+            if (opciones.nodos) {
+                var camino = Impedancias.obtenerCamino(p.id, opciones.nodos);
+                camino.forEach(function(nid) {
+                    var nodo = opciones.nodos.find(function(n) { return n.id === nid; });
+                    if (nodo && nodo.parentId && nodo.feeder) {
+                        var z0c = impedanciaCero(nodo.feeder, x0Config);
+                        R0_p += z0c.R0; X0_p += z0c.X0;
+                    }
+                });
+            }
+            var Z0_total = Impedancias.magnitud(R0_p, X0_p);
+            resultados.push({ iscFt: calcularIscFt(V, p.Z, Z0_total, factor, opciones.tipoSistema), Z0_total: Z0_total, Z1_total: p.Z });
+        });
 
         return resultados;
     }
@@ -141,14 +132,28 @@ var Secuencia = (function() {
      * @returns {number} Corriente de falla fase-tierra en kA
      */
     function calcularIscFt(V, Z1, Z0, factor, tipoSist) {
+        // En sistemas aislados (Delta) o con impedancia extremadamente alta (HRG),
+        // la corriente de falla es despreciable o tiende a 0.
+        if (Z0 > 10000) return 0;
+
         if (tipoSist === '3f') {
-            // If = V_LL / (sqrt(3) * |Z1 + Z2 + Z0|) con Z2 ≈ Z1
-            var Z_suma = Impedancias.magnitud(2 * Z1, Z0);
-            return (V / (factor * Z_suma)) / 1000; // kA
+            // Formula industrial correcta: If = (3 * Vph) / |Z1 + Z2 + Z0|
+            // Asumiendo Z2 ≈ Z1: If = (3 * Vph) / |2Z1 + Z0|
+            // Como Vph = V_LL / sqrt(3), If = (sqrt(3) * V_LL) / |2Z1 + Z0|
+            
+            // Optimizacion: En sistemas con alta impedancia (resistiva), Z1 y Z0 estan a 90 deg.
+            // La suma cuadratica (magnitud) es la aproximacion mas robusta para el peor caso.
+            var Z_total = Impedancias.magnitud(2 * Z1, Z0);
+            if (Z_total <= 0) return 0;
+
+            // Retornamos la corriente de falla real (3 * I0)
+            return (Math.sqrt(3) * V / Z_total) / 1000; // kA
         } else {
-            // Monofasico: If = V_FN / |Z1 + Z0|, V_FN = V (monofasico)
-            var Z_mono = Impedancias.magnitud(Z1, Z0);
-            return (V / Z_mono) / 1000; // kA
+            // Monofasico: If = V_FN / |Z1 + Z0|. Para alta impedancia de retorno (tierra),
+            // la suma cuadratica es mas precisa que la escalar.
+            var Z_total_1f = (Z0 > 5 * Z1) ? Impedancias.magnitud(Z1, Z0) : (Z1 + Z0);
+            if (Z_total_1f <= 0) return 0;
+            return (V / Z_total_1f) / 1000; // kA
         }
     }
 

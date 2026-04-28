@@ -465,7 +465,6 @@ var TCCCoordinacion = (function() {
         
         // Construir dispositivos TCC desde nodos
         var devices = {};
-        var topology = [[]];
         
         for (var i = 0; i < nodos.length; i++) {
             var nodo = nodos[i];
@@ -478,33 +477,35 @@ var TCCCoordinacion = (function() {
             
             if (device) {
                 devices[nodo.id] = device;
-                topology[0].push(nodo.id);
+            } else {
+                console.warn('[TCC Coordinación] Nodo ' + nodo.id + ' sin curva de disparo válida - coordinación inválida');
             }
         }
         
-        // Validar cada par consecutivo
-        if (topology[0].length >= 2) {
-            for (var j = 0; j < topology[0].length - 1; j++) {
-                var downId = topology[0][j];
-                var upId = topology[0][j + 1];
+        // Fase 9: Validar coordinación en estructura de árbol (Hijo vs Padre)
+        for (var k = 0; k < nodos.length; k++) {
+            var nodoHijo = nodos[k];
+            if (!nodoHijo.parentId) continue; // La raíz no tiene upstream
             
-                var down = devices[downId];
-                var up = devices[upId];
+            var down = devices[nodoHijo.id];
+            var up = devices[nodoHijo.parentId];
             
-                if (!down || !up) continue;
-            
-                var faultRange = buildFaultRange({ In: down.In, IccMax: 50000 });
-                var issues = scanPair(up, down, faultRange, 0.2);
-            
-                var pairResult = {
-                    pair: [downId, upId],
-                    issues: issues,
-                    status: issues.length === 0 ? 'OK' : 'FAIL'
-                };
-            
-                results.pairs.push(pairResult);
-                results.totalIssues += issues.length;
+            if (!down || !up) {
+                // Uno de los dos no tiene protección configurada
+                continue;
             }
+            
+            var faultRange = buildFaultRange({ In: down.In, IccMax: 50000 });
+            var issues = scanPair(up, down, faultRange, 0.2); // Margen industrial 0.2s
+            
+            var pairResult = {
+                pair: [nodoHijo.id, nodoHijo.parentId],
+                issues: issues,
+                status: issues.length === 0 ? 'OK' : 'FAIL'
+            };
+            
+            results.pairs.push(pairResult);
+            results.totalIssues += issues.length;
         }
         
         results.status = results.totalIssues === 0 ? 'OK' : 'FAIL';

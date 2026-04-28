@@ -235,7 +235,7 @@ var UIEquipos = (function() {
                         if (EQUIPOS[equipoKey] && EQUIPOS[equipoKey].curvaDisparo) {
                             var multiplicador = EQUIPOS[equipoKey].curvaDisparo.multiplicadorInstantaneo || 10;
                             multiplicadorHTML = '<div class="mt-2 flex items-center gap-2">' +
-                                '<label class="text-[0.6rem]">Multiplicador instantáneo (xIn):</label>' +
+                                '<label class="text-[0.6rem]" for="mult-' + prefix + '">Multiplicador instantáneo (xIn):</label>' +
                                 '<input type="number" id="mult-' + prefix + '" name="mult-' + prefix + '" value="' + multiplicador + '" min="5" max="20" step="0.5" ' +
                                 'class="border rounded px-2 py-1 text-[0.65rem] w-16" ' +
                                 'onchange="UIEquipos.actualizarMultiplicador(\'' + prefix + '\', \'' + equipoKey + '\', ' + mIdx + ', this.value)">' +
@@ -286,6 +286,7 @@ var UIEquipos = (function() {
                         infoDivContent.appendChild(infoText);
                         
                         var tempDiv = document.createElement('div');
+                        // Note: innerHTML is safe here as curvaHTML is generated internally from catalog data, not user input
                         tempDiv.innerHTML = curvaHTML;
                         while (tempDiv.firstChild) {
                             infoDivContent.appendChild(tempDiv.firstChild);

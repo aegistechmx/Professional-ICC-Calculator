@@ -24,7 +24,7 @@ export default function useLiveSimulation(delay = 300) {
 
       isSimulatingRef.current = true;
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
         
         const res = await fetch(`${API_BASE}/simulacion/live`, {
           method: 'POST',
@@ -51,7 +51,7 @@ export default function useLiveSimulation(delay = 300) {
         }));
 
         setNodes(updated);
-        console.log('Live simulation completed');
+        // Simulation completed successfully
       } catch (error) {
         console.error('Live simulation error:', error);
       } finally {

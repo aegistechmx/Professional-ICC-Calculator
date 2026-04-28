@@ -3,8 +3,16 @@ const IORedis = require('ioredis');
 const prisma = require('../config/db');
 const calculoService = require('../services/calculo.service');
 
-// Create Redis connection
+// Create Redis connection with error handling
 const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379');
+
+connection.on('error', (err) => {
+  console.error('Redis connection error:', err);
+});
+
+connection.on('connect', () => {
+  // Redis connected - logging removed for production
+});
 
 // Create simulation worker
 const simulationWorker = new Worker(
@@ -23,17 +31,17 @@ const simulationWorker = new Worker(
 
       // Process based on simulation type
       switch (type) {
-        case 'icc':
-          result = await calculoService.icc(data);
-          break;
-        case 'icc-motores':
-          result = await calculoService.iccConMotores(data);
-          break;
-        case 'falla-minima':
-          result = await calculoService.fallaMinima(data);
-          break;
-        default:
-          throw new Error(`Unknown simulation type: ${type}`);
+      case 'icc':
+        result = await calculoService.icc(data);
+        break;
+      case 'icc-motores':
+        result = await calculoService.iccConMotores(data);
+        break;
+      case 'falla-minima':
+        result = await calculoService.fallaMinima(data);
+        break;
+      default:
+        throw new Error(`Unknown simulation type: ${type}`);
       }
 
       // Update job status to completed
@@ -41,7 +49,7 @@ const simulationWorker = new Worker(
         where: { id: job.id },
         data: {
           status: 'completed',
-          result,
+          result: typeof result === 'object' ? JSON.stringify(result) : String(result),
           completedAt: new Date()
         }
       });
@@ -68,7 +76,7 @@ const simulationWorker = new Worker(
 
 // Handle worker events
 simulationWorker.on('completed', (job) => {
-  console.log(`Simulation completed for job ${job.id}`);
+  // Simulation completed - logging removed for production
 });
 
 simulationWorker.on('failed', (job, err) => {

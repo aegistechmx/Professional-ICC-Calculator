@@ -19,9 +19,11 @@ function calcularZeq(red, nodoFalla) {
   // Sum impedances along the path from fault to source
   for (const nodeId of camino) {
     const nodo = red[nodeId];
-    if (nodo && nodo.elemento) {
+    if (nodo && nodo.elemento && typeof nodo.elemento.getImpedancia === 'function') {
       const Z = nodo.elemento.getImpedancia();
-      impedancias.push(Z);
+      if (Z && (Z.R !== undefined || Z.X !== undefined)) {
+        impedancias.push(Z);
+      }
     }
   }
 
@@ -149,9 +151,34 @@ function calcularContribucionMotores(red, nodoFalla) {
  * @returns {Object} Trip status
  */
 function verificarDisparoBreaker(breaker, Ik) {
+  if (!breaker || !breaker.data) {
+    return {
+      trip: false,
+      In: 100,
+      Icu: 25000,
+      Ik: Ik || 0,
+      margen: 25000,
+      factor: 0,
+      error: 'Invalid breaker data'
+    };
+  }
+
   const params = breaker.data.parameters || {};
   const In = params.In || 100;
   const Icu = params.Icu || 25000;
+
+  // Validate Ik
+  if (!Ik || Ik < 0) {
+    return {
+      trip: false,
+      In,
+      Icu,
+      Ik: 0,
+      margen: Icu,
+      factor: 0,
+      error: 'Invalid current value'
+    };
+  }
 
   // Trip conditions
   const excedeIcu = Ik > Icu;
@@ -164,7 +191,7 @@ function verificarDisparoBreaker(breaker, Ik) {
     Icu,
     Ik,
     margen: Icu - Ik,
-    factor: Ik / In
+    factor: In > 0 ? Ik / In : 0
   };
 }
 

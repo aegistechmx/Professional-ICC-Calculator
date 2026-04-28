@@ -26,9 +26,9 @@ var Semaforo = (function() {
      * Iconos para UI
      */
     var ICONOS = {
-        OK: '🟢',
-        WARNING: '🟡',
-        ERROR: '🔴'
+        OK: '[OK]',
+        WARNING: '[!]',
+        ERROR: '[X]'
     };
 
     /**
@@ -151,19 +151,39 @@ var Semaforo = (function() {
             estado = ESTADOS.WARNING;
         }
 
-        // Si hay errores críticos, ERROR
-        if (errores.length > 0) {
+        // Si hay errores críticos, ERROR (a menos que fueron autocorregidos)
+        var erroresSinCorregir = errores.filter(function(e) {
+            // Verificar si este error fue autocorregido
+            return !fixes.some(function(f) {
+                return f.tipo === e.tipo || f.msg.includes(e.msg);
+            });
+        });
+
+        if (erroresSinCorregir.length > 0) {
             estado = ESTADOS.ERROR;
         }
 
-        // Si I_final es inválido, ERROR
+        // Si I_final es inválido, ERROR (a menos que fue autocorregido)
         if (!isFinite(nodo.I_final) || nodo.I_final <= 0) {
-            estado = ESTADOS.ERROR;
+            var fixAmpacidad = fixes.some(function(f) {
+                return f.tipo === 'AMPACIDAD_ZERO' || f.tipo === 'AMPACIDAD_FIX';
+            });
+            if (!fixAmpacidad) {
+                estado = ESTADOS.ERROR;
+            }
         }
 
         // Si hay autocorrecciones de cualquier tipo, al menos WARNING
         if (fixes.length > 0 && estado === ESTADOS.OK) {
             estado = ESTADOS.WARNING;
+        }
+
+        // Si el estado es WARNING pero todos los errores fueron autocorregidos, mostrar mensaje especial
+        if (estado === ESTADOS.WARNING && errores.length > 0 && erroresSinCorregir.length === 0) {
+            ctx.warnings.push({
+                nodo: nodo.id,
+                msg: '✔ Sistema corregido automáticamente - ' + errores.length + ' error(es) original(es) detectado(s) y resuelto(s)'
+            });
         }
 
         return {
@@ -183,6 +203,17 @@ var Semaforo = (function() {
         if (nodosEvaluados.some(function(n) { return n.estado === ESTADOS.ERROR; })) {
             ctx.estadoGlobal = ESTADOS.ERROR;
             return;
+        }
+
+        // Si hay violaciones NOM críticas, global es ERROR (no permitir OK)
+        if (ctx.violacionesNOM && ctx.violacionesNOM.length > 0) {
+            var violacionesCriticas = ctx.violacionesNOM.filter(function(v) {
+                return v.severidad === 'CRITICA' || v.severidad === 'ALTA';
+            });
+            if (violacionesCriticas.length > 0) {
+                ctx.estadoGlobal = ESTADOS.ERROR;
+                return;
+            }
         }
 
         // Si algún nodo está en WARNING, global es WARNING
@@ -223,7 +254,7 @@ var Semaforo = (function() {
      */
     function renderSemaforo(resultado) {
         console.log('═══════════════════════════════════════════════════════════');
-        console.log('🚦 SEMÁFORO DEL SISTEMA — ' + ICONOS[resultado.estadoGlobal] + ' ' + resultado.estadoGlobal);
+        console.log('[Semaforo] SEMAFORO DEL SISTEMA — ' + ICONOS[resultado.estadoGlobal] + ' ' + resultado.estadoGlobal);
         console.log('═══════════════════════════════════════════════════════════');
 
         resultado.evaluacion.forEach(function(n) {
@@ -234,11 +265,11 @@ var Semaforo = (function() {
             });
 
             n.warnings.forEach(function(w) {
-                console.log('  ⚠️ ' + w.msg);
+                console.log('  [!] ' + w.msg);
             });
 
             n.errores.forEach(function(e) {
-                console.log('  ❌ ' + e.msg);
+                console.log('  [X] ' + e.msg);
             });
         });
 
@@ -309,7 +340,7 @@ var Semaforo = (function() {
             if (n.warnings.length > 0) {
                 html += '<div class="mt-1 space-y-1">';
                 n.warnings.forEach(function(w) {
-                    html += '<div class="text-xs text-[--yellow]">⚠️ ' + w.msg + '</div>';
+                    html += '<div class="text-xs text-[--yellow]">[!] ' + w.msg + '</div>';
                 });
                 html += '</div>';
             }
@@ -317,7 +348,7 @@ var Semaforo = (function() {
             if (n.errores.length > 0) {
                 html += '<div class="mt-1 space-y-1">';
                 n.errores.forEach(function(e) {
-                    html += '<div class="text-xs text-[--red]">❌ ' + e.msg + '</div>';
+                    html += '<div class="text-xs text-[--red]">[X] ' + e.msg + '</div>';
                 });
                 html += '</div>';
             }

@@ -342,7 +342,7 @@
                             <div>
                                 <label class="field-label" for="input-retorno-tierra">Resistencia de retorno a tierra (mΩ)</label>
                                 <div class="flex gap-2">
-                                    <input type="number" id="input-retorno-tierra" name="input-retorno-tierra" value="0" min="0" step="0.1" placeholder="Auto-calculado" oninput="App.clearResults()" title="Valor calculado automáticamente según configuración del sistema">
+                                    <input type="number" id="input-retorno-tierra" name="input-retorno-tierra" value="" min="0" step="0.1" placeholder="Auto-calculado" oninput="App.clearResults()" title="Valor calculado automáticamente según configuración del sistema">
                                     <button class="btn-sm" onclick="Motor.actualizarRetornoTierra()" title="Calcular automáticamente"><i class="fas fa-calculator text-[0.65rem]"></i></button>
                                 </div>
                                 <p class="text-xs text-[--text-muted] mt-1">Resistencia del camino de retorno a tierra (opcional) - Calcular valor automáticamente</p>
@@ -410,8 +410,8 @@
                             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                                 <div><label class="field-label" for="cdt-fcc-input">Fcc (Factor carga continua)</label><input type="number" id="cdt-fcc-input" name="cdt-fcc-input" value="1.25" min="0" max="2" step="0.01" placeholder="Default 1.25" onchange="App.calculate()"></div>
                                 <div><label class="field-label" for="cdt-temp-input">Temp. Ambiente (°C)</label><input type="number" id="cdt-temp-input" name="cdt-temp-input" value="31" min="0" max="100" step="1" placeholder="Default 31°C" onchange="App.calculate()"></div>
-                                <div><label class="field-label" for="cdt-conductores-input">N° Conductores</label><input type="number" id="cdt-conductores-input" name="cdt-conductores-input" value="3" min="1" max="50" step="1" placeholder="Default 3" onchange="App.calculate()"></div>
-                                <div><label class="field-label" for="cdt-agrupamiento-input">F_agrupamiento</label><input type="number" id="cdt-agrupamiento-input" name="cdt-agrupamiento-input" value="" min="0" max="1" step="0.05" placeholder="Auto o manual" onchange="App.calculate()"></div>
+                                <div><label class="field-label" for="cdt-conductores-input">N° Conductores</label><input type="number" id="cdt-conductores-input" name="cdt-conductores-input" value="3" min="1" max="50" step="1" placeholder="Default 3" onchange="App.actualizarAgrupamientoAuto(); App.calculate()"></div>
+                                <div><label class="field-label" for="cdt-agrupamiento-input">F_agrupamiento (Auto)</label><input type="number" id="cdt-agrupamiento-input" name="cdt-agrupamiento-input" value="1.0" min="0" max="1" step="0.05" placeholder="Auto por NOM-001" readonly onchange="App.calculate()"></div>
                             </div>
                         </div>
                     </div>
@@ -590,9 +590,7 @@
             <section class="card hidden" id="results-section">
                         <div class="card-title"><i class="fas fa-table"></i> Resultados y Verificacion de Equipos</div>
                         <div class="overflow-x-auto rounded-lg border border-[--border]">
-                            <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script>
+                            <script>
         tailwind.config = {
             theme: {
                 extend: {
@@ -771,12 +769,58 @@
     <script src="js/datos/equipos.js"></script>
     <script src="js/datos/ampacidad.js?v=2"></script>
     <script src="js/datos/curvas_equipo.js?v=2"></script>
-    <!-- Calculo -->
+    <script src="js/datos/catalogo_schneider.js"></script>
+    <!-- Core Architecture (NOM-001-SEDE-2012) -->
+    <script src="js/core/data/tabla_ampacidad_310_15.js"></script>
+    <script src="js/core/data/factores_temperatura.js"></script>
+    <script src="js/core/data/factores_agrupamiento.js"></script>
+    <script src="js/core/data/conductores.nom.js"></script>
+    <script src="js/core/data/resistencias.js"></script>
+    <script src="js/core/data/catalog.adapter.js"></script>
+    <script src="js/core/MotorAmpacidadNOM.js"></script>
+    <script src="js/core/MotorElectricoUnificado.js"></script>
+    <script src="js/core/motor_v2.js"></script>
+    <script src="js/core/MotorElectrico.js"></script>
+    <script src="js/core/MotorIndustrial.js"></script>
+    <script src="js/core/MotorCoordinacionTCC.js"></script>
+    <script src="js/core/dominio/ampacidad.js"></script>
+    <script src="js/core/dominio/conductores.js"></script>
+    <script src="js/core/dominio/proteccion.js"></script>
+    <script src="js/core/dominio/cortocircuito.js"></script>
+    <script src="js/core/dominio/caida_tension.js"></script>
+    <script src="js/core/dominio/coordinacion.js"></script>
+    <script src="js/core/dominio/validacion_nom.js"></script>
+    <script src="js/core/models/nodo.model.js"></script>
+    <script src="js/core/domain/ampacity.engine.js"></script>
+    <script src="js/core/domain/shortcircuit.engine.js"></script>
+    <script src="js/core/domain/protection.engine.js"></script>
+    <script src="js/core/domain/coordination.engine.js"></script>
+    <script src="js/core/domain/voltageDrop.engine.js"></script>
+    <script src="js/core/services/conductor.selector.js"></script>
+    <script src="js/core/utils/nom.validator.js"></script>
+    <script src="js/app/orchestrator.js"></script>
+    <!-- Clean Architecture (Pipeline Único) -->
+    <script src="js/core/engine.js"></script>
+    <!-- <script src="js/modules/validator.js"></script> DUPLICADO - usar core/MotorIndustrial.js incluye validación -->
+    <!-- <script src="js/modules/calculo.js"></script> DUPLICADO - usar core/MotorIndustrial.js incluye cálculo -->
+    <!-- <script src="js/selectors/conductor.selector.js"></script> DUPLICADO - usar core/services/conductor.selector.js -->
+    <!-- <script src="js/selectors/breaker.selector.js"></script> DUPLICADO - usar core/domain/protection.engine.js -->
+    <!-- <script src="js/verification/nom.verifier.js"></script> DUPLICADO - usar core/utils/nom.validator.js -->
+    <!-- Calculo - MODULOS LEGACY (reemplazados por core) -->
+    <!-- REEMPLAZADOS POR CORE: agrupamiento_nom.js, ampacidad_real.js, breaker_selector.js, motor_inteligente_ccc.js, optimizador_conductores.js -->
+    <!-- Mantenidos temporalmente para compatibilidad -->
     <script src="js/calculo/secuencia.js?v=3"></script>
     <script src="js/calculo/fault_analysis.js"></script>
     <script src="js/calculo/impedancias.js"></script>
-    <script src="js/calculo/agrupamiento_nom.js"></script>
-    <script src="js/calculo/ampacidad_real.js?v=2"></script>
+    <!-- <script src="js/calculo/agrupamiento_nom.js"></script> REEMPLAZADO POR core/data/factores_agrupamiento.js -->
+    <!-- <script src="js/calculo/ampacidad_real.js?v=3"></script> REEMPLAZADO POR core/MotorAmpacidadNOM.js -->
+    <!-- <script src="js/calculo/breaker_selector.js?v=1"></script> REEMPLAZADO POR core/domain/protection.engine.js -->
+    <script src="js/calculo/coordinacion_automatica.js?v=1"></script>
+    <script src="js/calculo/tcc_curvas_reales.js?v=1"></script>
+    <script src="js/calculo/tcc_digitalizer_pro.js"></script>
+    <script src="js/calculo/tcc_pdf_importer.js"></script>
+    <!-- NOTA: tcc_pdf_importer.js requiere pdfjs-dist cargado antes para funcionar -->
+    <script src="js/ui/tcc_viewer_pro.js?v=1"></script>
     <script src="js/calculo/validador_sistema.js?v=1"></script>
     <script src="js/calculo/motor_falla_tierra.js?v=1"></script>
     <script src="js/calculo/motor_validacion_inteligente.js"></script>
@@ -786,30 +830,44 @@
     <script src="js/calculo/motor_protecciones.js"></script>
     <script src="js/calculo/debug_visual_pro.js?v=2"></script>
     <script src="js/calculo/tcc_chart_real.js"></script>
-    <script src="js/calculo/excel_export_pro.js"></script>
+    <script src="js/calculo/motor_rediseño.js"></script>
+    <script src="js/calculo/motor_arc_flash.js"></script>
+    <script src="js/calculo/ieee_1584_arcflash.js"></script>
+    <script src="js/calculo/motor_optimizacion_global.js"></script>
+    <script src="js/calculo/motor_optimizacion_ga.js"></script>
+    <script src="js/calculo/motor_ia_aprendizaje.js"></script>
+    <script src="js/calculo/motor_ajuste_lsig.js"></script>
+    <script src="js/calculo/motor_coordinacion_fase_tierra.js"></script>
     <script src="js/calculo/motor_autocorreccion_total.js?v=1"></script>
     <script src="js/calculo/semaforo.js?v=2"></script>
-    <script src="js/calculo/motor_inteligente_ccc.js"></script>
+    <!-- <script src="js/calculo/motor_inteligente_ccc.js"></script> REEMPLAZADO POR core/MotorAmpacidadNOM.js -->
     <script src="js/calculo/motor_diseno_automatico.js?v=4"></script>
     <script src="js/datos/catalogo_equipos_real.js?v=2"></script>
+    <script src="js/datos/catalogo_breakers_pro.js"></script>
+    <script src="js/datos/catalogo_conductores_nom.js"></script>
     <script src="js/calculo/motor_coordinacion_real.js?v=2"></script>
     <!-- Test script deshabilitado en producción -->
     <!-- <script src="js/calculo/test_coordinacion_real.js"></script> -->
     <script src="js/calculo/solver_electrico.js"></script>
     <script src="js/calculo/tcc_digitalizer.js"></script>
+    <script src="js/calculo/excel_export_pro.js"></script>
     <script src="js/calculo/caida_tension.js"></script>
+    <script src="js/calculo/caida_tension_pro.js"></script>
     <script src="js/calculo/capacitores.js"></script>
     <script src="js/calculo/motores.js"></script>
     <script src="js/calculo/nom_validacion.js"></script>
-    <script src="js/calculo/optimizador_conductores.js"></script>
+    <!-- <script src="js/calculo/optimizador_conductores.js"></script> REEMPLAZADO POR core/services/conductor.selector.js -->
     <script src="js/calculo/tcc_coordinacion.js"></script>
     <script src="js/calculo/curvas.js"></script>
+    <script src="js/calculo/curvas_tcc_pro.js"></script>
+    <script src="js/calculo/motor_impedancias.js"></script>
+    <script src="js/calculo/coordinacion_total_pro.js"></script>
     <script src="js/calculo/loadContext.js"></script>
-    <script src="js/calculo/motor.js?v=40"></script>
-    <script src="js/app.js?v=36"></script>
+    <script src="js/calculo/motor.js?v=44"></script>
     <!-- Utilidades -->
     <script src="js/units.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/app.js"></script>
     <!-- UI -->
     <script src="js/ui/toast.js?v=2"></script>
     <script src="js/ui/configuracion.js"></script>
@@ -837,7 +895,7 @@
             var modulosRequeridos = [
                 'CONSTANTES', 'CONDUCTORES', 'EQUIPOS', 'AMPACIDAD', 'CURVAS_EQUIPO',
                 'Secuencia', 'FaultAnalysis', 'Impedancias', 'Motor', 'CaidaTension',
-                'CalculoCapacitores', 'CalculoMotores', 'NOMValidacion', 'OptimizadorConductores', 'TCCCoordinacion', 'Curvas',
+                'CalculoCapacitores', 'CalculoMotores', 'NOMValidacion', 'TCCCoordinacion', 'Curvas',
                 'Units', 'Profile',
                 'UIToast', 'UIConfiguracion', 'UIAlimentadores', 'UIEquipos', 'UIDiagrama', 'UIResultados', 'UIProyectos', 'UICoordonograma', 'UIReportePDF', 'UIExportar', 'UIMotores',
                 'App'
@@ -858,7 +916,11 @@
             });
             if (errores.length > 0) {
                 console.error('Módulos no cargados:', errores);
-                alert('Error: No se cargaron los módulos: ' + errores.join(', '));
+                var errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 16px 24px; border-radius: 8px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+                errorDiv.textContent = 'Error: No se cargaron los módulos: ' + errores.join(', ');
+                document.body.appendChild(errorDiv);
+                setTimeout(function() { errorDiv.remove(); }, 5000);
             }
             var opcionalesFaltantes = [];
             modulosOpcionales.forEach(function(mod) {

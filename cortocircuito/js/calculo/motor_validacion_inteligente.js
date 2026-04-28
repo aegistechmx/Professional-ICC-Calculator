@@ -205,15 +205,21 @@ var MotorValidacionInteligente = (function() {
             });
         }
 
-        // 🔥 FALLA A TIERRA
+        // 🔥 FALLA A TIERRA - CRÍTICO
         if (punto.faseTierra && punto.faseTierra.iscFt && punto.equip && punto.equip.iDisparo) {
             var IFT = punto.faseTierra.iscFt * 1000;
             if (punto.equip.iDisparo > IFT) {
                 acciones.push({
                     tipo: 'FALLA_TIERRA',
-                    severidad: 'ALTA',
+                    severidad: 'CRÍTICA',
                     accion: 'Agregar protección diferencial (GFP)',
-                    razon: 'iDisparo=' + punto.equip.iDisparo + 'A > If-tierra=' + (IFT || 0).toFixed(0) + 'A'
+                    razon: 'iDisparo=' + punto.equip.iDisparo + 'A > If-tierra=' + (IFT || 0).toFixed(0) + 'A. Riesgo: Daño a equipo, incendio, tensiones peligrosas'
+                });
+                acciones.push({
+                    tipo: 'FALLA_TIERRA',
+                    severidad: 'ALTA',
+                    accion: 'Bajar instantáneo a ~2500-3000A',
+                    razon: 'Alternativa si no se puede agregar GFP. Precaución: Puede afectar coordinación'
                 });
                 acciones.push({
                     tipo: 'FALLA_TIERRA',

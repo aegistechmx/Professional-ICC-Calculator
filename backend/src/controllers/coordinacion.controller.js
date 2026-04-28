@@ -5,7 +5,7 @@
 
 const coordinacionService = require('../services/coordinacion.service');
 const { coordinacionTableroSchema, evaluacionSchema, ajusteSchema } = require('../validators/coordinacion.schema');
-const { success, error } = require('../utils/apiResponse');
+const { success } = require('../utils/apiResponse');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 /**

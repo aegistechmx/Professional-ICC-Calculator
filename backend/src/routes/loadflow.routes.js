@@ -5,20 +5,14 @@
 
 const router = require('express').Router();
 const ctrl = require('../controllers/loadflow.controller');
-const auth = require('../middlewares/auth.middleware');
+const auth = require('../middleware/auth.middleware');
+const { apiLimiter } = require('../middleware/rateLimiter.middleware');
 
-// Auth optional for development
-const optionalAuth = (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-};
+// Apply rate limiting to loadflow endpoints
+router.use(apiLimiter);
 
-// Run load flow analysis
-router.post('/', optionalAuth, ctrl.runLoadFlow);
-
-// Validate system before load flow
-router.post('/validate', optionalAuth, ctrl.validateSystem);
+// All loadflow routes require authentication
+router.post('/', auth, ctrl.runLoadFlow);
+router.post('/validate', auth, ctrl.validateSystem);
 
 module.exports = router;

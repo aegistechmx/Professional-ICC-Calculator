@@ -33,7 +33,7 @@ async function crearReportePDF(data, stream) {
   
   if (data.icc && data.icc.max_kA) {
     doc.fontSize(11).text(
-      `El presente estudio analiza el comportamiento del sistema eléctrico bajo condiciones de falla. ` +
+      'El presente estudio analiza el comportamiento del sistema eléctrico bajo condiciones de falla. ' +
       `Se determinó una corriente de cortocircuito máxima de ${data.icc.max_kA.toFixed(2)} kA en el punto de conexión.`
     );
   } else {
@@ -161,7 +161,7 @@ async function crearReportePDF(data, stream) {
     doc.fontSize(9).text(
       'Figura 1: Curva de corriente de cortocircuito vs tiempo (0-200ms). ' +
       'El decaimiento muestra la contribución subtransitoria de motores.'
-    , { align: 'center' });
+      , { align: 'center' });
     
     doc.addPage();
   }
@@ -186,7 +186,7 @@ async function crearReportePDF(data, stream) {
     doc.fontSize(9).text(
       'Figura 2: Curvas TCC de dispositivos de protección (escala log-log). ' +
       'El margen de coordinación debe ser ≥ 0.2s para selectividad.'
-    , { align: 'center' });
+      , { align: 'center' });
     
     doc.moveDown();
   }

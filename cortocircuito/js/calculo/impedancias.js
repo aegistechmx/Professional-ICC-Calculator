@@ -88,10 +88,19 @@ var Impedancias = (function() {
      * Fase 9: Calcula impedancia acumulada hasta un nodo en estructura de árbol
      * @param {string} nodoId - ID del nodo destino
      * @param {Array} nodos - Array de nodos con estructura { id, parentId, feeder }
+     * @param {Set} [visitados] - Interno para detectar recursión infinita por ciclos
      * @returns {Object} { R, X, Z } en ohms
      */
-    function impedanciaAcumuladaNodo(nodoId, nodos) {
-        var nodo = nodos.find(function(n) { return n.id === nodoId; });
+    function impedanciaAcumuladaNodo(nodoId, nodos, visitados) {
+        if (!visitados) visitados = new Set();
+        
+        if (visitados.has(nodoId)) {
+            console.error('Ciclo detectado en la jerarquía de nodos para:', nodoId);
+            return { R: 0, X: 0, Z: 0 };
+        }
+        visitados.add(nodoId);
+
+        var nodo = (nodos || []).find(function(n) { return n.id === nodoId; });
         if (!nodo) return { R: 0, X: 0, Z: 0 };
         
         if (!nodo.parentId) {
@@ -104,7 +113,7 @@ var Impedancias = (function() {
         }
         
         // Recursión: impedancia del padre + impedancia del feeder actual
-        var zPadre = impedanciaAcumuladaNodo(nodo.parentId, nodos);
+        var zPadre = impedanciaAcumuladaNodo(nodo.parentId, nodos, visitados);
         var zFeeder = nodo.feeder ? delConductor(nodo.feeder) : { R: 0, X: 0, Z: 0 };
         
         return {
@@ -122,10 +131,12 @@ var Impedancias = (function() {
      */
     function obtenerCamino(nodoId, nodos) {
         var camino = [];
+        var visitados = new Set();
         var nodoActual = nodos.find(function(n) { return n.id === nodoId; });
         if (!nodoActual) return camino;
         
-        while (nodoActual) {
+        while (nodoActual && !visitados.has(nodoActual.id)) {
+            visitados.add(nodoActual.id);
             camino.unshift(nodoActual.id);
             if (!nodoActual.parentId) break;
             nodoActual = nodos.find(function(n) { return n.id === nodoActual.parentId; });
@@ -152,10 +163,14 @@ var Impedancias = (function() {
      */
     function ordenarPorNivel(nodos) {
         var visitados = [];
+        var idsVistos = new Set();
         var cola = nodos.filter(function(n) { return !n.parentId; });
         
         while (cola.length > 0) {
             var nodo = cola.shift();
+            if (idsVistos.has(nodo.id)) continue;
+            
+            idsVistos.add(nodo.id);
             visitados.push(nodo);
             
             var hijos = obtenerHijos(nodo.id, nodos);
@@ -163,6 +178,30 @@ var Impedancias = (function() {
         }
         
         return visitados;
+    }
+
+    /**
+     * Detecta si existe una referencia circular en la jerarquía de nodos.
+     * @param {Array} nodos - Estructura de nodos a validar
+     * @returns {string|null} ID del nodo causante del ciclo o null si es válido.
+     */
+    function detectarCiclos(nodos) {
+        if (!nodos || !Array.isArray(nodos)) return null;
+
+        for (var i = 0; i < nodos.length; i++) {
+            var visitados = new Set();
+            var actual = nodos[i];
+
+            while (actual && actual.parentId) {
+                if (visitados.has(actual.id)) {
+                    return actual.id; // Ciclo detectado
+                }
+                visitados.add(actual.id);
+                var pid = actual.parentId;
+                actual = nodos.find(function(n) { return n.id === pid; });
+            }
+        }
+        return null;
     }
 
     // API publica
@@ -176,7 +215,8 @@ var Impedancias = (function() {
         impedanciaAcumuladaNodo: impedanciaAcumuladaNodo,
         obtenerCamino: obtenerCamino,
         obtenerHijos: obtenerHijos,
-        ordenarPorNivel: ordenarPorNivel
+        ordenarPorNivel: ordenarPorNivel,
+        detectarCiclos: detectarCiclos
     };
 })();
 

@@ -219,15 +219,15 @@ function runFaultAnalysis(node, groundingType, R_tierra) {
     const warnings = [];
     
     if (I_LG < I_3F * 0.05) {
-        warnings.push('⚠️ Falla a tierra muy baja (posible HRG)');
+        warnings.push('[!] Falla a tierra muy baja (posible HRG)');
     }
     
     if (I_LG > I_3F) {
-        warnings.push('❌ Físicamente imposible: I_LG > I_3F');
+        warnings.push('[X] Físicamente imposible: I_LG > I_3F');
     }
     
     if (I_LL > I_3F * 1.1) {
-        warnings.push('⚠️ I_LL > 110% de I_3F (verificar datos)');
+        warnings.push('[!] I_LL > 110% de I_3F (verificar datos)');
     }
     
     return {

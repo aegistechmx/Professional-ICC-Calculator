@@ -7,7 +7,7 @@ const { success } = require('../utils/apiResponse');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { construirYbusDesdeEditor } = require('../core/loadflow/ybus');
 const { loadFlowNR, loadFlowDecoupled, convertirNodosABuses } = require('../core/loadflow/newton');
-const { Bus, BUS_TYPES } = require('../core/loadflow/bus');
+const { Bus } = require('../core/loadflow/bus');
 
 /**
  * POST /api/loadflow

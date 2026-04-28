@@ -95,17 +95,23 @@ var MotorAutocorreccionTotal = (function() {
 
             // F_agrupamiento auto coherente
             var autoF;
+            var cccEfectivo = f.numConductores || 3;
+
+            // [Normativa] Si THDi > 15%, el neutro cuenta como portador de corriente
+            if (App.estado && App.estado.ctx && App.estado.ctx.harmonics && App.estado.ctx.harmonics.THDi > 0.15) {
+                if (cccEfectivo === 3) cccEfectivo = 4;
+            }
+
             if (f.tipoInst === 'charola') {
-                var numCond = f.numConductores || 3;
-                autoF = Math.max(0.85, 1 - numCond * 0.02);
+                autoF = Math.max(0.85, 1 - cccEfectivo * 0.02);
             } else {
                 if (typeof AmpacidadReal !== 'undefined') {
-                    autoF = AmpacidadReal.factorAgrupamiento(f.numConductores);
+                    autoF = AmpacidadReal.factorAgrupamiento(cccEfectivo);
                 } else {
                     // Fallback
-                    if (f.numConductores <= 3) autoF = 1.0;
-                    else if (f.numConductores <= 6) autoF = 0.80;
-                    else if (f.numConductores <= 9) autoF = 0.70;
+                    if (cccEfectivo <= 3) autoF = 1.0;
+                    else if (cccEfectivo <= 6) autoF = 0.80;
+                    else if (cccEfectivo <= 9) autoF = 0.70;
                     else autoF = 0.50;
                 }
             }
@@ -210,15 +216,21 @@ var MotorAutocorreccionTotal = (function() {
     // =========================
     function corregirTCC(estado, cambios) {
         var nodos = estado.nodos || [];
+        var cabecerasCorregidas = new Set();
         nodos.forEach(function(n) {
             var up = findNodo(estado, n.parentId);
-            if (!up) return;
+            if (!up || cabecerasCorregidas.has(up.id)) return;
+            cabecerasCorregidas.add(up.id);
 
-            // separación simple log-log (delay)
+            // Asegurar separación mínima de 0.1s respecto al hijo
             up.equip = up.equip || {};
-            up.equip.delay = (up.equip.delay || 0.1) + 0.1;
-
-            cambios.push('TCC: delay ' + up.id + '→' + (up.equip.delay || 0).toFixed(2) + 's');
+            var delayHijo = n.equip ? (n.equip.delay || 0) : 0;
+            var nuevoDelay = Math.max(up.equip.delay || 0.1, delayHijo + 0.1);
+            
+            if (up.equip.delay !== nuevoDelay) {
+                up.equip.delay = nuevoDelay;
+                cambios.push('TCC: Ajuste jerárquico ' + up.id + ' delay→' + nuevoDelay.toFixed(2) + 's');
+            }
         });
     }
 

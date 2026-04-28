@@ -93,7 +93,7 @@ var CalculoCapacitores = (function() {
         if (Tc < 0.001) Tc = 0.001;
 
         // Corriente inicial de descarga (pico del pulso)
-        var iCap0 = Vcaida * Math.SQRT(2) / Xc; // Amperes
+        var iCap0 = Vcaida * Math.SQRT2 / Xc; // Amperes
         var iCap0_mA = iCap0 * 1000; // miliamperes (para la curva de descarga)
         var iCapAmp = iCap0 / 1000; // kA (para sumar al pico)
 
@@ -130,11 +130,11 @@ var CalculoCapacitores = (function() {
             return Array(numPuntos).fill({ iCapPicoAmp: 0, iCapPicoTotal: 0, iCapPicoMotores: 0 });
         }
 
-        var aporte = aporte(kvar, Vcaida, distancia);
+        var datosAporte = aporte(kvar, Vcaida, distancia);
         var resultados = [];
         var iCapPicoTotal = 0;
         var iCapPicoMotores = 0;
-        var iCapPicoAmp = aporte.iCapPicoAmp;
+        var iCapPicoAmp = datosAporte.iCapPicoAmp;
 
         // El capacitor aporta a TODOS los puntos (es paralelo en el bus, afecta el primer cero)
         for (var i = 0; i < numPuntos; i++) {

@@ -1,0 +1,99 @@
+{
+  "name": "Protection Coordination Example",
+  "description": "System with relays configured for coordination study",
+  "baseMVA": 100,
+  "baseKV": 13.8,
+  "buses": [
+    {
+      "id": "bus1",
+      "type": "Slack",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.05, "angle": 0 },
+      "generation": { "P": 150, "Q": 75 }
+    },
+    {
+      "id": "bus2",
+      "type": "PV",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "generation": { "P": 0, "Q": 0 }
+    },
+    {
+      "id": "bus3",
+      "type": "PQ",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 100, "Q": 50 }
+    },
+    {
+      "id": "bus4",
+      "type": "PQ",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 50, "Q": 25 }
+    }
+  ],
+  "lines": [
+    {
+      "id": "line1",
+      "fromBus": "bus1",
+      "toBus": "bus2",
+      "r": 0.01,
+      "x": 0.1,
+      "b": 0.0,
+      "thermalLimit": 150
+    },
+    {
+      "id": "line2",
+      "fromBus": "bus2",
+      "toBus": "bus3",
+      "r": 0.015,
+      "x": 0.12,
+      "b": 0.0,
+      "thermalLimit": 100
+    },
+    {
+      "id": "line3",
+      "fromBus": "bus3",
+      "toBus": "bus4",
+      "r": 0.02,
+      "x": 0.15,
+      "b": 0.0,
+      "thermalLimit": 75
+    }
+  ],
+  "relays": [
+    {
+      "id": "relay1",
+      "bus": "bus1",
+      "pickup_kA": 0.5,
+      "TMS": 0.5,
+      "curve": "standard",
+      "upstream": null
+    },
+    {
+      "id": "relay2",
+      "bus": "bus2",
+      "pickup_kA": 0.4,
+      "TMS": 0.4,
+      "curve": "standard",
+      "upstream": "relay1"
+    },
+    {
+      "id": "relay3",
+      "bus": "bus3",
+      "pickup_kA": 0.3,
+      "TMS": 0.35,
+      "curve": "standard",
+      "upstream": "relay2"
+    },
+    {
+      "id": "relay4",
+      "bus": "bus4",
+      "pickup_kA": 0.25,
+      "TMS": 0.3,
+      "curve": "standard",
+      "upstream": "relay3"
+    }
+  ]
+}

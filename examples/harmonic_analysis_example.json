@@ -1,0 +1,93 @@
+{
+  "name": "Harmonic Analysis Example",
+  "description": "System with nonlinear loads for harmonic analysis",
+  "baseMVA": 100,
+  "baseKV": 13.8,
+  "buses": [
+    {
+      "id": "bus1",
+      "type": "Slack",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.05, "angle": 0 },
+      "generation": { "P": 200, "Q": 100 }
+    },
+    {
+      "id": "bus2",
+      "type": "PV",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "generation": { "P": 0, "Q": 0 }
+    },
+    {
+      "id": "bus3",
+      "type": "PQ",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 100, "Q": 50 }
+    },
+    {
+      "id": "bus4",
+      "type": "PQ",
+      "baseKV": 0.48,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 50, "Q": 25 }
+    }
+  ],
+  "transformers": [
+    {
+      "id": "xfm1",
+      "fromBus": "bus2",
+      "toBus": "bus4",
+      "primaryKV": 13.8,
+      "secondaryKV": 0.48,
+      "mva": 5,
+      "impedance": 0.0575
+    }
+  ],
+  "lines": [
+    {
+      "id": "line1",
+      "fromBus": "bus1",
+      "toBus": "bus2",
+      "r": 0.01,
+      "x": 0.1,
+      "b": 0.0,
+      "thermalLimit": 200
+    },
+    {
+      "id": "line2",
+      "fromBus": "bus2",
+      "toBus": "bus3",
+      "r": 0.015,
+      "x": 0.12,
+      "b": 0.0,
+      "thermalLimit": 150
+    }
+  ],
+  "harmonicSources": [
+    {
+      "bus": "bus3",
+      "type": "rectifier",
+      "fundamentalCurrent": 0.5,
+      "power": 100,
+      "harmonics": {
+        "5": 0.2,
+        "7": 0.14,
+        "11": 0.09,
+        "13": 0.07
+      }
+    },
+    {
+      "bus": "bus4",
+      "type": "inverter",
+      "fundamentalCurrent": 0.3,
+      "power": 50,
+      "harmonics": {
+        "5": 0.15,
+        "7": 0.1,
+        "11": 0.05,
+        "13": 0.03
+      }
+    }
+  ]
+}

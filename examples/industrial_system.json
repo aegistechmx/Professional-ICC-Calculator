@@ -1,0 +1,115 @@
+{
+  "name": "Industrial Distribution System",
+  "description": "A typical industrial system with transformers, motors, and loads",
+  "baseMVA": 100,
+  "baseKV": 13.8,
+  "buses": [
+    {
+      "id": "utility",
+      "type": "Slack",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.05, "angle": 0 },
+      "generation": { "P": 200, "Q": 100 }
+    },
+    {
+      "id": "hv_bus",
+      "type": "PV",
+      "baseKV": 13.8,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "generation": { "P": 0, "Q": 0 }
+    },
+    {
+      "id": "lv_bus1",
+      "type": "PQ",
+      "baseKV": 0.48,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 50, "Q": 25 }
+    },
+    {
+      "id": "lv_bus2",
+      "type": "PQ",
+      "baseKV": 0.48,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 75, "Q": 35 }
+    },
+    {
+      "id": "motor_bus",
+      "type": "PQ",
+      "baseKV": 0.48,
+      "voltage": { "magnitude": 1.0, "angle": 0 },
+      "load": { "P": 100, "Q": 50 }
+    }
+  ],
+  "transformers": [
+    {
+      "id": "xfm1",
+      "fromBus": "utility",
+      "toBus": "hv_bus",
+      "primaryKV": 13.8,
+      "secondaryKV": 13.8,
+      "mva": 100,
+      "impedance": 0.05
+    },
+    {
+      "id": "xfm2",
+      "fromBus": "hv_bus",
+      "toBus": "lv_bus1",
+      "primaryKV": 13.8,
+      "secondaryKV": 0.48,
+      "mva": 5,
+      "impedance": 0.0575
+    },
+    {
+      "id": "xfm3",
+      "fromBus": "hv_bus",
+      "toBus": "lv_bus2",
+      "primaryKV": 13.8,
+      "secondaryKV": 0.48,
+      "mva": 7.5,
+      "impedance": 0.0575
+    },
+    {
+      "id": "xfm4",
+      "fromBus": "hv_bus",
+      "toBus": "motor_bus",
+      "primaryKV": 13.8,
+      "secondaryKV": 0.48,
+      "mva": 10,
+      "impedance": 0.0575
+    }
+  ],
+  "motors": [
+    {
+      "id": "motor1",
+      "bus": "motor_bus",
+      "type": "induction",
+      "hp": 200,
+      "voltage": 0.48,
+      "efficiency": 0.92,
+      "powerFactor": 0.85,
+      "xd": 0.2,
+      "xd_prime": 0.15,
+      "H": 3
+    }
+  ],
+  "lines": [
+    {
+      "id": "line1",
+      "fromBus": "utility",
+      "toBus": "hv_bus",
+      "r": 0.005,
+      "x": 0.05,
+      "b": 0.0,
+      "thermalLimit": 200
+    },
+    {
+      "id": "line2",
+      "fromBus": "lv_bus1",
+      "toBus": "lv_bus2",
+      "r": 0.02,
+      "x": 0.1,
+      "b": 0.0,
+      "thermalLimit": 50
+    }
+  ]
+}

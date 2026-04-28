@@ -1,14 +1,12 @@
 const router = require('express').Router();
 const ctrl = require('../../controllers/reporte/reporte.controller');
-const auth = require('../../middlewares/auth.middleware');
+const auth = require('../../middleware/auth.middleware');
+const { apiLimiter } = require('../../middleware/rateLimiter.middleware');
 
-// Endpoint protegido (requiere login para generar reporte profesional)
-// Auth optional for development
-router.post('/pdf', (req, res, next) => {
-  if (req.headers.authorization) {
-    return auth(req, res, next);
-  }
-  next();
-}, ctrl.generarPDF);
+// Apply rate limiting to reporte endpoints
+router.use(apiLimiter);
+
+// PDF generation requires authentication
+router.post('/pdf', auth, ctrl.generarPDF);
 
 module.exports = router;

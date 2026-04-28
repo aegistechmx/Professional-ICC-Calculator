@@ -56,8 +56,8 @@ var TCCViewerInteractivo = (function() {
      */
     function generarCurva(breaker, I_min, I_max) {
         var puntos = [];
-        var pickup = breaker.pickup || 100;
-        I_min = I_min || pickup * 0.5;
+        var pickup = Math.max(10, breaker.pickup || 100);
+        I_min = Math.max(1, I_min || pickup * 0.5);
         I_max = I_max || 50000;
 
         // Generar puntos en escala log (más densos en rangos bajos)
@@ -81,25 +81,25 @@ var TCCViewerInteractivo = (function() {
         var cruces = [];
         var tolerancia = 0.1; // 10% de tolerancia
 
-        // Interpolar curvas para comparación punto a punto
-        var maxLen = Math.max(curvaUp.length, curvaDown.length);
-        
-        for (var i = 0; i < maxLen; i++) {
-            var pUp = curvaUp[Math.min(i, curvaUp.length - 1)];
-            var pDown = curvaDown[Math.min(i, curvaDown.length - 1)];
+        // Comparar puntos en el mismo eje X (corriente)
+        curvaDown.forEach(function(pDown) {
+            var I = pDown.x;
+            // Buscar el punto más cercano en corriente en la curva upstream
+            var pUp = curvaUp.reduce(function(prev, curr) {
+                return (Math.abs(curr.x - I) < Math.abs(prev.x - I) ? curr : prev);
+            });
 
-            if (!pUp || !pDown) continue;
-
-            // Si curva upstream está abajo o igual que downstream → NO coordinación
-            if (pUp.y <= pDown.y * (1 + tolerancia)) {
-                cruces.push({
-                    corriente: pUp.x,
-                    tiempoUp: pUp.y,
-                    tiempoDown: pDown.y,
-                    severidad: pUp.y < pDown.y ? 'CRITICO' : 'WARNING'
-                });
+            if (pUp && Math.abs(pUp.x - I) / I < 0.1) {
+                if (pUp.y <= pDown.y * (1 + tolerancia)) {
+                    cruces.push({
+                        corriente: I,
+                        tiempoUp: pUp.y,
+                        tiempoDown: pDown.y,
+                        severidad: pUp.y < pDown.y ? 'CRITICO' : 'WARNING'
+                    });
+                }
             }
-        }
+        });
 
         return {
             hayCruce: cruces.length > 0,
@@ -324,6 +324,8 @@ var TCCViewerInteractivo = (function() {
         }
         
         html += '</div>';
+        // Note: innerHTML is used here for rendering generated HTML structure
+        // The content is generated internally, not from user input
         semaforoDiv.innerHTML = html;
     }
 
@@ -354,7 +356,7 @@ var TCCViewerInteractivo = (function() {
             // Pickup
             html += '<div class="mb-3">';
             html += '<div class="flex justify-between mb-1">';
-            html += '<label class="text-sm font-medium">Pickup (A)</label>';
+            html += '<label class="text-sm font-medium" for="pickup-slider-' + index + '">Pickup (A)</label>';
             html += '<span id="pickup-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + tcc.pickup.toFixed(0) + '</span>';
             html += '</div>';
             html += '<input type="range" id="pickup-slider-' + index + '" name="pickup-slider-' + index + '" min="50" max="2000" step="10" value="' + tcc.pickup + '" ' +
@@ -365,7 +367,7 @@ var TCCViewerInteractivo = (function() {
             // Long Delay
             html += '<div class="mb-3">';
             html += '<div class="flex justify-between mb-1">';
-            html += '<label class="text-sm font-medium">Long Delay (s)</label>';
+            html += '<label class="text-sm font-medium" for="longdelay-slider-' + index + '">Long Delay (s)</label>';
             html += '<span id="longdelay-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + tcc.longDelay.toFixed(1) + '</span>';
             html += '</div>';
             html += '<input type="range" id="longdelay-slider-' + index + '" name="longdelay-slider-' + index + '" min="0.5" max="10" step="0.1" value="' + tcc.longDelay + '" ' +
@@ -376,7 +378,7 @@ var TCCViewerInteractivo = (function() {
             // Short Delay
             html += '<div class="mb-3">';
             html += '<div class="flex justify-between mb-1">';
-            html += '<label class="text-sm font-medium">Short Delay (s)</label>';
+            html += '<label class="text-sm font-medium" for="shortdelay-slider-' + index + '">Short Delay (s)</label>';
             html += '<span id="shortdelay-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + tcc.shortDelay.toFixed(2) + '</span>';
             html += '</div>';
             html += '<input type="range" id="shortdelay-slider-' + index + '" name="shortdelay-slider-' + index + '" min="0.01" max="1" step="0.01" value="' + tcc.shortDelay + '" ' +
@@ -387,7 +389,7 @@ var TCCViewerInteractivo = (function() {
             // Instantaneous
             html += '<div class="mb-3">';
             html += '<div class="flex justify-between mb-1">';
-            html += '<label class="text-sm font-medium">Instantaneous (A)</label>';
+            html += '<label class="text-sm font-medium" for="inst-slider-' + index + '">Instantaneous (A)</label>';
             html += '<span id="inst-val-' + index + '" class="text-sm font-bold text-[--cyan]">' + (tcc.instantaneous === 'OFF' ? 'OFF' : tcc.instantaneous.toFixed(0)) + '</span>';
             html += '</div>';
             html += '<input type="range" id="inst-slider-' + index + '" name="inst-slider-' + index + '" min="100" max="10000" step="50" value="' + (tcc.instantaneous === 'OFF' ? 10000 : tcc.instantaneous) + '" ' +
@@ -512,7 +514,11 @@ var TCCViewerInteractivo = (function() {
      */
     function exportarPDF() {
         if (!chartInstance) {
-            alert('No hay gráfico para exportar');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('No hay gráfico para exportar', 'error');
+            } else {
+                console.error('No hay gráfico para exportar');
+            }
             return;
         }
 
@@ -524,37 +530,49 @@ var TCCViewerInteractivo = (function() {
 
         // Crear ventana de impresión
         var printWindow = window.open('', '_blank');
-        printWindow.document.write('<html><head><title>Reporte TCC</title>');
-        printWindow.document.write('<style>');
-        printWindow.document.write('body { font-family: Arial, sans-serif; padding: 20px; }');
-        printWindow.document.write('h1 { color: #333; }');
-        printWindow.document.write('table { border-collapse: collapse; width: 100%; margin-top: 20px; }');
-        printWindow.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }');
-        printWindow.document.write('th { background-color: #f2f2f2; }');
-        printWindow.document.write('</style>');
-        printWindow.document.write('</head><body>');
-        printWindow.document.write('<h1>Reporte de Coordinación TCC</h1>');
-        printWindow.document.write('<p>Fecha: ' + new Date().toLocaleString() + '</p>');
-        printWindow.document.write('<img src="' + imgData + '" style="max-width: 100%; height: auto; margin: 20px 0;">');
+        if (!printWindow) {
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('El navegador bloqueó la ventana de impresión. Por favor, permita los popups.', 'error');
+            }
+            return;
+        }
+
+        // Note: document.write is used here for printing to a new window
+        // This is acceptable since the content is generated internally, not from user input
+        var html = '<html><head><title>Reporte TCC</title>';
+        html += '<style>';
+        html += 'body { font-family: Arial, sans-serif; padding: 20px; }';
+        html += 'h1 { color: #333; }';
+        html += 'table { border-collapse: collapse; width: 100%; margin-top: 20px; }';
+        html += 'th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }';
+        html += 'th { background-color: #f2f2f2; }';
+        html += '</style>';
+        html += '</head><body>';
+        html += '<h1>Reporte de Coordinación TCC</h1>';
+        html += '<p>Fecha: ' + new Date().toLocaleString() + '</p>';
+        html += '<img src="' + imgData + '" style="max-width: 100%; height: auto; margin: 20px 0;">';
         
         // Tabla de parámetros
-        printWindow.document.write('<h2>Parámetros TCC</h2>');
-        printWindow.document.write('<table>');
-        printWindow.document.write('<tr><th>Nodo</th><th>Pickup (A)</th><th>Long Delay (s)</th><th>Short Delay (s)</th><th>Instantaneous (A)</th></tr>');
+        html += '<h2>Parámetros TCC</h2>';
+        html += '<table>';
+        html += '<tr><th>Nodo</th><th>Pickup (A)</th><th>Long Delay (s)</th><th>Short Delay (s)</th><th>Instantaneous (A)</th></tr>';
         
         nodosTCC.forEach(function(nodo) {
             var tcc = nodo.tcc || {};
-            printWindow.document.write('<tr>');
-            printWindow.document.write('<td>' + nodo.id + '</td>');
-            printWindow.document.write('<td>' + (tcc.pickup || 0).toFixed(0) + '</td>');
-            printWindow.document.write('<td>' + (tcc.longDelay || 0).toFixed(2) + '</td>');
-            printWindow.document.write('<td>' + (tcc.shortDelay || 0).toFixed(3) + '</td>');
-            printWindow.document.write('<td>' + (tcc.instantaneous === 'OFF' ? 'OFF' : (tcc.instantaneous || 0).toFixed(0)) + '</td>');
-            printWindow.document.write('</tr>');
+            html += '<tr>';
+            // Sanitización de ID para evitar inyección en el reporte
+            var safeId = String(nodo.id).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            html += '<td>' + safeId + '</td>';
+            html += '<td>' + (tcc.pickup || 0).toFixed(0) + '</td>';
+            html += '<td>' + (tcc.longDelay || 0).toFixed(2) + '</td>';
+            html += '<td>' + (tcc.shortDelay || 0).toFixed(3) + '</td>';
+            html += '<td>' + (tcc.instantaneous === 'OFF' ? 'OFF' : (tcc.instantaneous || 0).toFixed(0)) + '</td>';
+            html += '</tr>';
         });
         
-        printWindow.document.write('</table>');
-        printWindow.document.write('</body></html>');
+        html += '</table>';
+        html += '</body></html>';
+        printWindow.document.write(html);
         printWindow.document.close();
         printWindow.print();
     }
@@ -564,7 +582,11 @@ var TCCViewerInteractivo = (function() {
      */
     function exportarExcel() {
         if (!nodosTCC || nodosTCC.length === 0) {
-            alert('No hay datos para exportar');
+            if (typeof UIToast !== 'undefined') {
+                UIToast.mostrar('No hay datos para exportar', 'error');
+            } else {
+                console.error('No hay datos para exportar');
+            }
             return;
         }
 
