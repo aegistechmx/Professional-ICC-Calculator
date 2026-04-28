@@ -11,19 +11,31 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false // Allow embedding
 }));
 
-// Restrict CORS to specific origins
+// Restrict CORS to specific origins with production security
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'];
+  : process.env.NODE_ENV === 'production' 
+    ? [] // No default origins in production
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174']; // Development defaults
 
 app.use(cors({
   origin: function (origin, callback) {
-    // In production, require origin for security
-    if (process.env.NODE_ENV === 'production' && !origin) {
-      return callback(new Error('Origin required in production'));
+    // In production, require explicit origin configuration
+    if (process.env.NODE_ENV === 'production') {
+      if (!origin) {
+        return callback(new Error('Origin required in production'));
+      }
+      if (allowedOrigins.length === 0) {
+        return callback(new Error('ALLOWED_ORIGINS must be configured in production'));
+      }
     }
+    
     // Allow requests with no origin in development (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin && process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // Check if origin is allowed
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -35,6 +47,9 @@ app.use(cors({
 
 app.use(express.json());
 
+// Serve static files (including cortocircuito calculator)
+app.use(express.static('public'));
+
 // Root route
 app.get('/', (req, res) => {
   res.json({
@@ -44,6 +59,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: '/auth',
       calculo: '/calculo',
+      cortocircuito: '/cortocircuito',
       proyectos: '/proyectos',
       proteccion: '/proteccion',
       reporte: '/reporte',
@@ -60,7 +76,9 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/auth', require('./routes/auth.routes'));
 app.use('/calculo', require('./routes/calculo.routes'));
+app.use('/cortocircuito', require('./routes/cortocircuito.routes'));
 app.use('/proyectos', require('./routes/proyecto.routes'));
+app.use('/projects', require('./routes/projects.routes')); // New full-featured projects API
 app.use('/proteccion', require('./routes/proteccion.routes'));
 app.use('/reporte', require('./routes/reporte/reporte.routes'));
 app.use('/coord', require('./routes/coordinacion.routes'));
@@ -69,6 +87,7 @@ app.use('/simulacion', require('./routes/simulacion.routes'));
 app.use('/templates', require('./routes/template.routes'));
 app.use('/loadflow', require('./routes/loadflow.routes'));
 app.use('/powerflow', require('./routes/powerflow.routes'));
+app.use('/icc', require('./routes/icc.routes'));
 
 // 404 handler
 app.use(notFoundHandler);

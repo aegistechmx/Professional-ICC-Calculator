@@ -413,6 +413,9 @@ var Motor = (function() {
             info: []
         };
 
+        // Obtener Fcc del contexto de carga
+        var Fcc = (App.estado && App.estado.ctx && App.estado.ctx.system && App.estado.ctx.system.Fcc != null) ? App.estado.ctx.system.Fcc : 1.25;
+
         for (var i = 0; i < puntos.length; i++) {
             var nodo = App.estado.nodos[i];
             if (!nodo || !nodo.feeder) continue;
@@ -519,8 +522,8 @@ var Motor = (function() {
                 icc: puntos[i].isc * 1000,
                 interruptorKA: (nodo.equip && nodo.equip.cap) ? nodo.equip.cap : 0,
                 numConductores: f.numConductores || 3,
-                fc: f.fc || 0.8,
-                ft: f.ft || 0.91,
+                fc: Fcc || 1.25,
+                ft: f.tempAmbiente > 30 ? 0.91 : 1.0,
                 temperatura: 31, // Puerto Vallarta default
                 paralelos: f.paralelo || 1,
                 balanceado: true,
@@ -572,18 +575,6 @@ var Motor = (function() {
         // Adjuntar estado global al resultado
         puntos.estadoGlobal = resultado.estadoGlobal;
         puntos.erroresGlobales = resultado.errores;
-        
-        // FIX: Estructurar resultado con contrato de salida consistente
-        var resultadoFinal = {
-            status: resultado.estadoGlobal === "PASS" ? "OK" : (resultado.estadoGlobal === "FAIL" ? "ERROR" : "WARNING"),
-            estadoGlobal: resultado.estadoGlobal,
-            errores: resultado.errores,
-            warnings: resultado.warnings,
-            resultados: {
-                puntos: puntos,
-                numPuntos: puntos.length
-            }
-        };
         
         if (DEBUG) DebugSystem.log("MOTOR_EJECUTAR:END", { 
             estadoGlobal: resultado.estadoGlobal,
@@ -736,8 +727,7 @@ var Motor = (function() {
             }
         }
 
-        // FIX: Retornar resultado estructurado con contrato de salida consistente
-        return resultadoFinal;
+        return { puntos: puntos };
     }
 
     /**
@@ -818,15 +808,13 @@ var Motor = (function() {
 
             // PRIORIDAD 3: CAPACIDAD INTERRUPTIVA
             if (punto.isc && nodo.equip && nodo.equip.cap) {
-                var Icu = nodo.equip.cap || 0; // kA
-                var Isc_kA = punto.isc; // Already in kA (from calculation)
+                var Icu = nodo.equip.cap || 0;
+                var Isc = punto.isc * 1000;
                 
-                // FIX: Comparar ambos en kA para evitar errores de conversión
-                // Icu está en kA, punto.isc está en kA
-                if (Icu < Isc_kA) {
+                if (Icu < Isc) {
                     resultado.estadoGlobal = "FAIL";
                     resultado.severidad = Math.max(resultado.severidad, 5);
-                    resultado.errores.push("CAPACIDAD INTERRUPTIVA INSUFICIENTE: Icu=" + Icu + "kA < Isc=" + Isc_kA.toFixed(2) + "kA");
+                    resultado.errores.push("CAPACIDAD INTERRUPTIVA INSUFICIENTE: Icu=" + Icu + "kA < Isc=" + (Isc / 1000).toFixed(2) + "kA");
                 }
             }
         }
@@ -844,7 +832,7 @@ var Motor = (function() {
 
         // PRIORIDAD 6: COORDINACIÓN TCC (WARNING)
         // Solo evaluar si hay al menos 2 dispositivos en el sistema
-        var nDispositivos = App.estado ? App.estado.nodos.filter(function(n) { return n.equip && n.equip.cap; }).length : 0;
+        var nDispositivos = App.estado && App.estado.nodos ? App.estado.nodos.filter(function(n) { return n.equip && n.equip.cap; }).length : 0;
         if (nDispositivos >= 2 && App.estado.resultados && App.estado.resultados.coordinacionTCC) {
             var tccFail = App.estado.resultados.coordinacionTCC.puntosConFalla && 
                           App.estado.resultados.coordinacionTCC.puntosConFalla.indexOf(punto.nombre) !== -1;
@@ -911,61 +899,6 @@ var Motor = (function() {
         if (!isNaN(tempInput) && tempInput > 0) {
             tempAmbiente = tempInput;
         }
-
-        // USAR MotorIndustrial (motor industrial con trazabilidad) - ÚNICO ENTRYPOINT
-        if (typeof MotorIndustrial !== 'undefined') {
-            try {
-                var resultadoIndustrial = MotorIndustrial.run({
-                    I_carga: cargaA,
-                    material: material || 'cobre',
-                    tempAislamiento: 75,
-                    tempAmbiente: tempAmbiente,
-                    nConductores: conductoresInput || 3,
-                    paralelos: paralelos || 1,
-                    tempTerminal: 75,
-                    voltaje: 480,
-                    FP: 0.9,
-                    longitud: longitud || 0,
-                    tipoSistema: App.estado.tipoSistema || '3F',
-                    calibre: calibreExistente
-                });
-                
-                console.log("[MotorIndustrial] Resultado completo:", resultadoIndustrial);
-                console.log("[MotorIndustrial] Trazabilidad:", resultadoIndustrial.trazabilidad);
-                
-                // FIX: Validar estructura de resultadoIndustrial
-                if (!resultadoIndustrial.conductor || !resultadoIndustrial.conductor.amp) {
-                    throw new Error("MotorIndustrial returned invalid conductor structure");
-                }
-                
-                // Adaptar resultado al formato esperado
-                var resultado = resultadoIndustrial.conductor.amp;
-                resultado.calibre = resultadoIndustrial.conductor.calibre;
-                resultado.paralelos = resultadoIndustrial.conductor.paralelo;
-                resultado.I_diseño = resultadoIndustrial.sistema.I_diseño;
-                resultado.ampacidadFinal = resultado.I_final;
-                resultado.ampacidadCorregida = resultado.I_corregida;
-                resultado.ampacidadTerminal = resultado.I_terminal;
-                resultado.ampacidad75 = resultado.I_tabla;
-                resultado.F_temp = resultado.F_temp;
-                resultado.F_agrupamiento = resultado.F_agrup;
-                resultado.violacionTerminal = resultado.violacionTerminal;
-                resultado.score = resultadoIndustrial.score;
-                resultado.validacion = resultadoIndustrial.validacion;
-                
-                return resultado;
-            } catch (error) {
-                console.error("[MotorIndustrial] Error:", error.message);
-                throw new Error("MotorIndustrial falló: " + error.message + ". Este es el único entrypoint permitido.");
-            }
-        }
-        
-        throw new Error("MotorIndustrial no está disponible. Debe cargar core/MotorIndustrial.js como único entrypoint.");
-
-        // ============================================================
-        // CÓDIGO LEGACY NO ALCANZABLE (mantenido temporalmente para referencia)
-        // Este código ya no se ejecuta porque MotorIndustrial es el único entrypoint
-        // ============================================================
 
         // Configuración del cable
         var cableConfig = {
@@ -1284,9 +1217,9 @@ var Motor = (function() {
             usa90C: resultado.usa90C || false,
             icc: (isc || 0) * 1000,
             interruptorKA: (nodo && nodo.equip && nodo.equip.cap) ? nodo.equip.cap : 0,
-            numConductores: f.numConductores || 3,
-            fc: f.fc || 0.8,
-            ft: f.ft || 0.91,
+            numConductores: cableConfig.numConductores || 3,
+            fc: Fcc || 0.8,
+            ft: resultado.F_temp || 0.91,
             temperatura: 31, // Puerto Vallarta default
             Fcc: Fcc,
             F_temp: resultado.F_temp || 1.0,
@@ -1651,8 +1584,8 @@ var Motor = (function() {
                             tipo: 'TERMINAL',
                             punto: critico.punto,
                             prioridad: 'CRITICA',
-                            accion: 'CAMBIAR_CONDUCTOR: ' + breakerTerminal.brand + ' ' + breakerTerminal.family + ' ' + breakerTerminal.frame + 'A',
-                            razon: 'Violación de terminal NOM 110.14C - cambiar conductor (no breaker)',
+                            accion: 'REEMPLAZO: ' + breakerTerminal.brand + ' ' + breakerTerminal.family + ' ' + breakerTerminal.frame + 'A',
+                            razon: 'Violación de terminal NOM 110.14C - upgrade breaker',
                             reporte: reporte,
                             mutacion: true
                         });

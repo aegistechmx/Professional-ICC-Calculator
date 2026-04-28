@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
 
@@ -8,7 +9,9 @@ import { useStore } from '../store/useStore';
  * @param {number} delay - Debounce delay in milliseconds (default: 2000)
  */
 export function useAutoSave(projectId, delay = 2000) {
-  const { nodes, edges, saveSystem } = useStore();
+  const nodes = useStore((state) => state.nodes);
+  const edges = useStore((state) => state.edges);
+  const saveSystem = useStore((state) => state.saveSystem);
   const timeoutRef = useRef(null);
   const isSavingRef = useRef(false);
 

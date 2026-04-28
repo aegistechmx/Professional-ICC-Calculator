@@ -1,13 +1,27 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Editor from './components/Editor';
 import Sidebar from './components/Sidebar';
 import { useStore } from './store/useStore';
 
 function App() {
-  const { calculateICC, generatePDF, mode, setMode, 
-          isPlaying, currentTime, maxTime, playbackSpeed,
-          playPlayback, pausePlayback, stepPlayback, rewindPlayback, setPlaybackSpeed, setCurrentTime } = useStore();
+  // Use individual selectors to prevent re-renders from unrelated store changes
+  const calculateICC = useStore((state) => state.calculateICC);
+  const generatePDF = useStore((state) => state.generatePDF);
+  const mode = useStore((state) => state.mode);
+  const setMode = useStore((state) => state.setMode);
+  const systemMode = useStore((state) => state.systemMode);
+  const setSystemMode = useStore((state) => state.setSystemMode);
+  const calculateShortCircuitFromGraph = useStore((state) => state.calculateShortCircuitFromGraph);
+  const isPlaying = useStore((state) => state.isPlaying);
+  const currentTime = useStore((state) => state.currentTime);
+  const maxTime = useStore((state) => state.maxTime);
+  const playbackSpeed = useStore((state) => state.playbackSpeed);
+  const playPlayback = useStore((state) => state.playPlayback);
+  const pausePlayback = useStore((state) => state.pausePlayback);
+  const stepPlayback = useStore((state) => state.stepPlayback);
+  const rewindPlayback = useStore((state) => state.rewindPlayback);
+  const setPlaybackSpeed = useStore((state) => state.setPlaybackSpeed);
+  const setCurrentTime = useStore((state) => state.setCurrentTime);
 
   return (
     <div className="flex h-screen w-screen">
@@ -48,9 +62,46 @@ function App() {
                 Modo Simulación
               </button>
             </div>
+
+            {/* System Mode toggle - NEW: ATS modes */}
+            <div className="flex bg-gray-200 rounded-lg p-1">
+              <button
+                onClick={() => setSystemMode('normal')}
+                className={`px-4 py-2 rounded-md transition ${
+                  systemMode === 'normal'
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-300'
+                }`}
+                title="Modo Normal: Red eléctrica activa"
+              >
+                🟢 Normal
+              </button>
+              <button
+                onClick={() => setSystemMode('emergency')}
+                className={`px-4 py-2 rounded-md transition ${
+                  systemMode === 'emergency'
+                    ? 'bg-red-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-300'
+                }`}
+                title="Modo Emergencia: Generador activo"
+              >
+                🔴 Emergencia
+              </button>
+            </div>
           </div>
           
           <div className="flex gap-2">
+            <button
+              onClick={() => {
+                // Esta función se implementará en el componente Editor
+                // Por ahora, mostrar mensaje
+                alert('Selecciona elementos y presiona DELETE para eliminar, o usa el botón en el panel de propiedades.');
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              title="Eliminar elementos seleccionados (o presiona DELETE)"
+            >
+              🗑️ Eliminar
+            </button>
             {mode === 'edit' && (
               <>
                 <button
@@ -58,6 +109,12 @@ function App() {
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                 >
                   Calcular ICC
+                </button>
+                <button
+                  onClick={calculateShortCircuitFromGraph}
+                  className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition"
+                >
+                  Cortocircuito
                 </button>
                 <button
                   onClick={generatePDF}

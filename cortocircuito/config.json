@@ -1,0 +1,153 @@
+{
+  "test_cases": [
+    {
+      "name": "Sistema Básico 480V",
+      "description": "Sistema trifásico básico de 480V con carga moderada",
+      "parameters": {
+        "tension": 480,
+        "corriente": 100,
+        "fp": 0.9,
+        "longitud": 10,
+        "calibre": "350",
+        "temperatura": 30
+      },
+      "expected_ranges": {
+        "I_3F_kA": [1, 20],
+        "I_1F_kA": [1, 15],
+        "I_2F_kA": [1, 18],
+        "V_drop": [0, 10]
+      }
+    },
+    {
+      "name": "Sistema Industrial 4160V",
+      "description": "Sistema industrial de media tensión",
+      "parameters": {
+        "tension": 4160,
+        "corriente": 500,
+        "fp": 0.85,
+        "longitud": 25,
+        "calibre": "4/0",
+        "temperatura": 40
+      },
+      "expected_ranges": {
+        "I_3F_kA": [5, 100],
+        "I_1F_kA": [3, 80],
+        "I_2F_kA": [4, 90],
+        "V_drop": [0, 5]
+      }
+    },
+    {
+      "name": "Sistema Comercial 208V",
+      "description": "Sistema comercial de baja tensión",
+      "parameters": {
+        "tension": 208,
+        "corriente": 200,
+        "fp": 0.95,
+        "longitud": 5,
+        "calibre": "3/0",
+        "temperatura": 25
+      },
+      "expected_ranges": {
+        "I_3F_kA": [2, 50],
+        "I_1F_kA": [1.5, 40],
+        "I_2F_kA": [1.8, 45],
+        "V_drop": [0, 8]
+      }
+    },
+    {
+      "name": "Sistema Residencial 240V",
+      "description": "Sistema residencial monofásico",
+      "parameters": {
+        "tension": 240,
+        "corriente": 150,
+        "fp": 1.0,
+        "longitud": 15,
+        "calibre": "12",
+        "temperatura": 20
+      },
+      "expected_ranges": {
+        "I_3F_kA": [0.5, 10],
+        "I_1F_kA": [0.3, 8],
+        "I_2F_kA": [0.4, 9],
+        "V_drop": [0, 15]
+      }
+    },
+    {
+      "name": "Sistema de Alta Tensión 138kV",
+      "description": "Sistema de transmisión de alta tensión",
+      "parameters": {
+        "tension": 138000,
+        "corriente": 1000,
+        "fp": 0.9,
+        "longitud": 50,
+        "calibre": "250",
+        "temperatura": 35
+      },
+      "expected_ranges": {
+        "I_3F_kA": [10, 500],
+        "I_1F_kA": [8, 400],
+        "I_2F_kA": [9, 450],
+        "V_drop": [0, 3]
+      }
+    }
+  ],
+  "validation_rules": {
+    "tension": {
+      "min": 120,
+      "max": 500000,
+      "unit": "V"
+    },
+    "corriente": {
+      "min": 0.1,
+      "max": 100000,
+      "unit": "A"
+    },
+    "fp": {
+      "min": 0.1,
+      "max": 1.0,
+      "unit": "pu"
+    },
+    "longitud": {
+      "min": 0.1,
+      "max": 10000,
+      "unit": "m"
+    },
+    "temperatura": {
+      "min": -40,
+      "max": 100,
+      "unit": "°C"
+    }
+  },
+  "conductor_data": {
+    "12": { "area_mm2": 3.31, "resistance_ohm_km": 5.21, "ampacity_A": 20 },
+    "10": { "area_mm2": 5.26, "resistance_ohm_km": 3.28, "ampacity_A": 30 },
+    "8": { "area_mm2": 8.37, "resistance_ohm_km": 2.06, "ampacity_A": 40 },
+    "6": { "area_mm2": 13.3, "resistance_ohm_km": 1.30, "ampacity_A": 55 },
+    "4": { "area_mm2": 21.2, "resistance_ohm_km": 0.818, "ampacity_A": 70 },
+    "3": { "area_mm2": 26.7, "resistance_ohm_km": 0.647, "ampacity_A": 85 },
+    "2": { "area_mm2": 33.6, "resistance_ohm_km": 0.514, "ampacity_A": 95 },
+    "1": { "area_mm2": 42.4, "resistance_ohm_km": 0.408, "ampacity_A": 110 },
+    "1/0": { "area_mm2": 53.5, "resistance_ohm_km": 0.322, "ampacity_A": 125 },
+    "2/0": { "area_mm2": 67.4, "resistance_ohm_km": 0.256, "ampacity_A": 145 },
+    "3/0": { "area_mm2": 85.0, "resistance_ohm_km": 0.203, "ampacity_A": 165 },
+    "4/0": { "area_mm2": 107, "resistance_ohm_km": 0.161, "ampacity_A": 195 },
+    "250": { "area_mm2": 127, "resistance_ohm_km": 0.129, "ampacity_A": 215 },
+    "300": { "area_mm2": 152, "resistance_ohm_km": 0.108, "ampacity_A": 240 },
+    "350": { "area_mm2": 177, "resistance_ohm_km": 0.094, "ampacity_A": 260 },
+    "400": { "area_mm2": 203, "resistance_ohm_km": 0.081, "ampacity_A": 280 },
+    "500": { "area_mm2": 253, "resistance_ohm_km": 0.064, "ampacity_A": 320 }
+  },
+  "iec_constants": {
+    "c_max_3ph": 1.1,
+    "c_min": 0.95,
+    "k_s": 1.02,
+    "temperature_coefficient_cu": 0.00393,
+    "temperature_coefficient_al": 0.00403
+  },
+  "api_config": {
+    "base_url": "http://localhost:3002",
+    "timeout": 30000,
+    "retries": 3,
+    "retry_delay": 1000
+  }
+}

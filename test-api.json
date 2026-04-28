@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "id": "transformer-1",
+      "type": "transformer",
+      "data": {
+        "parameters": {
+          "kVA": 500,
+          "primario": 13800,
+          "secundario": 480,
+          "Z": 5.75
+        }
+      }
+    }
+  ],
+  "edges": []
+}

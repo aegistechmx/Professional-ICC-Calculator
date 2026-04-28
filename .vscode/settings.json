@@ -1,3 +1,4 @@
 {
-    "js/ts.locale": "es"
+    "js/ts.locale": "es",
+    "git.ignoreLimitWarning": true
 }

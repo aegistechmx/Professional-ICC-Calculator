@@ -12,10 +12,19 @@ function getICCColor(icc) {
 }
 
 export default function BreakerNode({ data }) {
-  const iccColor = getICCColor(data.icc);
+  const icc = data.results?.isc || data.icc;
+  const iccColor = getICCColor(icc);
+  const breakerStatus = data.results?.breakerStatus;
+
+  const getStatusColor = (status) => {
+    if (status === 'FAIL') return 'border-red-600 bg-red-50';
+    if (status === 'WARNING') return 'border-yellow-600 bg-yellow-50';
+    if (status === 'OK') return 'border-green-600 bg-green-50';
+    return 'border-gray-500';
+  };
 
   return (
-    <div className={`bg-white border-2 rounded-lg p-3 min-w-[150px] shadow-md ${data.trip ? 'border-red-600 bg-red-50' : 'border-red-500'}`}>
+    <div className={`bg-white border-2 rounded-lg p-3 min-w-[150px] shadow-md ${getStatusColor(breakerStatus)}`}>
       <Handle type="target" position="top" className="w-3 h-3 bg-red-500" />
 
       <div className="flex items-center gap-2">
@@ -34,9 +43,19 @@ export default function BreakerNode({ data }) {
           <div className="text-xs text-gray-500">
             {data.parameters?.In || 100}A / {(data.parameters?.Icu || 25000) / 1000}kA
           </div>
-          {data.icc && (
+          {icc && (
             <div className="text-xs font-semibold" style={{ color: iccColor }}>
-              ICC: {data.icc.toFixed(1)} A
+              ICC: {(icc / 1000).toFixed(2)} kA
+            </div>
+          )}
+          {breakerStatus === 'FAIL' && (
+            <div className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded mt-1">
+              INSUFICIENTE
+            </div>
+          )}
+          {breakerStatus === 'WARNING' && (
+            <div className="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-1 rounded mt-1">
+              MARGINAL
             </div>
           )}
           {data.trip && (

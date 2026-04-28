@@ -18,6 +18,7 @@ vi.mock('../store/useStore', () => ({
 }));
 
 // Global test utilities
+// eslint-disable-next-line no-undef
 global.testUtils = {
   // Helper to render components with providers
   renderWithProviders: (component) => {

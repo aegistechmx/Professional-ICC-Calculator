@@ -8,6 +8,7 @@ export default function Sidebar() {
 
   const components = [
     { type: 'transformer', icon: '🔌', label: 'Transformador', color: 'bg-blue-500' },
+    { type: 'generator', icon: '⚙️', label: 'Generador', color: 'bg-orange-500' },
     { type: 'breaker', icon: '⚡', label: 'Breaker', color: 'bg-red-500' },
     { type: 'panel', icon: '📦', label: 'Tablero', color: 'bg-green-500' },
     { type: 'motor', icon: '🏭', label: 'Motor', color: 'bg-purple-500' },

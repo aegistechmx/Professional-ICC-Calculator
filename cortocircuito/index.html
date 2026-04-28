@@ -778,18 +778,6 @@
     <script src="js/core/data/resistencias.js"></script>
     <script src="js/core/data/catalog.adapter.js"></script>
     <script src="js/core/MotorAmpacidadNOM.js"></script>
-    <script src="js/core/MotorElectricoUnificado.js"></script>
-    <script src="js/core/motor_v2.js"></script>
-    <script src="js/core/MotorElectrico.js"></script>
-    <script src="js/core/MotorIndustrial.js"></script>
-    <script src="js/core/MotorCoordinacionTCC.js"></script>
-    <script src="js/core/dominio/ampacidad.js"></script>
-    <script src="js/core/dominio/conductores.js"></script>
-    <script src="js/core/dominio/proteccion.js"></script>
-    <script src="js/core/dominio/cortocircuito.js"></script>
-    <script src="js/core/dominio/caida_tension.js"></script>
-    <script src="js/core/dominio/coordinacion.js"></script>
-    <script src="js/core/dominio/validacion_nom.js"></script>
     <script src="js/core/models/nodo.model.js"></script>
     <script src="js/core/domain/ampacity.engine.js"></script>
     <script src="js/core/domain/shortcircuit.engine.js"></script>
@@ -801,20 +789,18 @@
     <script src="js/app/orchestrator.js"></script>
     <!-- Clean Architecture (Pipeline Único) -->
     <script src="js/core/engine.js"></script>
-    <!-- <script src="js/modules/validator.js"></script> DUPLICADO - usar core/MotorIndustrial.js incluye validación -->
-    <!-- <script src="js/modules/calculo.js"></script> DUPLICADO - usar core/MotorIndustrial.js incluye cálculo -->
-    <!-- <script src="js/selectors/conductor.selector.js"></script> DUPLICADO - usar core/services/conductor.selector.js -->
-    <!-- <script src="js/selectors/breaker.selector.js"></script> DUPLICADO - usar core/domain/protection.engine.js -->
-    <!-- <script src="js/verification/nom.verifier.js"></script> DUPLICADO - usar core/utils/nom.validator.js -->
-    <!-- Calculo - MODULOS LEGACY (reemplazados por core) -->
-    <!-- REEMPLAZADOS POR CORE: agrupamiento_nom.js, ampacidad_real.js, breaker_selector.js, motor_inteligente_ccc.js, optimizador_conductores.js -->
-    <!-- Mantenidos temporalmente para compatibilidad -->
+    <script src="js/modules/validator.js"></script>
+    <script src="js/modules/calculo.js"></script>
+    <script src="js/selectors/conductor.selector.js"></script>
+    <script src="js/selectors/breaker.selector.js"></script>
+    <script src="js/verification/nom.verifier.js"></script>
+    <!-- Calculo -->
     <script src="js/calculo/secuencia.js?v=3"></script>
     <script src="js/calculo/fault_analysis.js"></script>
     <script src="js/calculo/impedancias.js"></script>
-    <!-- <script src="js/calculo/agrupamiento_nom.js"></script> REEMPLAZADO POR core/data/factores_agrupamiento.js -->
-    <!-- <script src="js/calculo/ampacidad_real.js?v=3"></script> REEMPLAZADO POR core/MotorAmpacidadNOM.js -->
-    <!-- <script src="js/calculo/breaker_selector.js?v=1"></script> REEMPLAZADO POR core/domain/protection.engine.js -->
+    <script src="js/calculo/agrupamiento_nom.js"></script>
+    <script src="js/calculo/ampacidad_real.js?v=3"></script>
+    <script src="js/calculo/breaker_selector.js?v=1"></script>
     <script src="js/calculo/coordinacion_automatica.js?v=1"></script>
     <script src="js/calculo/tcc_curvas_reales.js?v=1"></script>
     <script src="js/calculo/tcc_digitalizer_pro.js"></script>
@@ -840,7 +826,7 @@
     <script src="js/calculo/motor_coordinacion_fase_tierra.js"></script>
     <script src="js/calculo/motor_autocorreccion_total.js?v=1"></script>
     <script src="js/calculo/semaforo.js?v=2"></script>
-    <!-- <script src="js/calculo/motor_inteligente_ccc.js"></script> REEMPLAZADO POR core/MotorAmpacidadNOM.js -->
+    <script src="js/calculo/motor_inteligente_ccc.js"></script>
     <script src="js/calculo/motor_diseno_automatico.js?v=4"></script>
     <script src="js/datos/catalogo_equipos_real.js?v=2"></script>
     <script src="js/datos/catalogo_breakers_pro.js"></script>
@@ -856,7 +842,7 @@
     <script src="js/calculo/capacitores.js"></script>
     <script src="js/calculo/motores.js"></script>
     <script src="js/calculo/nom_validacion.js"></script>
-    <!-- <script src="js/calculo/optimizador_conductores.js"></script> REEMPLAZADO POR core/services/conductor.selector.js -->
+    <script src="js/calculo/optimizador_conductores.js"></script>
     <script src="js/calculo/tcc_coordinacion.js"></script>
     <script src="js/calculo/curvas.js"></script>
     <script src="js/calculo/curvas_tcc_pro.js"></script>
@@ -867,7 +853,6 @@
     <!-- Utilidades -->
     <script src="js/units.js"></script>
     <script src="js/profile.js"></script>
-    <script src="js/app.js"></script>
     <!-- UI -->
     <script src="js/ui/toast.js?v=2"></script>
     <script src="js/ui/configuracion.js"></script>
@@ -895,7 +880,7 @@
             var modulosRequeridos = [
                 'CONSTANTES', 'CONDUCTORES', 'EQUIPOS', 'AMPACIDAD', 'CURVAS_EQUIPO',
                 'Secuencia', 'FaultAnalysis', 'Impedancias', 'Motor', 'CaidaTension',
-                'CalculoCapacitores', 'CalculoMotores', 'NOMValidacion', 'TCCCoordinacion', 'Curvas',
+                'CalculoCapacitores', 'CalculoMotores', 'NOMValidacion', 'OptimizadorConductores', 'TCCCoordinacion', 'Curvas',
                 'Units', 'Profile',
                 'UIToast', 'UIConfiguracion', 'UIAlimentadores', 'UIEquipos', 'UIDiagrama', 'UIResultados', 'UIProyectos', 'UICoordonograma', 'UIReportePDF', 'UIExportar', 'UIMotores',
                 'App'
@@ -933,6 +918,12 @@
             }
         });
     </script>
+    <!-- Módulos tipo ETAP/SKM -->
+    <script src="js/core/ConductorSelectorNOM.js?v=1"></script>
+    <script src="js/core/BreakerSelectorNOM.js?v=1"></script>
+    <script src="js/core/AutocorreccionETAP.js?v=1"></script>
+    <script src="js/core/RamasDetector.js?v=1"></script>
+    <script src="js/core/MotorICCCompleto.js?v=1"></script>
     <script src="js/testEngine.js?v=1"></script>
 </body>
 </html>

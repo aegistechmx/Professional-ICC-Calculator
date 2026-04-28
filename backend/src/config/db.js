@@ -20,24 +20,26 @@ try {
   prisma = null;
 }
 
-// Graceful shutdown
-process.on('beforeExit', async () => {
+// Graceful shutdown with proper cleanup to prevent memory leaks
+const cleanup = async (signal) => {
   if (prisma) {
-    await prisma.$disconnect();
+    try {
+      await prisma.$disconnect();
+      logger.info('Database disconnected gracefully');
+    } catch (error) {
+      logger.error('Error disconnecting database:', error);
+    }
   }
-});
+};
 
-process.on('SIGINT', async () => {
-  if (prisma) {
-    await prisma.$disconnect();
-  }
+// Use once() to prevent multiple listeners and memory leaks
+process.once('beforeExit', cleanup);
+process.once('SIGINT', async () => {
+  await cleanup('SIGINT');
   process.exit(0);
 });
-
-process.on('SIGTERM', async () => {
-  if (prisma) {
-    await prisma.$disconnect();
-  }
+process.once('SIGTERM', async () => {
+  await cleanup('SIGTERM');
   process.exit(0);
 });
 

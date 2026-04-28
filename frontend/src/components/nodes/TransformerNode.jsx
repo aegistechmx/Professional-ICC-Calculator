@@ -12,7 +12,8 @@ function getICCColor(icc) {
 }
 
 export default function TransformerNode({ data }) {
-  const iccColor = getICCColor(data.icc);
+  const icc = data.results?.isc || data.icc;
+  const iccColor = getICCColor(icc);
 
   return (
     <div className="bg-white border-2 border-blue-500 rounded-lg p-3 min-w-[150px] shadow-md">
@@ -36,9 +37,9 @@ export default function TransformerNode({ data }) {
           <div className="text-xs text-gray-400">
             {data.parameters?.primario || 13800}V → {data.parameters?.secundario || 480}V
           </div>
-          {data.icc && (
+          {icc && (
             <div className="text-xs font-semibold" style={{ color: iccColor }}>
-              ICC: {data.icc.toFixed(1)} A
+              ICC: {(icc / 1000).toFixed(2)} kA
             </div>
           )}
         </div>

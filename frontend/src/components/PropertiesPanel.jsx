@@ -1,27 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+/* eslint-disable no-console */
+import React, { useState, useEffect, useMemo } from 'react';
 import { useStore } from '../store/useStore';
+import CableFields from './properties/CableFields';
+import BreakerFields from './properties/BreakerFields';
+import TransformerFields from './properties/TransformerFields';
+import LoadFields from './properties/LoadFields';
+import OtherNodeFields from './properties/OtherNodeFields';
+import ATSFields from './properties/ATSFields';
+import { getICCLevel, getICCColor, getICCBackgroundColor, getICCTextColor } from '../utils/iccColoring';
 
 export default function PropertiesPanel() {
-  const { selectedNode, updateNode, calculateICC } = useStore();
-  const [localParams, setLocalParams] = useState({});
+  // Use individual selectors to prevent re-renders from unrelated store changes
+  const selectedNode = useStore((state) => state.selectedNode);
+  const selectedEdge = useStore((state) => state.selectedEdge);
+  const updateNode = useStore((state) => state.updateNode);
+  const updateEdge = useStore((state) => state.updateEdge);
+  const calculateICC = useStore((state) => state.calculateICC);
+  const shortCircuitResults = useStore((state) => state.shortCircuitResults);
+  const removeNode = useStore((state) => state.removeNode);
+  const removeEdge = useStore((state) => state.removeEdge);
+  const validationErrors = useStore((state) => state.validationErrors);
   const [simulating, setSimulating] = useState(false);
   const [simulationResults, setSimulationResults] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (selectedNode) {
-      setLocalParams(selectedNode.data.parameters || {});
-      setSimulationResults(null);
-      setError(null); // Clear error when node changes
-    }
-  }, [selectedNode]);
+    setSimulationResults(null);
+    setError(null);
+  }, [selectedNode, selectedEdge]);
 
-  if (!selectedNode) {
+  const cableRes = selectedEdge?.data?.results?.cable;
+
+  const localEdge = useMemo(() => {
+    if (selectedEdge) {
+      return {
+        ...selectedEdge,
+        material: selectedEdge.data?.material,
+        calibre: selectedEdge.data?.calibre,
+      };
+    }
+    return null;
+  }, [selectedEdge]);
+
+  if (!selectedNode && !selectedEdge) {
     return (
       <div className="w-80 bg-white border-l border-gray-200 p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Propiedades</h3>
-        <p className="text-sm text-gray-500">Selecciona un elemento para ver sus propiedades</p>
+        <p className="text-sm text-gray-500">Selecciona un elemento o un cable para ver sus propiedades</p>
       </div>
     );
   }
@@ -54,40 +79,6 @@ export default function PropertiesPanel() {
     );
   }
 
-  const handleParamChange = (key, value) => {
-    let parsedValue = value;
-    if (typeof value === 'string' && value !== '') {
-      parsedValue = parseFloat(value);
-    }
-
-    // Validation based on parameter type
-    const validations = {
-      In: { min: 1, max: 10000 },
-      Icu: { min: 1, max: 200000 },
-      kVA: { min: 1, max: 100000 },
-      primario: { min: 120, max: 500000 },
-      secundario: { min: 120, max: 35000 },
-      Z: { min: 0.1, max: 20 },
-      tension: { min: 120, max: 500000 },
-      potencia_kW: { min: 0.1, max: 100000 },
-      potencia_kVAR: { min: -100000, max: 100000 },
-      fp: { min: 0, max: 1 },
-      hp: { min: 0.1, max: 10000 },
-      eficiencia: { min: 0.1, max: 1 }
-    };
-
-    const validation = validations[key];
-    if (validation && parsedValue !== '') {
-      if (parsedValue < validation.min || parsedValue > validation.max) {
-        console.warn(`${key} out of range: ${parsedValue} (valid: ${validation.min}-${validation.max})`);
-      }
-    }
-
-    const newParams = { ...localParams, [key]: parsedValue };
-    setLocalParams(newParams);
-    updateNode(selectedNode.id, { parameters: newParams });
-  };
-
   const handleSimulate = async () => {
     setSimulating(true);
     setError(null); // Clear previous error
@@ -97,213 +88,41 @@ export default function PropertiesPanel() {
     } catch (error) {
       console.error('Simulation error:', error);
       // Use proper error handling instead of alert
-      setError('Error al simular: ' + error.message);
+      setError(error.message || 'Error al simular: ' + error.message);
     } finally {
       setSimulating(false);
     }
   };
 
-  const renderFields = () => {
+  const renderEdgeFields = () => {
+    const isCable = localEdge?.type === 'cable' || localEdge.material || localEdge.calibre;
+    if (!isCable) {
+      return <p className="text-sm text-gray-500">No hay propiedades disponibles para esta conexión</p>;
+    }
+
+    return (
+      <CableFields
+        edge={selectedEdge}
+        updateEdge={updateEdge}
+        cableRes={cableRes}
+      />
+    );
+  };
+
+  const renderNodeFields = () => {
     switch (selectedNode.type) {
       case 'breaker':
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Corriente Nominal (A)</label>
-              <input
-                type="number"
-                value={localParams.In || ''}
-                onChange={(e) => handleParamChange('In', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad de Interrupción (A)</label>
-              <input
-                type="number"
-                value={localParams.Icu || ''}
-                onChange={(e) => handleParamChange('Icu', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-              <select
-                value={localParams.tipo || 'molded_case'}
-                onChange={(e) => handleParamChange('tipo', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="molded_case">Molded Case</option>
-                <option value="air_circuit">Air Circuit</option>
-                <option value="miniature">Miniature</option>
-              </select>
-            </div>
-          </>
-        );
-
+        return <BreakerFields node={selectedNode} updateNode={updateNode} />;
       case 'transformer':
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Potencia (kVA)</label>
-              <input
-                type="number"
-                value={localParams.kVA || ''}
-                onChange={(e) => handleParamChange('kVA', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tensión Primaria (V)</label>
-              <input
-                type="number"
-                value={localParams.primario || ''}
-                onChange={(e) => handleParamChange('primario', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tensión Secundaria (V)</label>
-              <input
-                type="number"
-                value={localParams.secundario || ''}
-                onChange={(e) => handleParamChange('secundario', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Impedancia (%)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={localParams.Z || ''}
-                onChange={(e) => handleParamChange('Z', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </>
-        );
-
-      case 'panel':
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tensión (V)</label>
-              <input
-                type="number"
-                value={localParams.tension || ''}
-                onChange={(e) => handleParamChange('tension', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fases</label>
-              <select
-                value={localParams.fases || 3}
-                onChange={(e) => handleParamChange('fases', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value={1}>Monofásico</option>
-                <option value={2}>Bifásico</option>
-                <option value={3}>Trifásico</option>
-              </select>
-            </div>
-          </>
-        );
-
+        return <TransformerFields node={selectedNode} updateNode={updateNode} />;
       case 'load':
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Potencia Activa P (kW)</label>
-              <input
-                type="number"
-                value={localParams.potencia_kW || ''}
-                onChange={(e) => handleParamChange('potencia_kW', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Potencia Reactiva Q (kVAR)</label>
-              <input
-                type="number"
-                value={localParams.potencia_kVAR || ''}
-                onChange={(e) => handleParamChange('potencia_kVAR', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="1"
-                value={localParams.fp || ''}
-                onChange={(e) => handleParamChange('fp', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Voltaje Nominal (V)</label>
-              <input
-                type="number"
-                value={localParams.voltaje || ''}
-                onChange={(e) => handleParamChange('voltaje', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </>
-        );
-
+        return <LoadFields node={selectedNode} updateNode={updateNode} />;
+      case 'ats':
+        return <ATSFields node={selectedNode} updateNode={updateNode} />;
+      case 'panel':
       case 'motor':
-        return (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Potencia (HP)</label>
-              <input
-                type="number"
-                value={localParams.hp || ''}
-                onChange={(e) => handleParamChange('hp', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Voltaje (V)</label>
-              <input
-                type="number"
-                value={localParams.voltaje || ''}
-                onChange={(e) => handleParamChange('voltaje', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Eficiencia</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="1"
-                value={localParams.eficiencia || ''}
-                onChange={(e) => handleParamChange('eficiencia', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="1"
-                value={localParams.fp || ''}
-                onChange={(e) => handleParamChange('fp', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </>
-        );
-
+      case 'generator':
+        return <OtherNodeFields node={selectedNode} updateNode={updateNode} />;
       default:
         return <p className="text-sm text-gray-500">No hay propiedades disponibles</p>;
     }
@@ -313,12 +132,155 @@ export default function PropertiesPanel() {
     <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Propiedades</h3>
 
+      {validationErrors && validationErrors.length > 0 && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <h4 className="text-sm font-semibold text-red-900 mb-2">⚠️ Errores de Validación</h4>
+          <ul className="text-xs text-red-800 space-y-1">
+            {validationErrors.slice(0, 5).map((error, index) => (
+              <li key={index}>• {error}</li>
+            ))}
+            {validationErrors.length > 5 && (
+              <li className="text-red-600">...y {validationErrors.length - 5} más</li>
+            )}
+          </ul>
+        </div>
+      )}
+
       <div className="mb-4 pb-4 border-b border-gray-200">
-        <p className="text-sm font-medium text-gray-700">Tipo: {selectedNode.type}</p>
-        <p className="text-sm text-gray-500">ID: {selectedNode.id}</p>
+        {selectedNode ? (
+          <>
+            <p className="text-sm font-medium text-gray-700">Tipo: {selectedNode.type}</p>
+            <p className="text-sm text-gray-500">ID: {selectedNode.id}</p>
+            {/* Show ICC results for nodes */}
+            {selectedNode.data?.results && (
+              <div className="mt-3 p-3 bg-gray-50 rounded border border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">📊 Resultados de Simulación</h4>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">ICC (kA):</span>
+                    <span 
+                      className="font-mono font-semibold px-2 py-1 rounded"
+                      style={{
+                        backgroundColor: selectedNode.data.results.isc ? getICCBackgroundColor(selectedNode.data.results.isc / 1000) : '#f3f4f6',
+                        color: selectedNode.data.results.isc ? getICCTextColor(selectedNode.data.results.isc / 1000) : '#1f2937',
+                        border: `1px solid ${selectedNode.data.results.isc ? getICCColor(selectedNode.data.results.isc / 1000) : '#6b7280'}`
+                      }}
+                    >
+                      {selectedNode.data.results.isc?.toFixed(2) || 'N/A'}
+                    </span>
+                  </div>
+                  {selectedNode.data.results.I_diseño && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">I Diseño (kA):</span>
+                      <span className="font-mono font-semibold text-green-600">
+                        {selectedNode.data.results.I_diseño?.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  {selectedNode.data.results.estado && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Estado:</span>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded ${
+                        selectedNode.data.results.estado === 'OK' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {selectedNode.data.results.estado}
+                      </span>
+                    </div>
+                  )}
+                  {/* ICC Level Indicator */}
+                  {selectedNode.data.results.isc && (
+                    <div className="mt-2 pt-2 border-t border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Nivel ICC:</span>
+                        <span 
+                          className="px-2 py-1 text-xs font-semibold rounded-full"
+                          style={{
+                            backgroundColor: selectedNode.data.results.isc ? getICCBackgroundColor(selectedNode.data.results.isc / 1000) : '#f3f4f6',
+                            color: selectedNode.data.results.isc ? getICCTextColor(selectedNode.data.results.isc / 1000) : '#1f2937'
+                          }}
+                        >
+                          {getICCLevel(selectedNode.data.results.isc / 1000).description}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-xs" style={{ color: getICCTextColor(selectedNode.data.results.isc / 1000) }}>
+                        {getICCLevel(selectedNode.data.results.isc / 1000).range}
+                      </div>
+                      {getICCLevel(selectedNode.data.results.isc / 1000).warning && (
+                        <div className="mt-1 text-xs text-amber-600">
+                          ⚠️ {getICCLevel(selectedNode.data.results.isc / 1000).warning}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="text-sm font-medium text-gray-700">Tipo: cable</p>
+            <p className="text-sm text-gray-500">ID: {selectedEdge.id}</p>
+            <p className="text-xs text-gray-400">De: {selectedEdge.source} → {selectedEdge.target}</p>
+            {/* Show cable results */}
+            {selectedEdge.data?.results && (
+              <div className="mt-3 p-3 bg-gray-50 rounded border border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">📊 Resultados de Cable</h4>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Cable:</span>
+                    <span className="font-mono font-semibold text-blue-600">
+                      {selectedEdge.data.results.cable || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">I Corriente (A):</span>
+                    <span className="font-mono font-semibold text-orange-600">
+                      {selectedEdge.data.results.I_corr?.toFixed(1) || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Caída Tensión (%):</span>
+                    <span className="font-mono font-semibold text-yellow-600">
+                      {selectedEdge.data.results.caida?.toFixed(1) || 'N/A'}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Estado:</span>
+                    <span className={`px-2 py-1 text-xs font-semibold rounded ${
+                      selectedEdge.data.results.estado === 'OK' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {selectedEdge.data.results.estado}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-      {renderFields()}
+      {selectedNode ? renderNodeFields() : renderEdgeFields()}
+
+      {(selectedNode || selectedEdge) && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <button
+            onClick={() => {
+              if (selectedNode && confirm(`¿Eliminar ${selectedNode.type}?`)) {
+                removeNode(selectedNode.id);
+              } else if (selectedEdge && confirm('¿Eliminar conexión?')) {
+                removeEdge(selectedEdge.id);
+              }
+            }}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition"
+          >
+            🗑️ Eliminar Elemento
+          </button>
+        </div>
+      )}
 
       <div className="mt-6 pt-4 border-t border-gray-200">
         <button
@@ -334,10 +296,36 @@ export default function PropertiesPanel() {
         <div className="mt-4 p-4 bg-gray-50 rounded-md">
           <h4 className="text-sm font-semibold text-gray-900 mb-2">Resultados de Simulación</h4>
           <div className="text-xs text-gray-600 space-y-1">
-            <p>ICC: {simulationResults.icc_total_ka || simulationResults.icc?.toFixed(2)} kA</p>
+            <p>
+              ICC:{' '}
+              {simulationResults.icc_total_ka
+                ? simulationResults.icc_total_ka
+                : simulationResults.icc
+                  ? simulationResults.icc.toFixed(2)
+                  : simulationResults.resultsByNodeId
+                    ? 'OK (ver nodos/edges)'
+                    : '—'}{' '}
+              kA
+            </p>
             {simulationResults.icc_red_ka && <p>Red: {simulationResults.icc_red_ka} kA</p>}
             {simulationResults.icc_motores_ka && <p>Motores: {simulationResults.icc_motores_ka} kA</p>}
             {simulationResults.mva && <p>MVA: {simulationResults.mva.toFixed(2)}</p>}
+          </div>
+        </div>
+      )}
+
+      {shortCircuitResults && shortCircuitResults.success && (
+        <div className="mt-4 p-4 bg-orange-50 rounded-md border border-orange-200">
+          <h4 className="text-sm font-semibold text-orange-900 mb-2">Resultados de Cortocircuito</h4>
+          <div className="text-xs text-orange-800 space-y-1">
+            {shortCircuitResults.data && (
+              <>
+                {shortCircuitResults.data.I_3F_kA && <p>Icc 3F: {shortCircuitResults.data.I_3F_kA.toFixed(2)} kA</p>}
+                {shortCircuitResults.data.I_1F_kA && <p>Icc 1F: {shortCircuitResults.data.I_1F_kA.toFixed(2)} kA</p>}
+                {shortCircuitResults.data.I_2F_kA && <p>Icc 2F: {shortCircuitResults.data.I_2F_kA.toFixed(2)} kA</p>}
+                {shortCircuitResults.data.V_min && <p>Voltaje mínimo: {shortCircuitResults.data.V_min.toFixed(1)}%</p>}
+              </>
+            )}
           </div>
         </div>
       )}
