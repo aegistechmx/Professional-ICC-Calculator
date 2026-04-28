@@ -1,0 +1,44 @@
+# Local Netlify folder
+.netlify
+node_modules
+
+# Environment variables
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist
+build
+coverage/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-debug.log*
+.vscode/
+.idea/
