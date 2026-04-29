@@ -91,7 +91,7 @@ class EdgeCasesTest {
    */
   createIslandedSystem(system) {
     // Clone system
-    const { ElectricalSystem } = require('../../core')
+    const { ElectricalSystem } = require('@/core')')
     const islanded = new ElectricalSystem()
 
     // Add buses (subset that will form the island)

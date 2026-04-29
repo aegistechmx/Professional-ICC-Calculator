@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../core');
+const { toElectricalPrecision, formatElectricalValue } = require('@/core')');
 /**
  * sqd_real.js - Real SQD Curves from Digitized PDF Data
  *

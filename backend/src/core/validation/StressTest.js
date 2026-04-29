@@ -51,7 +51,7 @@ class StressTest {
       ElectricalSystem,
       Bus,
       Line,
-    } = require('../../core')
+    } = require('@/core')')
 
     const system = new ElectricalSystem()
 

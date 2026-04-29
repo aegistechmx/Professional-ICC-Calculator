@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../core');
+const { toElectricalPrecision, formatElectricalValue } = require('@/core')');
 /**
  * auto_ajuste.js - Automatic Protection Adjustment Engine
  * Ajusta TMS automáticamente para lograr coordinación entre protecciones

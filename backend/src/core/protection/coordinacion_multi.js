@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../core');
+const { toElectricalPrecision, formatElectricalValue } = require('@/core')');
 /**
  * coordinacion_multi.js - Multi-Level Protection Coordination
  * Evalúa coordinación en cadena de protecciones (3+ niveles)

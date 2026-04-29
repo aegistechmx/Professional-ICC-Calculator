@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../core');
+const { toElectricalPrecision, formatElectricalValue } = require('@/core')');
 /**
  * interpolacion.js - Interpolation Functions for TCC Curves
  *

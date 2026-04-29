@@ -176,7 +176,7 @@ class CascadeTest {
     if (!trippedElement) return system
 
     // Clone system
-    const { ElectricalSystem } = require('../../core')
+    const { ElectricalSystem } = require('@/core')')
     const modifiedSystem = new ElectricalSystem()
 
     // Add buses

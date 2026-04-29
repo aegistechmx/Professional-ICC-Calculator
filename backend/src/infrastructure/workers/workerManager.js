@@ -98,7 +98,7 @@ async function runParallelBatch(scenarios, options = {}, maxConcurrency = 4) {
  * @returns {Promise} Contingency results
  */
 async function runParallelContingency(model, options = {}, maxConcurrency = 4) {
-  const { runN1Contingency } = require('../../core/powerflow/contingency');
+  const { runN1Contingency } = require('@/core')/powerflow/contingency');
   
   // For now, run sequentially (contingency analysis is complex)
   // Future: parallelize individual contingency cases

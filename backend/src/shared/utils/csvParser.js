@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../core');
+const { toElectricalPrecision, formatElectricalValue } = require('@/core')');
 /**
  * csvParser.js - CSV Parser Utility
  * Parsea archivos CSV de curvas digitalizadas de fabricantes

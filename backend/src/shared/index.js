@@ -1,53 +1,18 @@
 /**
- * shared/index.js - Shared utilities and common functions
+ * shared/index.js - Shared utilities exports
  * 
- * Responsibility: Common utilities used across the application
+ * Responsibility: Centralized shared utilities
  */
 
-const { 
-  validateElectricalSystem,
-  convertToPerUnit,
-  calculatePowerFactor
-} = require('./electrical');
-
-const {
-  formatNumber,
-  formatVoltage,
-  formatPower
-} = require('./formatting');
-
-const {
-  createLogger,
-  logError,
-  logInfo,
-  logDebug
-} = require('./logging');
-
-const {
-  deepClone,
-  validateInputs,
-  handleErrors
-} = require('./helpers');
+const { validateElectricalSystem } = require('./models/electrical');
+const { formatNumber, formatVoltage, formatPower } = require('./utils/formatting');
+const { createLogger, logError, logInfo } = require('./utils/logging');
 
 module.exports = {
-  // Electrical utilities
-  validateElectricalSystem,
-  convertToPerUnit,
-  calculatePowerFactor,
+  // Models
+  electrical: { validateElectricalSystem },
   
-  // Formatting utilities
-  formatNumber,
-  formatVoltage,
-  formatPower,
-  
-  // Logging utilities
-  createLogger,
-  logError,
-  logInfo,
-  logDebug,
-  
-  // General utilities
-  deepClone,
-  validateInputs,
-  handleErrors
+  // Utils
+  formatting: { formatNumber, formatVoltage, formatPower },
+  logging: { createLogger, logError, logInfo }
 };

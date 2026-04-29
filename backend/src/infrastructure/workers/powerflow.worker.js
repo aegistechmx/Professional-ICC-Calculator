@@ -6,8 +6,8 @@
  */
 
 const { parentPort, workerData } = require('worker_threads');
-const { solve } = require('../../core/powerflow/solver');
-const { solveFDLF } = require('../../core/powerflow/fastDecoupled');
+const { solve } = require('@/core')/powerflow/solver');
+const { solveFDLF } = require('@/core')/powerflow/fastDecoupled');
 
 /**
  * Handle worker message

@@ -231,7 +231,7 @@ async function runPowerFlow(system, options = {}) {
     maxIterations = 20
   } = options;
 
-  console.log(`⚡ PowerFlow: Running ${method} analysis...`);
+  console.log('⚡ PowerFlow: Running ' + method + ' analysis...');
 
   let result;
   switch (method) {
@@ -242,10 +242,10 @@ async function runPowerFlow(system, options = {}) {
       result = await solveFDLF(system, { tolerance, maxIterations });
       break;
     default:
-      throw new Error(\`Unknown power flow method: \${method}\`);
+      throw new Error('Unknown power flow method: ' + method);
   }
 
-  console.log(\`⚡ PowerFlow: \${result.converged ? 'CONVERGED' : 'NOT CONVERGED'} in \${result.iterations} iterations\`);
+  console.log('⚡ PowerFlow: ' + (result.converged ? 'CONVERGED' : 'NOT CONVERGED') + ' in ' + result.iterations + ' iterations');
 
   return {
     method,
@@ -303,8 +303,8 @@ async function runOPF(system, options = {}) {
     baseSolution: pfResult
   });
 
-  console.log(\`⚡ OPF: \${result.converged ? 'CONVERGED' : 'NOT CONVERGED'} in \${result.iterations} iterations\`);
-  console.log(\`⚡ OPF: Final cost: $\${result.cost.toFixed(2)}\`);
+  console.log('⚡ OPF: ' + (result.converged ? 'CONVERGED' : 'NOT CONVERGED') + ' in ' + result.iterations + ' iterations');
+  console.log('⚡ OPF: Final cost: $' + result.cost.toFixed(2));
 
   return {
     converged: result.converged,
@@ -425,7 +425,7 @@ module.exports = {
 }
 
 // === MAIN EXECUTION ===
-function main() {
+function reorganize() {
   console.log('🚀 Starting industrial architecture refactor...');
   console.log('📋 Phase 1: Core reorganization and cleanup');
 
@@ -466,9 +466,18 @@ function main() {
   console.log('  3. Test core functionality');
 }
 
-// Run the refactor
+// Run: refactor
 if (require.main === module) {
-  main();
+  reorganize();
+  console.log('📁 Structure ready for:');
+  console.log('  🔥 Plugins system');
+  console.log('  ⚡ Parallel processing');
+  console.log('  🧠 SCOPF implementation');
+  console.log('  🌐 Clean API layer');
+  console.log('\n📋 Next steps:');
+  console.log('  1. npm run dev');
+  console.log('  2. Fix any remaining errors');
+  console.log('  3. Test core functionality');
 }
 
 module.exports = {
