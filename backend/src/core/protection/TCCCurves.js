@@ -51,7 +51,8 @@ function calculateOperatingTime(params) {
   } = params
 
   // Validate inputs
-  if (current <= pickup) { // current (A)
+  if (current <= pickup) {
+    // current (A)
     return Infinity // No operation if current below pickup
   }
 
@@ -66,7 +67,8 @@ function calculateOperatingTime(params) {
   const { K, alpha } = curve
 
   // Calculate I/Is ratio
-  const I_ratio = current / pickup // current (A)
+  const I_ratio = current / pickup
+  // current (A)
 
   // IEC equation: t = TMS * (K / ((I/Is)^α - 1))
   const t = tms * (K / (Math.pow(I_ratio, alpha) - 1))
@@ -98,7 +100,8 @@ function generateTCCCurve(params) {
   const step = (logMax - logMin) / points
 
   for (let i = 0; i <= points; i++) {
-    const current = Math.pow(10, logMin + i * step) // current (A)
+    const current = Math.pow(10, logMin + i * step)
+    // current (A)
     const time = calculateOperatingTime({
       pickup,
       current,

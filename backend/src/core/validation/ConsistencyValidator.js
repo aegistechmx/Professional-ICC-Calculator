@@ -52,7 +52,8 @@ class ConsistencyValidator {
     try {
       // Run power flow
       const systemPF = this.cloneSystem(system)
-      results.powerFlow = engines.powerFlow.run(systemPF) // power (W)
+      results.powerFlow = engines.powerFlow.run(systemPF)
+      // power (W)
 
       // Run fault analysis
       const systemFault = this.cloneSystem(system)
@@ -134,7 +135,8 @@ class ConsistencyValidator {
     }
 
     // Extract Ybus from power flow
-    const YbusPF = results.powerFlow.Ybus || results.powerFlow.ybus // power (W)
+    const YbusPF = results.powerFlow.Ybus || results.powerFlow.ybus
+    // power (W)
 
     // Extract Ybus from fault analysis
     const YbusFault = results.fault.Ybus || results.fault.ybus
@@ -180,13 +182,16 @@ class ConsistencyValidator {
     }
 
     // Get currents from power flow
-    const currentsPF = this.extractCurrents(results.powerFlow) // current (A)
+    const currentsPF = this.extractCurrents(results.powerFlow)
+    // current (A)
 
     // Get currents from fault analysis
-    const currentsFault = this.extractCurrents(results.fault) // current (A)
+    const currentsFault = this.extractCurrents(results.fault)
+    // current (A)
 
     // Compare currents (should match for normal operating conditions)
-    const maxDiff = this.compareCurrents(currentsPF, currentsFault) // current (A)
+    const maxDiff = this.compareCurrents(currentsPF, currentsFault)
+    // current (A)
 
     if (maxDiff < this.options.tolerance) {
       this.results.passed.push({
@@ -218,11 +223,13 @@ class ConsistencyValidator {
     }
 
     // Get voltages from power flow
-    const voltagesPF = this.extractVoltages(results.powerFlow) // voltage (V)
+    const voltagesPF = this.extractVoltages(results.powerFlow)
+    // voltage (V)
 
     // Get initial voltages from dynamics (should match power flow)
-    const voltagesDyn = results.dynamics.voltages // voltage (V)
-      ? results.dynamics.voltages[0]
+    const voltagesDyn = results.dynamics.voltages
+      ? // voltage (V)
+        results.dynamics.voltages[0]
       : null
 
     if (!voltagesDyn) {
@@ -234,7 +241,8 @@ class ConsistencyValidator {
     }
 
     // Compare initial voltages
-    const maxDiff = this.compareVoltages(voltagesPF, voltagesDyn) // voltage (V)
+    const maxDiff = this.compareVoltages(voltagesPF, voltagesDyn)
+    // voltage (V)
 
     if (maxDiff < this.options.tolerance) {
       this.results.passed.push({
@@ -315,7 +323,8 @@ class ConsistencyValidator {
    */
   extractCurrents(results) {
     if (results.lines) {
-      return results.lines.map(l => l.current || l.I_flow || 0) // current (A)
+      return results.lines.map(l => l.current || l.I_flow || 0)
+      // current (A)
     }
     if (results.currents) {
       return results.currents
@@ -330,7 +339,8 @@ class ConsistencyValidator {
    */
   extractVoltages(results) {
     if (results.buses) {
-      return results.buses.map(b => b.V || b.voltage || 1.0) // voltage (V)
+      return results.buses.map(b => b.V || b.voltage || 1.0)
+      // voltage (V)
     }
     if (results.voltages) {
       return results.voltages
@@ -379,10 +389,12 @@ class ConsistencyValidator {
     if (!currentsA || !currentsB) return Infinity
 
     let maxDiff = 0
-    const minLen = Math.min(currentsA.length, currentsB.length) // current (A)
+    const minLen = Math.min(currentsA.length, currentsB.length)
+    // current (A)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = Math.abs(currentsA[i] - currentsB[i]) // current (A)
+      const diff = Math.abs(currentsA[i] - currentsB[i])
+      // current (A)
       maxDiff = Math.max(maxDiff, diff)
     }
 
@@ -399,10 +411,12 @@ class ConsistencyValidator {
     if (!voltagesA || !voltagesB) return Infinity
 
     let maxDiff = 0
-    const minLen = Math.min(voltagesA.length, voltagesB.length) // voltage (V)
+    const minLen = Math.min(voltagesA.length, voltagesB.length)
+    // voltage (V)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = Math.abs(voltagesA[i] - voltagesB[i]) // voltage (V)
+      const diff = Math.abs(voltagesA[i] - voltagesB[i])
+      // voltage (V)
       maxDiff = Math.max(maxDiff, diff)
     }
 
@@ -482,7 +496,8 @@ class ConsistencyValidator {
     currentsB,
     tolerance = this.options.tolerance
   ) {
-    const maxDiff = this.compareCurrents(currentsA, currentsB) // current (A)
+    const maxDiff = this.compareCurrents(currentsA, currentsB)
+    // current (A)
     this.assert(
       maxDiff < tolerance,
       `Currents do not match: max difference ${maxDiff} exceeds tolerance ${tolerance}`

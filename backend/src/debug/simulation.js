@@ -1,10 +1,10 @@
 /**
  * debug/simulation.js - Professional simulation debugging system
- * 
+ *
  * Responsibility: Specialized debugging for power system simulations
  */
 
-const { logInfo, logWarn, logError, logDebug } = require('./logger');
+const { _logInfo, _logWarn, _logError, _logDebug } = require('./logger')
 
 /**
  * Simulation event levels
@@ -15,18 +15,18 @@ const SimulationLogLevel = {
   INFO: 2,
   WARNING: 3,
   ERROR: 4,
-  CRITICAL: 5
-};
+  CRITICAL: 5,
+}
 
 /**
  * Simulation Logger class
  */
 class SimulationLogger {
   constructor(sessionId = null) {
-    this.sessionId = sessionId || this.generateSessionId();
-    this.events = [];
-    this.startTime = null;
-    this.minLogLevel = SimulationLogLevel.INFO;
+    this.sessionId = sessionId || this.generateSessionId()
+    this.events = []
+    this.startTime = null
+    this.minLogLevel = SimulationLogLevel.INFO
   }
 
   /**
@@ -34,7 +34,7 @@ class SimulationLogger {
    * @returns {string} Session ID
    */
   generateSessionId() {
-    return `sim_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `sim_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
   /**
@@ -42,14 +42,18 @@ class SimulationLogger {
    * @param {Object} config - Simulation configuration
    */
   startSession(config) {
-    this.startTime = new Date();
-    this.events = [];
-    
-    this.logEvent('SESSION_START', {
-      sessionId: this.sessionId,
-      timestamp: this.startTime.toISOString(),
-      config: config
-    }, SimulationLogLevel.INFO);
+    this.startTime = new Date()
+    this.events = []
+
+    this.logEvent(
+      'SESSION_START',
+      {
+        sessionId: this.sessionId,
+        timestamp: this.startTime.toISOString(),
+        config: config,
+      },
+      SimulationLogLevel.INFO
+    )
   }
 
   /**
@@ -57,15 +61,19 @@ class SimulationLogger {
    * @param {Object} results - Simulation results
    */
   endSession(results) {
-    const endTime = new Date();
-    const duration = endTime - this.startTime;
-    
-    this.logEvent('SESSION_END', {
-      sessionId: this.sessionId,
-      timestamp: endTime.toISOString(),
-      duration: `${duration}ms`,
-      results: results
-    }, SimulationLogLevel.INFO);
+    const endTime = new Date()
+    const duration = endTime - this.startTime
+
+    this.logEvent(
+      'SESSION_END',
+      {
+        sessionId: this.sessionId,
+        timestamp: endTime.toISOString(),
+        duration: `${duration}ms`,
+        results: results,
+      },
+      SimulationLogLevel.INFO
+    )
   }
 
   /**
@@ -75,18 +83,18 @@ class SimulationLogger {
    * @param {number} level - Log level
    */
   logEvent(event, data = {}, level = SimulationLogLevel.INFO) {
-    if (level < this.minLogLevel) return;
+    if (level < this.minLogLevel) return
 
     const logEntry = {
       sessionId: this.sessionId,
       timestamp: new Date().toISOString(),
       event: event,
       level: SimulationLogLevel[level] || 'INFO',
-      data: JSON.parse(JSON.stringify(data))
-    };
+      data: JSON.parse(JSON.stringify(data)),
+    }
 
-    this.events.push(logEntry);
-    this.consoleLog(logEntry);
+    this.events.push(logEntry)
+    this.consoleLog(logEntry)
   }
 
   /**
@@ -95,21 +103,24 @@ class SimulationLogger {
    */
   consoleLog(logEntry) {
     const colors = {
-      TRACE: '\x1b[90m',   // Gray
-      DEBUG: '\x1b[36m',   // Cyan
-      INFO: '\x1b[32m',    // Green
+      TRACE: '\x1b[90m', // Gray
+      DEBUG: '\x1b[36m', // Cyan
+      INFO: '\x1b[32m', // Green
       WARNING: '\x1b[33m', // Yellow
-      ERROR: '\x1b[31m',   // Red
-      CRITICAL: '\x1b[35m' // Magenta
-    };
+      ERROR: '\x1b[31m', // Red
+      CRITICAL: '\x1b[35m', // Magenta
+    }
 
-    const reset = '\x1b[0m';
-    const color = colors[logEntry.level] || '';
-    
-    const message = `[SIM] ${logEntry.timestamp} [${logEntry.level}] ${logEntry.event}`;
-    const dataStr = Object.keys(logEntry.data).length > 0 ? `\n${JSON.stringify(logEntry.data, null, 2)}` : '';
-    
-    console.log(`${color}${message}${reset}${dataStr}`);
+    const reset = '\x1b[0m'
+    const color = colors[logEntry.level] || ''
+
+    const message = `[SIM] ${logEntry.timestamp} [${logEntry.level}] ${logEntry.event}`
+    const dataStr =
+      Object.keys(logEntry.data).length > 0
+        ? `\n${JSON.stringify(logEntry.data, null, 2)}`
+        : ''
+
+    console.log(`${color}${message}${reset}${dataStr}`)
   }
 
   /**
@@ -119,13 +130,17 @@ class SimulationLogger {
    * @param {Object} metrics - Convergence metrics
    */
   logPowerFlowIteration(iteration, state, metrics) {
-    this.logEvent('POWERFLOW_ITERATION', {
-      iteration,
-      maxMismatch: metrics.maxMismatch,
-      converged: metrics.converged,
-      busCount: state.buses?.length || 0,
-      branchCount: state.branches?.length || 0
-    }, SimulationLogLevel.DEBUG);
+    this.logEvent(
+      'POWERFLOW_ITERATION',
+      {
+        iteration,
+        maxMismatch: metrics.maxMismatch,
+        converged: metrics.converged,
+        busCount: state.buses?.length || 0,
+        branchCount: state.branches?.length || 0,
+      },
+      SimulationLogLevel.DEBUG
+    )
   }
 
   /**
@@ -135,14 +150,18 @@ class SimulationLogger {
    * @param {number} time - Trip time
    */
   logRelayTrip(relay, fault, time) {
-    this.logEvent('RELAY_TRIP', {
-      relayId: relay.id,
-      relayType: relay.type,
-      faultType: fault.type,
-      faultLocation: fault.location,
-      tripTime: `${time}ms`,
-      timestamp: new Date().toISOString()
-    }, SimulationLogLevel.WARNING);
+    this.logEvent(
+      'RELAY_TRIP',
+      {
+        relayId: relay.id,
+        relayType: relay.type,
+        faultType: fault.type,
+        faultLocation: fault.location,
+        tripTime: `${time}ms`,
+        timestamp: new Date().toISOString(),
+      },
+      SimulationLogLevel.WARNING
+    )
   }
 
   /**
@@ -152,12 +171,16 @@ class SimulationLogger {
    * @param {number} time - Operation time
    */
   logBreakerOperation(breaker, operation, time) {
-    this.logEvent('BREAKER_OPERATION', {
-      breakerId: breaker.id,
-      operation: operation,
-      time: `${time}ms`,
-      status: breaker.status
-    }, SimulationLogLevel.INFO);
+    this.logEvent(
+      'BREAKER_OPERATION',
+      {
+        breakerId: breaker.id,
+        operation: operation,
+        time: `${time}ms`,
+        status: breaker.status,
+      },
+      SimulationLogLevel.INFO
+    )
   }
 
   /**
@@ -166,14 +189,18 @@ class SimulationLogger {
    * @param {Object} detection - Detection details
    */
   logFaultDetected(fault, detection) {
-    this.logEvent('FAULT_DETECTED', {
-      faultType: fault.type,
-      faultLocation: fault.location,
-      faultMagnitude: fault.magnitude,
-      detectionTime: detection.time,
-      detectedBy: detection.detector,
-      confidence: detection.confidence
-    }, SimulationLogLevel.WARNING);
+    this.logEvent(
+      'FAULT_DETECTED',
+      {
+        faultType: fault.type,
+        faultLocation: fault.location,
+        faultMagnitude: fault.magnitude,
+        detectionTime: detection.time,
+        detectedBy: detection.detector,
+        confidence: detection.confidence,
+      },
+      SimulationLogLevel.WARNING
+    )
   }
 
   /**
@@ -181,14 +208,18 @@ class SimulationLogger {
    * @param {Object} analysis - Convergence analysis
    */
   logConvergenceAnalysis(analysis) {
-    this.logEvent('CONVERGENCE_ANALYSIS', {
-      algorithm: analysis.algorithm,
-      iterations: analysis.iterations,
-      finalMismatch: analysis.finalMismatch,
-      convergenceRate: analysis.convergenceRate,
-      converged: analysis.converged,
-      warnings: analysis.warnings || []
-    }, SimulationLogLevel.INFO);
+    this.logEvent(
+      'CONVERGENCE_ANALYSIS',
+      {
+        algorithm: analysis.algorithm,
+        iterations: analysis.iterations,
+        finalMismatch: analysis.finalMismatch,
+        convergenceRate: analysis.convergenceRate,
+        converged: analysis.converged,
+        warnings: analysis.warnings || [],
+      },
+      SimulationLogLevel.INFO
+    )
   }
 
   /**
@@ -196,14 +227,18 @@ class SimulationLogger {
    * @param {Object} metrics - Performance metrics
    */
   logPerformanceMetrics(metrics) {
-    this.logEvent('PERFORMANCE_METRICS', {
-      cpuTime: metrics.cpuTime,
-      memoryUsage: metrics.memoryUsage,
-      solverTime: metrics.solverTime,
-      totalNodes: metrics.totalNodes,
-      totalBranches: metrics.totalBranches,
-      throughput: metrics.throughput
-    }, SimulationLogLevel.DEBUG);
+    this.logEvent(
+      'PERFORMANCE_METRICS',
+      {
+        cpuTime: metrics.cpuTime,
+        memoryUsage: metrics.memoryUsage,
+        solverTime: metrics.solverTime,
+        totalNodes: metrics.totalNodes,
+        totalBranches: metrics.totalBranches,
+        throughput: metrics.throughput,
+      },
+      SimulationLogLevel.DEBUG
+    )
   }
 
   /**
@@ -212,7 +247,7 @@ class SimulationLogger {
    * @returns {Array} Filtered events
    */
   getEventsByType(eventType) {
-    return this.events.filter(event => event.event === eventType);
+    return this.events.filter(event => event.event === eventType)
   }
 
   /**
@@ -221,9 +256,10 @@ class SimulationLogger {
    * @returns {Array} Filtered events
    */
   getEventsByLevel(minLevel) {
-    return this.events.filter(event => 
-      Object.values(SimulationLogLevel).indexOf(event.level) >= minLevel
-    );
+    return this.events.filter(
+      event =>
+        Object.values(SimulationLogLevel).indexOf(event.level) >= minLevel
+    )
   }
 
   /**
@@ -236,8 +272,8 @@ class SimulationLogger {
       startTime: this.startTime,
       endTime: new Date(),
       eventCount: this.events.length,
-      events: this.events
-    };
+      events: this.events,
+    }
   }
 
   /**
@@ -245,7 +281,7 @@ class SimulationLogger {
    * @param {number} level - Minimum log level
    */
   setLogLevel(level) {
-    this.minLogLevel = level;
+    this.minLogLevel = level
   }
 }
 
@@ -254,9 +290,9 @@ class SimulationLogger {
  */
 class PowerFlowDebugger extends SimulationLogger {
   constructor(sessionId) {
-    super(sessionId);
-    this.iterations = [];
-    this.convergenceHistory = [];
+    super(sessionId)
+    this.iterations = []
+    this.convergenceHistory = []
   }
 
   /**
@@ -272,13 +308,13 @@ class PowerFlowDebugger extends SimulationLogger {
       jacobianCondition: jacobian.condition,
       maxMismatch: Math.max(...mismatch.map(m => Math.abs(m))),
       maxVoltageChange: Math.max(...solution.map(s => Math.abs(s))),
-      converged: Math.max(...mismatch.map(m => Math.abs(m))) < 1e-6
-    };
+      converged: Math.max(...mismatch.map(m => Math.abs(m))) < 1e-6,
+    }
 
-    this.iterations.push(step);
-    this.convergenceHistory.push(step.maxMismatch);
+    this.iterations.push(step)
+    this.convergenceHistory.push(step.maxMismatch)
 
-    this.logEvent('NEWTON_STEP', step, SimulationLogLevel.DEBUG);
+    this.logEvent('NEWTON_STEP', step, SimulationLogLevel.DEBUG)
   }
 
   /**
@@ -291,13 +327,17 @@ class PowerFlowDebugger extends SimulationLogger {
       bus: i + 1,
       magnitude: v.magnitude,
       angle: v.angle,
-      deviation: v.deviation || 0
-    }));
+      deviation: v.deviation || 0,
+    }))
 
-    this.logEvent('VOLTAGE_PROFILE', {
-      iteration,
-      profile
-    }, SimulationLogLevel.DEBUG);
+    this.logEvent(
+      'VOLTAGE_PROFILE',
+      {
+        iteration,
+        profile,
+      },
+      SimulationLogLevel.DEBUG
+    )
   }
 
   /**
@@ -305,16 +345,19 @@ class PowerFlowDebugger extends SimulationLogger {
    * @returns {Object} Convergence statistics
    */
   getConvergenceStats() {
-    if (this.iterations.length === 0) return null;
+    if (this.iterations.length === 0) return null
 
-    const mismatches = this.iterations.map(i => i.maxMismatch);
-    
+    const mismatches = this.iterations.map(i => i.maxMismatch)
+
     return {
       totalIterations: this.iterations.length,
       finalMismatch: mismatches[mismatches.length - 1],
-      convergenceRate: mismatches.map((m, i) => i > 0 ? mismatches[i-1]/m : 0),
-      averageReduction: mismatches.reduce((sum, m) => sum + m, 0) / mismatches.length
-    };
+      convergenceRate: mismatches.map((m, i) =>
+        i > 0 ? mismatches[i - 1] / m : 0
+      ),
+      averageReduction:
+        mismatches.reduce((sum, m) => sum + m, 0) / mismatches.length,
+    }
   }
 }
 
@@ -324,5 +367,5 @@ class PowerFlowDebugger extends SimulationLogger {
 module.exports = {
   SimulationLogger,
   PowerFlowDebugger,
-  SimulationLogLevel
-};
+  SimulationLogLevel,
+}

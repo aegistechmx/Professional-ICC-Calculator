@@ -1,6 +1,6 @@
 /**
  * generatorModel.js - Comprehensive generator model for TS-SCOPF
- * 
+ *
  * Responsibility: Complete generator model with AVR, Governor, and PSS
  * NO Express, NO axios, NO UI logic
  */
@@ -10,58 +10,58 @@
  */
 class GeneratorModel {
   constructor(params) {
-    this.id = params.id;
-    this.bus = params.bus;
-    
+    this.id = params.id
+    this.bus = params.bus
+
     // Machine parameters
-    this.M = params.inertia || 5.0;        // Inertia constant (H)
-    this.D = params.damping || 2.0;        // Damping coefficient
-    this.xd = params.xd || 0.3;             // Direct axis reactance
-    this.xq = params.xq || 0.4;             // Quadrature axis reactance
-    this.xdPrime = params.xdPrime || 0.25;    // Transient reactance
-    this.Tdo = params.Tdo || 5.0;           // Direct axis open circuit time constant
-    this.TdoPrime = params.TdoPrime || 1.0;    // Direct axis short circuit time constant
-    this.Tqo = params.Tqo || 1.5;           // Quadrature axis open circuit time constant
-    
+    this.M = params.inertia || 5.0 // Inertia constant (H)
+    this.D = params.damping || 2.0 // Damping coefficient
+    this.xd = params.xd || 0.3 // Direct axis reactance
+    this.xq = params.xq || 0.4 // Quadrature axis reactance
+    this.xdPrime = params.xdPrime || 0.25 // Transient reactance
+    this.Tdo = params.Tdo || 5.0 // Direct axis open circuit time constant
+    this.TdoPrime = params.TdoPrime || 1.0 // Direct axis short circuit time constant
+    this.Tqo = params.Tqo || 1.5 // Quadrature axis open circuit time constant
+
     // Electrical parameters
-    this.Eq = params.Eq || 1.0;            // Internal voltage (q-axis)
-    this.Ed = params.Ed || 0.0;             // Internal voltage (d-axis)
-    this.Efd = params.Efd || 1.0;           // Field voltage
-    
+    this.Eq = params.Eq || 1.0 // Internal voltage (q-axis)
+    this.Ed = params.Ed || 0.0 // Internal voltage (d-axis)
+    this.Efd = params.Efd || 1.0 // Field voltage
+
     // Mechanical parameters
-    this.Pm = params.Pm || params.P || 0.8;   // Mechanical power
-    this.omega = params.omega || 1.0;        // Angular velocity
-    this.delta = params.delta || 0.0;          // Rotor angle
-    
+    this.Pm = params.Pm || params.P || 0.8 // Mechanical power
+    this.omega = params.omega || 1.0 // Angular velocity
+    this.delta = params.delta || 0.0 // Rotor angle
+
     // AVR parameters
     this.avr = {
-      Ka: params.avrKa || 200,              // AVR gain
-      Ta: params.avrTa || 0.05,              // AVR time constant
-      Vref: params.Vref || 1.0,             // Reference voltage
-      Vmax: params.Vmax || 5.0,              // Maximum field voltage
-      Vmin: params.Vmin || 0.0,              // Minimum field voltage
-      ...params.avr
-    };
-    
+      Ka: params.avrKa || 200, // AVR gain
+      Ta: params.avrTa || 0.05, // AVR time constant
+      Vref: params.Vref || 1.0, // Reference voltage
+      Vmax: params.Vmax || 5.0, // Maximum field voltage
+      Vmin: params.Vmin || 0.0, // Minimum field voltage
+      ...params.avr,
+    }
+
     // Governor parameters
     this.gov = {
-      Tg: params.govTg || 0.3,              // Governor time constant
-      R: params.govR || 0.05,                // Droop
-      Pref: params.Pref || params.P || 0.8,    // Reference power
-      Pmax: params.Pmax || 1.5,             // Maximum power
-      Pmin: params.Pmin || 0.2,             // Minimum power
-      ...params.gov
-    };
-    
+      Tg: params.govTg || 0.3, // Governor time constant
+      R: params.govR || 0.05, // Droop
+      Pref: params.Pref || params.P || 0.8, // Reference power
+      Pmax: params.Pmax || 1.5, // Maximum power
+      Pmin: params.Pmin || 0.2, // Minimum power
+      ...params.gov,
+    }
+
     // PSS parameters
     this.pss = {
-      K: params.pssK || 10,                 // PSS gain
-      Tw: params.pssTw || 10,                // Washout time constant
-      T1: params.pssT1 || 0.1,             // Lead time constant 1
-      T2: params.pssT2 || 0.05,            // Lead time constant 2
-      T3: params.pssT3 || 1.0,             // Lag time constant
-      ...params.pss
-    };
+      K: params.pssK || 10, // PSS gain
+      Tw: params.pssTw || 10, // Washout time constant
+      T1: params.pssT1 || 0.1, // Lead time constant 1
+      T2: params.pssT2 || 0.05, // Lead time constant 2
+      T3: params.pssT3 || 1.0, // Lag time constant
+      ...params.pss,
+    }
   }
 
   /**
@@ -71,20 +71,20 @@ class GeneratorModel {
    * @returns {Object} State derivatives
    */
   machineModel(state, inputs) {
-    const { delta, omega, Eq, Ed, Efd } = state;
-    const { Vd, Vq, Id, Iq } = inputs;
+    const { _delta, omega, Eq, Ed, Efd } = state
+    const { _Vd, _Vq, Id, Iq } = inputs
 
     // Calculate electrical power
-    const Pe = Eq * Iq + Ed * Id;
-    const Qe = Eq * Id - Ed * Iq;
+    const Pe = Eq * Iq + Ed * Id
+    const Qe = Eq * Id - Ed * Iq
 
     // Differential equations for internal voltages
-    const dEd = (Efd - Ed - (this.xd - this.xdPrime) * Id) / this.TdoPrime;
-    const dEq = (Efd - Eq) / this.Tdo;
+    const dEd = (Efd - Ed - (this.xd - this.xdPrime) * Id) / this.TdoPrime
+    const dEq = (Efd - Eq) / this.Tdo
 
     // Swing equation
-    const dDelta = omega;
-    const dOmega = (this.Pm - Pe - this.D * (omega - 1)) / this.M;
+    const dDelta = omega
+    const dOmega = (this.Pm - Pe - this.D * (omega - 1)) / this.M
 
     return {
       dDelta,
@@ -92,8 +92,8 @@ class GeneratorModel {
       dEd,
       dEq,
       Pe,
-      Qe
-    };
+      Qe,
+    }
   }
 
   /**
@@ -104,19 +104,22 @@ class GeneratorModel {
    * @returns {number} Field voltage derivative
    */
   avrModel(state, V, pssSignal) {
-    const { Efd } = state;
-    const { Ka, Ta, Vref } = this.avr;
+    const { Efd } = state
+    const { Ka, Ta, Vref } = this.avr
 
     // Voltage error with PSS signal
-    const error = Vref - V + pssSignal;
+    const error = Vref - V + pssSignal
 
     // AVR differential equation
-    const dEfd = (Ka * error - Efd) / Ta;
+    const dEfd = (Ka * error - Efd) / Ta
 
     // Apply limits
-    const EfdNew = Math.max(this.avr.Vmin, Math.min(this.avr.Vmax, Efd + dEfd * 0.01));
+    const EfdNew = Math.max(
+      this.avr.Vmin,
+      Math.min(this.avr.Vmax, Efd + dEfd * 0.01)
+    )
 
-    return { dEfd, EfdNew };
+    return { dEfd, EfdNew }
   }
 
   /**
@@ -126,19 +129,22 @@ class GeneratorModel {
    * @returns {number} Mechanical power derivative
    */
   governorModel(state, omega) {
-    const { Pm } = state;
-    const { Tg, R, Pref } = this.gov;
+    const { Pm } = state
+    const { Tg, R, Pref } = this.gov
 
     // Speed deviation
-    const speedError = omega - 1.0;
+    const speedError = omega - 1.0
 
     // Governor differential equation
-    const dPm = (Pref - Pm - R * speedError) / Tg;
+    const dPm = (Pref - Pm - R * speedError) / Tg
 
     // Apply limits
-    const PmNew = Math.max(this.gov.Pmin, Math.min(this.gov.Pmax, Pm + dPm * 0.01));
+    const PmNew = Math.max(
+      this.gov.Pmin,
+      Math.min(this.gov.Pmax, Pm + dPm * 0.01)
+    )
 
-    return { dPm, PmNew };
+    return { dPm, PmNew }
   }
 
   /**
@@ -148,21 +154,21 @@ class GeneratorModel {
    * @returns {number} PSS output signal
    */
   pssModel(state, omega) {
-    const { K, Tw, T1, T2, T3 } = this.pss;
+    const { K, Tw, T1, T2, T3 } = this.pss
 
     // Speed deviation (input to PSS)
-    const speedError = omega - 1.0;
+    const speedError = omega - 1.0
 
     // Washout filter
-    const washoutOutput = this.washoutFilter(speedError, Tw);
+    const washoutOutput = this.washoutFilter(speedError, Tw)
 
     // Lead-lag compensation
-    const leadLagOutput = this.leadLagFilter(washoutOutput, T1, T2);
+    const leadLagOutput = this.leadLagFilter(washoutOutput, T1, T2)
 
     // Lag filter
-    const pssSignal = this.lagFilter(leadLagOutput, T3);
+    const pssSignal = this.lagFilter(leadLagOutput, T3)
 
-    return K * pssSignal;
+    return K * pssSignal
   }
 
   /**
@@ -173,8 +179,8 @@ class GeneratorModel {
    */
   washoutFilter(input, Tw) {
     // Simple washout implementation
-    const output = input / (1 + Tw * Math.abs(input));
-    return output;
+    const output = input / (1 + Tw * Math.abs(input))
+    return output
   }
 
   /**
@@ -186,8 +192,8 @@ class GeneratorModel {
    */
   leadLagFilter(input, T1, T2) {
     // Simplified lead-lag implementation
-    const output = input * (1 + T1) / (1 + T2);
-    return output;
+    const output = (input * (1 + T1)) / (1 + T2)
+    return output
   }
 
   /**
@@ -198,8 +204,8 @@ class GeneratorModel {
    */
   lagFilter(input, T3) {
     // Simple lag implementation
-    const output = input / (1 + T3);
-    return output;
+    const output = input / (1 + T3)
+    return output
   }
 
   /**
@@ -211,15 +217,15 @@ class GeneratorModel {
    */
   updateState(state, inputs, dt) {
     // Get machine model derivatives
-    const machineDerivs = this.machineModel(state, inputs);
+    const machineDerivs = this.machineModel(state, inputs)
 
     // Get AVR output
-    const V = Math.sqrt(inputs.Vd * inputs.Vd + inputs.Vq * inputs.Vq);
-    const pssSignal = this.pssModel(state, state.omega);
-    const avrOutput = this.avrModel(state, V, pssSignal);
+    const V = Math.sqrt(inputs.Vd * inputs.Vd + inputs.Vq * inputs.Vq)
+    const pssSignal = this.pssModel(state, state.omega)
+    const avrOutput = this.avrModel(state, V, pssSignal)
 
     // Get governor output
-    const govOutput = this.governorModel(state, state.omega);
+    const govOutput = this.governorModel(state, state.omega)
 
     // Update state using Euler integration
     const newState = {
@@ -230,10 +236,10 @@ class GeneratorModel {
       Efd: avrOutput.EfdNew,
       Pm: govOutput.PmNew,
       Pe: machineDerivs.Pe,
-      Qe: machineDerivs.Qe
-    };
+      Qe: machineDerivs.Qe,
+    }
 
-    return newState;
+    return newState
   }
 
   /**
@@ -252,25 +258,25 @@ class GeneratorModel {
       Pm: this.Pm,
       Pe: this.Pe || 0,
       Qe: this.Qe || 0,
-      angleDegrees: this.delta * 180 / Math.PI,
+      angleDegrees: (this.delta * 180) / Math.PI,
       speedPercent: this.omega * 100,
       electricalPower: this.Pe || 0,
-      reactivePower: this.Qe || 0
-    };
+      reactivePower: this.Qe || 0,
+    }
   }
 
   /**
    * Reset to initial conditions
    */
   reset() {
-    this.delta = 0.0;
-    this.omega = 1.0;
-    this.Ed = 0.0;
-    this.Eq = 1.0;
-    this.Efd = 1.0;
-    this.Pm = this.Pm || 0.8;
-    this.Pe = 0.0;
-    this.Qe = 0.0;
+    this.delta = 0.0
+    this.omega = 1.0
+    this.Ed = 0.0
+    this.Eq = 1.0
+    this.Efd = 1.0
+    this.Pm = this.Pm || 0.8
+    this.Pe = 0.0
+    this.Qe = 0.0
   }
 
   /**
@@ -278,20 +284,20 @@ class GeneratorModel {
    * @returns {Object} Stability check
    */
   checkStability() {
-    const maxAngleDiff = Math.PI; // 180 degrees
-    const maxSpeedDeviation = 0.5; // 50% deviation
+    const maxAngleDiff = Math.PI // 180 degrees
+    const maxSpeedDeviation = 0.5 // 50% deviation
 
-    const angleDiff = Math.abs(this.delta);
-    const speedDeviation = Math.abs(this.omega - 1.0);
+    const angleDiff = Math.abs(this.delta)
+    const speedDeviation = Math.abs(this.omega - 1.0)
 
     return {
       stable: angleDiff < maxAngleDiff && speedDeviation < maxSpeedDeviation,
       angleDiff,
       speedDeviation,
       angleMargin: maxAngleDiff - angleDiff,
-      speedMargin: maxSpeedDeviation - speedDeviation
-    };
+      speedMargin: maxSpeedDeviation - speedDeviation,
+    }
   }
 }
 
-module.exports = GeneratorModel;
+module.exports = GeneratorModel

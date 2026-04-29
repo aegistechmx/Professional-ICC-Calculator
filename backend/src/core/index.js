@@ -1,40 +1,40 @@
 /**
  * core/index.js - Core module exports
- * 
+ *
  * Responsibility: Centralized core exports
  */
 
 // Power flow solvers
-const { solveNR, solveFDLF } = require('./powerflow/solvers');
+const { solveNR, solveFDLF } = require('./powerflow/solvers')
 
 // OPF algorithms
-const { solveOPF } = require('./opf/algorithms');
+const { solveOPF } = require('./opf/algorithms')
 
 // Stability simulators
-const { simulateDynamics } = require('./stability/solvers');
+const { simulateDynamics } = require('./stability/solvers')
 
 // Short circuit analysis
-const { analyzeShortCircuit } = require('./shortcircuit');
+const { analyzeShortCircuit } = require('./shortcircuit')
 
 module.exports = {
   // Power flow
   powerflow: {
     solveNR,
-    solveFDLF
+    solveFDLF,
   },
-  
+
   // OPF
   opf: {
-    solveOPF
+    solveOPF,
   },
-  
+
   // Stability
   stability: {
-    simulateDynamics
+    simulateDynamics,
   },
-  
+
   // Short circuit
   shortcircuit: {
-    analyzeShortCircuit
-  }
-};
+    analyzeShortCircuit,
+  },
+}

@@ -729,7 +729,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * debug/panel.js - Debug UI panel for browser environment
- * 
+ *
  * Responsibility: Interactive debug panel with log viewing and controls
  */
 &nbsp;
@@ -738,10 +738,10 @@
  */
 class DebugPanel {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor() {
-<span class="cstat-no" title="statement not covered" >    this.isVisible = false;</span>
-<span class="cstat-no" title="statement not covered" >    this.panelElement = null;</span>
-<span class="cstat-no" title="statement not covered" >    this.logContainer = null;</span>
-<span class="cstat-no" title="statement not covered" >    this.maxLogEntries = 100;</span>
+<span class="cstat-no" title="statement not covered" >    this.isVisible = false</span>
+<span class="cstat-no" title="statement not covered" >    this.panelElement = null</span>
+<span class="cstat-no" title="statement not covered" >    this.logContainer = null</span>
+<span class="cstat-no" title="statement not covered" >    this.maxLogEntries = 100</span>
   }
 &nbsp;
   /**
@@ -749,20 +749,20 @@ class DebugPanel {
    * @param {boolean} showOnStart - Show panel immediately
    */
 <span class="fstat-no" title="function not covered" >  in</span>it(showOnStart = <span class="branch-0 cbranch-no" title="branch not covered" >false)</span> {
-<span class="cstat-no" title="statement not covered" >    if (typeof document === 'undefined') <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >    if (typeof document === 'undefined') <span class="cstat-no" title="statement not covered" >return</span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    this.createPanel();</span>
-    
+<span class="cstat-no" title="statement not covered" >    this.createPanel()</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    if (showOnStart) {</span>
-<span class="cstat-no" title="statement not covered" >      this.show();</span>
+<span class="cstat-no" title="statement not covered" >      this.show()</span>
     }
 &nbsp;
     // Add keyboard shortcut (Ctrl+Shift+D)
-<span class="cstat-no" title="statement not covered" >    document.addEventListener('keydown', <span class="fstat-no" title="function not covered" >(e</span>) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    document.addEventListener('keydown', <span class="fstat-no" title="function not covered" >e </span>=&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (e.ctrlKey &amp;&amp; e.shiftKey &amp;&amp; e.key === 'D') {</span>
-<span class="cstat-no" title="statement not covered" >        this.toggle();</span>
+<span class="cstat-no" title="statement not covered" >        this.toggle()</span>
       }
-    });
+    })
   }
 &nbsp;
   /**
@@ -770,8 +770,8 @@ class DebugPanel {
    */
 <span class="fstat-no" title="function not covered" >  cr</span>eatePanel() {
     // Create panel container
-<span class="cstat-no" title="statement not covered" >    this.panelElement = document.createElement('div');</span>
-<span class="cstat-no" title="statement not covered" >    this.panelElement.id = 'debug-panel';</span>
+<span class="cstat-no" title="statement not covered" >    this.panelElement = document.createElement('div')</span>
+<span class="cstat-no" title="statement not covered" >    this.panelElement.id = 'debug-panel'</span>
 <span class="cstat-no" title="statement not covered" >    this.panelElement.style.cssText = `</span>
       position: fixed;
       top: 10px;
@@ -788,10 +788,10 @@ class DebugPanel {
       display: none;
       flex-direction: column;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    `;
+    `
 &nbsp;
     // Create header
-    const header = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
+    const header = <span class="cstat-no" title="statement not covered" >document.createElement('div')</span>
 <span class="cstat-no" title="statement not covered" >    header.style.cssText = `</span>
       background: #334155;
       padding: 8px;
@@ -799,14 +799,14 @@ class DebugPanel {
       display: flex;
       justify-content: space-between;
       align-items: center;
-    `;
+    `
 &nbsp;
-    const title = <span class="cstat-no" title="statement not covered" >document.createElement('span');</span>
-<span class="cstat-no" title="statement not covered" >    title.textContent = 'Debug Panel';</span>
-<span class="cstat-no" title="statement not covered" >    title.style.fontWeight = 'bold';</span>
+    const title = <span class="cstat-no" title="statement not covered" >document.createElement('span')</span>
+<span class="cstat-no" title="statement not covered" >    title.textContent = 'Debug Panel'</span>
+<span class="cstat-no" title="statement not covered" >    title.style.fontWeight = 'bold'</span>
 &nbsp;
-    const closeBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button');</span>
-<span class="cstat-no" title="statement not covered" >    closeBtn.textContent = '×';</span>
+    const closeBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button')</span>
+<span class="cstat-no" title="statement not covered" >    closeBtn.textContent = '×'</span>
 <span class="cstat-no" title="statement not covered" >    closeBtn.style.cssText = `</span>
       background: none;
       border: none;
@@ -816,24 +816,24 @@ class DebugPanel {
       padding: 0;
       width: 20px;
       height: 20px;
-    `;
-<span class="cstat-no" title="statement not covered" >    closeBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.hide();</span></span>
+    `
+<span class="cstat-no" title="statement not covered" >    closeBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.hide()</span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    header.appendChild(title);</span>
-<span class="cstat-no" title="statement not covered" >    header.appendChild(closeBtn);</span>
+<span class="cstat-no" title="statement not covered" >    header.appendChild(title)</span>
+<span class="cstat-no" title="statement not covered" >    header.appendChild(closeBtn)</span>
 &nbsp;
     // Create controls
-    const controls = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
+    const controls = <span class="cstat-no" title="statement not covered" >document.createElement('div')</span>
 <span class="cstat-no" title="statement not covered" >    controls.style.cssText = `</span>
       background: #334155;
       padding: 8px;
       border-bottom: 1px solid #475569;
       display: flex;
       gap: 8px;
-    `;
+    `
 &nbsp;
-    const clearBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button');</span>
-<span class="cstat-no" title="statement not covered" >    clearBtn.textContent = 'Clear';</span>
+    const clearBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button')</span>
+<span class="cstat-no" title="statement not covered" >    clearBtn.textContent = 'Clear'</span>
 <span class="cstat-no" title="statement not covered" >    clearBtn.style.cssText = `</span>
       background: #ef4444;
       color: white;
@@ -842,11 +842,11 @@ class DebugPanel {
       border-radius: 4px;
       cursor: pointer;
       font-size: 11px;
-    `;
-<span class="cstat-no" title="statement not covered" >    clearBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.clearLogs();</span></span>
+    `
+<span class="cstat-no" title="statement not covered" >    clearBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.clearLogs()</span></span>
 &nbsp;
-    const refreshBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button');</span>
-<span class="cstat-no" title="statement not covered" >    refreshBtn.textContent = 'Refresh';</span>
+    const refreshBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button')</span>
+<span class="cstat-no" title="statement not covered" >    refreshBtn.textContent = 'Refresh'</span>
 <span class="cstat-no" title="statement not covered" >    refreshBtn.style.cssText = `</span>
       background: #22c55e;
       color: white;
@@ -855,11 +855,11 @@ class DebugPanel {
       border-radius: 4px;
       cursor: pointer;
       font-size: 11px;
-    `;
-<span class="cstat-no" title="statement not covered" >    refreshBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.refreshLogs();</span></span>
+    `
+<span class="cstat-no" title="statement not covered" >    refreshBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.refreshLogs()</span></span>
 &nbsp;
-    const exportBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button');</span>
-<span class="cstat-no" title="statement not covered" >    exportBtn.textContent = 'Export';</span>
+    const exportBtn = <span class="cstat-no" title="statement not covered" >document.createElement('button')</span>
+<span class="cstat-no" title="statement not covered" >    exportBtn.textContent = 'Export'</span>
 <span class="cstat-no" title="statement not covered" >    exportBtn.style.cssText = `</span>
       background: #3b82f6;
       color: white;
@@ -868,65 +868,65 @@ class DebugPanel {
       border-radius: 4px;
       cursor: pointer;
       font-size: 11px;
-    `;
-<span class="cstat-no" title="statement not covered" >    exportBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.exportLogs();</span></span>
+    `
+<span class="cstat-no" title="statement not covered" >    exportBtn.onclick = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.exportLogs()</span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    controls.appendChild(clearBtn);</span>
-<span class="cstat-no" title="statement not covered" >    controls.appendChild(refreshBtn);</span>
-<span class="cstat-no" title="statement not covered" >    controls.appendChild(exportBtn);</span>
+<span class="cstat-no" title="statement not covered" >    controls.appendChild(clearBtn)</span>
+<span class="cstat-no" title="statement not covered" >    controls.appendChild(refreshBtn)</span>
+<span class="cstat-no" title="statement not covered" >    controls.appendChild(exportBtn)</span>
 &nbsp;
     // Create log container
-<span class="cstat-no" title="statement not covered" >    this.logContainer = document.createElement('div');</span>
+<span class="cstat-no" title="statement not covered" >    this.logContainer = document.createElement('div')</span>
 <span class="cstat-no" title="statement not covered" >    this.logContainer.style.cssText = `</span>
       flex: 1;
       overflow-y: auto;
       padding: 8px;
       background: #0f172a;
-    `;
+    `
 &nbsp;
     // Assemble panel
-<span class="cstat-no" title="statement not covered" >    this.panelElement.appendChild(header);</span>
-<span class="cstat-no" title="statement not covered" >    this.panelElement.appendChild(controls);</span>
-<span class="cstat-no" title="statement not covered" >    this.panelElement.appendChild(this.logContainer);</span>
+<span class="cstat-no" title="statement not covered" >    this.panelElement.appendChild(header)</span>
+<span class="cstat-no" title="statement not covered" >    this.panelElement.appendChild(controls)</span>
+<span class="cstat-no" title="statement not covered" >    this.panelElement.appendChild(this.logContainer)</span>
 &nbsp;
     // Add to document
-<span class="cstat-no" title="statement not covered" >    document.body.appendChild(this.panelElement);</span>
+<span class="cstat-no" title="statement not covered" >    document.body.appendChild(this.panelElement)</span>
 &nbsp;
     // Make panel draggable
-<span class="cstat-no" title="statement not covered" >    this.makeDraggable();</span>
+<span class="cstat-no" title="statement not covered" >    this.makeDraggable()</span>
   }
 &nbsp;
   /**
    * Make panel draggable
    */
 <span class="fstat-no" title="function not covered" >  ma</span>keDraggable() {
-    const header = <span class="cstat-no" title="statement not covered" >this.panelElement.querySelector('div');</span>
-    let isDragging = <span class="cstat-no" title="statement not covered" >false;</span>
-    let currentX;
-    let currentY;
-    let initialX;
-    let initialY;
+    const header = <span class="cstat-no" title="statement not covered" >this.panelElement.querySelector('div')</span>
+    let isDragging = <span class="cstat-no" title="statement not covered" >false</span>
+    let currentX
+    let currentY
+    let initialX
+    let initialY
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    header.addEventListener('mousedown', <span class="fstat-no" title="function not covered" >(e</span>) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      isDragging = true;</span>
-<span class="cstat-no" title="statement not covered" >      initialX = e.clientX - this.panelElement.offsetLeft;</span>
-<span class="cstat-no" title="statement not covered" >      initialY = e.clientY - this.panelElement.offsetTop;</span>
-    });
+<span class="cstat-no" title="statement not covered" >    header.addEventListener('mousedown', <span class="fstat-no" title="function not covered" >e </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      isDragging = true</span>
+<span class="cstat-no" title="statement not covered" >      initialX = e.clientX - this.panelElement.offsetLeft</span>
+<span class="cstat-no" title="statement not covered" >      initialY = e.clientY - this.panelElement.offsetTop</span>
+    })
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    document.addEventListener('mousemove', <span class="fstat-no" title="function not covered" >(e</span>) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      if (!isDragging) <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >    document.addEventListener('mousemove', <span class="fstat-no" title="function not covered" >e </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      if (!isDragging) <span class="cstat-no" title="statement not covered" >return</span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      e.preventDefault();</span>
-<span class="cstat-no" title="statement not covered" >      currentX = e.clientX - initialX;</span>
-<span class="cstat-no" title="statement not covered" >      currentY = e.clientY - initialY;</span>
+<span class="cstat-no" title="statement not covered" >      e.preventDefault()</span>
+<span class="cstat-no" title="statement not covered" >      currentX = e.clientX - initialX</span>
+<span class="cstat-no" title="statement not covered" >      currentY = e.clientY - initialY</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      this.panelElement.style.left = currentX + 'px';</span>
-<span class="cstat-no" title="statement not covered" >      this.panelElement.style.top = currentY + 'px';</span>
-    });
+<span class="cstat-no" title="statement not covered" >      this.panelElement.style.left = currentX + 'px'</span>
+<span class="cstat-no" title="statement not covered" >      this.panelElement.style.top = currentY + 'px'</span>
+    })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    document.addEventListener('mouseup', <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      isDragging = false;</span>
-    });
+<span class="cstat-no" title="statement not covered" >      isDragging = false</span>
+    })
   }
 &nbsp;
   /**
@@ -934,9 +934,9 @@ class DebugPanel {
    */
 <span class="fstat-no" title="function not covered" >  sh</span>ow() {
 <span class="cstat-no" title="statement not covered" >    if (this.panelElement) {</span>
-<span class="cstat-no" title="statement not covered" >      this.panelElement.style.display = 'flex';</span>
-<span class="cstat-no" title="statement not covered" >      this.isVisible = true;</span>
-<span class="cstat-no" title="statement not covered" >      this.refreshLogs();</span>
+<span class="cstat-no" title="statement not covered" >      this.panelElement.style.display = 'flex'</span>
+<span class="cstat-no" title="statement not covered" >      this.isVisible = true</span>
+<span class="cstat-no" title="statement not covered" >      this.refreshLogs()</span>
     }
   }
 &nbsp;
@@ -945,8 +945,8 @@ class DebugPanel {
    */
 <span class="fstat-no" title="function not covered" >  hi</span>de() {
 <span class="cstat-no" title="statement not covered" >    if (this.panelElement) {</span>
-<span class="cstat-no" title="statement not covered" >      this.panelElement.style.display = 'none';</span>
-<span class="cstat-no" title="statement not covered" >      this.isVisible = false;</span>
+<span class="cstat-no" title="statement not covered" >      this.panelElement.style.display = 'none'</span>
+<span class="cstat-no" title="statement not covered" >      this.isVisible = false</span>
     }
   }
 &nbsp;
@@ -955,9 +955,9 @@ class DebugPanel {
    */
 <span class="fstat-no" title="function not covered" >  to</span>ggle() {
 <span class="cstat-no" title="statement not covered" >    if (this.isVisible) {</span>
-<span class="cstat-no" title="statement not covered" >      this.hide();</span>
+<span class="cstat-no" title="statement not covered" >      this.hide()</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      this.show();</span>
+<span class="cstat-no" title="statement not covered" >      this.show()</span>
     }
   }
 &nbsp;
@@ -965,47 +965,47 @@ class DebugPanel {
    * Refresh log display
    */
 <span class="fstat-no" title="function not covered" >  re</span>freshLogs() {
-<span class="cstat-no" title="statement not covered" >    if (!this.logContainer) <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >    if (!this.logContainer) <span class="cstat-no" title="statement not covered" >return</span></span>
 &nbsp;
-    const logs = <span class="cstat-no" title="statement not covered" >this.getLogs();</span>
-<span class="cstat-no" title="statement not covered" >    this.logContainer.innerHTML = '';</span>
+    const logs = <span class="cstat-no" title="statement not covered" >this.getLogs()</span>
+<span class="cstat-no" title="statement not covered" >    this.logContainer.innerHTML = ''</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    logs.slice(-this.maxLogEntries).forEach(<span class="fstat-no" title="function not covered" >lo</span>g =&gt; {</span>
-      const logEntry = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
+      const logEntry = <span class="cstat-no" title="statement not covered" >document.createElement('div')</span>
 <span class="cstat-no" title="statement not covered" >      logEntry.style.cssText = `</span>
         margin-bottom: 4px;
         padding: 4px;
         border-radius: 2px;
         font-size: 11px;
         word-wrap: break-word;
-      `;
+      `
 &nbsp;
       // Color based on level
       const levelColors = <span class="cstat-no" title="statement not covered" >{</span>
         DEBUG: '#06b6d4',
         INFO: '#22c55e',
         WARN: '#f59e0b',
-        ERROR: '#ef4444'
-      };
+        ERROR: '#ef4444',
+      }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      logEntry.style.backgroundColor = levelColors[log.level] || '#64748b';</span>
-<span class="cstat-no" title="statement not covered" >      logEntry.style.opacity = '0.9';</span>
+<span class="cstat-no" title="statement not covered" >      logEntry.style.backgroundColor = levelColors[log.level] || '#64748b'</span>
+<span class="cstat-no" title="statement not covered" >      logEntry.style.opacity = '0.9'</span>
 &nbsp;
-      const timestamp = <span class="cstat-no" title="statement not covered" >new Date(log.timestamp).toLocaleTimeString();</span>
-      const content = <span class="cstat-no" title="statement not covered" >`[${timestamp}] [${log.level}] ${log.message}`;</span>
-      
-<span class="cstat-no" title="statement not covered" >      logEntry.textContent = content;</span>
+      const timestamp = <span class="cstat-no" title="statement not covered" >new Date(log.timestamp).toLocaleTimeString()</span>
+      const content = <span class="cstat-no" title="statement not covered" >`[${timestamp}] [${log.level}] ${log.message}`</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      logEntry.textContent = content</span>
 &nbsp;
       // Add tooltip for data
 <span class="cstat-no" title="statement not covered" >      if (log.data &amp;&amp; Object.keys(log.data).length &gt; 0) {</span>
-<span class="cstat-no" title="statement not covered" >        logEntry.title = JSON.stringify(log.data, null, 2);</span>
+<span class="cstat-no" title="statement not covered" >        logEntry.title = JSON.stringify(log.data, null, 2)</span>
       }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      this.logContainer.appendChild(logEntry);</span>
-    });
+<span class="cstat-no" title="statement not covered" >      this.logContainer.appendChild(logEntry)</span>
+    })
 &nbsp;
     // Scroll to bottom
-<span class="cstat-no" title="statement not covered" >    this.logContainer.scrollTop = this.logContainer.scrollHeight;</span>
+<span class="cstat-no" title="statement not covered" >    this.logContainer.scrollTop = this.logContainer.scrollHeight</span>
   }
 &nbsp;
   /**
@@ -1013,26 +1013,26 @@ class DebugPanel {
    */
 <span class="fstat-no" title="function not covered" >  cl</span>earLogs() {
 <span class="cstat-no" title="statement not covered" >    if (typeof window !== 'undefined' &amp;&amp; window.__DEBUG_LOGS__) {</span>
-<span class="cstat-no" title="statement not covered" >      window.__DEBUG_LOGS__ = [];</span>
+<span class="cstat-no" title="statement not covered" >      window.__DEBUG_LOGS__ = []</span>
     }
-<span class="cstat-no" title="statement not covered" >    this.refreshLogs();</span>
+<span class="cstat-no" title="statement not covered" >    this.refreshLogs()</span>
   }
 &nbsp;
   /**
    * Export logs
    */
 <span class="fstat-no" title="function not covered" >  ex</span>portLogs() {
-    const logs = <span class="cstat-no" title="statement not covered" >this.getLogs();</span>
-    const dataStr = <span class="cstat-no" title="statement not covered" >JSON.stringify(logs, null, 2);</span>
-    const dataBlob = <span class="cstat-no" title="statement not covered" >new Blob([dataStr], { type: 'application/json' });</span>
-    const url = <span class="cstat-no" title="statement not covered" >URL.createObjectURL(dataBlob);</span>
-    
-    const link = <span class="cstat-no" title="statement not covered" >document.createElement('a');</span>
-<span class="cstat-no" title="statement not covered" >    link.href = url;</span>
-<span class="cstat-no" title="statement not covered" >    link.download = `debug-logs-${new Date().toISOString().slice(0, 19)}.json`;</span>
-<span class="cstat-no" title="statement not covered" >    link.click();</span>
-    
-<span class="cstat-no" title="statement not covered" >    URL.revokeObjectURL(url);</span>
+    const logs = <span class="cstat-no" title="statement not covered" >this.getLogs()</span>
+    const dataStr = <span class="cstat-no" title="statement not covered" >JSON.stringify(logs, null, 2)</span>
+    const dataBlob = <span class="cstat-no" title="statement not covered" >new Blob([dataStr], { type: 'application/json' })</span>
+    const url = <span class="cstat-no" title="statement not covered" >URL.createObjectURL(dataBlob)</span>
+&nbsp;
+    const link = <span class="cstat-no" title="statement not covered" >document.createElement('a')</span>
+<span class="cstat-no" title="statement not covered" >    link.href = url</span>
+<span class="cstat-no" title="statement not covered" >    link.download = `debug-logs-${new Date().toISOString().slice(0, 19)}.json`</span>
+<span class="cstat-no" title="statement not covered" >    link.click()</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    URL.revokeObjectURL(url)</span>
   }
 &nbsp;
   /**
@@ -1041,23 +1041,23 @@ class DebugPanel {
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tLogs() {
 <span class="cstat-no" title="statement not covered" >    if (typeof window !== 'undefined' &amp;&amp; window.__DEBUG_LOGS__) {</span>
-<span class="cstat-no" title="statement not covered" >      return window.__DEBUG_LOGS__;</span>
+<span class="cstat-no" title="statement not covered" >      return window.__DEBUG_LOGS__</span>
     }
-<span class="cstat-no" title="statement not covered" >    return [];</span>
+<span class="cstat-no" title="statement not covered" >    return []</span>
   }
 }
 &nbsp;
 // Create global instance
-const debugPanel = <span class="cstat-no" title="statement not covered" >new DebugPanel();</span>
+const debugPanel = <span class="cstat-no" title="statement not covered" >new DebugPanel()</span>
 &nbsp;
 // Export for Node.js
 <span class="cstat-no" title="statement not covered" >if (typeof module !== 'undefined' &amp;&amp; module.exports) {</span>
-<span class="cstat-no" title="statement not covered" >  module.exports = DebugPanel;</span>
+<span class="cstat-no" title="statement not covered" >  module.exports = DebugPanel</span>
 }
 &nbsp;
 // Global assignment for browser
 <span class="cstat-no" title="statement not covered" >if (typeof window !== 'undefined') {</span>
-<span class="cstat-no" title="statement not covered" >  window.DebugPanel = debugPanel;</span>
+<span class="cstat-no" title="statement not covered" >  window.DebugPanel = debugPanel</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -1066,7 +1066,7 @@ const debugPanel = <span class="cstat-no" title="statement not covered" >new Deb
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

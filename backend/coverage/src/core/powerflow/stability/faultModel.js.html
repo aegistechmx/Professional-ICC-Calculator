@@ -313,7 +313,8 @@
 <a name='L248'></a><a href='#L248'>248</a>
 <a name='L249'></a><a href='#L249'>249</a>
 <a name='L250'></a><a href='#L250'>250</a>
-<a name='L251'></a><a href='#L251'>251</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -408,6 +409,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -565,7 +567,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * faultModel.js - Fault modeling for TS-SCOPF
- * 
+ *
  * Responsibility: Model electrical faults for dynamic simulation
  * NO Express, NO axios, NO UI logic
  */
@@ -577,29 +579,29 @@
  * @returns {Object} Modified system with fault
  */
 function <span class="fstat-no" title="function not covered" >createThreePhaseFault(</span>system, fault) {
-  const modified = <span class="cstat-no" title="statement not covered" >JSON.parse(JSON.stringify(system));</span>
-  
+  const modified = <span class="cstat-no" title="statement not covered" >JSON.parse(JSON.stringify(system))</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  if (fault.type === 'three_phase') {</span>
     // Apply fault at specified bus
-    const faultedBus = <span class="cstat-no" title="statement not covered" >modified.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span>;</span>
+    const faultedBus = <span class="cstat-no" title="statement not covered" >modified.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span></span>
 <span class="cstat-no" title="statement not covered" >    if (faultedBus) {</span>
       // Set bus voltage to zero for fault
-<span class="cstat-no" title="statement not covered" >      faultedBus.voltage = { magnitude: 0, angle: 0 };</span>
-<span class="cstat-no" title="statement not covered" >      faultedBus.faulted = true;</span>
+<span class="cstat-no" title="statement not covered" >      faultedBus.voltage = { magnitude: 0, angle: 0 }</span>
+<span class="cstat-no" title="statement not covered" >      faultedBus.faulted = true</span>
     }
-    
+&nbsp;
     // Modify impedance of connected lines
-<span class="cstat-no" title="statement not covered" >    modified.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    modified.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, _i) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (branch.from === fault.bus || branch.to === fault.bus) {</span>
         // Add fault impedance
-<span class="cstat-no" title="statement not covered" >        branch.R += fault.R || 0.001;</span>
-<span class="cstat-no" title="statement not covered" >        branch.X += fault.X || 0.01;</span>
-<span class="cstat-no" title="statement not covered" >        branch.faulted = true;</span>
+<span class="cstat-no" title="statement not covered" >        branch.R += fault.R || 0.001</span>
+<span class="cstat-no" title="statement not covered" >        branch.X += fault.X || 0.01</span>
+<span class="cstat-no" title="statement not covered" >        branch.faulted = true</span>
       }
-    });
+    })
   }
-  
-<span class="cstat-no" title="statement not covered" >  return modified;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return modified</span>
 }
 &nbsp;
 /**
@@ -609,27 +611,27 @@ function <span class="fstat-no" title="function not covered" >createThreePhaseFa
  * @returns {Object} Modified system without fault
  */
 function <span class="fstat-no" title="function not covered" >clearFault(</span>system, fault) {
-  const modified = <span class="cstat-no" title="statement not covered" >JSON.parse(JSON.stringify(system));</span>
-  
+  const modified = <span class="cstat-no" title="statement not covered" >JSON.parse(JSON.stringify(system))</span>
+&nbsp;
   // Restore bus voltage
-  const faultedBus = <span class="cstat-no" title="statement not covered" >modified.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span>;</span>
+  const faultedBus = <span class="cstat-no" title="statement not covered" >modified.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span></span>
 <span class="cstat-no" title="statement not covered" >  if (faultedBus) {</span>
-<span class="cstat-no" title="statement not covered" >    faultedBus.voltage = { magnitude: 1.0, angle: 0 };</span>
-<span class="cstat-no" title="statement not covered" >    delete faultedBus.faulted;</span>
+<span class="cstat-no" title="statement not covered" >    faultedBus.voltage = { magnitude: 1.0, angle: 0 }</span>
+<span class="cstat-no" title="statement not covered" >    delete faultedBus.faulted</span>
   }
-  
+&nbsp;
   // Restore line impedances
-<span class="cstat-no" title="statement not covered" >  modified.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  modified.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, _i) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (branch.from === fault.bus || branch.to === fault.bus) {</span>
 <span class="cstat-no" title="statement not covered" >      if (branch.originalR !== undefined &amp;&amp; branch.originalX !== undefined) {</span>
-<span class="cstat-no" title="statement not covered" >        branch.R = branch.originalR;</span>
-<span class="cstat-no" title="statement not covered" >        branch.X = branch.originalX;</span>
+<span class="cstat-no" title="statement not covered" >        branch.R = branch.originalR</span>
+<span class="cstat-no" title="statement not covered" >        branch.X = branch.originalX</span>
       }
-<span class="cstat-no" title="statement not covered" >      delete branch.faulted;</span>
+<span class="cstat-no" title="statement not covered" >      delete branch.faulted</span>
     }
-  });
-  
-<span class="cstat-no" title="statement not covered" >  return modified;</span>
+  })
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return modified</span>
 }
 &nbsp;
 /**
@@ -643,21 +645,22 @@ function <span class="fstat-no" title="function not covered" >generateFaultScena
     faultType = <span class="branch-0 cbranch-no" title="branch not covered" >'three_phase',</span>
     faultLocations = <span class="branch-0 cbranch-no" title="branch not covered" >'all',</span> // 'all', 'critical', 'buses'
     faultDuration = <span class="branch-0 cbranch-no" title="branch not covered" >0.1,</span> // seconds
-    faultImpedance = <span class="branch-0 cbranch-no" title="branch not covered" >{ R: 0.001, X: 0.01 }</span>
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
-  
-  const scenarios = <span class="cstat-no" title="statement not covered" >[];</span>
-  
+    faultImpedance = <span class="branch-0 cbranch-no" title="branch not covered" >{ R: 0.001, X: 0.01 },</span>
+  } = <span class="cstat-no" title="statement not covered" >options</span>
+&nbsp;
+  const scenarios = <span class="cstat-no" title="statement not covered" >[]</span>
+&nbsp;
   // Store original impedances
-<span class="cstat-no" title="statement not covered" >  system.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    branch.originalR = branch.R;</span>
-<span class="cstat-no" title="statement not covered" >    branch.originalX = branch.X;</span>
-  });
-  
+<span class="cstat-no" title="statement not covered" >  system.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, _i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    branch.originalR = branch.R</span>
+<span class="cstat-no" title="statement not covered" >    branch.originalX = branch.X</span>
+  })
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  if (faultLocations === 'all' || faultLocations === 'buses') {</span>
     // Create fault at each bus
-<span class="cstat-no" title="statement not covered" >    system.buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>us, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      if (bus.type === 'PQ' || bus.type === 'PV') { // Don't fault slack bus</span>
+<span class="cstat-no" title="statement not covered" >    system.buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>us, _i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      if (bus.type === 'PQ' || bus.type === 'PV') {</span>
+        // Don't fault slack bus
 <span class="cstat-no" title="statement not covered" >        scenarios.push({</span>
           type: faultType,
           bus: bus.id,
@@ -665,15 +668,15 @@ function <span class="fstat-no" title="function not covered" >generateFaultScena
           clear: 0.1 + faultDuration,
           R: faultImpedance.R,
           X: faultImpedance.X,
-          description: `3-phase fault at Bus ${bus.id}`
-        });
+          description: `3-phase fault at Bus ${bus.id}`,
+        })
       }
-    });
+    })
   }
-  
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  if (faultLocations === 'all' || faultLocations === 'lines') {</span>
     // Create fault at each line (50% point)
-<span class="cstat-no" title="statement not covered" >    system.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    system.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, _i) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      scenarios.push({</span>
         type: faultType,
         line: branch.id,
@@ -684,12 +687,12 @@ function <span class="fstat-no" title="function not covered" >generateFaultScena
         clear: 0.1 + faultDuration,
         R: faultImpedance.R,
         X: faultImpedance.X,
-        description: `3-phase fault at Line ${branch.id} (50%)`
-      });
-    });
+        description: `3-phase fault at Line ${branch.id} (50%)`,
+      })
+    })
   }
-  
-<span class="cstat-no" title="statement not covered" >  return scenarios;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return scenarios</span>
 }
 &nbsp;
 /**
@@ -701,9 +704,9 @@ function <span class="fstat-no" title="function not covered" >generateFaultScena
  */
 function <span class="fstat-no" title="function not covered" >applyFaultAtTime(</span>system, fault, time) {
 <span class="cstat-no" title="statement not covered" >  if (time &gt;= fault.start &amp;&amp; time &lt; fault.clear) {</span>
-<span class="cstat-no" title="statement not covered" >    return createThreePhaseFault(system, fault);</span>
+<span class="cstat-no" title="statement not covered" >    return createThreePhaseFault(system, fault)</span>
   } else {
-<span class="cstat-no" title="statement not covered" >    return clearFault(system, fault);</span>
+<span class="cstat-no" title="statement not covered" >    return clearFault(system, fault)</span>
   }
 }
 &nbsp;
@@ -715,17 +718,17 @@ function <span class="fstat-no" title="function not covered" >applyFaultAtTime(<
  */
 function <span class="fstat-no" title="function not covered" >calculateFaultCurrent(</span>system, fault) {
 <span class="cstat-no" title="statement not covered" >  if (fault.type === 'three_phase') {</span>
-    const faultedBus = <span class="cstat-no" title="statement not covered" >system.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span>;</span>
+    const faultedBus = <span class="cstat-no" title="statement not covered" >system.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span></span>
 <span class="cstat-no" title="statement not covered" >    if (faultedBus) {</span>
       // Simplified fault current calculation
-      const Zfault = <span class="cstat-no" title="statement not covered" >Math.sqrt(fault.R * fault.R + fault.X * fault.X);</span>
-      const Ifault = <span class="cstat-no" title="statement not covered" >1.0 / Zfault;</span> // Assuming 1.0 pu voltage
-      
-<span class="cstat-no" title="statement not covered" >      return Ifault;</span>
+      const Zfault = <span class="cstat-no" title="statement not covered" >Math.sqrt(fault.R * fault.R + fault.X * fault.X)</span>
+      const Ifault = <span class="cstat-no" title="statement not covered" >1.0 / Zfault </span>// Assuming 1.0 pu voltage
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      return Ifault</span>
     }
   }
-  
-<span class="cstat-no" title="statement not covered" >  return 0;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return 0</span>
 }
 &nbsp;
 /**
@@ -736,11 +739,11 @@ function <span class="fstat-no" title="function not covered" >calculateFaultCurr
  */
 function <span class="fstat-no" title="function not covered" >getFaultStatus(</span>fault, time) {
 <span class="cstat-no" title="statement not covered" >  if (time &lt; fault.start) {</span>
-<span class="cstat-no" title="statement not covered" >    return { active: false, status: 'pre-fault' };</span>
+<span class="cstat-no" title="statement not covered" >    return { active: false, status: 'pre-fault' }</span>
   } else <span class="cstat-no" title="statement not covered" >if (time &gt;= fault.start &amp;&amp; time &lt; fault.clear) {</span>
-<span class="cstat-no" title="statement not covered" >    return { active: true, status: 'during-fault' };</span>
+<span class="cstat-no" title="statement not covered" >    return { active: true, status: 'during-fault' }</span>
   } else {
-<span class="cstat-no" title="statement not covered" >    return { active: false, status: 'post-fault' };</span>
+<span class="cstat-no" title="statement not covered" >    return { active: false, status: 'post-fault' }</span>
   }
 }
 &nbsp;
@@ -753,18 +756,18 @@ function <span class="fstat-no" title="function not covered" >getFaultStatus(</s
 function <span class="fstat-no" title="function not covered" >generateCriticalFaults(</span>system, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
   const {
     maxFaults = <span class="branch-0 cbranch-no" title="branch not covered" >5,</span>
-    priority = <span class="branch-0 cbranch-no" title="branch not covered" >'high_load' </span>// 'high_load', 'critical_lines', 'all'
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
-  
-  const scenarios = <span class="cstat-no" title="statement not covered" >[];</span>
-  
+    priority = <span class="branch-0 cbranch-no" title="branch not covered" >'high_load',</span> // 'high_load', 'critical_lines', 'all'
+  } = <span class="cstat-no" title="statement not covered" >options</span>
+&nbsp;
+  const scenarios = <span class="cstat-no" title="statement not covered" >[]</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  if (priority === 'high_load') {</span>
     // Focus on high-load buses
     const loadBuses = <span class="cstat-no" title="statement not covered" >system.buses</span>
       .filter(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.type === 'PQ' &amp;&amp; b.P &lt; 0)</span>
       .sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >Math.abs(a.P) - Math.abs(b.P))</span>
-      .slice(0, maxFaults);
-    
+      .slice(0, maxFaults)
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    loadBuses.forEach(<span class="fstat-no" title="function not covered" >bu</span>s =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      scenarios.push({</span>
         type: 'three_phase',
@@ -774,16 +777,16 @@ function <span class="fstat-no" title="function not covered" >generateCriticalFa
         R: 0.001,
         X: 0.01,
         severity: 'high',
-        description: `Critical fault at high-load Bus ${bus.id}`
-      });
-    });
+        description: `Critical fault at high-load Bus ${bus.id}`,
+      })
+    })
   } else <span class="cstat-no" title="statement not covered" >if (priority === 'critical_lines') {</span>
     // Focus on critical transmission lines
     const criticalLines = <span class="cstat-no" title="statement not covered" >system.branches</span>
       .filter(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.limit &amp;&amp; b.loading &gt; 0.7)</span>
       .sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >b.loading - a.loading)</span>
-      .slice(0, maxFaults);
-    
+      .slice(0, maxFaults)
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    criticalLines.forEach(<span class="fstat-no" title="function not covered" >li</span>ne =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      scenarios.push({</span>
         type: 'three_phase',
@@ -796,12 +799,12 @@ function <span class="fstat-no" title="function not covered" >generateCriticalFa
         R: 0.001,
         X: 0.01,
         severity: 'high',
-        description: `Critical fault at Line ${line.id}`
-      });
-    });
+        description: `Critical fault at Line ${line.id}`,
+      })
+    })
   }
-  
-<span class="cstat-no" title="statement not covered" >  return scenarios;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return scenarios</span>
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >module.exports = {</span>
@@ -811,8 +814,8 @@ function <span class="fstat-no" title="function not covered" >generateCriticalFa
   applyFaultAtTime,
   calculateFaultCurrent,
   getFaultStatus,
-  generateCriticalFaults
-};
+  generateCriticalFaults,
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -820,7 +823,7 @@ function <span class="fstat-no" title="function not covered" >generateCriticalFa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

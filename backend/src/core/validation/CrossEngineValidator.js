@@ -3,7 +3,8 @@
  *
  * This module validates that different solvers produce consistent results:
  * - NR === OPF (Newton-Raphson vs Optimal Power Flow)
- * - ICC === Zbus (Fault current vs Impedance bus calculation) // current (A)
+ * - ICC === Zbus (Fault current vs Impedance bus calculation)
+ // current (A)
  * - Dynamics inicia en NR (Dynamic simulation starts from power flow)
  *
  * Architecture:
@@ -100,7 +101,8 @@ class CrossEngineValidator {
       const opfResult = opfEngine.run ? opfEngine.run(system) : nrResult
 
       // Compare voltages
-      const voltageDiff = this.compareVoltages( // voltage (V)
+      const voltageDiff = this.compareVoltages(
+        // voltage (V)
         nrResult.voltages,
         opfResult.voltages
       )
@@ -109,13 +111,16 @@ class CrossEngineValidator {
       const angleDiff = this.compareAngles(nrResult.angles, opfResult.angles)
 
       // Compare power flows
-      const powerDiff = this.comparePowerFlows(nrResult.P, opfResult.P) // power (W)
+      const powerDiff = this.comparePowerFlows(nrResult.P, opfResult.P)
+      // power (W)
 
       // Check if within tolerance
       const tolerance = this.options.tolerance
-      const voltageOK = voltageDiff < tolerance // voltage (V)
+      const voltageOK = voltageDiff < tolerance
+      // voltage (V)
       const angleOK = angleDiff < tolerance
-      const powerOK = powerDiff < tolerance // power (W)
+      const powerOK = powerDiff < tolerance
+      // power (W)
 
       if (voltageOK && angleOK && powerOK) {
         this.results.passed.push({
@@ -192,14 +197,16 @@ class CrossEngineValidator {
       const iccFromZbus = this.calculateICCFromZbus(zbusResult.Zbus, system)
 
       // Compare fault currents
-      const currentDiff = this.compareFaultCurrents( // current (A)
+      const currentDiff = this.compareFaultCurrents(
+        // current (A)
         iccResult.currents,
         iccFromZbus
       )
 
       // Check if within tolerance
       const tolerance = this.options.tolerance
-      const currentOK = currentDiff < tolerance // current (A)
+      const currentOK = currentDiff < tolerance
+      // current (A)
 
       if (currentOK) {
         this.results.passed.push({
@@ -260,8 +267,10 @@ class CrossEngineValidator {
         : dynamicsEngine
 
       // Check if initial dynamics voltages match NR
-      const initialVoltages = dynamicsResult.voltages[0] // voltage (V)
-      const voltageDiff = this.compareVoltages( // voltage (V)
+      const initialVoltages = dynamicsResult.voltages[0]
+      // voltage (V)
+      const voltageDiff = this.compareVoltages(
+        // voltage (V)
         nrResult.voltages,
         initialVoltages
       )
@@ -276,7 +285,8 @@ class CrossEngineValidator {
 
       // Check if within tolerance
       const tolerance = this.options.tolerance
-      const voltageOK = voltageDiff < tolerance // voltage (V)
+      const voltageOK = voltageDiff < tolerance
+      // voltage (V)
       const angleOK = angleDiff < tolerance
 
       if (voltageOK && angleOK) {
@@ -334,7 +344,8 @@ class CrossEngineValidator {
    * @returns {Array} ICC currents
    */
   calculateICCFromZbus(Zbus, system) {
-    const currents = [] // current (A)
+    const currents = []
+    // current (A)
 
     // Calculate fault currents using Zbus
     // I_fault = V_prefault / Z_fault
@@ -361,16 +372,19 @@ class CrossEngineValidator {
     if (!voltagesA || !voltagesB) return Infinity
 
     let maxDiff = 0
-    const minLen = Math.min(voltagesA.length, voltagesB.length) // voltage (V)
+    const minLen = Math.min(voltagesA.length, voltagesB.length)
+    // voltage (V)
 
     for (let i = 0; i < minLen; i++) {
       const valA =
-        typeof voltagesA[i] === 'object' // voltage (V)
-          ? Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2)
+        typeof voltagesA[i] === 'object'
+          ? // voltage (V)
+            Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2)
           : voltagesA[i]
       const valB =
-        typeof voltagesB[i] === 'object' // voltage (V)
-          ? Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2)
+        typeof voltagesB[i] === 'object'
+          ? // voltage (V)
+            Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2)
           : voltagesB[i]
 
       const diff = Math.abs(valA - valB)
@@ -410,10 +424,12 @@ class CrossEngineValidator {
     if (!powerA || !powerB) return Infinity
 
     let maxDiff = 0
-    const minLen = Math.min(powerA.length, powerB.length) // power (W)
+    const minLen = Math.min(powerA.length, powerB.length)
+    // power (W)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = Math.abs(powerA[i] - powerB[i]) // power (W)
+      const diff = Math.abs(powerA[i] - powerB[i])
+      // power (W)
       maxDiff = Math.max(maxDiff, diff)
     }
 
@@ -430,10 +446,12 @@ class CrossEngineValidator {
     if (!currentsA || !currentsB) return Infinity
 
     let maxDiff = 0
-    const minLen = Math.min(currentsA.length, currentsB.length) // current (A)
+    const minLen = Math.min(currentsA.length, currentsB.length)
+    // current (A)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = Math.abs(currentsA[i] - currentsB[i]) // current (A)
+      const diff = Math.abs(currentsA[i] - currentsB[i])
+      // current (A)
       maxDiff = Math.max(maxDiff, diff)
     }
 

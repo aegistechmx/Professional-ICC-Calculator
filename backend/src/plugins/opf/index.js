@@ -1,10 +1,10 @@
 /**
  * plugins/opf/index.js - Optimal Power Flow Plugin
- * 
+ *
  * Responsibility: Economic dispatch optimization
  */
 
-const NewtonOPFSolver = require('@/core/powerflow/opf/solver');
+const NewtonOPFSolver = require('@/core/powerflow/opf/solver')
 
 module.exports = {
   name: 'opf',
@@ -16,38 +16,39 @@ module.exports = {
     context.opf = {
       solver: NewtonOPFSolver,
       methods: {
-        'newton': NewtonOPFSolver,
-        'interior-point': null // Future implementation
+        newton: NewtonOPFSolver,
+        'interior-point': null, // Future implementation
       },
       capabilities: {
         'economic-dispatch': true,
         'lmp-calculation': true,
         'constraint-handling': true,
-        'cost-optimization': true
-      }
-    };
+        'cost-optimization': true,
+      },
+    }
   },
 
   async run(payload, context) {
-    const { system, options = {} } = payload;
+    const { system, options = {} } = payload
     const {
       tolerance = 1e-6,
       maxIterations = 30,
       alpha = 0.5,
       powerFlowMethod = 'FDLF',
-      penalty = 1000
-    } = options;
+      penalty = 1000,
+    } = options
 
-    console.log(`⚡ OPF: Running economic dispatch optimization...`);
+    // eslint-disable-next-line no-console
+    console.log(`⚡ OPF: Running economic dispatch optimization...`)
 
     // Get power flow result first
     const pfResult = await context.engine.run('powerflow', 'run', {
       system,
-      options: { method: powerFlowMethod }
-    });
+      options: { method: powerFlowMethod },
+    })
 
     if (!pfResult.success || !pfResult.data.converged) {
-      throw new Error('Power flow did not converge');
+      throw new Error('Power flow did not converge')
     }
 
     // Run OPF optimization
@@ -56,13 +57,17 @@ module.exports = {
       maxIterations,
       alpha,
       powerFlowMethod,
-      penalty
-    });
+      penalty,
+    })
 
-    const result = solver.solve();
+    const result = solver.solve()
 
-    console.log(`⚡ OPF: ${result.converged ? 'CONVERGED' : 'NOT CONVERGED'} in ${result.iterations} iterations`);
-    console.log(`⚡ OPF: Final cost: $${result.cost.toFixed(2)}`);
+    // eslint-disable-next-line no-console
+    console.log(
+      `⚡ OPF: ${result.converged ? 'CONVERGED' : 'NOT CONVERGED'} in ${result.iterations} iterations`
+    )
+    // eslint-disable-next-line no-console
+    console.log(`⚡ OPF: Final cost: $${result.cost.toFixed(2)}`)
 
     return {
       converged: result.converged,
@@ -73,11 +78,12 @@ module.exports = {
       lmp: result.lmp,
       system,
       options,
-      timestamp: new Date().toISOString()
-    };
+      timestamp: new Date().toISOString(),
+    }
   },
 
-  async shutdown(context) {
-    console.log('🔌 OPF plugin shutdown');
-  }
-};
+  async shutdown(_context) {
+    // eslint-disable-next-line no-console
+    console.log('🔌 OPF plugin shutdown')
+  },
+}

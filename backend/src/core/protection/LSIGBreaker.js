@@ -109,7 +109,8 @@ class LSIGBreaker {
    * @returns {number} Operating time (s)
    */
   calculateInverseTime(current, pickup, curve, timeDelay) {
-    if (current <= pickup) return Infinity // current (A)
+    if (current <= pickup) return Infinity
+    // current (A)
 
     const M = current / pickup // Multiple of pickup
 
@@ -139,7 +140,8 @@ class LSIGBreaker {
       return { trip: false, reason: 'Long time disabled' }
     }
 
-    const current_pu = current / this.ratedCurrent // current (A)
+    const current_pu = current / this.ratedCurrent
+    // current (A)
 
     if (current_pu < this.longTime.pickup) {
       return {
@@ -176,7 +178,8 @@ class LSIGBreaker {
       return { trip: false, reason: 'Short time disabled' }
     }
 
-    const current_pu = current / this.ratedCurrent // current (A)
+    const current_pu = current / this.ratedCurrent
+    // current (A)
 
     if (current_pu < this.shortTime.pickup) {
       return {
@@ -213,7 +216,8 @@ class LSIGBreaker {
       return { trip: false, reason: 'Instantaneous disabled' }
     }
 
-    const current_pu = current / this.ratedCurrent // current (A)
+    const current_pu = current / this.ratedCurrent
+    // current (A)
 
     if (current_pu < this.instantaneous.pickup) {
       return {
@@ -242,7 +246,8 @@ class LSIGBreaker {
       return { trip: false, reason: 'Ground protection disabled' }
     }
 
-    const current_pu = groundCurrent / this.ratedCurrent // current (A)
+    const current_pu = groundCurrent / this.ratedCurrent
+    // current (A)
 
     if (current_pu < this.ground.pickup) {
       return {
@@ -277,11 +282,13 @@ class LSIGBreaker {
    * @param {number} currentTime - Current simulation time (s)
    * @returns {Object} Complete LSIG evaluation result
    */
-  evaluate(measurement, currentTime = 0) { // current (A)
+  evaluate(measurement, currentTime = 0) {
+    // current (A)
     const { I, Ig } = measurement
 
     // Update state
-    this.state.current = I // current (A)
+    this.state.current = I
+    // current (A)
     this.state.groundCurrent = Ig
 
     // Evaluate each element
@@ -360,7 +367,8 @@ class LSIGBreaker {
     // Update temporal state (NEW)
     if (overallTrip && !this.state.overallTrip) {
       // Fault just detected
-      this.state.faultDetectedAt = currentTime // current (A)
+      this.state.faultDetectedAt = currentTime
+      // current (A)
       this.state.relayPickupAt =
         currentTime + this.temporalDelays.relayPickupDelay
       this.state.breakerCommandAt =
@@ -408,7 +416,8 @@ class LSIGBreaker {
    */
   shouldTrip(currentTime) {
     if (!this.state.tripTime) return false
-    return currentTime >= this.state.tripTime // current (A)
+    return currentTime >= this.state.tripTime
+    // current (A)
   }
 
   /**

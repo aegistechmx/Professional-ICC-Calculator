@@ -1,6 +1,6 @@
 /**
  * faultModel.js - Fault modeling for TS-SCOPF
- * 
+ *
  * Responsibility: Model electrical faults for dynamic simulation
  * NO Express, NO axios, NO UI logic
  */
@@ -12,29 +12,29 @@
  * @returns {Object} Modified system with fault
  */
 function createThreePhaseFault(system, fault) {
-  const modified = JSON.parse(JSON.stringify(system));
-  
+  const modified = JSON.parse(JSON.stringify(system))
+
   if (fault.type === 'three_phase') {
     // Apply fault at specified bus
-    const faultedBus = modified.buses.find(b => b.id === fault.bus);
+    const faultedBus = modified.buses.find(b => b.id === fault.bus)
     if (faultedBus) {
       // Set bus voltage to zero for fault
-      faultedBus.voltage = { magnitude: 0, angle: 0 };
-      faultedBus.faulted = true;
+      faultedBus.voltage = { magnitude: 0, angle: 0 }
+      faultedBus.faulted = true
     }
-    
+
     // Modify impedance of connected lines
-    modified.branches.forEach((branch, i) => {
+    modified.branches.forEach((branch, _i) => {
       if (branch.from === fault.bus || branch.to === fault.bus) {
         // Add fault impedance
-        branch.R += fault.R || 0.001;
-        branch.X += fault.X || 0.01;
-        branch.faulted = true;
+        branch.R += fault.R || 0.001
+        branch.X += fault.X || 0.01
+        branch.faulted = true
       }
-    });
+    })
   }
-  
-  return modified;
+
+  return modified
 }
 
 /**
@@ -44,27 +44,27 @@ function createThreePhaseFault(system, fault) {
  * @returns {Object} Modified system without fault
  */
 function clearFault(system, fault) {
-  const modified = JSON.parse(JSON.stringify(system));
-  
+  const modified = JSON.parse(JSON.stringify(system))
+
   // Restore bus voltage
-  const faultedBus = modified.buses.find(b => b.id === fault.bus);
+  const faultedBus = modified.buses.find(b => b.id === fault.bus)
   if (faultedBus) {
-    faultedBus.voltage = { magnitude: 1.0, angle: 0 };
-    delete faultedBus.faulted;
+    faultedBus.voltage = { magnitude: 1.0, angle: 0 }
+    delete faultedBus.faulted
   }
-  
+
   // Restore line impedances
-  modified.branches.forEach((branch, i) => {
+  modified.branches.forEach((branch, _i) => {
     if (branch.from === fault.bus || branch.to === fault.bus) {
       if (branch.originalR !== undefined && branch.originalX !== undefined) {
-        branch.R = branch.originalR;
-        branch.X = branch.originalX;
+        branch.R = branch.originalR
+        branch.X = branch.originalX
       }
-      delete branch.faulted;
+      delete branch.faulted
     }
-  });
-  
-  return modified;
+  })
+
+  return modified
 }
 
 /**
@@ -78,21 +78,22 @@ function generateFaultScenarios(system, options = {}) {
     faultType = 'three_phase',
     faultLocations = 'all', // 'all', 'critical', 'buses'
     faultDuration = 0.1, // seconds
-    faultImpedance = { R: 0.001, X: 0.01 }
-  } = options;
-  
-  const scenarios = [];
-  
+    faultImpedance = { R: 0.001, X: 0.01 },
+  } = options
+
+  const scenarios = []
+
   // Store original impedances
-  system.branches.forEach((branch, i) => {
-    branch.originalR = branch.R;
-    branch.originalX = branch.X;
-  });
-  
+  system.branches.forEach((branch, _i) => {
+    branch.originalR = branch.R
+    branch.originalX = branch.X
+  })
+
   if (faultLocations === 'all' || faultLocations === 'buses') {
     // Create fault at each bus
-    system.buses.forEach((bus, i) => {
-      if (bus.type === 'PQ' || bus.type === 'PV') { // Don't fault slack bus
+    system.buses.forEach((bus, _i) => {
+      if (bus.type === 'PQ' || bus.type === 'PV') {
+        // Don't fault slack bus
         scenarios.push({
           type: faultType,
           bus: bus.id,
@@ -100,15 +101,15 @@ function generateFaultScenarios(system, options = {}) {
           clear: 0.1 + faultDuration,
           R: faultImpedance.R,
           X: faultImpedance.X,
-          description: `3-phase fault at Bus ${bus.id}`
-        });
+          description: `3-phase fault at Bus ${bus.id}`,
+        })
       }
-    });
+    })
   }
-  
+
   if (faultLocations === 'all' || faultLocations === 'lines') {
     // Create fault at each line (50% point)
-    system.branches.forEach((branch, i) => {
+    system.branches.forEach((branch, _i) => {
       scenarios.push({
         type: faultType,
         line: branch.id,
@@ -119,12 +120,12 @@ function generateFaultScenarios(system, options = {}) {
         clear: 0.1 + faultDuration,
         R: faultImpedance.R,
         X: faultImpedance.X,
-        description: `3-phase fault at Line ${branch.id} (50%)`
-      });
-    });
+        description: `3-phase fault at Line ${branch.id} (50%)`,
+      })
+    })
   }
-  
-  return scenarios;
+
+  return scenarios
 }
 
 /**
@@ -136,9 +137,9 @@ function generateFaultScenarios(system, options = {}) {
  */
 function applyFaultAtTime(system, fault, time) {
   if (time >= fault.start && time < fault.clear) {
-    return createThreePhaseFault(system, fault);
+    return createThreePhaseFault(system, fault)
   } else {
-    return clearFault(system, fault);
+    return clearFault(system, fault)
   }
 }
 
@@ -150,17 +151,17 @@ function applyFaultAtTime(system, fault, time) {
  */
 function calculateFaultCurrent(system, fault) {
   if (fault.type === 'three_phase') {
-    const faultedBus = system.buses.find(b => b.id === fault.bus);
+    const faultedBus = system.buses.find(b => b.id === fault.bus)
     if (faultedBus) {
       // Simplified fault current calculation
-      const Zfault = Math.sqrt(fault.R * fault.R + fault.X * fault.X);
-      const Ifault = 1.0 / Zfault; // Assuming 1.0 pu voltage
-      
-      return Ifault;
+      const Zfault = Math.sqrt(fault.R * fault.R + fault.X * fault.X)
+      const Ifault = 1.0 / Zfault // Assuming 1.0 pu voltage
+
+      return Ifault
     }
   }
-  
-  return 0;
+
+  return 0
 }
 
 /**
@@ -171,11 +172,11 @@ function calculateFaultCurrent(system, fault) {
  */
 function getFaultStatus(fault, time) {
   if (time < fault.start) {
-    return { active: false, status: 'pre-fault' };
+    return { active: false, status: 'pre-fault' }
   } else if (time >= fault.start && time < fault.clear) {
-    return { active: true, status: 'during-fault' };
+    return { active: true, status: 'during-fault' }
   } else {
-    return { active: false, status: 'post-fault' };
+    return { active: false, status: 'post-fault' }
   }
 }
 
@@ -188,18 +189,18 @@ function getFaultStatus(fault, time) {
 function generateCriticalFaults(system, options = {}) {
   const {
     maxFaults = 5,
-    priority = 'high_load' // 'high_load', 'critical_lines', 'all'
-  } = options;
-  
-  const scenarios = [];
-  
+    priority = 'high_load', // 'high_load', 'critical_lines', 'all'
+  } = options
+
+  const scenarios = []
+
   if (priority === 'high_load') {
     // Focus on high-load buses
     const loadBuses = system.buses
       .filter(b => b.type === 'PQ' && b.P < 0)
       .sort((a, b) => Math.abs(a.P) - Math.abs(b.P))
-      .slice(0, maxFaults);
-    
+      .slice(0, maxFaults)
+
     loadBuses.forEach(bus => {
       scenarios.push({
         type: 'three_phase',
@@ -209,16 +210,16 @@ function generateCriticalFaults(system, options = {}) {
         R: 0.001,
         X: 0.01,
         severity: 'high',
-        description: `Critical fault at high-load Bus ${bus.id}`
-      });
-    });
+        description: `Critical fault at high-load Bus ${bus.id}`,
+      })
+    })
   } else if (priority === 'critical_lines') {
     // Focus on critical transmission lines
     const criticalLines = system.branches
       .filter(b => b.limit && b.loading > 0.7)
       .sort((a, b) => b.loading - a.loading)
-      .slice(0, maxFaults);
-    
+      .slice(0, maxFaults)
+
     criticalLines.forEach(line => {
       scenarios.push({
         type: 'three_phase',
@@ -231,12 +232,12 @@ function generateCriticalFaults(system, options = {}) {
         R: 0.001,
         X: 0.01,
         severity: 'high',
-        description: `Critical fault at Line ${line.id}`
-      });
-    });
+        description: `Critical fault at Line ${line.id}`,
+      })
+    })
   }
-  
-  return scenarios;
+
+  return scenarios
 }
 
 module.exports = {
@@ -246,5 +247,5 @@ module.exports = {
   applyFaultAtTime,
   calculateFaultCurrent,
   getFaultStatus,
-  generateCriticalFaults
-};
+  generateCriticalFaults,
+}

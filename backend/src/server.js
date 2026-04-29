@@ -19,5 +19,6 @@ const server = http.createServer((req, res) => {
 })
 
 server.listen(3001, () => {
+  // eslint-disable-next-line no-console
   console.log('✅ Servidor ICC en puerto 3001')
 })

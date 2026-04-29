@@ -1,19 +1,19 @@
 /**
  * stability/index.js - Stability analysis module exports
- * 
+ *
  * Responsibility: Centralized exports for transient stability analysis
  * Architecture: Swing Equation → Fault Modeling → Dynamic Simulation → Stability Criteria
  */
 
-const DynamicSimulator = require('./dynamicSimulator');
-const { 
+const DynamicSimulator = require('./dynamicSimulator')
+const {
   swingEquation,
   calculateElectricalPower,
   updateGeneratorState,
   isGeneratorStable,
   calculateCriticalClearingTime,
-  calculateDampingRatio
-} = require('./swingEquation');
+  calculateDampingRatio,
+} = require('./swingEquation')
 const {
   createThreePhaseFault,
   clearFault,
@@ -21,21 +21,21 @@ const {
   applyFaultAtTime,
   calculateFaultCurrent,
   getFaultStatus,
-  generateCriticalFaults
-} = require('./faultModel');
+  generateCriticalFaults,
+} = require('./faultModel')
 const {
   checkAngleStability,
   checkSpeedStability,
   checkEqualAreaCriterion,
   checkKineticEnergy,
   checkSystemStability,
-  calculateStabilityIndices
-} = require('./stabilityCriteria');
+  calculateStabilityIndices,
+} = require('./stabilityCriteria')
 
 module.exports = {
   // Main simulator
   DynamicSimulator,
-  
+
   // Swing equation
   swingEquation,
   calculateElectricalPower,
@@ -43,7 +43,7 @@ module.exports = {
   isGeneratorStable,
   calculateCriticalClearingTime,
   calculateDampingRatio,
-  
+
   // Fault modeling
   createThreePhaseFault,
   clearFault,
@@ -52,12 +52,12 @@ module.exports = {
   calculateFaultCurrent,
   getFaultStatus,
   generateCriticalFaults,
-  
+
   // Stability criteria
   checkAngleStability,
   checkSpeedStability,
   checkEqualAreaCriterion,
   checkKineticEnergy,
   checkSystemStability,
-  calculateStabilityIndices
-};
+  calculateStabilityIndices,
+}

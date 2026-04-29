@@ -191,7 +191,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * pvControl.js - PV bus Q limit enforcement and dynamic switching
- * 
+ *
  * Responsibility: Enforce Qmin/Qmax limits and handle PV↔PQ switching
  * NO Express, NO axios, NO UI logic
  */
@@ -205,53 +205,53 @@
  * @returns {Object} Updated bus indices { pvBuses, pqBuses }
  */
 function <span class="fstat-no" title="function not covered" >enforcePVLimits(</span>system, Q, pvBuses, pqBuses) {
-  const newPV = <span class="cstat-no" title="statement not covered" >[];</span>
-  const newPQ = <span class="cstat-no" title="statement not covered" >[...pqBuses];</span>
+  const newPV = <span class="cstat-no" title="statement not covered" >[]</span>
+  const newPQ = <span class="cstat-no" title="statement not covered" >[...pqBuses]</span>
 &nbsp;
   // Check PV buses for Q limit violations
 <span class="cstat-no" title="statement not covered" >  pvBuses.forEach(<span class="fstat-no" title="function not covered" >i </span>=&gt; {</span>
-    const bus = <span class="cstat-no" title="statement not covered" >system.buses[i];</span>
-    const Qi = <span class="cstat-no" title="statement not covered" >Q[i];</span>
+    const bus = <span class="cstat-no" title="statement not covered" >system.buses[i]</span>
+    const Qi = <span class="cstat-no" title="statement not covered" >Q[i]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (Qi &lt; bus.Qmin) {</span>
       // Violate Qmin - switch to PQ and clamp Q
-<span class="cstat-no" title="statement not covered" >      bus.Q = bus.Qmin;</span>
-<span class="cstat-no" title="statement not covered" >      bus.type = 'PQ';</span>
-<span class="cstat-no" title="statement not covered" >      newPQ.push(i);</span>
+<span class="cstat-no" title="statement not covered" >      bus.Q = bus.Qmin</span>
+<span class="cstat-no" title="statement not covered" >      bus.type = 'PQ'</span>
+<span class="cstat-no" title="statement not covered" >      newPQ.push(i)</span>
     } else <span class="cstat-no" title="statement not covered" >if (Qi &gt; bus.Qmax) {</span>
       // Violate Qmax - switch to PQ and clamp Q
-<span class="cstat-no" title="statement not covered" >      bus.Q = bus.Qmax;</span>
-<span class="cstat-no" title="statement not covered" >      bus.type = 'PQ';</span>
-<span class="cstat-no" title="statement not covered" >      newPQ.push(i);</span>
+<span class="cstat-no" title="statement not covered" >      bus.Q = bus.Qmax</span>
+<span class="cstat-no" title="statement not covered" >      bus.type = 'PQ'</span>
+<span class="cstat-no" title="statement not covered" >      newPQ.push(i)</span>
     } else {
       // Within limits - remain PV
-<span class="cstat-no" title="statement not covered" >      newPV.push(i);</span>
+<span class="cstat-no" title="statement not covered" >      newPV.push(i)</span>
     }
-  });
+  })
 &nbsp;
   // Attempt to restore PV status for buses that came back within limits
-  const finalPQ = <span class="cstat-no" title="statement not covered" >[];</span>
+  const finalPQ = <span class="cstat-no" title="statement not covered" >[]</span>
 <span class="cstat-no" title="statement not covered" >  newPQ.forEach(<span class="fstat-no" title="function not covered" >i </span>=&gt; {</span>
-    const bus = <span class="cstat-no" title="statement not covered" >system.buses[i];</span>
+    const bus = <span class="cstat-no" title="statement not covered" >system.buses[i]</span>
 <span class="cstat-no" title="statement not covered" >    if (bus.type === 'PQ' &amp;&amp; bus.Vset !== undefined) {</span>
-      const Qi = <span class="cstat-no" title="statement not covered" >Q[i];</span>
+      const Qi = <span class="cstat-no" title="statement not covered" >Q[i]</span>
 <span class="cstat-no" title="statement not covered" >      if (Qi &gt; bus.Qmin &amp;&amp; Qi &lt; bus.Qmax) {</span>
         // Back within limits - restore PV control
-<span class="cstat-no" title="statement not covered" >        bus.type = 'PV';</span>
-<span class="cstat-no" title="statement not covered" >        bus.Q = 0; </span>// PV buses control Q, don't fix it
-<span class="cstat-no" title="statement not covered" >        newPV.push(i);</span>
+<span class="cstat-no" title="statement not covered" >        bus.type = 'PV'</span>
+<span class="cstat-no" title="statement not covered" >        bus.Q = 0 </span>// PV buses control Q, don't fix it
+<span class="cstat-no" title="statement not covered" >        newPV.push(i)</span>
       } else {
-<span class="cstat-no" title="statement not covered" >        finalPQ.push(i);</span>
+<span class="cstat-no" title="statement not covered" >        finalPQ.push(i)</span>
       }
     } else {
-<span class="cstat-no" title="statement not covered" >      finalPQ.push(i);</span>
+<span class="cstat-no" title="statement not covered" >      finalPQ.push(i)</span>
     }
-  });
+  })
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return { pvBuses: newPV, pqBuses: finalPQ };</span>
+<span class="cstat-no" title="statement not covered" >  return { pvBuses: newPV, pqBuses: finalPQ }</span>
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = { enforcePVLimits };</span>
+<span class="cstat-no" title="statement not covered" >module.exports = { enforcePVLimits }</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -259,7 +259,7 @@ function <span class="fstat-no" title="function not covered" >enforcePVLimits(</
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

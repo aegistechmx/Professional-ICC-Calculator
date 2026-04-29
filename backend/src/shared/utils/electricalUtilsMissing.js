@@ -3,12 +3,12 @@
  * These functions are referenced in tests but not implemented in the main utils file
  */
 
-// Inline toElectricalPrecision function to avoid circular dependency
+// Local definition to avoid circular dependency
 function toElectricalPrecision(value, precision = 6) {
   if (typeof value !== 'number' || isNaN(value)) {
-    return value;
+    return value
   }
-  return Number(value.toFixed(precision));
+  return Number(value.toFixed(precision))
 }
 
 /**
@@ -21,30 +21,33 @@ function toElectricalPrecision(value, precision = 6) {
  */
 function convertVoltage(value, fromUnit, toUnit, baseVoltage = 1.0) {
   const VOLTAGE_CONVERSIONS = {
-    'V': 1,
-    'kV': 1000,
-    'MV': 1000000,
-    'per-unit': null // Needs base voltage
-  };
-  
+    V: 1,
+    kV: 1000,
+    MV: 1000000,
+    'per-unit': null, // Needs base voltage
+  }
+
   // Validate units
-  if (!VOLTAGE_CONVERSIONS.hasOwnProperty(fromUnit) || !VOLTAGE_CONVERSIONS.hasOwnProperty(toUnit)) {
-    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`);
+  if (
+    !VOLTAGE_CONVERSIONS.hasOwnProperty(fromUnit) ||
+    !VOLTAGE_CONVERSIONS.hasOwnProperty(toUnit)
+  ) {
+    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
   }
-  
+
   // Convert to volts first
-  let volts;
+  let volts
   if (fromUnit === 'per-unit') {
-    volts = value * baseVoltage * 1000; // Convert kV to V
+    volts = value * baseVoltage * 1000 // Convert kV to V
   } else {
-    volts = value * VOLTAGE_CONVERSIONS[fromUnit];
+    volts = value * VOLTAGE_CONVERSIONS[fromUnit]
   }
-  
+
   // Convert from volts to target unit
   if (toUnit === 'per-unit') {
-    return toElectricalPrecision(volts / (baseVoltage * 1000));
+    return toElectricalPrecision(volts / (baseVoltage * 1000))
   } else {
-    return toElectricalPrecision(volts / VOLTAGE_CONVERSIONS[toUnit]);
+    return toElectricalPrecision(volts / VOLTAGE_CONVERSIONS[toUnit])
   }
 }
 
@@ -57,18 +60,21 @@ function convertVoltage(value, fromUnit, toUnit, baseVoltage = 1.0) {
  */
 function convertCurrent(value, fromUnit, toUnit) {
   const CURRENT_CONVERSIONS = {
-    'A': 1,
-    'kA': 1000,
-    'mA': 0.001
-  };
-  
-  // Validate units
-  if (!CURRENT_CONVERSIONS.hasOwnProperty(fromUnit) || !CURRENT_CONVERSIONS.hasOwnProperty(toUnit)) {
-    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`);
+    A: 1,
+    kA: 1000,
+    mA: 0.001,
   }
-  
-  const amps = value * CURRENT_CONVERSIONS[fromUnit];
-  return toElectricalPrecision(amps / CURRENT_CONVERSIONS[toUnit]);
+
+  // Validate units
+  if (
+    !CURRENT_CONVERSIONS.hasOwnProperty(fromUnit) ||
+    !CURRENT_CONVERSIONS.hasOwnProperty(toUnit)
+  ) {
+    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
+  }
+
+  const amps = value * CURRENT_CONVERSIONS[fromUnit]
+  return toElectricalPrecision(amps / CURRENT_CONVERSIONS[toUnit])
 }
 
 /**
@@ -80,21 +86,24 @@ function convertCurrent(value, fromUnit, toUnit) {
  */
 function convertPower(value, fromUnit, toUnit) {
   const POWER_CONVERSIONS = {
-    'W': 1,
-    'kW': 1000,
-    'MW': 1000000,
-    'VA': 1,
-    'kVA': 1000,
-    'MVA': 1000000
-  };
-  
-  // Validate units
-  if (!POWER_CONVERSIONS.hasOwnProperty(fromUnit) || !POWER_CONVERSIONS.hasOwnProperty(toUnit)) {
-    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`);
+    W: 1,
+    kW: 1000,
+    MW: 1000000,
+    VA: 1,
+    kVA: 1000,
+    MVA: 1000000,
   }
-  
-  const watts = value * POWER_CONVERSIONS[fromUnit];
-  return toElectricalPrecision(watts / POWER_CONVERSIONS[toUnit]);
+
+  // Validate units
+  if (
+    !POWER_CONVERSIONS.hasOwnProperty(fromUnit) ||
+    !POWER_CONVERSIONS.hasOwnProperty(toUnit)
+  ) {
+    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
+  }
+
+  const watts = value * POWER_CONVERSIONS[fromUnit]
+  return toElectricalPrecision(watts / POWER_CONVERSIONS[toUnit])
 }
 
 /**
@@ -107,30 +116,33 @@ function convertPower(value, fromUnit, toUnit) {
  */
 function convertImpedance(value, fromUnit, toUnit, baseImpedance = 1.0) {
   const IMPEDANCE_CONVERSIONS = {
-    'Ω': 1,
-    'kΩ': 1000,
-    'MΩ': 1000000,
-    'pu': null // Needs base impedance
-  };
-  
+    Ω: 1,
+    kΩ: 1000,
+    MΩ: 1000000,
+    pu: null, // Needs base impedance
+  }
+
   // Validate units
-  if (!IMPEDANCE_CONVERSIONS.hasOwnProperty(fromUnit) || !IMPEDANCE_CONVERSIONS.hasOwnProperty(toUnit)) {
-    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`);
+  if (
+    !IMPEDANCE_CONVERSIONS.hasOwnProperty(fromUnit) ||
+    !IMPEDANCE_CONVERSIONS.hasOwnProperty(toUnit)
+  ) {
+    throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
   }
-  
+
   // Convert to ohms first
-  let ohms;
+  let ohms
   if (fromUnit === 'pu') {
-    ohms = value * baseImpedance;
+    ohms = value * baseImpedance
   } else {
-    ohms = value * IMPEDANCE_CONVERSIONS[fromUnit];
+    ohms = value * IMPEDANCE_CONVERSIONS[fromUnit]
   }
-  
+
   // Convert from ohms to target unit
   if (toUnit === 'pu') {
-    return toElectricalPrecision(ohms / baseImpedance);
+    return toElectricalPrecision(ohms / baseImpedance)
   } else {
-    return toElectricalPrecision(ohms / IMPEDANCE_CONVERSIONS[toUnit]);
+    return toElectricalPrecision(ohms / IMPEDANCE_CONVERSIONS[toUnit])
   }
 }
 
@@ -142,15 +154,15 @@ function convertImpedance(value, fromUnit, toUnit, baseImpedance = 1.0) {
  */
 function calculateReactivePower(apparentPower, activePower) {
   if (typeof apparentPower !== 'number' || isNaN(apparentPower)) {
-    throw new Error('Apparent power must be a valid number');
+    throw new Error('Apparent power must be a valid number')
   }
   if (typeof activePower !== 'number' || isNaN(activePower)) {
-    throw new Error('Active power must be a valid number');
+    throw new Error('Active power must be a valid number')
   }
-  
-  const reactiveSquared = Math.pow(apparentPower, 2) - Math.pow(activePower, 2);
-  if (reactiveSquared < 0) return 0;
-  return toElectricalPrecision(Math.sqrt(reactiveSquared));
+
+  const reactiveSquared = Math.pow(apparentPower, 2) - Math.pow(activePower, 2)
+  if (reactiveSquared < 0) return 0
+  return toElectricalPrecision(Math.sqrt(reactiveSquared))
 }
 
 /**
@@ -164,54 +176,54 @@ function validateElectricalValue(value, type, unit) {
   if (typeof value !== 'number' || isNaN(value)) {
     return {
       valid: false,
-      reason: 'Value must be a valid number'
-    };
+      reason: 'Value must be a valid number',
+    }
   }
-  
+
   const RANGES = {
     voltage: {
-      'V': { min: 0, max: 1000000 },
-      'kV': { min: 0, max: 1000 },
-      'MV': { min: 0, max: 1 },
-      'per-unit': { min: 0, max: 2 }
+      V: { min: 0, max: 1000000 },
+      kV: { min: 0, max: 1000 },
+      MV: { min: 0, max: 1 },
+      'per-unit': { min: 0, max: 2 },
     },
     current: {
-      'A': { min: 0, max: 100000 },
-      'kA': { min: 0, max: 100 },
-      'mA': { min: 0, max: 100000000 }
+      A: { min: 0, max: 100000 },
+      kA: { min: 0, max: 100 },
+      mA: { min: 0, max: 100000000 },
     },
     power: {
-      'W': { min: -1000000000, max: 1000000000 },
-      'kW': { min: -1000000, max: 1000000 },
-      'MW': { min: -1000, max: 1000 },
-      'VA': { min: 0, max: 1000000000 },
-      'kVA': { min: 0, max: 1000000 },
-      'MVA': { min: 0, max: 1000 }
+      W: { min: -1000000000, max: 1000000000 },
+      kW: { min: -1000000, max: 1000000 },
+      MW: { min: -1000, max: 1000 },
+      VA: { min: 0, max: 1000000000 },
+      kVA: { min: 0, max: 1000000 },
+      MVA: { min: 0, max: 1000 },
     },
     impedance: {
-      'Ω': { min: 0, max: 10000 },
-      'kΩ': { min: 0, max: 10 },
-      'MΩ': { min: 0, max: 0.01 },
-      'pu': { min: 0, max: 10 }
-    }
-  };
-  
-  const range = RANGES[type]?.[unit];
+      Ω: { min: 0, max: 10000 },
+      kΩ: { min: 0, max: 10 },
+      MΩ: { min: 0, max: 0.01 },
+      pu: { min: 0, max: 10 },
+    },
+  }
+
+  const range = RANGES[type]?.[unit]
   if (!range) {
     return {
       valid: false,
-      reason: `Unknown type/unit combination: ${type}/${unit}`
-    };
+      reason: `Unknown type/unit combination: ${type}/${unit}`,
+    }
   }
-  
+
   if (value < range.min || value > range.max) {
     return {
       valid: false,
-      reason: `Value ${value} ${unit} outside valid range [${range.min}, ${range.max}]`
-    };
+      reason: `Value ${value} ${unit} outside valid range [${range.min}, ${range.max}]`,
+    }
   }
-  
-  return { valid: true };
+
+  return { valid: true }
 }
 
 /**
@@ -223,10 +235,10 @@ function validateElectricalValue(value, type, unit) {
  */
 function formatElectricalValue(value, unit, precision = 6) {
   if (typeof value !== 'number' || isNaN(value)) {
-    return `${value} ${unit}`;
+    return `${value} ${unit}`
   }
-  const formattedValue = toElectricalPrecision(value, precision);
-  return `${formattedValue} ${unit}`;
+  const formattedValue = toElectricalPrecision(value, precision)
+  return `${formattedValue} ${unit}`
 }
 
 module.exports = {
@@ -236,5 +248,5 @@ module.exports = {
   convertImpedance,
   calculateReactivePower,
   validateElectricalValue,
-  formatElectricalValue
-};
+  formatElectricalValue,
+}

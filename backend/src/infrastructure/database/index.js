@@ -1,6 +1,6 @@
 /**
  * infrastructure/database/index.js - Database infrastructure
- * 
+ *
  * Responsibility: Database connections and operations
  */
 
@@ -13,8 +13,8 @@ const config = {
   database: process.env.DB_NAME || 'power_system',
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'password',
-  ssl: process.env.NODE_ENV === 'production'
-};
+  ssl: process.env.NODE_ENV === 'production',
+}
 
 /**
  * Create database connection
@@ -27,10 +27,10 @@ function createConnection() {
     config,
     connected: false,
     query: async (sql, params) => {
-      console.log('DB Query:', sql, params);
-      return { rows: [] };
-    }
-  };
+      console.log('DB Query:', sql, params)
+      return { rows: [] }
+    },
+  }
 }
 
 /**
@@ -38,14 +38,14 @@ function createConnection() {
  * @returns {Promise} Database initialization
  */
 async function initializeDatabase() {
-  console.log('Initializing database...');
-  const db = createConnection();
-  
+  console.log('Initializing database...')
+  const db = createConnection()
+
   // Create tables if they don't exist
-  await createTables(db);
-  
-  console.log('Database initialized');
-  return db;
+  await createTables(db)
+
+  console.log('Database initialized')
+  return db
 }
 
 /**
@@ -67,16 +67,16 @@ async function createTables(db) {
       parameters JSONB,
       results JSONB,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )`
-  ];
+    )`,
+  ]
 
   for (const sql of tables) {
-    await db.query(sql);
+    await db.query(sql)
   }
 }
 
 module.exports = {
   createConnection,
   initializeDatabase,
-  createTables
-};
+  createTables,
+}

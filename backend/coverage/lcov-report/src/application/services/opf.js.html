@@ -120,7 +120,17 @@
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -143,25 +153,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,20 +172,39 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * application/services/opf.js - OPF business logic
- * 
+ *
  * Responsibility: Business logic for optimal power flow operations
  */
 &nbsp;
-const { solveOPF } = <span class="cstat-no" title="statement not covered" >require('@/core/opf/algorithms');</span>
-const { runPowerFlow } = <span class="cstat-no" title="statement not covered" >require('./powerflow');</span>
+const { solveOPF } = <span class="cstat-no" title="statement not covered" >require('@/core/opf/algorithms')</span>
+const { runPowerFlow } = <span class="cstat-no" title="statement not covered" >require('./powerflow')</span>
 &nbsp;
 /**
  * Run optimal power flow analysis
@@ -197,16 +217,17 @@ async function <span class="fstat-no" title="function not covered" >runOPF(</spa
     tolerance = <span class="branch-0 cbranch-no" title="branch not covered" >1e-6,</span>
     maxIterations = <span class="branch-0 cbranch-no" title="branch not covered" >30,</span>
     alpha = <span class="branch-0 cbranch-no" title="branch not covered" >0.5,</span>
-    powerFlowMethod = <span class="branch-0 cbranch-no" title="branch not covered" >'FDLF'</span>
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+    powerFlowMethod = <span class="branch-0 cbranch-no" title="branch not covered" >'FDLF',</span>
+  } = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  console.log('⚡ OPF: Running economic dispatch optimization...');</span>
+  // eslint-disable-next-line no-console
+<span class="cstat-no" title="statement not covered" >  console.log('⚡ OPF: Running economic dispatch optimization...')</span>
 &nbsp;
   // Get base power flow solution
-  const pfResult = <span class="cstat-no" title="statement not covered" >await runPowerFlow(system, { method: powerFlowMethod });</span>
-  
+  const pfResult = <span class="cstat-no" title="statement not covered" >await runPowerFlow(system, { method: powerFlowMethod })</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  if (!pfResult.converged) {</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error('Base power flow did not converge');</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error('Base power flow did not converge')</span>
   }
 &nbsp;
   // Run OPF optimization
@@ -214,11 +235,19 @@ async function <span class="fstat-no" title="function not covered" >runOPF(</spa
     tolerance,
     maxIterations,
     alpha,
-    baseSolution: pfResult
-  });
+    baseSolution: pfResult,
+  })
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  console.log('⚡ OPF: ' + (result.converged ? 'CONVERGED' : 'NOT CONVERGED') + ' in ' + result.iterations + ' iterations');</span>
-<span class="cstat-no" title="statement not covered" >  console.log('⚡ OPF: Final cost: $' + result.cost.toFixed(2));</span>
+  // eslint-disable-next-line no-console
+<span class="cstat-no" title="statement not covered" >  console.log(</span>
+    '⚡ OPF: ' +
+    (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +
+    ' in ' +
+    result.iterations +
+    ' iterations'
+  )
+  // eslint-disable-next-line no-console
+<span class="cstat-no" title="statement not covered" >  console.log('⚡ OPF: Final cost: $' + result.cost.toFixed(2))</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     converged: result.converged,
@@ -230,18 +259,19 @@ async function <span class="fstat-no" title="function not covered" >runOPF(</spa
     basePowerFlow: pfResult,
     system,
     options,
-    timestamp: new Date().toISOString()
-  };
+    timestamp: new Date().toISOString(),
+  }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = { runOPF };</span></pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >module.exports = { runOPF }</span>
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.680Z
+                at 2026-04-29T07:48:07.940Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

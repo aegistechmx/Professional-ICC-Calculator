@@ -1,6 +1,6 @@
 /**
  * avr.js - Automatic Voltage Regulator (AVR) model
- * 
+ *
  * Responsibility: IEEE Type 1 simplified AVR implementation
  * NO Express, NO axios, NO UI logic
  */
@@ -10,12 +10,12 @@
  */
 class AVRModel {
   constructor(params) {
-    this.Ka = params.Ka || 200;              // AVR gain
-    this.Ta = params.Ta || 0.05;             // AVR time constant
-    this.Vref = params.Vref || 1.0;            // Reference voltage
-    this.Vmax = params.Vmax || 5.0;            // Maximum field voltage
-    this.Vmin = params.Vmin || 0.0;             // Minimum field voltage
-    this.Efd = params.Efd || 1.0;             // Initial field voltage
+    this.Ka = params.Ka || 200 // AVR gain
+    this.Ta = params.Ta || 0.05 // AVR time constant
+    this.Vref = params.Vref || 1.0 // Reference voltage
+    this.Vmax = params.Vmax || 5.0 // Maximum field voltage
+    this.Vmin = params.Vmin || 0.0 // Minimum field voltage
+    this.Efd = params.Efd || 1.0 // Initial field voltage
   }
 
   /**
@@ -26,12 +26,12 @@ class AVRModel {
    */
   calculateOutput(V, pssSignal) {
     // Voltage error with PSS signal
-    const error = this.Vref - V + pssSignal;
+    const error = this.Vref - V + pssSignal
 
     // AVR differential equation
-    const dEfd = (this.Ka * error - this.Efd) / this.Ta;
+    const dEfd = (this.Ka * error - this.Efd) / this.Ta
 
-    return dEfd;
+    return dEfd
   }
 
   /**
@@ -42,13 +42,13 @@ class AVRModel {
    * @returns {number} New field voltage
    */
   updateState(V, pssSignal, dt) {
-    const dEfd = this.calculateOutput(V, pssSignal);
-    const EfdNew = this.Efd + dEfd * dt;
+    const dEfd = this.calculateOutput(V, pssSignal)
+    const EfdNew = this.Efd + dEfd * dt
 
     // Apply limits
-    this.Efd = Math.max(this.Vmin, Math.min(this.Vmax, EfdNew));
+    this.Efd = Math.max(this.Vmin, Math.min(this.Vmax, EfdNew))
 
-    return this.Efd;
+    return this.Efd
   }
 
   /**
@@ -62,16 +62,16 @@ class AVRModel {
       Ka: this.Ka,
       Ta: this.Ta,
       Vmax: this.Vmax,
-      Vmin: this.Vmin
-    };
+      Vmin: this.Vmin,
+    }
   }
 
   /**
    * Reset to initial conditions
    */
   reset() {
-    this.Efd = 1.0;
+    this.Efd = 1.0
   }
 }
 
-module.exports = AVRModel;
+module.exports = AVRModel

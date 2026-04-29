@@ -1134,7 +1134,7 @@ class ConsistencyValidator {
       // Run power flow
       const systemPF = <span class="cstat-no" title="statement not covered" >this.cloneSystem(system)</span>
 <span class="cstat-no" title="statement not covered" >      results.powerFlow = engines.powerFlow.run(systemPF)</span>
- // power (W)
+      // power (W)
 &nbsp;
       // Run fault analysis
       const systemFault = <span class="cstat-no" title="statement not covered" >this.cloneSystem(system)</span>
@@ -1217,7 +1217,7 @@ class ConsistencyValidator {
 &nbsp;
     // Extract Ybus from power flow
     const YbusPF = <span class="cstat-no" title="statement not covered" >results.powerFlow.Ybus || results.powerFlow.ybus</span>
- // power (W)
+    // power (W)
 &nbsp;
     // Extract Ybus from fault analysis
     const YbusFault = <span class="cstat-no" title="statement not covered" >results.fault.Ybus || results.fault.ybus</span>
@@ -1264,15 +1264,15 @@ class ConsistencyValidator {
 &nbsp;
     // Get currents from power flow
     const currentsPF = <span class="cstat-no" title="statement not covered" >this.extractCurrents(results.powerFlow)</span>
- // current (A)
+    // current (A)
 &nbsp;
     // Get currents from fault analysis
     const currentsFault = <span class="cstat-no" title="statement not covered" >this.extractCurrents(results.fault)</span>
- // current (A)
+    // current (A)
 &nbsp;
     // Compare currents (should match for normal operating conditions)
     const maxDiff = <span class="cstat-no" title="statement not covered" >this.compareCurrents(currentsPF, currentsFault)</span>
- // current (A)
+    // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (maxDiff &lt; this.options.tolerance) {</span>
 <span class="cstat-no" title="statement not covered" >      this.results.passed.push({</span>
@@ -1305,12 +1305,12 @@ class ConsistencyValidator {
 &nbsp;
     // Get voltages from power flow
     const voltagesPF = <span class="cstat-no" title="statement not covered" >this.extractVoltages(results.powerFlow)</span>
- // voltage (V)
+    // voltage (V)
 &nbsp;
     // Get initial voltages from dynamics (should match power flow)
     const voltagesDyn = <span class="cstat-no" title="statement not covered" >results.dynamics.voltages</span>
- // voltage (V)
-      ? results.dynamics.voltages[0]
+      ? // voltage (V)
+        results.dynamics.voltages[0]
       : null
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (!voltagesDyn) {</span>
@@ -1323,7 +1323,7 @@ class ConsistencyValidator {
 &nbsp;
     // Compare initial voltages
     const maxDiff = <span class="cstat-no" title="statement not covered" >this.compareVoltages(voltagesPF, voltagesDyn)</span>
- // voltage (V)
+    // voltage (V)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (maxDiff &lt; this.options.tolerance) {</span>
 <span class="cstat-no" title="statement not covered" >      this.results.passed.push({</span>
@@ -1405,7 +1405,7 @@ class ConsistencyValidator {
 <span class="fstat-no" title="function not covered" >  ex</span>tractCurrents(results) {
 <span class="cstat-no" title="statement not covered" >    if (results.lines) {</span>
 <span class="cstat-no" title="statement not covered" >      return results.lines.map(<span class="fstat-no" title="function not covered" >l </span>=&gt; <span class="cstat-no" title="statement not covered" >l.current || l.I_flow || 0)</span></span>
- // current (A)
+      // current (A)
     }
 <span class="cstat-no" title="statement not covered" >    if (results.currents) {</span>
 <span class="cstat-no" title="statement not covered" >      return results.currents</span>
@@ -1421,7 +1421,7 @@ class ConsistencyValidator {
 <span class="fstat-no" title="function not covered" >  ex</span>tractVoltages(results) {
 <span class="cstat-no" title="statement not covered" >    if (results.buses) {</span>
 <span class="cstat-no" title="statement not covered" >      return results.buses.map(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.V || b.voltage || 1.0)</span></span>
- // voltage (V)
+      // voltage (V)
     }
 <span class="cstat-no" title="statement not covered" >    if (results.voltages) {</span>
 <span class="cstat-no" title="statement not covered" >      return results.voltages</span>
@@ -1471,11 +1471,11 @@ class ConsistencyValidator {
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
     const minLen = <span class="cstat-no" title="statement not covered" >Math.min(currentsA.length, currentsB.length)</span>
- // current (A)
+    // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
       const diff = <span class="cstat-no" title="statement not covered" >Math.abs(currentsA[i] - currentsB[i])</span>
- // current (A)
+      // current (A)
 <span class="cstat-no" title="statement not covered" >      maxDiff = Math.max(maxDiff, diff)</span>
     }
 &nbsp;
@@ -1493,11 +1493,11 @@ class ConsistencyValidator {
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
     const minLen = <span class="cstat-no" title="statement not covered" >Math.min(voltagesA.length, voltagesB.length)</span>
- // voltage (V)
+    // voltage (V)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
       const diff = <span class="cstat-no" title="statement not covered" >Math.abs(voltagesA[i] - voltagesB[i])</span>
- // voltage (V)
+      // voltage (V)
 <span class="cstat-no" title="statement not covered" >      maxDiff = Math.max(maxDiff, diff)</span>
     }
 &nbsp;
@@ -1578,7 +1578,7 @@ class ConsistencyValidator {
     tolerance = <span class="branch-0 cbranch-no" title="branch not covered" >this.options.tolerance</span>
   ) {
     const maxDiff = <span class="cstat-no" title="statement not covered" >this.compareCurrents(currentsA, currentsB)</span>
- // current (A)
+    // current (A)
 <span class="cstat-no" title="statement not covered" >    this.assert(</span>
       maxDiff &lt; tolerance,
       `Currents do not match: max difference ${maxDiff} exceeds tolerance ${tolerance}`
@@ -1594,7 +1594,7 @@ class ConsistencyValidator {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -360,7 +360,13 @@
 <a name='L295'></a><a href='#L295'>295</a>
 <a name='L296'></a><a href='#L296'>296</a>
 <a name='L297'></a><a href='#L297'>297</a>
-<a name='L298'></a><a href='#L298'>298</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -478,17 +484,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -499,6 +508,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -659,7 +671,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * generatorModel.js - Comprehensive generator model for TS-SCOPF
- * 
+ *
  * Responsibility: Complete generator model with AVR, Governor, and PSS
  * NO Express, NO axios, NO UI logic
  */
@@ -669,58 +681,58 @@
  */
 class GeneratorModel {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(params) {
-<span class="cstat-no" title="statement not covered" >    this.id = params.id;</span>
-<span class="cstat-no" title="statement not covered" >    this.bus = params.bus;</span>
-    
+<span class="cstat-no" title="statement not covered" >    this.id = params.id</span>
+<span class="cstat-no" title="statement not covered" >    this.bus = params.bus</span>
+&nbsp;
     // Machine parameters
-<span class="cstat-no" title="statement not covered" >    this.M = params.inertia || 5.0; </span>       // Inertia constant (H)
-<span class="cstat-no" title="statement not covered" >    this.D = params.damping || 2.0; </span>       // Damping coefficient
-<span class="cstat-no" title="statement not covered" >    this.xd = params.xd || 0.3; </span>            // Direct axis reactance
-<span class="cstat-no" title="statement not covered" >    this.xq = params.xq || 0.4; </span>            // Quadrature axis reactance
-<span class="cstat-no" title="statement not covered" >    this.xdPrime = params.xdPrime || 0.25; </span>   // Transient reactance
-<span class="cstat-no" title="statement not covered" >    this.Tdo = params.Tdo || 5.0; </span>          // Direct axis open circuit time constant
-<span class="cstat-no" title="statement not covered" >    this.TdoPrime = params.TdoPrime || 1.0; </span>   // Direct axis short circuit time constant
-<span class="cstat-no" title="statement not covered" >    this.Tqo = params.Tqo || 1.5; </span>          // Quadrature axis open circuit time constant
-    
+<span class="cstat-no" title="statement not covered" >    this.M = params.inertia || 5.0 </span>// Inertia constant (H)
+<span class="cstat-no" title="statement not covered" >    this.D = params.damping || 2.0 </span>// Damping coefficient
+<span class="cstat-no" title="statement not covered" >    this.xd = params.xd || 0.3 </span>// Direct axis reactance
+<span class="cstat-no" title="statement not covered" >    this.xq = params.xq || 0.4 </span>// Quadrature axis reactance
+<span class="cstat-no" title="statement not covered" >    this.xdPrime = params.xdPrime || 0.25 </span>// Transient reactance
+<span class="cstat-no" title="statement not covered" >    this.Tdo = params.Tdo || 5.0 </span>// Direct axis open circuit time constant
+<span class="cstat-no" title="statement not covered" >    this.TdoPrime = params.TdoPrime || 1.0 </span>// Direct axis short circuit time constant
+<span class="cstat-no" title="statement not covered" >    this.Tqo = params.Tqo || 1.5 </span>// Quadrature axis open circuit time constant
+&nbsp;
     // Electrical parameters
-<span class="cstat-no" title="statement not covered" >    this.Eq = params.Eq || 1.0; </span>           // Internal voltage (q-axis)
-<span class="cstat-no" title="statement not covered" >    this.Ed = params.Ed || 0.0; </span>            // Internal voltage (d-axis)
-<span class="cstat-no" title="statement not covered" >    this.Efd = params.Efd || 1.0; </span>          // Field voltage
-    
+<span class="cstat-no" title="statement not covered" >    this.Eq = params.Eq || 1.0 </span>// Internal voltage (q-axis)
+<span class="cstat-no" title="statement not covered" >    this.Ed = params.Ed || 0.0 </span>// Internal voltage (d-axis)
+<span class="cstat-no" title="statement not covered" >    this.Efd = params.Efd || 1.0 </span>// Field voltage
+&nbsp;
     // Mechanical parameters
-<span class="cstat-no" title="statement not covered" >    this.Pm = params.Pm || params.P || 0.8; </span>  // Mechanical power
-<span class="cstat-no" title="statement not covered" >    this.omega = params.omega || 1.0; </span>       // Angular velocity
-<span class="cstat-no" title="statement not covered" >    this.delta = params.delta || 0.0; </span>         // Rotor angle
-    
+<span class="cstat-no" title="statement not covered" >    this.Pm = params.Pm || params.P || 0.8 </span>// Mechanical power
+<span class="cstat-no" title="statement not covered" >    this.omega = params.omega || 1.0 </span>// Angular velocity
+<span class="cstat-no" title="statement not covered" >    this.delta = params.delta || 0.0 </span>// Rotor angle
+&nbsp;
     // AVR parameters
 <span class="cstat-no" title="statement not covered" >    this.avr = {</span>
-      Ka: params.avrKa || 200,              // AVR gain
-      Ta: params.avrTa || 0.05,              // AVR time constant
-      Vref: params.Vref || 1.0,             // Reference voltage
-      Vmax: params.Vmax || 5.0,              // Maximum field voltage
-      Vmin: params.Vmin || 0.0,              // Minimum field voltage
-      ...params.avr
-    };
-    
+      Ka: params.avrKa || 200, // AVR gain
+      Ta: params.avrTa || 0.05, // AVR time constant
+      Vref: params.Vref || 1.0, // Reference voltage
+      Vmax: params.Vmax || 5.0, // Maximum field voltage
+      Vmin: params.Vmin || 0.0, // Minimum field voltage
+      ...params.avr,
+    }
+&nbsp;
     // Governor parameters
 <span class="cstat-no" title="statement not covered" >    this.gov = {</span>
-      Tg: params.govTg || 0.3,              // Governor time constant
-      R: params.govR || 0.05,                // Droop
-      Pref: params.Pref || params.P || 0.8,    // Reference power
-      Pmax: params.Pmax || 1.5,             // Maximum power
-      Pmin: params.Pmin || 0.2,             // Minimum power
-      ...params.gov
-    };
-    
+      Tg: params.govTg || 0.3, // Governor time constant
+      R: params.govR || 0.05, // Droop
+      Pref: params.Pref || params.P || 0.8, // Reference power
+      Pmax: params.Pmax || 1.5, // Maximum power
+      Pmin: params.Pmin || 0.2, // Minimum power
+      ...params.gov,
+    }
+&nbsp;
     // PSS parameters
 <span class="cstat-no" title="statement not covered" >    this.pss = {</span>
-      K: params.pssK || 10,                 // PSS gain
-      Tw: params.pssTw || 10,                // Washout time constant
-      T1: params.pssT1 || 0.1,             // Lead time constant 1
-      T2: params.pssT2 || 0.05,            // Lead time constant 2
-      T3: params.pssT3 || 1.0,             // Lag time constant
-      ...params.pss
-    };
+      K: params.pssK || 10, // PSS gain
+      Tw: params.pssTw || 10, // Washout time constant
+      T1: params.pssT1 || 0.1, // Lead time constant 1
+      T2: params.pssT2 || 0.05, // Lead time constant 2
+      T3: params.pssT3 || 1.0, // Lag time constant
+      ...params.pss,
+    }
   }
 &nbsp;
   /**
@@ -730,20 +742,20 @@ class GeneratorModel {
    * @returns {Object} State derivatives
    */
 <span class="fstat-no" title="function not covered" >  ma</span>chineModel(state, inputs) {
-    const { delta, omega, Eq, Ed, Efd } = <span class="cstat-no" title="statement not covered" >state;</span>
-    const { Vd, Vq, Id, Iq } = <span class="cstat-no" title="statement not covered" >inputs;</span>
+    const { _delta, omega, Eq, Ed, Efd } = <span class="cstat-no" title="statement not covered" >state</span>
+    const { _Vd, _Vq, Id, Iq } = <span class="cstat-no" title="statement not covered" >inputs</span>
 &nbsp;
     // Calculate electrical power
-    const Pe = <span class="cstat-no" title="statement not covered" >Eq * Iq + Ed * Id;</span>
-    const Qe = <span class="cstat-no" title="statement not covered" >Eq * Id - Ed * Iq;</span>
+    const Pe = <span class="cstat-no" title="statement not covered" >Eq * Iq + Ed * Id</span>
+    const Qe = <span class="cstat-no" title="statement not covered" >Eq * Id - Ed * Iq</span>
 &nbsp;
     // Differential equations for internal voltages
-    const dEd = <span class="cstat-no" title="statement not covered" >(Efd - Ed - (this.xd - this.xdPrime) * Id) / this.TdoPrime;</span>
-    const dEq = <span class="cstat-no" title="statement not covered" >(Efd - Eq) / this.Tdo;</span>
+    const dEd = <span class="cstat-no" title="statement not covered" >(Efd - Ed - (this.xd - this.xdPrime) * Id) / this.TdoPrime</span>
+    const dEq = <span class="cstat-no" title="statement not covered" >(Efd - Eq) / this.Tdo</span>
 &nbsp;
     // Swing equation
-    const dDelta = <span class="cstat-no" title="statement not covered" >omega;</span>
-    const dOmega = <span class="cstat-no" title="statement not covered" >(this.Pm - Pe - this.D * (omega - 1)) / this.M;</span>
+    const dDelta = <span class="cstat-no" title="statement not covered" >omega</span>
+    const dOmega = <span class="cstat-no" title="statement not covered" >(this.Pm - Pe - this.D * (omega - 1)) / this.M</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       dDelta,
@@ -751,8 +763,8 @@ class GeneratorModel {
       dEd,
       dEq,
       Pe,
-      Qe
-    };
+      Qe,
+    }
   }
 &nbsp;
   /**
@@ -763,19 +775,22 @@ class GeneratorModel {
    * @returns {number} Field voltage derivative
    */
 <span class="fstat-no" title="function not covered" >  av</span>rModel(state, V, pssSignal) {
-    const { Efd } = <span class="cstat-no" title="statement not covered" >state;</span>
-    const { Ka, Ta, Vref } = <span class="cstat-no" title="statement not covered" >this.avr;</span>
+    const { Efd } = <span class="cstat-no" title="statement not covered" >state</span>
+    const { Ka, Ta, Vref } = <span class="cstat-no" title="statement not covered" >this.avr</span>
 &nbsp;
     // Voltage error with PSS signal
-    const error = <span class="cstat-no" title="statement not covered" >Vref - V + pssSignal;</span>
+    const error = <span class="cstat-no" title="statement not covered" >Vref - V + pssSignal</span>
 &nbsp;
     // AVR differential equation
-    const dEfd = <span class="cstat-no" title="statement not covered" >(Ka * error - Efd) / Ta;</span>
+    const dEfd = <span class="cstat-no" title="statement not covered" >(Ka * error - Efd) / Ta</span>
 &nbsp;
     // Apply limits
-    const EfdNew = <span class="cstat-no" title="statement not covered" >Math.max(this.avr.Vmin, Math.min(this.avr.Vmax, Efd + dEfd * 0.01));</span>
+    const EfdNew = <span class="cstat-no" title="statement not covered" >Math.max(</span>
+      this.avr.Vmin,
+      Math.min(this.avr.Vmax, Efd + dEfd * 0.01)
+    )
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return { dEfd, EfdNew };</span>
+<span class="cstat-no" title="statement not covered" >    return { dEfd, EfdNew }</span>
   }
 &nbsp;
   /**
@@ -785,19 +800,22 @@ class GeneratorModel {
    * @returns {number} Mechanical power derivative
    */
 <span class="fstat-no" title="function not covered" >  go</span>vernorModel(state, omega) {
-    const { Pm } = <span class="cstat-no" title="statement not covered" >state;</span>
-    const { Tg, R, Pref } = <span class="cstat-no" title="statement not covered" >this.gov;</span>
+    const { Pm } = <span class="cstat-no" title="statement not covered" >state</span>
+    const { Tg, R, Pref } = <span class="cstat-no" title="statement not covered" >this.gov</span>
 &nbsp;
     // Speed deviation
-    const speedError = <span class="cstat-no" title="statement not covered" >omega - 1.0;</span>
+    const speedError = <span class="cstat-no" title="statement not covered" >omega - 1.0</span>
 &nbsp;
     // Governor differential equation
-    const dPm = <span class="cstat-no" title="statement not covered" >(Pref - Pm - R * speedError) / Tg;</span>
+    const dPm = <span class="cstat-no" title="statement not covered" >(Pref - Pm - R * speedError) / Tg</span>
 &nbsp;
     // Apply limits
-    const PmNew = <span class="cstat-no" title="statement not covered" >Math.max(this.gov.Pmin, Math.min(this.gov.Pmax, Pm + dPm * 0.01));</span>
+    const PmNew = <span class="cstat-no" title="statement not covered" >Math.max(</span>
+      this.gov.Pmin,
+      Math.min(this.gov.Pmax, Pm + dPm * 0.01)
+    )
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return { dPm, PmNew };</span>
+<span class="cstat-no" title="statement not covered" >    return { dPm, PmNew }</span>
   }
 &nbsp;
   /**
@@ -807,21 +825,21 @@ class GeneratorModel {
    * @returns {number} PSS output signal
    */
 <span class="fstat-no" title="function not covered" >  ps</span>sModel(state, omega) {
-    const { K, Tw, T1, T2, T3 } = <span class="cstat-no" title="statement not covered" >this.pss;</span>
+    const { K, Tw, T1, T2, T3 } = <span class="cstat-no" title="statement not covered" >this.pss</span>
 &nbsp;
     // Speed deviation (input to PSS)
-    const speedError = <span class="cstat-no" title="statement not covered" >omega - 1.0;</span>
+    const speedError = <span class="cstat-no" title="statement not covered" >omega - 1.0</span>
 &nbsp;
     // Washout filter
-    const washoutOutput = <span class="cstat-no" title="statement not covered" >this.washoutFilter(speedError, Tw);</span>
+    const washoutOutput = <span class="cstat-no" title="statement not covered" >this.washoutFilter(speedError, Tw)</span>
 &nbsp;
     // Lead-lag compensation
-    const leadLagOutput = <span class="cstat-no" title="statement not covered" >this.leadLagFilter(washoutOutput, T1, T2);</span>
+    const leadLagOutput = <span class="cstat-no" title="statement not covered" >this.leadLagFilter(washoutOutput, T1, T2)</span>
 &nbsp;
     // Lag filter
-    const pssSignal = <span class="cstat-no" title="statement not covered" >this.lagFilter(leadLagOutput, T3);</span>
+    const pssSignal = <span class="cstat-no" title="statement not covered" >this.lagFilter(leadLagOutput, T3)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return K * pssSignal;</span>
+<span class="cstat-no" title="statement not covered" >    return K * pssSignal</span>
   }
 &nbsp;
   /**
@@ -832,8 +850,8 @@ class GeneratorModel {
    */
 <span class="fstat-no" title="function not covered" >  wa</span>shoutFilter(input, Tw) {
     // Simple washout implementation
-    const output = <span class="cstat-no" title="statement not covered" >input / (1 + Tw * Math.abs(input));</span>
-<span class="cstat-no" title="statement not covered" >    return output;</span>
+    const output = <span class="cstat-no" title="statement not covered" >input / (1 + Tw * Math.abs(input))</span>
+<span class="cstat-no" title="statement not covered" >    return output</span>
   }
 &nbsp;
   /**
@@ -845,8 +863,8 @@ class GeneratorModel {
    */
 <span class="fstat-no" title="function not covered" >  le</span>adLagFilter(input, T1, T2) {
     // Simplified lead-lag implementation
-    const output = <span class="cstat-no" title="statement not covered" >input * (1 + T1) / (1 + T2);</span>
-<span class="cstat-no" title="statement not covered" >    return output;</span>
+    const output = <span class="cstat-no" title="statement not covered" >(input * (1 + T1)) / (1 + T2)</span>
+<span class="cstat-no" title="statement not covered" >    return output</span>
   }
 &nbsp;
   /**
@@ -857,8 +875,8 @@ class GeneratorModel {
    */
 <span class="fstat-no" title="function not covered" >  la</span>gFilter(input, T3) {
     // Simple lag implementation
-    const output = <span class="cstat-no" title="statement not covered" >input / (1 + T3);</span>
-<span class="cstat-no" title="statement not covered" >    return output;</span>
+    const output = <span class="cstat-no" title="statement not covered" >input / (1 + T3)</span>
+<span class="cstat-no" title="statement not covered" >    return output</span>
   }
 &nbsp;
   /**
@@ -870,15 +888,15 @@ class GeneratorModel {
    */
 <span class="fstat-no" title="function not covered" >  up</span>dateState(state, inputs, dt) {
     // Get machine model derivatives
-    const machineDerivs = <span class="cstat-no" title="statement not covered" >this.machineModel(state, inputs);</span>
+    const machineDerivs = <span class="cstat-no" title="statement not covered" >this.machineModel(state, inputs)</span>
 &nbsp;
     // Get AVR output
-    const V = <span class="cstat-no" title="statement not covered" >Math.sqrt(inputs.Vd * inputs.Vd + inputs.Vq * inputs.Vq);</span>
-    const pssSignal = <span class="cstat-no" title="statement not covered" >this.pssModel(state, state.omega);</span>
-    const avrOutput = <span class="cstat-no" title="statement not covered" >this.avrModel(state, V, pssSignal);</span>
+    const V = <span class="cstat-no" title="statement not covered" >Math.sqrt(inputs.Vd * inputs.Vd + inputs.Vq * inputs.Vq)</span>
+    const pssSignal = <span class="cstat-no" title="statement not covered" >this.pssModel(state, state.omega)</span>
+    const avrOutput = <span class="cstat-no" title="statement not covered" >this.avrModel(state, V, pssSignal)</span>
 &nbsp;
     // Get governor output
-    const govOutput = <span class="cstat-no" title="statement not covered" >this.governorModel(state, state.omega);</span>
+    const govOutput = <span class="cstat-no" title="statement not covered" >this.governorModel(state, state.omega)</span>
 &nbsp;
     // Update state using Euler integration
     const newState = <span class="cstat-no" title="statement not covered" >{</span>
@@ -889,10 +907,10 @@ class GeneratorModel {
       Efd: avrOutput.EfdNew,
       Pm: govOutput.PmNew,
       Pe: machineDerivs.Pe,
-      Qe: machineDerivs.Qe
-    };
+      Qe: machineDerivs.Qe,
+    }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return newState;</span>
+<span class="cstat-no" title="statement not covered" >    return newState</span>
   }
 &nbsp;
   /**
@@ -911,25 +929,25 @@ class GeneratorModel {
       Pm: this.Pm,
       Pe: this.Pe || 0,
       Qe: this.Qe || 0,
-      angleDegrees: this.delta * 180 / Math.PI,
+      angleDegrees: (this.delta * 180) / Math.PI,
       speedPercent: this.omega * 100,
       electricalPower: this.Pe || 0,
-      reactivePower: this.Qe || 0
-    };
+      reactivePower: this.Qe || 0,
+    }
   }
 &nbsp;
   /**
    * Reset to initial conditions
    */
 <span class="fstat-no" title="function not covered" >  re</span>set() {
-<span class="cstat-no" title="statement not covered" >    this.delta = 0.0;</span>
-<span class="cstat-no" title="statement not covered" >    this.omega = 1.0;</span>
-<span class="cstat-no" title="statement not covered" >    this.Ed = 0.0;</span>
-<span class="cstat-no" title="statement not covered" >    this.Eq = 1.0;</span>
-<span class="cstat-no" title="statement not covered" >    this.Efd = 1.0;</span>
-<span class="cstat-no" title="statement not covered" >    this.Pm = this.Pm || 0.8;</span>
-<span class="cstat-no" title="statement not covered" >    this.Pe = 0.0;</span>
-<span class="cstat-no" title="statement not covered" >    this.Qe = 0.0;</span>
+<span class="cstat-no" title="statement not covered" >    this.delta = 0.0</span>
+<span class="cstat-no" title="statement not covered" >    this.omega = 1.0</span>
+<span class="cstat-no" title="statement not covered" >    this.Ed = 0.0</span>
+<span class="cstat-no" title="statement not covered" >    this.Eq = 1.0</span>
+<span class="cstat-no" title="statement not covered" >    this.Efd = 1.0</span>
+<span class="cstat-no" title="statement not covered" >    this.Pm = this.Pm || 0.8</span>
+<span class="cstat-no" title="statement not covered" >    this.Pe = 0.0</span>
+<span class="cstat-no" title="statement not covered" >    this.Qe = 0.0</span>
   }
 &nbsp;
   /**
@@ -937,23 +955,23 @@ class GeneratorModel {
    * @returns {Object} Stability check
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckStability() {
-    const maxAngleDiff = <span class="cstat-no" title="statement not covered" >Math.PI;</span> // 180 degrees
-    const maxSpeedDeviation = <span class="cstat-no" title="statement not covered" >0.5;</span> // 50% deviation
+    const maxAngleDiff = <span class="cstat-no" title="statement not covered" >Math.PI </span>// 180 degrees
+    const maxSpeedDeviation = <span class="cstat-no" title="statement not covered" >0.5 </span>// 50% deviation
 &nbsp;
-    const angleDiff = <span class="cstat-no" title="statement not covered" >Math.abs(this.delta);</span>
-    const speedDeviation = <span class="cstat-no" title="statement not covered" >Math.abs(this.omega - 1.0);</span>
+    const angleDiff = <span class="cstat-no" title="statement not covered" >Math.abs(this.delta)</span>
+    const speedDeviation = <span class="cstat-no" title="statement not covered" >Math.abs(this.omega - 1.0)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       stable: angleDiff &lt; maxAngleDiff &amp;&amp; speedDeviation &lt; maxSpeedDeviation,
       angleDiff,
       speedDeviation,
       angleMargin: maxAngleDiff - angleDiff,
-      speedMargin: maxSpeedDeviation - speedDeviation
-    };
+      speedMargin: maxSpeedDeviation - speedDeviation,
+    }
   }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = GeneratorModel;</span>
+<span class="cstat-no" title="statement not covered" >module.exports = GeneratorModel</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -961,7 +979,7 @@ class GeneratorModel {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.680Z
+                at 2026-04-29T07:48:07.940Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

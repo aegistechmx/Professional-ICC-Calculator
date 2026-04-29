@@ -1,14 +1,14 @@
 /**
  * engine/PluginManager.js - Plugin management system
- * 
+ *
  * Responsibility: Register and manage simulation plugins
  * Architecture: ETAP-style plugin system
  */
 
 class PluginManager {
   constructor() {
-    this.plugins = new Map();
-    this.context = {};
+    this.plugins = new Map()
+    this.context = {}
   }
 
   /**
@@ -17,19 +17,20 @@ class PluginManager {
    */
   register(plugin) {
     if (!plugin.name) {
-      throw new Error('Plugin must have a name');
+      throw new Error('Plugin must have a name')
     }
 
     if (!plugin.version) {
-      throw new Error('Plugin must have a version');
+      throw new Error('Plugin must have a version')
     }
 
     if (!plugin.init) {
-      throw new Error('Plugin must have init method');
+      throw new Error('Plugin must have init method')
     }
 
-    this.plugins.set(plugin.name, plugin);
-    console.log(`🔌 Plugin registered: ${plugin.name} v${plugin.version}`);
+    this.plugins.set(plugin.name, plugin)
+    // eslint-disable-next-line no-console
+    console.log(`🔌 Plugin registered: ${plugin.name} v${plugin.version}`)
   }
 
   /**
@@ -38,7 +39,7 @@ class PluginManager {
    * @returns {Object} Plugin instance
    */
   get(name) {
-    return this.plugins.get(name);
+    return this.plugins.get(name)
   }
 
   /**
@@ -46,7 +47,7 @@ class PluginManager {
    * @returns {Array} Plugin names
    */
   list() {
-    return Array.from(this.plugins.keys());
+    return Array.from(this.plugins.keys())
   }
 
   /**
@@ -54,18 +55,21 @@ class PluginManager {
    * @param {Object} context - Engine context
    */
   async initAll(context) {
-    this.context = context;
-    
-    console.log(`🚀 Initializing ${this.plugins.size} plugins...`);
-    
+    this.context = context
+
+    // eslint-disable-next-line no-console
+    console.log(`🚀 Initializing ${this.plugins.size} plugins...`)
+
     for (const plugin of this.plugins.values()) {
       try {
         if (plugin.init) {
-          await plugin.init(context);
-          console.log(`✅ Plugin initialized: ${plugin.name}`);
+          await plugin.init(context)
+          // eslint-disable-next-line no-console
+          console.log(`✅ Plugin initialized: ${plugin.name}`)
         }
       } catch (error) {
-        console.error(`❌ Plugin initialization failed: ${plugin.name}`, error);
+        // eslint-disable-next-line no-console
+        console.error(`❌ Plugin initialization failed: ${plugin.name}`, error)
       }
     }
   }
@@ -76,16 +80,18 @@ class PluginManager {
    * @returns {Object} Plugin capabilities
    */
   getCapabilities(name) {
-    const plugin = this.plugins.get(name);
-    if (!plugin) return null;
+    const plugin = this.plugins.get(name)
+    if (!plugin) return null
 
     return {
       name: plugin.name,
       version: plugin.version,
       description: plugin.description,
-      methods: Object.keys(plugin).filter(key => typeof plugin[key] === 'function'),
-      dependencies: plugin.dependencies || []
-    };
+      methods: Object.keys(plugin).filter(
+        key => typeof plugin[key] === 'function'
+      ),
+      dependencies: plugin.dependencies || [],
+    }
   }
 
   /**
@@ -96,21 +102,21 @@ class PluginManager {
     const analysis = {
       satisfied: true,
       missing: [],
-      circular: []
-    };
+      circular: [],
+    }
 
     for (const plugin of this.plugins.values()) {
       if (plugin.dependencies) {
         for (const dep of plugin.dependencies) {
           if (!this.plugins.has(dep)) {
-            analysis.satisfied = false;
-            analysis.missing.push(dep);
+            analysis.satisfied = false
+            analysis.missing.push(dep)
           }
         }
       }
     }
 
-    return analysis;
+    return analysis
   }
 
   /**
@@ -121,10 +127,10 @@ class PluginManager {
     return {
       total: this.plugins.size,
       names: this.list(),
-      capabilities: this.list().map(name => this.getCapabilities(name))
-    };
+      capabilities: this.list().map(name => this.getCapabilities(name)),
+    }
   }
 }
 
 // Singleton instance
-module.exports = new PluginManager();
+module.exports = new PluginManager()

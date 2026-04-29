@@ -1,11 +1,11 @@
 /**
  * engine/Engine.js - Core simulation engine
- * 
+ *
  * Responsibility: Orchestrate plugin-based simulation system
  * Architecture: ETAP-style plugin system
  */
 
-const PluginManager = require('./PluginManager');
+const PluginManager = require('./PluginManager')
 
 class Engine {
   constructor() {
@@ -15,11 +15,11 @@ class Engine {
       stability: {},
       contingencies: {},
       market: {},
-      protection: {}
-    };
-    
-    this.pluginManager = PluginManager;
-    this.initialized = false;
+      protection: {},
+    }
+
+    this.pluginManager = PluginManager
+    this.initialized = false
   }
 
   /**
@@ -28,17 +28,18 @@ class Engine {
    */
   async init(options = {}) {
     if (this.initialized) {
-      throw new Error('Engine already initialized');
+      throw new Error('Engine already initialized')
     }
 
-    this.context.options = options;
-    this.context.engine = this;
-    
+    this.context.options = options
+    this.context.engine = this
+
     // Initialize all registered plugins
-    await this.pluginManager.initAll(this.context);
-    
-    this.initialized = true;
-    console.log('🚀 Engine initialized successfully');
+    await this.pluginManager.initAll(this.context)
+
+    this.initialized = true
+    // eslint-disable-next-line no-console
+    console.log('🚀 Engine initialized successfully')
   }
 
   /**
@@ -50,44 +51,46 @@ class Engine {
    */
   async run(pluginName, method, payload) {
     if (!this.initialized) {
-      throw new Error('Engine not initialized');
+      throw new Error('Engine not initialized')
     }
 
-    const plugin = this.pluginManager.get(pluginName);
-    
+    const plugin = this.pluginManager.get(pluginName)
+
     if (!plugin) {
-      throw new Error(`Plugin ${pluginName} not found`);
+      throw new Error(`Plugin ${pluginName} not found`)
     }
 
     if (!plugin[method]) {
-      throw new Error(`Method ${method} not found in ${pluginName}`);
+      throw new Error(`Method ${method} not found in ${pluginName}`)
     }
 
     try {
-      const startTime = Date.now();
-      const result = await plugin[method](payload, this.context);
-      const duration = Date.now() - startTime;
-      
-      console.log(`⚡ ${pluginName}.${method} completed in ${duration}ms`);
-      
+      const startTime = Date.now()
+      const result = await plugin[method](payload, this.context)
+      const duration = Date.now() - startTime
+
+      // eslint-disable-next-line no-console
+      console.log(`⚡ ${pluginName}.${method} completed in ${duration}ms`)
+
       return {
         success: true,
         data: result,
         plugin: pluginName,
         method,
         duration,
-        timestamp: new Date().toISOString()
-      };
+        timestamp: new Date().toISOString(),
+      }
     } catch (error) {
-      console.error(`❌ ${pluginName}.${method} failed:`, error.message);
-      
+      // eslint-disable-next-line no-console
+      console.error(`❌ ${pluginName}.${method} failed:`, error.message)
+
       return {
         success: false,
         error: error.message,
         plugin: pluginName,
         method,
-        timestamp: new Date().toISOString()
-      };
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
@@ -97,19 +100,20 @@ class Engine {
    * @returns {Promise<Array>} Results
    */
   async runSequence(tasks) {
-    const results = [];
-    
+    const results = []
+
     for (const task of tasks) {
-      const result = await this.run(task.plugin, task.method, task.payload);
-      results.push(result);
-      
+      const result = await this.run(task.plugin, task.method, task.payload)
+      results.push(result)
+
       if (!result.success) {
-        console.log(`⚠️ Sequence stopped at ${task.plugin}.${task.method}`);
-        break;
+        // eslint-disable-next-line no-console
+        console.log(`⚠️ Sequence stopped at ${task.plugin}.${task.method}`)
+        break
       }
     }
-    
-    return results;
+
+    return results
   }
 
   /**
@@ -118,11 +122,11 @@ class Engine {
    * @returns {Promise<Array>} Results
    */
   async runParallel(tasks) {
-    const promises = tasks.map(task => 
+    const promises = tasks.map(task =>
       this.run(task.plugin, task.method, task.payload)
-    );
+    )
 
-    return Promise.all(promises);
+    return Promise.all(promises)
   }
 
   /**
@@ -134,8 +138,8 @@ class Engine {
       initialized: this.initialized,
       plugins: this.pluginManager.getStats(),
       context: Object.keys(this.context),
-      uptime: this.initialized ? Date.now() - this.initTime : 0
-    };
+      uptime: this.initialized ? Date.now() - this.initTime : 0,
+    }
   }
 
   /**
@@ -144,7 +148,7 @@ class Engine {
    * @returns {Object} Plugin capabilities
    */
   getPluginCapabilities(pluginName) {
-    return this.pluginManager.getCapabilities(pluginName);
+    return this.pluginManager.getCapabilities(pluginName)
   }
 
   /**
@@ -154,8 +158,8 @@ class Engine {
   listPlugins() {
     return this.pluginManager.list().map(name => ({
       name,
-      capabilities: this.getPluginCapabilities(name)
-    }));
+      capabilities: this.getPluginCapabilities(name),
+    }))
   }
 
   /**
@@ -168,33 +172,37 @@ class Engine {
       stability: {},
       contingencies: {},
       market: {},
-      protection: {}
-    };
-    this.context.engine = this;
-    console.log('🔄 Engine context reset');
+      protection: {},
+    }
+    this.context.engine = this
+    // eslint-disable-next-line no-console
+    console.log('🔄 Engine context reset')
   }
 
   /**
    * Shutdown engine
    */
   async shutdown() {
-    console.log('🛑 Shutting down engine...');
-    
+    // eslint-disable-next-line no-console
+    console.log('🛑 Shutting down engine...')
+
     // Cleanup plugins if they have shutdown methods
     for (const pluginName of this.pluginManager.list()) {
-      const plugin = this.pluginManager.get(pluginName);
+      const plugin = this.pluginManager.get(pluginName)
       if (plugin && plugin.shutdown) {
         try {
-          await plugin.shutdown(this.context);
+          await plugin.shutdown(this.context)
         } catch (error) {
-          console.error(`❌ Plugin shutdown failed: ${pluginName}`, error);
+          // eslint-disable-next-line no-console
+          console.error(`❌ Plugin shutdown failed: ${pluginName}`, error)
         }
       }
     }
-    
-    this.initialized = false;
-    console.log('✅ Engine shutdown complete');
+
+    this.initialized = false
+    // eslint-disable-next-line no-console
+    console.log('✅ Engine shutdown complete')
   }
 }
 
-module.exports = Engine;
+module.exports = Engine

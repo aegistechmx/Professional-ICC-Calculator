@@ -112,7 +112,43 @@
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -130,44 +166,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * application/services/powerflow.js - Power flow business logic
- * 
+ *
  * Responsibility: Business logic for power flow operations
  */
 &nbsp;
-const { solveNR, solveFDLF } = <span class="cstat-no" title="statement not covered" >require('@/core/powerflow/solvers');</span>
+const { solveNR, solveFDLF } = <span class="cstat-no" title="statement not covered" >require('@/core/powerflow/solvers')</span>
 &nbsp;
 /**
  * Run power flow analysis
@@ -176,27 +182,29 @@ const { solveNR, solveFDLF } = <span class="cstat-no" title="statement not cover
  * @returns {Object} Power flow results
  */
 async function <span class="fstat-no" title="function not covered" >runPowerFlow(</span>system, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
-  const {
-    method = <span class="branch-0 cbranch-no" title="branch not covered" >'FDLF',</span>
-    tolerance = <span class="branch-0 cbranch-no" title="branch not covered" >1e-6,</span>
-    maxIterations = <span class="branch-0 cbranch-no" title="branch not covered" >20</span>
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+  const { method = <span class="branch-0 cbranch-no" title="branch not covered" >'FDLF',</span> tolerance = <span class="branch-0 cbranch-no" title="branch not covered" >1e-6,</span> maxIterations = <span class="branch-0 cbranch-no" title="branch not covered" >20 </span>} = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  console.log('⚡ PowerFlow: Running ' + method + ' analysis...');</span>
+<span class="cstat-no" title="statement not covered" >  console.log('⚡ PowerFlow: Running ' + method + ' analysis...')</span>
 &nbsp;
-  let result;
+  let result
 <span class="cstat-no" title="statement not covered" >  switch (method) {</span>
     case 'NR':
-<span class="cstat-no" title="statement not covered" >      result = await solveNR(system, { tolerance, maxIterations });</span>
-<span class="cstat-no" title="statement not covered" >      break;</span>
+<span class="cstat-no" title="statement not covered" >      result = await solveNR(system, { tolerance, maxIterations })</span>
+<span class="cstat-no" title="statement not covered" >      break</span>
     case 'FDLF':
-<span class="cstat-no" title="statement not covered" >      result = await solveFDLF(system, { tolerance, maxIterations });</span>
-<span class="cstat-no" title="statement not covered" >      break;</span>
+<span class="cstat-no" title="statement not covered" >      result = await solveFDLF(system, { tolerance, maxIterations })</span>
+<span class="cstat-no" title="statement not covered" >      break</span>
     default:
-<span class="cstat-no" title="statement not covered" >      throw new Error('Unknown power flow method: ' + method);</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Unknown power flow method: ' + method)</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  console.log('⚡ PowerFlow: ' + (result.converged ? 'CONVERGED' : 'NOT CONVERGED') + ' in ' + result.iterations + ' iterations');</span>
+<span class="cstat-no" title="statement not covered" >  console.log(</span>
+    '⚡ PowerFlow: ' +
+      (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +
+      ' in ' +
+      result.iterations +
+      ' iterations'
+  )
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     method,
@@ -206,18 +214,19 @@ async function <span class="fstat-no" title="function not covered" >runPowerFlow
     flows: result.flows,
     system,
     options,
-    timestamp: new Date().toISOString()
-  };
+    timestamp: new Date().toISOString(),
+  }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = { runPowerFlow };</span></pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >module.exports = { runPowerFlow }</span>
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

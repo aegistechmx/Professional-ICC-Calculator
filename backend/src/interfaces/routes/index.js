@@ -1,14 +1,14 @@
 /**
  * interfaces/routes/index.js - API routes aggregation
- * 
+ *
  * Responsibility: Combine all API routes into a single router
  */
 
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 
 // Import individual route modules
-const distributedRoutes = require('../../api/routes/distributed.routes');
+const distributedRoutes = require('../../api/routes/distributed.routes')
 
 // Health check route
 router.get('/health', (req, res) => {
@@ -16,9 +16,9 @@ router.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    version: process.env.npm_package_version || '1.0.0'
-  });
-});
+    version: process.env.npm_package_version || '1.0.0',
+  })
+})
 
 // API info route
 router.get('/', (req, res) => {
@@ -31,13 +31,13 @@ router.get('/', (req, res) => {
       distributed: '/api/distributed',
       powerflow: '/api/powerflow (coming soon)',
       shortcircuit: '/api/shortcircuit (coming soon)',
-      opf: '/api/opf (coming soon)'
-    }
-  });
-});
+      opf: '/api/opf (coming soon)',
+    },
+  })
+})
 
 // Mount route modules
-router.use('/api/distributed', distributedRoutes);
+router.use('/api/distributed', distributedRoutes)
 
 // 404 handler for unknown routes
 router.use('*', (req, res) => {
@@ -45,12 +45,8 @@ router.use('*', (req, res) => {
     error: 'Endpoint not found',
     path: req.originalUrl,
     method: req.method,
-    availableEndpoints: [
-      '/health',
-      '/',
-      '/api/distributed/*'
-    ]
-  });
-});
+    availableEndpoints: ['/health', '/', '/api/distributed/*'],
+  })
+})
 
-module.exports = router;
+module.exports = router

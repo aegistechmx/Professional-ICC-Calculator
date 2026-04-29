@@ -209,7 +209,10 @@
 <a name='L144'></a><a href='#L144'>144</a>
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
-<a name='L147'></a><a href='#L147'>147</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -267,24 +270,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -298,6 +287,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -318,9 +315,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -357,7 +363,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * generator.js - Synchronous generator model for transient stability
- * 
+ *
  * Responsibility: Model generator dynamics with swing equation
  * NO Express, NO axios, NO UI logic
  */
@@ -376,15 +382,15 @@ class Generator {
    * @param {number} params.xd - Direct axis reactance (pu)
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor({ H, D, Pm, xd }) {
-<span class="cstat-no" title="statement not covered" >    this.H = H; </span>    // Inertia constant
-<span class="cstat-no" title="statement not covered" >    this.D = D; </span>    // Damping coefficient
-<span class="cstat-no" title="statement not covered" >    this.Pm = Pm; </span>  // Mechanical power
-<span class="cstat-no" title="statement not covered" >    this.xd = xd; </span>  // Direct axis reactance
+<span class="cstat-no" title="statement not covered" >    this.H = H </span>// Inertia constant
+<span class="cstat-no" title="statement not covered" >    this.D = D </span>// Damping coefficient
+<span class="cstat-no" title="statement not covered" >    this.Pm = Pm </span>// Mechanical power
+<span class="cstat-no" title="statement not covered" >    this.xd = xd </span>// Direct axis reactance
 &nbsp;
     // State variables
-<span class="cstat-no" title="statement not covered" >    this.delta = 0; </span>   // Rotor angle (radians)
-<span class="cstat-no" title="statement not covered" >    this.omega = 1; </span>   // Angular velocity (pu, 1.0 = synchronous)
-<span class="cstat-no" title="statement not covered" >    this.Pe = 0; </span>    // Electrical power output
+<span class="cstat-no" title="statement not covered" >    this.delta = 0 </span>// Rotor angle (radians)
+<span class="cstat-no" title="statement not covered" >    this.omega = 1 </span>// Angular velocity (pu, 1.0 = synchronous)
+<span class="cstat-no" title="statement not covered" >    this.Pe = 0 </span>// Electrical power output
   }
 &nbsp;
   /**
@@ -395,8 +401,8 @@ class Generator {
    * @returns {number} Electrical power (pu)
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateElectricalPower(V, theta, Eq) {
-    const deltaDiff = <span class="cstat-no" title="statement not covered" >this.delta - theta;</span>
-<span class="cstat-no" title="statement not covered" >    return (V * Eq / this.xd) * Math.sin(deltaDiff);</span>
+    const deltaDiff = <span class="cstat-no" title="statement not covered" >this.delta - theta</span>
+<span class="cstat-no" title="statement not covered" >    return ((V * Eq) / this.xd) * Math.sin(deltaDiff)</span>
   }
 &nbsp;
   /**
@@ -408,14 +414,15 @@ class Generator {
    */
 <span class="fstat-no" title="function not covered" >  de</span>rivatives(V, theta, Eq) {
     // Electrical power
-<span class="cstat-no" title="statement not covered" >    this.Pe = this.calculateElectricalPower(V, theta, Eq);</span>
+<span class="cstat-no" title="statement not covered" >    this.Pe = this.calculateElectricalPower(V, theta, Eq)</span>
 &nbsp;
     // Swing equation: 2H d²δ/dt² + D dδ/dt = Pm - Pe
-    const dDelta = <span class="cstat-no" title="statement not covered" >this.omega - 1;</span>  // dδ/dt = ω - ωsynchronous
+    const dDelta = <span class="cstat-no" title="statement not covered" >this.omega - 1 </span>// dδ/dt = ω - ωsynchronous
 &nbsp;
-    const dOmega = <span class="cstat-no" title="statement not covered" >(this.Pm - this.Pe - this.D * (this.omega - 1)) / (2 * this.H);</span>
+    const dOmega =
+<span class="cstat-no" title="statement not covered" >      (this.Pm - this.Pe - this.D * (this.omega - 1)) / (2 * this.H)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return { dDelta, dOmega };</span>
+<span class="cstat-no" title="statement not covered" >    return { dDelta, dOmega }</span>
   }
 &nbsp;
   /**
@@ -426,10 +433,10 @@ class Generator {
    * @param {number} dt - Time step (seconds)
    */
 <span class="fstat-no" title="function not covered" >  up</span>dateEuler(V, theta, Eq, dt) {
-    const { dDelta, dOmega } = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq);</span>
+    const { dDelta, dOmega } = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    this.delta += dDelta * dt;</span>
-<span class="cstat-no" title="statement not covered" >    this.omega += dOmega * dt;</span>
+<span class="cstat-no" title="statement not covered" >    this.delta += dDelta * dt</span>
+<span class="cstat-no" title="statement not covered" >    this.omega += dOmega * dt</span>
   }
 &nbsp;
   /**
@@ -441,32 +448,34 @@ class Generator {
    */
 <span class="fstat-no" title="function not covered" >  up</span>dateRK4(V, theta, Eq, dt) {
     // RK4 coefficients
-    const k1 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq);</span>
-    
+    const k1 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq)</span>
+&nbsp;
     const temp1 = <span class="cstat-no" title="statement not covered" >{</span>
-      delta: this.delta + k1.dDelta * dt / 2,
-      omega: this.omega + k1.dOmega * dt / 2
-    };
-    
-    const k2 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq);</span>
-    
+      delta: this.delta + (k1.dDelta * dt) / 2,
+      omega: this.omega + (k1.dOmega * dt) / 2,
+    }
+&nbsp;
+    const k2 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq)</span>
+&nbsp;
     const temp2 = <span class="cstat-no" title="statement not covered" >{</span>
-      delta: this.delta + k2.dDelta * dt / 2,
-      omega: this.omega + k2.dOmega * dt / 2
-    };
-    
-    const k3 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq);</span>
-    
+      delta: this.delta + (k2.dDelta * dt) / 2,
+      omega: this.omega + (k2.dOmega * dt) / 2,
+    }
+&nbsp;
+    const k3 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq)</span>
+&nbsp;
     const temp3 = <span class="cstat-no" title="statement not covered" >{</span>
       delta: this.delta + k3.dDelta * dt,
-      omega: this.omega + k3.dOmega * dt
-    };
-    
-    const k4 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq);</span>
-    
+      omega: this.omega + k3.dOmega * dt,
+    }
+&nbsp;
+    const k4 = <span class="cstat-no" title="statement not covered" >this.derivatives(V, theta, Eq)</span>
+&nbsp;
     // Final update
-<span class="cstat-no" title="statement not covered" >    this.delta += (dt / 6) * (k1.dDelta + 2*k2.dDelta + 2*k3.dDelta + k4.dDelta);</span>
-<span class="cstat-no" title="statement not covered" >    this.omega += (dt / 6) * (k1.dOmega + 2*k2.dOmega + 2*k3.dOmega + k4.dOmega);</span>
+<span class="cstat-no" title="statement not covered" >    this.delta +=</span>
+      (dt / 6) * (k1.dDelta + 2 * k2.dDelta + 2 * k3.dDelta + k4.dDelta)
+<span class="cstat-no" title="statement not covered" >    this.omega +=</span>
+      (dt / 6) * (k1.dOmega + 2 * k2.dOmega + 2 * k3.dOmega + k4.dOmega)
   }
 &nbsp;
   /**
@@ -474,7 +483,7 @@ class Generator {
    * @returns {boolean} True if angle exceeds π radians
    */
 <span class="fstat-no" title="function not covered" >  is</span>Unstable() {
-<span class="cstat-no" title="statement not covered" >    return Math.abs(this.delta) &gt; Math.PI;</span>
+<span class="cstat-no" title="statement not covered" >    return Math.abs(this.delta) &gt; Math.PI</span>
   }
 &nbsp;
   /**
@@ -486,21 +495,21 @@ class Generator {
       delta: this.delta,
       omega: this.omega,
       Pe: this.Pe,
-      unstable: this.isUnstable()
-    };
+      unstable: this.isUnstable(),
+    }
   }
 &nbsp;
   /**
    * Reset generator to initial conditions
    */
 <span class="fstat-no" title="function not covered" >  re</span>set() {
-<span class="cstat-no" title="statement not covered" >    this.delta = 0;</span>
-<span class="cstat-no" title="statement not covered" >    this.omega = 1;</span>
-<span class="cstat-no" title="statement not covered" >    this.Pe = 0;</span>
+<span class="cstat-no" title="statement not covered" >    this.delta = 0</span>
+<span class="cstat-no" title="statement not covered" >    this.omega = 1</span>
+<span class="cstat-no" title="statement not covered" >    this.Pe = 0</span>
   }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = Generator;</span>
+<span class="cstat-no" title="statement not covered" >module.exports = Generator</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -508,7 +517,7 @@ class Generator {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

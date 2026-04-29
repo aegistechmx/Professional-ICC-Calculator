@@ -265,7 +265,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * pss.js - Power System Stabilizer (PSS) model
- * 
+ *
  * Responsibility: Simplified PSS implementation for stability enhancement
  * NO Express, NO axios, NO UI logic
  */
@@ -275,12 +275,12 @@
  */
 class PSSModel {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor(params) {
-<span class="cstat-no" title="statement not covered" >    this.K = params.K || 10; </span>                // PSS gain
-<span class="cstat-no" title="statement not covered" >    this.Tw = params.Tw || 10; </span>             // Washout time constant
-<span class="cstat-no" title="statement not covered" >    this.T1 = params.T1 || 0.1; </span>            // Lead time constant 1
-<span class="cstat-no" title="statement not covered" >    this.T2 = params.T2 || 0.05; </span>           // Lead time constant 2
-<span class="cstat-no" title="statement not covered" >    this.T3 = params.T3 || 1.0; </span>            // Lag time constant
-<span class="cstat-no" title="statement not covered" >    this.output = 0; </span>                      // PSS output signal
+<span class="cstat-no" title="statement not covered" >    this.K = params.K || 10 </span>// PSS gain
+<span class="cstat-no" title="statement not covered" >    this.Tw = params.Tw || 10 </span>// Washout time constant
+<span class="cstat-no" title="statement not covered" >    this.T1 = params.T1 || 0.1 </span>// Lead time constant 1
+<span class="cstat-no" title="statement not covered" >    this.T2 = params.T2 || 0.05 </span>// Lead time constant 2
+<span class="cstat-no" title="statement not covered" >    this.T3 = params.T3 || 1.0 </span>// Lag time constant
+<span class="cstat-no" title="statement not covered" >    this.output = 0 </span>// PSS output signal
   }
 &nbsp;
   /**
@@ -290,20 +290,20 @@ class PSSModel {
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateOutput(omega) {
     // Speed deviation (input to PSS)
-    const speedError = <span class="cstat-no" title="statement not covered" >omega - 1.0;</span>
+    const speedError = <span class="cstat-no" title="statement not covered" >omega - 1.0</span>
 &nbsp;
     // Washout filter
-    const washoutOutput = <span class="cstat-no" title="statement not covered" >this.washoutFilter(speedError);</span>
+    const washoutOutput = <span class="cstat-no" title="statement not covered" >this.washoutFilter(speedError)</span>
 &nbsp;
     // Lead-lag compensation
-    const leadLagOutput = <span class="cstat-no" title="statement not covered" >this.leadLagFilter(washoutOutput);</span>
+    const leadLagOutput = <span class="cstat-no" title="statement not covered" >this.leadLagFilter(washoutOutput)</span>
 &nbsp;
     // Lag filter
-    const pssSignal = <span class="cstat-no" title="statement not covered" >this.lagFilter(leadLagOutput);</span>
+    const pssSignal = <span class="cstat-no" title="statement not covered" >this.lagFilter(leadLagOutput)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    this.output = this.K * pssSignal;</span>
+<span class="cstat-no" title="statement not covered" >    this.output = this.K * pssSignal</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return this.output;</span>
+<span class="cstat-no" title="statement not covered" >    return this.output</span>
   }
 &nbsp;
   /**
@@ -313,8 +313,8 @@ class PSSModel {
    */
 <span class="fstat-no" title="function not covered" >  wa</span>shoutFilter(input) {
     // Simple washout implementation
-    const output = <span class="cstat-no" title="statement not covered" >input / (1 + this.Tw * Math.abs(input));</span>
-<span class="cstat-no" title="statement not covered" >    return output;</span>
+    const output = <span class="cstat-no" title="statement not covered" >input / (1 + this.Tw * Math.abs(input))</span>
+<span class="cstat-no" title="statement not covered" >    return output</span>
   }
 &nbsp;
   /**
@@ -324,8 +324,8 @@ class PSSModel {
    */
 <span class="fstat-no" title="function not covered" >  le</span>adLagFilter(input) {
     // Simplified lead-lag implementation
-    const output = <span class="cstat-no" title="statement not covered" >input * (1 + this.T1) / (1 + this.T2);</span>
-<span class="cstat-no" title="statement not covered" >    return output;</span>
+    const output = <span class="cstat-no" title="statement not covered" >(input * (1 + this.T1)) / (1 + this.T2)</span>
+<span class="cstat-no" title="statement not covered" >    return output</span>
   }
 &nbsp;
   /**
@@ -335,8 +335,8 @@ class PSSModel {
    */
 <span class="fstat-no" title="function not covered" >  la</span>gFilter(input) {
     // Simple lag implementation
-    const output = <span class="cstat-no" title="statement not covered" >input / (1 + this.T3);</span>
-<span class="cstat-no" title="statement not covered" >    return output;</span>
+    const output = <span class="cstat-no" title="statement not covered" >input / (1 + this.T3)</span>
+<span class="cstat-no" title="statement not covered" >    return output</span>
   }
 &nbsp;
   /**
@@ -350,19 +350,19 @@ class PSSModel {
       T1: this.T1,
       T2: this.T2,
       T3: this.T3,
-      output: this.output
-    };
+      output: this.output,
+    }
   }
 &nbsp;
   /**
    * Reset to initial conditions
    */
 <span class="fstat-no" title="function not covered" >  re</span>set() {
-<span class="cstat-no" title="statement not covered" >    this.output = 0;</span>
+<span class="cstat-no" title="statement not covered" >    this.output = 0</span>
   }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = PSSModel;</span>
+<span class="cstat-no" title="statement not covered" >module.exports = PSSModel</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -370,7 +370,7 @@ class PSSModel {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

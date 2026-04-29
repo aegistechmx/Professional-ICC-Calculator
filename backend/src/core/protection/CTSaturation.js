@@ -100,7 +100,8 @@ class CTSaturation {
     }
 
     // Saturation region
-    const overVoltage = (voltage - this.kneePoint) / this.saturationVoltage // voltage (V)
+    const overVoltage = (voltage - this.kneePoint) / this.saturationVoltage
+    // voltage (V)
 
     switch (type) {
       case 'exponential':
@@ -210,7 +211,8 @@ class CTSaturationProtection {
    * @param {number} currentTime - Current simulation time (s)
    * @returns {Object} Protection evaluation result
    */
-  evaluate(measurement, currentTime = 0) { // current (A)
+  evaluate(measurement, currentTime = 0) {
+    // current (A)
     const { I } = measurement
 
     // Calculate secondary current with saturation
@@ -230,7 +232,8 @@ class CTSaturationProtection {
     // Update trip state
     if (shouldTrip && !this.state.trip) {
       this.state.trip = true
-      this.state.tripTime = currentTime + this.timeDelay // current (A)
+      this.state.tripTime = currentTime + this.timeDelay
+      // current (A)
     }
 
     return {

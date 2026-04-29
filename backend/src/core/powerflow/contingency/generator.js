@@ -1,6 +1,6 @@
 /**
  * generator.js - Contingency scenario generator
- * 
+ *
  * Responsibility: Generate N-1 contingency scenarios
  * NO Express, NO axios, NO UI logic
  */
@@ -11,7 +11,7 @@
  * @returns {Array} Array of contingency scenarios
  */
 function generateN1Contingencies(model) {
-  const contingencies = [];
+  const contingencies = []
 
   // Line outages
   model.branches.forEach(branch => {
@@ -20,9 +20,9 @@ function generateN1Contingencies(model) {
       elementId: branch.id,
       from: branch.from,
       to: branch.to,
-      apply: (m) => removeLine(m, branch.id)
-    });
-  });
+      apply: m => removeLine(m, branch.id),
+    })
+  })
 
   // Generator outages (PV buses with generation)
   model.buses.forEach(bus => {
@@ -30,12 +30,12 @@ function generateN1Contingencies(model) {
       contingencies.push({
         type: 'generator_outage',
         elementId: bus.id,
-        apply: (m) => removeGenerator(m, bus.id)
-      });
+        apply: m => removeGenerator(m, bus.id),
+      })
     }
-  });
+  })
 
-  return contingencies;
+  return contingencies
 }
 
 /**
@@ -44,7 +44,7 @@ function generateN1Contingencies(model) {
  * @returns {Object} Cloned model
  */
 function cloneModel(model) {
-  return JSON.parse(JSON.stringify(model));
+  return JSON.parse(JSON.stringify(model))
 }
 
 /**
@@ -54,9 +54,9 @@ function cloneModel(model) {
  * @returns {Object} Modified model
  */
 function removeLine(model, lineId) {
-  const cloned = cloneModel(model);
-  cloned.branches = cloned.branches.filter(b => b.id !== lineId);
-  return cloned;
+  const cloned = cloneModel(model)
+  cloned.branches = cloned.branches.filter(b => b.id !== lineId)
+  return cloned
 }
 
 /**
@@ -66,13 +66,13 @@ function removeLine(model, lineId) {
  * @returns {Object} Modified model
  */
 function removeGenerator(model, busId) {
-  const cloned = cloneModel(model);
-  const bus = cloned.buses.find(b => b.id === busId);
+  const cloned = cloneModel(model)
+  const bus = cloned.buses.find(b => b.id === busId)
   if (bus) {
-    bus.P = 0;
-    bus.type = 'PQ';
+    bus.P = 0
+    bus.type = 'PQ'
   }
-  return cloned;
+  return cloned
 }
 
 /**
@@ -82,11 +82,11 @@ function removeGenerator(model, busId) {
  * @returns {Array} Array of N-2 contingency scenarios
  */
 function generateN2Contingencies(model, maxCombinations = 50) {
-  const contingencies = [];
-  const branches = model.branches;
-  const generators = model.buses.filter(b => b.type === 'PV' && b.P > 0);
+  const contingencies = []
+  const branches = model.branches
+  const generators = model.buses.filter(b => b.type === 'PV' && b.P > 0)
 
-  let count = 0;
+  let count = 0
 
   // Branch-Branch combinations
   for (let i = 0; i < branches.length && count < maxCombinations; i++) {
@@ -94,43 +94,43 @@ function generateN2Contingencies(model, maxCombinations = 50) {
       contingencies.push({
         type: 'line_line_outage',
         elementIds: [branches[i].id, branches[j].id],
-        apply: (m) => {
-          const cloned = cloneModel(m);
-          cloned.branches = cloned.branches.filter(b => 
-            b.id !== branches[i].id && b.id !== branches[j].id
-          );
-          return cloned;
-        }
-      });
-      count++;
+        apply: m => {
+          const cloned = cloneModel(m)
+          cloned.branches = cloned.branches.filter(
+            b => b.id !== branches[i].id && b.id !== branches[j].id
+          )
+          return cloned
+        },
+      })
+      count++
     }
   }
 
   // Branch-Generator combinations
   for (const branch of branches) {
     for (const gen of generators) {
-      if (count >= maxCombinations) break;
-      
+      if (count >= maxCombinations) break
+
       contingencies.push({
         type: 'line_generator_outage',
         elementIds: [branch.id, gen.id],
-        apply: (m) => {
-          const cloned = cloneModel(m);
-          cloned.branches = cloned.branches.filter(b => b.id !== branch.id);
-          const bus = cloned.buses.find(b => b.id === gen.id);
+        apply: m => {
+          const cloned = cloneModel(m)
+          cloned.branches = cloned.branches.filter(b => b.id !== branch.id)
+          const bus = cloned.buses.find(b => b.id === gen.id)
           if (bus) {
-            bus.P = 0;
-            bus.type = 'PQ';
+            bus.P = 0
+            bus.type = 'PQ'
           }
-          return cloned;
-        }
-      });
-      count++;
+          return cloned
+        },
+      })
+      count++
     }
-    if (count >= maxCombinations) break;
+    if (count >= maxCombinations) break
   }
 
-  return contingencies;
+  return contingencies
 }
 
 module.exports = {
@@ -138,5 +138,5 @@ module.exports = {
   generateN2Contingencies,
   cloneModel,
   removeLine,
-  removeGenerator
-};
+  removeGenerator,
+}

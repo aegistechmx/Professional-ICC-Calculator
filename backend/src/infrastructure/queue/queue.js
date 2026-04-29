@@ -1,11 +1,11 @@
 /**
  * infrastructure/queue/queue.js - Professional distributed queue system
- * 
+ *
  * Responsibility: Distributed job management with Redis
  */
 
-const Queue = require('bullmq');
-const Redis = require('ioredis');
+const Queue = require('bullmq')
+const Redis = require('ioredis')
 
 class DistributedQueue {
   constructor(options = {}) {
@@ -15,18 +15,18 @@ class DistributedQueue {
       db: options.redisDb || 0,
       maxRetries: options.maxRetries || 3,
       retryDelay: options.retryDelay || 5000,
-      ...options
-    };
+      ...options,
+    }
 
-    this.queues = new Map();
-    this.redis = new Redis(this.config);
+    this.queues = new Map()
+    this.redis = new Redis(this.config)
     this.stats = {
       created: 0,
       completed: 0,
       failed: 0,
       retried: 0,
-      avgProcessingTime: 0
-    };
+      avgProcessingTime: 0,
+    }
   }
 
   /**
@@ -45,34 +45,37 @@ class DistributedQueue {
         attempts: options.attempts || 3,
         backoff: {
           type: options.backoffType || 'exponential',
-          delay: options.backoffDelay || 2000
-        }
+          delay: options.backoffDelay || 2000,
+        },
       },
       settings: {
         stalledInterval: options.stalledInterval || 30000,
-        maxStalledCount: options.maxStalledCount || 3
-      }
-    };
+        maxStalledCount: options.maxStalledCount || 3,
+      },
+    }
 
-    const queue = new Queue(name, queueConfig);
-    this.queues.set(name, queue);
+    const queue = new Queue(name, queueConfig)
+    this.queues.set(name, queue)
 
     // Event handlers
-    queue.on('completed', (job, result) => {
-      this.updateStats('completed', job);
-      console.log(`✅ Queue ${name}: Job ${job.id} completed`);
-    });
+    queue.on('completed', (job, _result) => {
+      this.updateStats('completed', job)
+      // eslint-disable-next-line no-console
+      console.log(`✅ Queue ${name}: Job ${job.id} completed`)
+    })
 
     queue.on('failed', (job, err) => {
-      this.updateStats('failed', job);
-      console.error(`❌ Queue ${name}: Job ${job.id} failed:`, err.message);
-    });
+      this.updateStats('failed', job)
+      // eslint-disable-next-line no-console
+      console.error(`❌ Queue ${name}: Job ${job.id} failed:`, err.message)
+    })
 
-    queue.on('stalled', (job) => {
-      console.warn(`⚠️ Queue ${name}: Job ${job.id} stalled`);
-    });
+    queue.on('stalled', job => {
+      // eslint-disable-next-line no-console
+      console.warn(`⚠️ Queue ${name}: Job ${job.id} stalled`)
+    })
 
-    return queue;
+    return queue
   }
 
   /**
@@ -83,9 +86,9 @@ class DistributedQueue {
    * @returns {Promise} Job instance
    */
   async add(queueName, data, options = {}) {
-    const queue = this.queues.get(queueName);
+    const queue = this.queues.get(queueName)
     if (!queue) {
-      queue = this.createQueue(queueName);
+      queue = this.createQueue(queueName)
     }
 
     const job = await queue.add(data, {
@@ -93,13 +96,14 @@ class DistributedQueue {
       delay: options.delay || 0,
       attempts: options.attempts || 3,
       removeOnComplete: true,
-      removeOnFail: true
-    });
+      removeOnFail: true,
+    })
 
-    this.updateStats('created', job);
-    console.log(`📤 Queue ${queueName}: Job ${job.id} added`);
+    this.updateStats('created', job)
+    // eslint-disable-next-line no-console
+    console.log(`📤 Queue ${queueName}: Job ${job.id} added`)
 
-    return job;
+    return job
   }
 
   /**
@@ -110,24 +114,25 @@ class DistributedQueue {
    * @returns {Promise<Array>} Job instances
    */
   async addBatch(queueName, jobs, options = {}) {
-    const queue = this.queues.get(queueName);
+    const queue = this.queues.get(queueName)
     if (!queue) {
-      queue = this.createQueue(queueName);
+      queue = this.createQueue(queueName)
     }
 
-    const jobPromises = jobs.map(data => 
+    const jobPromises = jobs.map(data =>
       queue.add(data, {
         ...options,
-        priority: options.priority || 0
+        priority: options.priority || 0,
       })
-    );
+    )
 
-    const addedJobs = await Promise.all(jobPromises);
-    
-    this.stats.created += jobs.length;
-    console.log(`📤 Queue ${queueName}: Batch of ${jobs.length} jobs added`);
+    const addedJobs = await Promise.all(jobPromises)
 
-    return addedJobs;
+    this.stats.created += jobs.length
+    // eslint-disable-next-line no-console
+    console.log(`📤 Queue ${queueName}: Batch of ${jobs.length} jobs added`)
+
+    return addedJobs
   }
 
   /**
@@ -137,13 +142,13 @@ class DistributedQueue {
    * @returns {Promise} Job instance
    */
   async getJob(queueName, jobId) {
-    const queue = this.queues.get(queueName);
+    const queue = this.queues.get(queueName)
     if (!queue) {
-      throw new Error(`Queue ${queueName} not found`);
+      throw new Error(`Queue ${queueName} not found`)
     }
 
-    const job = await queue.getJob(jobId);
-    return job;
+    const job = await queue.getJob(jobId)
+    return job
   }
 
   /**
@@ -152,15 +157,15 @@ class DistributedQueue {
    * @returns {Object} Queue statistics
    */
   async getQueueStats(queueName) {
-    const queue = this.queues.get(queueName);
+    const queue = this.queues.get(queueName)
     if (!queue) {
-      throw new Error(`Queue ${queueName} not found`);
+      throw new Error(`Queue ${queueName} not found`)
     }
 
-    const waiting = await queue.getWaiting();
-    const active = await queue.getActive();
-    const completed = await queue.getCompleted();
-    const failed = await queue.getFailed();
+    const waiting = await queue.getWaiting()
+    const active = await queue.getActive()
+    const completed = await queue.getCompleted()
+    const failed = await queue.getFailed()
 
     return {
       queueName,
@@ -169,8 +174,11 @@ class DistributedQueue {
       completed: completed.length,
       failed: failed.length,
       total: waiting + active + completed + failed,
-      processingRate: active.length > 0 ? (completed.length / (completed.length + failed.length)) * 100 : 0
-    };
+      processingRate:
+        active.length > 0
+          ? (completed.length / (completed.length + failed.length)) * 100
+          : 0,
+    }
   }
 
   /**
@@ -178,10 +186,10 @@ class DistributedQueue {
    * @returns {Object} Overall statistics
    */
   async getAllStats() {
-    const queueStats = {};
-    
+    const queueStats = {}
+
     for (const queueName of this.queues.keys()) {
-      queueStats[queueName] = await this.getQueueStats(queueName);
+      queueStats[queueName] = await this.getQueueStats(queueName)
     }
 
     return {
@@ -191,9 +199,9 @@ class DistributedQueue {
       redis: {
         host: this.config.host,
         port: this.config.port,
-        connected: this.redis.status === 'ready'
-      }
-    };
+        connected: this.redis.status === 'ready',
+      },
+    }
   }
 
   /**
@@ -201,10 +209,11 @@ class DistributedQueue {
    * @param {string} queueName - Queue name
    */
   async pauseQueue(queueName) {
-    const queue = this.queues.get(queueName);
+    const queue = this.queues.get(queueName)
     if (queue) {
-      await queue.pause();
-      console.log(`⏸️ Queue ${queueName}: Paused`);
+      await queue.pause()
+      // eslint-disable-next-line no-console
+      console.log(`⏸️ Queue ${queueName}: Paused`)
     }
   }
 
@@ -213,10 +222,11 @@ class DistributedQueue {
    * @param {string} queueName - Queue name
    */
   async resumeQueue(queueName) {
-    const queue = this.queues.get(queueName);
+    const queue = this.queues.get(queueName)
     if (queue) {
-      await queue.resume();
-      console.log(`▶️ Queue ${queueName}: Resumed`);
+      await queue.resume()
+      // eslint-disable-next-line no-console
+      console.log(`▶️ Queue ${queueName}: Resumed`)
     }
   }
 
@@ -225,11 +235,12 @@ class DistributedQueue {
    * @param {string} queueName - Queue name
    */
   async clearQueue(queueName) {
-    const queue = this.queues.get(queueName);
+    const queue = this.queues.get(queueName)
     if (queue) {
-      await queue.clean(0, 'completed');
-      await queue.clean(0, 'failed');
-      console.log(`🗑️ Queue ${queueName}: Cleared`);
+      await queue.clean(0, 'completed')
+      await queue.clean(0, 'failed')
+      // eslint-disable-next-line no-console
+      console.log(`🗑️ Queue ${queueName}: Cleared`)
     }
   }
 
@@ -239,33 +250,37 @@ class DistributedQueue {
    * @param {Object} job - Job instance
    */
   updateStats(type, job) {
-    this.stats[type]++;
-    
+    this.stats[type]++
+
     if (job.processedOn) {
-      const processingTime = Date.now() - job.processedOn;
-      this.stats.avgProcessingTime = 
-        (this.stats.avgProcessingTime * (this.stats.completed - 1) + processingTime) / this.stats.completed;
+      const processingTime = Date.now() - job.processedOn
+      this.stats.avgProcessingTime =
+        (this.stats.avgProcessingTime * (this.stats.completed - 1) +
+          processingTime) /
+        this.stats.completed
     }
   }
 
   /**
    * Shutdown queue system
    */
-  async shutdown() {
-    console.log('🛑 Shutting down distributed queue system...');
-    
+  async shutdown(_name) {
+    // eslint-disable-next-line no-console
+    console.log('🛑 Shutting down distributed queue system...')
+
     // Pause all queues
-    for (const [name, queue] of this.queues) {
-      await queue.pause();
+    for (const [_name, queue] of this.queues) {
+      await queue.pause()
     }
 
     // Wait for active jobs to complete
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 5000))
 
     // Close Redis connection
-    await this.redis.quit();
-    
-    console.log('✅ Distributed queue system shutdown complete');
+    await this.redis.quit()
+
+    // eslint-disable-next-line no-console
+    console.log('✅ Distributed queue system shutdown complete')
   }
 
   /**
@@ -274,20 +289,20 @@ class DistributedQueue {
    */
   async healthCheck() {
     try {
-      const stats = await this.getAllStats();
+      const stats = await this.getAllStats()
       return {
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        stats
-      };
+        stats,
+      }
     } catch (error) {
       return {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error.message
-      };
+        error: error.message,
+      }
     }
   }
 }
 
-module.exports = DistributedQueue;
+module.exports = DistributedQueue

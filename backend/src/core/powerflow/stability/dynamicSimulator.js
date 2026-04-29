@@ -1,20 +1,20 @@
 /**
  * dynamicSimulator.js - Dynamic simulator for TS-SCOPF
- * 
+ *
  * Responsibility: Simulate system dynamics with faults and stability analysis
  * NO Express, NO axios, NO UI logic
  */
 
-const { solveFDLF } = require('../fastDecoupled');
-const { swingEquation, calculateElectricalPower, updateGeneratorState } = require('./swingEquation');
-const { createThreePhaseFault, clearFault, applyFaultAtTime } = require('./faultModel');
+const { solveFDLF } = require('../fastDecoupled')
+const { updateGeneratorState } = require('./swingEquation')
+const { applyFaultAtTime } = require('./faultModel')
 
 /**
  * Dynamic simulator for transient stability analysis
  */
 class DynamicSimulator {
   constructor(system, options = {}) {
-    this.system = JSON.parse(JSON.stringify(system)); // Deep clone
+    this.system = JSON.parse(JSON.stringify(system)) // Deep clone
     this.options = {
       dt: 0.01, // Time step (seconds)
       tEnd: 5.0, // End time (seconds)
@@ -22,12 +22,12 @@ class DynamicSimulator {
       powerFlowMethod: 'FDLF',
       maxAngleDiff: Math.PI, // Maximum angle difference
       maxSpeedDeviation: 0.5, // Maximum speed deviation
-      ...options
-    };
+      ...options,
+    }
 
     // Initialize generator states
-    this.generators = [];
-    this.initializeGenerators();
+    this.generators = []
+    this.initializeGenerators()
   }
 
   /**
@@ -47,10 +47,10 @@ class DynamicSimulator {
           omega: 1.0, // Initial angular velocity
           Pe: 0, // Initial electrical power
           Eq: 1.0, // Internal voltage
-          referenceAngle: 0 // Reference angle for stability check
-        });
+          referenceAngle: 0, // Reference angle for stability check
+        })
       }
-    });
+    })
   }
 
   /**
@@ -68,55 +68,62 @@ class DynamicSimulator {
       stable: true,
       instabilityTime: null,
       maxAngleDiff: 0,
-      fault
-    };
+      fault,
+    }
 
-    let t = 0;
-    let currentSystem = JSON.parse(JSON.stringify(this.system));
+    let t = 0
+    let currentSystem = JSON.parse(JSON.stringify(this.system))
 
-    console.log(`Starting dynamic simulation with fault: ${fault.description}`);
+    // eslint-disable-next-line no-console
+    console.log(`Starting dynamic simulation with fault: ${fault.description}`)
 
     while (t < this.options.tEnd) {
       // Apply fault at specified time
-      currentSystem = applyFaultAtTime(currentSystem, fault, t);
+      currentSystem = applyFaultAtTime(currentSystem, fault, t)
 
       // Solve power flow for current system state
-      const pfResult = this.solvePowerFlow(currentSystem);
-      
+      const pfResult = this.solvePowerFlow(currentSystem)
+
       if (!pfResult.converged) {
-        results.stable = false;
-        results.instabilityTime = t;
-        break;
+        results.stable = false
+        results.instabilityTime = t
+        break
       }
 
       // Update generator states
-      this.updateAllGenerators(pfResult.voltages, this.options.dt);
+      this.updateAllGenerators(pfResult.voltages, this.options.dt)
 
       // Check stability
-      const stabilityCheck = this.checkStability();
+      const stabilityCheck = this.checkStability()
       if (!stabilityCheck.stable) {
-        results.stable = false;
-        results.instabilityTime = t;
-        results.maxAngleDiff = stabilityCheck.maxAngleDiff;
-        break;
+        results.stable = false
+        results.instabilityTime = t
+        results.maxAngleDiff = stabilityCheck.maxAngleDiff
+        break
       }
 
       // Store results
-      results.time.push(t);
-      results.angles.push(this.generators.map(g => g.delta));
-      results.speeds.push(this.generators.map(g => g.omega));
-      results.powers.push(this.generators.map(g => g.Pe));
-      results.voltages.push(pfResult.voltages);
+      results.time.push(t)
+      results.angles.push(this.generators.map(g => g.delta))
+      results.speeds.push(this.generators.map(g => g.omega))
+      results.powers.push(this.generators.map(g => g.Pe))
+      results.voltages.push(pfResult.voltages)
 
-      t += this.options.dt;
+      t += this.options.dt
     }
 
-    console.log(`Dynamic simulation completed: ${results.stable ? 'STABLE' : 'UNSTABLE'}`);
+    // eslint-disable-next-line no-console
+    console.log(
+      `Dynamic simulation completed: ${results.stable ? 'STABLE' : 'UNSTABLE'}`
+    )
     if (!results.stable) {
-      console.log(`Instability detected at t=${results.instabilityTime.toFixed(3)}s`);
+      // eslint-disable-next-line no-console
+      console.log(
+        `Instability detected at t=${results.instabilityTime.toFixed(3)}s`
+      )
     }
 
-    return results;
+    return results
   }
 
   /**
@@ -126,20 +133,20 @@ class DynamicSimulator {
    */
   solvePowerFlow(system) {
     // Update system with current generator angles
-    this.generators.forEach((gen, i) => {
-      const bus = system.buses.find(b => b.id === gen.bus);
+    this.generators.forEach((gen, _i) => {
+      const bus = system.buses.find(b => b.id === gen.bus)
       if (bus) {
         bus.voltage = {
           magnitude: 1.0, // Assume constant voltage magnitude
-          angle: gen.delta // Use generator angle as bus angle
-        };
+          angle: gen.delta, // Use generator angle as bus angle
+        }
       }
-    });
+    })
 
     return solveFDLF(system, {
       tolerance: 1e-6,
-      maxIterations: 20
-    });
+      maxIterations: 20,
+    })
   }
 
   /**
@@ -148,15 +155,15 @@ class DynamicSimulator {
    * @param {number} dt - Time step
    */
   updateAllGenerators(voltages, dt) {
-    this.generators.forEach((gen, i) => {
-      const V = voltages[gen.bus];
+    this.generators.forEach((gen, _i) => {
+      const V = voltages[gen.bus]
       if (V) {
-        const Vmag = Math.sqrt(V.re * V.re + V.im * V.im);
-        const Vang = Math.atan2(V.im, V.re);
-        
-        updateGeneratorState(gen, dt, Vmag, Vang);
+        const Vmag = Math.sqrt(V.re * V.re + V.im * V.im)
+        const Vang = Math.atan2(V.im, V.re)
+
+        updateGeneratorState(gen, dt, Vmag, Vang)
       }
-    });
+    })
   }
 
   /**
@@ -164,25 +171,27 @@ class DynamicSimulator {
    * @returns {Object} Stability check results
    */
   checkStability() {
-    let maxAngleDiff = 0;
-    let maxSpeedDeviation = 0;
-    let stable = true;
+    let maxAngleDiff = 0
+    let maxSpeedDeviation = 0
+    let stable = true
 
-    this.generators.forEach((gen, i) => {
+    this.generators.forEach((gen, _i) => {
       // Check angle difference from reference
-      const angleDiff = Math.abs(gen.delta - gen.referenceAngle);
-      maxAngleDiff = Math.max(maxAngleDiff, angleDiff);
+      const angleDiff = Math.abs(gen.delta - gen.referenceAngle)
+      maxAngleDiff = Math.max(maxAngleDiff, angleDiff)
 
       // Check speed deviation from synchronous
-      const speedDeviation = Math.abs(gen.omega - 1.0);
-      maxSpeedDeviation = Math.max(maxSpeedDeviation, speedDeviation);
+      const speedDeviation = Math.abs(gen.omega - 1.0)
+      maxSpeedDeviation = Math.max(maxSpeedDeviation, speedDeviation)
 
       // Check individual stability limits
-      if (angleDiff > this.options.maxAngleDiff || 
-          speedDeviation > this.options.maxSpeedDeviation) {
-        stable = false;
+      if (
+        angleDiff > this.options.maxAngleDiff ||
+        speedDeviation > this.options.maxSpeedDeviation
+      ) {
+        stable = false
       }
-    });
+    })
 
     return {
       stable,
@@ -195,10 +204,11 @@ class DynamicSimulator {
         power: g.Pe,
         angleDiff: Math.abs(g.delta - g.referenceAngle),
         speedDeviation: Math.abs(g.omega - 1.0),
-        stable: Math.abs(g.delta - g.referenceAngle) < this.options.maxAngleDiff &&
-                Math.abs(g.omega - 1.0) < this.options.maxSpeedDeviation
-      }))
-    };
+        stable:
+          Math.abs(g.delta - g.referenceAngle) < this.options.maxAngleDiff &&
+          Math.abs(g.omega - 1.0) < this.options.maxSpeedDeviation,
+      })),
+    }
   }
 
   /**
@@ -207,29 +217,36 @@ class DynamicSimulator {
    * @returns {Array} Results for each fault
    */
   simulateMultipleFaults(faults) {
-    const results = [];
-    
-    console.log(`Simulating ${faults.length} fault scenarios...`);
-    
+    const results = []
+
+    // eslint-disable-next-line no-console
+    console.log(`Simulating ${faults.length} fault scenarios...`)
+
     faults.forEach((fault, i) => {
-      console.log(`\nFault ${i + 1}/${faults.length}: ${fault.description}`);
-      
+      // eslint-disable-next-line no-console
+      console.log(`\nFault ${i + 1}/${faults.length}: ${fault.description}`)
+
       // Reset generators to initial state
-      this.resetGenerators();
-      
+      this.resetGenerators()
+
       // Simulate fault
-      const result = this.simulateWithFault(fault);
-      results.push(result);
-      
+      const result = this.simulateWithFault(fault)
+      results.push(result)
+
       // Summary
-      console.log(`  Result: ${result.stable ? 'STABLE' : 'UNSTABLE'}`);
+      // eslint-disable-next-line no-console
+      console.log(`  Result: ${result.stable ? 'STABLE' : 'UNSTABLE'}`)
       if (!result.stable) {
-        console.log(`  Instability time: ${result.instabilityTime.toFixed(3)}s`);
-        console.log(`  Max angle difference: ${(result.maxAngleDiff * 180 / Math.PI).toFixed(1)}°`);
+        // eslint-disable-next-line no-console
+        console.log(`  Instability time: ${result.instabilityTime.toFixed(3)}s`)
+        // eslint-disable-next-line no-console
+        console.log(
+          `  Max angle difference: ${((result.maxAngleDiff * 180) / Math.PI).toFixed(1)}°`
+        )
       }
-    });
-    
-    return results;
+    })
+
+    return results
   }
 
   /**
@@ -237,11 +254,11 @@ class DynamicSimulator {
    */
   resetGenerators() {
     this.generators.forEach(gen => {
-      gen.delta = 0;
-      gen.omega = 1.0;
-      gen.Pe = 0;
-      gen.referenceAngle = 0;
-    });
+      gen.delta = 0
+      gen.omega = 1.0
+      gen.Pe = 0
+      gen.referenceAngle = 0
+    })
   }
 
   /**
@@ -255,9 +272,9 @@ class DynamicSimulator {
       delta: gen.delta,
       omega: gen.omega,
       Pe: gen.Pe,
-      angleDegrees: gen.delta * 180 / Math.PI,
-      speedPercent: gen.omega * 100
-    }));
+      angleDegrees: (gen.delta * 180) / Math.PI,
+      speedPercent: gen.omega * 100,
+    }))
   }
 
   /**
@@ -268,32 +285,32 @@ class DynamicSimulator {
     const margins = {
       angleMargin: Infinity,
       speedMargin: Infinity,
-      criticalGenerators: []
-    };
+      criticalGenerators: [],
+    }
 
     this.generators.forEach(gen => {
-      const angleDiff = Math.abs(gen.delta - gen.referenceAngle);
-      const speedDeviation = Math.abs(gen.omega - 1.0);
-      
-      const angleMargin = this.options.maxAngleDiff - angleDiff;
-      const speedMargin = this.options.maxSpeedDeviation - speedDeviation;
-      
-      margins.angleMargin = Math.min(margins.angleMargin, angleMargin);
-      margins.speedMargin = Math.min(margins.speedMargin, speedMargin);
-      
+      const angleDiff = Math.abs(gen.delta - gen.referenceAngle)
+      const speedDeviation = Math.abs(gen.omega - 1.0)
+
+      const angleMargin = this.options.maxAngleDiff - angleDiff
+      const speedMargin = this.options.maxSpeedDeviation - speedDeviation
+
+      margins.angleMargin = Math.min(margins.angleMargin, angleMargin)
+      margins.speedMargin = Math.min(margins.speedMargin, speedMargin)
+
       if (angleMargin < 0.1 || speedMargin < 0.1) {
         margins.criticalGenerators.push({
           id: gen.id,
           angleDiff,
           speedDeviation,
           angleMargin,
-          speedMargin
-        });
+          speedMargin,
+        })
       }
-    });
+    })
 
-    return margins;
+    return margins
   }
 }
 
-module.exports = DynamicSimulator;
+module.exports = DynamicSimulator

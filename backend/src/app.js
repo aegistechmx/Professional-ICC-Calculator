@@ -1,10 +1,9 @@
+const express = require('express')
+const routes = require('./interfaces/routes')
 
-const express = require('express');
-const routes = require('./interfaces/routes');
+const app = express()
 
-const app = express();
+app.use(express.json())
+app.use('/api', routes)
 
-app.use(express.json());
-app.use('/api', routes);
-
-module.exports = app;
+module.exports = app

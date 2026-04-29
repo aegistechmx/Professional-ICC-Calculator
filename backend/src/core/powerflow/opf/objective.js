@@ -1,6 +1,6 @@
 /**
  * objective.js - Objective function for OPF optimization
- * 
+ *
  * Responsibility: Calculate total generation cost and gradients
  * NO Express, NO axios, NO UI logic
  */
@@ -12,8 +12,8 @@
  */
 function totalCost(generators) {
   return generators.reduce((sum, gen) => {
-    return sum + gen.getCost();
-  }, 0);
+    return sum + gen.getCost()
+  }, 0)
 }
 
 /**
@@ -23,8 +23,8 @@ function totalCost(generators) {
  */
 function costGradient(generators) {
   return generators.map(gen => {
-    return gen.getMarginalCost();
-  });
+    return gen.getMarginalCost()
+  })
 }
 
 /**
@@ -33,15 +33,17 @@ function costGradient(generators) {
  * @returns {Array} Hessian matrix (∂²C/∂P²)
  */
 function costHessian(generators) {
-  const n = generators.length;
-  const H = Array(n).fill().map(() => Array(n).fill(0));
+  const n = generators.length
+  const H = Array(n)
+    .fill()
+    .map(() => Array(n).fill(0))
 
   for (let i = 0; i < n; i++) {
     // Second derivative of quadratic cost: ∂²C/∂P² = 2a
-    H[i][i] = 2 * generators[i].cost.a;
+    H[i][i] = 2 * generators[i].cost.a
   }
 
-  return H;
+  return H
 }
 
 /**
@@ -51,16 +53,16 @@ function costHessian(generators) {
  * @returns {number} Incremental cost
  */
 function incrementalCost(generators, deltaP) {
-  let cost = 0;
-  
+  let cost = 0
+
   for (let i = 0; i < generators.length; i++) {
-    const gen = generators[i];
-    const P_new = gen.P + deltaP[i];
-    const { a, b, c } = gen.cost;
-    cost += a * P_new * P_new + b * P_new + c;
+    const gen = generators[i]
+    const P_new = gen.P + deltaP[i]
+    const { a, b, c } = gen.cost
+    cost += a * P_new * P_new + b * P_new + c
   }
 
-  return cost;
+  return cost
 }
 
 /**
@@ -69,7 +71,7 @@ function incrementalCost(generators, deltaP) {
  * @returns {boolean} True if convex
  */
 function isConvex(generators) {
-  return generators.every(gen => gen.cost.a > 0);
+  return generators.every(gen => gen.cost.a > 0)
 }
 
 /**
@@ -79,17 +81,17 @@ function isConvex(generators) {
  * @returns {number} Cost reduction
  */
 function costReduction(generators, P_old) {
-  const cost_new = totalCost(generators);
-  
+  const cost_new = totalCost(generators)
+
   // Calculate old cost
-  let cost_old = 0;
+  let cost_old = 0
   for (let i = 0; i < generators.length; i++) {
-    const gen = generators[i];
-    const { a, b, c } = gen.cost;
-    cost_old += a * P_old[i] * P_old[i] + b * P_old[i] + c;
+    const gen = generators[i]
+    const { a, b, c } = gen.cost
+    cost_old += a * P_old[i] * P_old[i] + b * P_old[i] + c
   }
 
-  return cost_old - cost_new;
+  return cost_old - cost_new
 }
 
 module.exports = {
@@ -98,5 +100,5 @@ module.exports = {
   costHessian,
   incrementalCost,
   isConvex,
-  costReduction
-};
+  costReduction,
+}

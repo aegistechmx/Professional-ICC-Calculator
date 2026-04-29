@@ -1,6 +1,6 @@
 /**
  * generator.js - Synchronous generator model for transient stability
- * 
+ *
  * Responsibility: Model generator dynamics with swing equation
  * NO Express, NO axios, NO UI logic
  */
@@ -19,15 +19,15 @@ class Generator {
    * @param {number} params.xd - Direct axis reactance (pu)
    */
   constructor({ H, D, Pm, xd }) {
-    this.H = H;     // Inertia constant
-    this.D = D;     // Damping coefficient
-    this.Pm = Pm;   // Mechanical power
-    this.xd = xd;   // Direct axis reactance
+    this.H = H // Inertia constant
+    this.D = D // Damping coefficient
+    this.Pm = Pm // Mechanical power
+    this.xd = xd // Direct axis reactance
 
     // State variables
-    this.delta = 0;    // Rotor angle (radians)
-    this.omega = 1;    // Angular velocity (pu, 1.0 = synchronous)
-    this.Pe = 0;     // Electrical power output
+    this.delta = 0 // Rotor angle (radians)
+    this.omega = 1 // Angular velocity (pu, 1.0 = synchronous)
+    this.Pe = 0 // Electrical power output
   }
 
   /**
@@ -38,8 +38,8 @@ class Generator {
    * @returns {number} Electrical power (pu)
    */
   calculateElectricalPower(V, theta, Eq) {
-    const deltaDiff = this.delta - theta;
-    return (V * Eq / this.xd) * Math.sin(deltaDiff);
+    const deltaDiff = this.delta - theta
+    return ((V * Eq) / this.xd) * Math.sin(deltaDiff)
   }
 
   /**
@@ -51,14 +51,15 @@ class Generator {
    */
   derivatives(V, theta, Eq) {
     // Electrical power
-    this.Pe = this.calculateElectricalPower(V, theta, Eq);
+    this.Pe = this.calculateElectricalPower(V, theta, Eq)
 
     // Swing equation: 2H d²δ/dt² + D dδ/dt = Pm - Pe
-    const dDelta = this.omega - 1;  // dδ/dt = ω - ωsynchronous
+    const dDelta = this.omega - 1 // dδ/dt = ω - ωsynchronous
 
-    const dOmega = (this.Pm - this.Pe - this.D * (this.omega - 1)) / (2 * this.H);
+    const dOmega =
+      (this.Pm - this.Pe - this.D * (this.omega - 1)) / (2 * this.H)
 
-    return { dDelta, dOmega };
+    return { dDelta, dOmega }
   }
 
   /**
@@ -69,10 +70,10 @@ class Generator {
    * @param {number} dt - Time step (seconds)
    */
   updateEuler(V, theta, Eq, dt) {
-    const { dDelta, dOmega } = this.derivatives(V, theta, Eq);
+    const { dDelta, dOmega } = this.derivatives(V, theta, Eq)
 
-    this.delta += dDelta * dt;
-    this.omega += dOmega * dt;
+    this.delta += dDelta * dt
+    this.omega += dOmega * dt
   }
 
   /**
@@ -84,32 +85,34 @@ class Generator {
    */
   updateRK4(V, theta, Eq, dt) {
     // RK4 coefficients
-    const k1 = this.derivatives(V, theta, Eq);
-    
+    const k1 = this.derivatives(V, theta, Eq)
+
     const temp1 = {
-      delta: this.delta + k1.dDelta * dt / 2,
-      omega: this.omega + k1.dOmega * dt / 2
-    };
-    
-    const k2 = this.derivatives(V, theta, Eq);
-    
+      delta: this.delta + (k1.dDelta * dt) / 2,
+      omega: this.omega + (k1.dOmega * dt) / 2,
+    }
+
+    const k2 = this.derivatives(V, theta, Eq)
+
     const temp2 = {
-      delta: this.delta + k2.dDelta * dt / 2,
-      omega: this.omega + k2.dOmega * dt / 2
-    };
-    
-    const k3 = this.derivatives(V, theta, Eq);
-    
+      delta: this.delta + (k2.dDelta * dt) / 2,
+      omega: this.omega + (k2.dOmega * dt) / 2,
+    }
+
+    const k3 = this.derivatives(V, theta, Eq)
+
     const temp3 = {
       delta: this.delta + k3.dDelta * dt,
-      omega: this.omega + k3.dOmega * dt
-    };
-    
-    const k4 = this.derivatives(V, theta, Eq);
-    
+      omega: this.omega + k3.dOmega * dt,
+    }
+
+    const k4 = this.derivatives(V, theta, Eq)
+
     // Final update
-    this.delta += (dt / 6) * (k1.dDelta + 2*k2.dDelta + 2*k3.dDelta + k4.dDelta);
-    this.omega += (dt / 6) * (k1.dOmega + 2*k2.dOmega + 2*k3.dOmega + k4.dOmega);
+    this.delta +=
+      (dt / 6) * (k1.dDelta + 2 * k2.dDelta + 2 * k3.dDelta + k4.dDelta)
+    this.omega +=
+      (dt / 6) * (k1.dOmega + 2 * k2.dOmega + 2 * k3.dOmega + k4.dOmega)
   }
 
   /**
@@ -117,7 +120,7 @@ class Generator {
    * @returns {boolean} True if angle exceeds π radians
    */
   isUnstable() {
-    return Math.abs(this.delta) > Math.PI;
+    return Math.abs(this.delta) > Math.PI
   }
 
   /**
@@ -129,18 +132,18 @@ class Generator {
       delta: this.delta,
       omega: this.omega,
       Pe: this.Pe,
-      unstable: this.isUnstable()
-    };
+      unstable: this.isUnstable(),
+    }
   }
 
   /**
    * Reset generator to initial conditions
    */
   reset() {
-    this.delta = 0;
-    this.omega = 1;
-    this.Pe = 0;
+    this.delta = 0
+    this.omega = 1
+    this.Pe = 0
   }
 }
 
-module.exports = Generator;
+module.exports = Generator

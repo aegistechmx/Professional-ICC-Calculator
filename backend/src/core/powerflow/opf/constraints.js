@@ -1,6 +1,6 @@
 /**
  * constraints.js - Power flow constraints for OPF
- * 
+ *
  * Responsibility: Enforce physical and operational constraints
  * NO Express, NO axios, NO UI logic
  */
@@ -13,9 +13,9 @@
  * @returns {number} Power mismatch
  */
 function powerBalanceMismatch(model, Pgen, Pload) {
-  const totalGen = Pgen.reduce((sum, P) => sum + P, 0);
-  const totalLoad = Pload.reduce((sum, P) => sum + P, 0);
-  return totalGen - totalLoad;
+  const totalGen = Pgen.reduce((sum, P) => sum + P, 0)
+  const totalLoad = Pload.reduce((sum, P) => sum + P, 0)
+  return totalGen - totalLoad
 }
 
 /**
@@ -25,16 +25,18 @@ function powerBalanceMismatch(model, Pgen, Pload) {
  * @param {Array} loads - Load array
  */
 function enforcePowerBalance(model, generators, loads) {
-  const Pgen = generators.map(g => g.P);
-  const Pload = loads.map(l => l.P);
-  
-  const mismatch = powerBalanceMismatch(model, Pgen, Pload);
-  
+  const Pgen = generators.map(g => g.P)
+  const Pload = loads.map(l => l.P)
+
+  const mismatch = powerBalanceMismatch(model, Pgen, Pload)
+
   // Adjust slack generator (first generator)
   if (generators.length > 0) {
-    generators[0].P -= mismatch;
-    generators[0].P = Math.max(generators[0].Pmin, 
-                                 Math.min(generators[0].Pmax, generators[0].P));
+    generators[0].P -= mismatch
+    generators[0].P = Math.max(
+      generators[0].Pmin,
+      Math.min(generators[0].Pmax, generators[0].P)
+    )
   }
 }
 
@@ -44,8 +46,8 @@ function enforcePowerBalance(model, generators, loads) {
  * @returns {Object} Violation information
  */
 function checkGenerationLimits(generators) {
-  const violations = [];
-  
+  const violations = []
+
   generators.forEach((gen, i) => {
     if (gen.P < gen.Pmin) {
       violations.push({
@@ -53,25 +55,25 @@ function checkGenerationLimits(generators) {
         generator: i,
         value: gen.P,
         limit: gen.Pmin,
-        violation: gen.Pmin - gen.P
-      });
+        violation: gen.Pmin - gen.P,
+      })
     }
-    
+
     if (gen.P > gen.Pmax) {
       violations.push({
         type: 'generation_above_max',
         generator: i,
         value: gen.P,
         limit: gen.Pmax,
-        violation: gen.P - gen.Pmax
-      });
+        violation: gen.P - gen.Pmax,
+      })
     }
-  });
+  })
 
   return {
     violations,
-    feasible: violations.length === 0
-  };
+    feasible: violations.length === 0,
+  }
 }
 
 /**
@@ -82,36 +84,36 @@ function checkGenerationLimits(generators) {
  * @returns {Object} Violation information
  */
 function checkVoltageLimits(voltages, Vmin = 0.95, Vmax = 1.05) {
-  const violations = [];
-  
+  const violations = []
+
   voltages.forEach((V, i) => {
-    const Vmag = Math.sqrt(V.re * V.re + V.im * V.im);
-    
+    const Vmag = Math.sqrt(V.re * V.re + V.im * V.im)
+
     if (Vmag < Vmin) {
       violations.push({
         type: 'voltage_below_min',
         bus: i,
         value: Vmag,
         limit: Vmin,
-        violation: Vmin - Vmag
-      });
+        violation: Vmin - Vmag,
+      })
     }
-    
+
     if (Vmag > Vmax) {
       violations.push({
         type: 'voltage_above_max',
         bus: i,
         value: Vmag,
         limit: Vmax,
-        violation: Vmag - Vmax
-      });
+        violation: Vmag - Vmax,
+      })
     }
-  });
+  })
 
   return {
     violations,
-    feasible: violations.length === 0
-  };
+    feasible: violations.length === 0,
+  }
 }
 
 /**
@@ -121,8 +123,8 @@ function checkVoltageLimits(voltages, Vmin = 0.95, Vmax = 1.05) {
  * @returns {Object} Violation information
  */
 function checkLineFlowLimits(flows, limits) {
-  const violations = [];
-  
+  const violations = []
+
   flows.forEach((flow, i) => {
     if (Math.abs(flow) > limits[i]) {
       violations.push({
@@ -130,15 +132,15 @@ function checkLineFlowLimits(flows, limits) {
         line: i,
         value: Math.abs(flow),
         limit: limits[i],
-        violation: Math.abs(flow) - limits[i]
-      });
+        violation: Math.abs(flow) - limits[i],
+      })
     }
-  });
+  })
 
   return {
     violations,
-    feasible: violations.length === 0
-  };
+    feasible: violations.length === 0,
+  }
 }
 
 /**
@@ -148,15 +150,15 @@ function checkLineFlowLimits(flows, limits) {
  * @returns {number} Total penalty
  */
 function calculatePenalty(violations, penalty = 1000) {
-  let totalPenalty = 0;
-  
+  let totalPenalty = 0
+
   if (violations.violations) {
     violations.violations.forEach(v => {
-      totalPenalty += penalty * Math.abs(v.violation);
-    });
+      totalPenalty += penalty * Math.abs(v.violation)
+    })
   }
-  
-  return totalPenalty;
+
+  return totalPenalty
 }
 
 /**
@@ -168,31 +170,27 @@ function calculatePenalty(violations, penalty = 1000) {
  * @returns {Object} Overall constraint status
  */
 function checkAllConstraints(model, generators, voltages, options = {}) {
-  const {
-    Vmin = 0.95,
-    Vmax = 1.05,
-    penalty = 1000
-  } = options;
+  const { Vmin = 0.95, Vmax = 1.05, penalty = 1000 } = options
 
   // Check generation limits
-  const genConstraints = checkGenerationLimits(generators);
-  
+  const genConstraints = checkGenerationLimits(generators)
+
   // Check voltage limits
-  const voltConstraints = checkVoltageLimits(voltages, Vmin, Vmax);
-  
+  const voltConstraints = checkVoltageLimits(voltages, Vmin, Vmax)
+
   // Check line flow limits (if available)
-  let flowConstraints = { violations: [], feasible: true };
+  let flowConstraints = { violations: [], feasible: true }
   if (model.branches && model.branches.every(b => b.limit)) {
-    const flows = []; // Would need power flow to calculate
-    const limits = model.branches.map(b => b.limit);
-    flowConstraints = checkLineFlowLimits(flows, limits);
+    const flows = [] // Would need power flow to calculate
+    const limits = model.branches.map(b => b.limit)
+    flowConstraints = checkLineFlowLimits(flows, limits)
   }
 
   const allViolations = [
     ...genConstraints.violations,
     ...voltConstraints.violations,
-    ...flowConstraints.violations
-  ];
+    ...flowConstraints.violations,
+  ]
 
   return {
     feasible: allViolations.length === 0,
@@ -200,8 +198,8 @@ function checkAllConstraints(model, generators, voltages, options = {}) {
     penalty: calculatePenalty({ violations: allViolations }, penalty),
     generation: genConstraints,
     voltage: voltConstraints,
-    flow: flowConstraints
-  };
+    flow: flowConstraints,
+  }
 }
 
 module.exports = {
@@ -211,5 +209,5 @@ module.exports = {
   checkVoltageLimits,
   checkLineFlowLimits,
   calculatePenalty,
-  checkAllConstraints
-};
+  checkAllConstraints,
+}

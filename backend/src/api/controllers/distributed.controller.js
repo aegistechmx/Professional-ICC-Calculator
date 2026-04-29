@@ -1,13 +1,13 @@
 /**
  * api/controllers/distributed.controller.js - Distributed simulation controller
- * 
+ *
  * Responsibility: HTTP controller for distributed simulation services
  */
 
-const JobScheduler = require('../../infrastructure/scheduler/jobScheduler');
+const JobScheduler = require('../../infrastructure/scheduler/jobScheduler')
 
 // Global scheduler instance
-let globalScheduler = null;
+let globalScheduler = null
 
 /**
  * Initialize distributed scheduler
@@ -21,24 +21,24 @@ exports.initializeScheduler = async (req, res) => {
         redisHost: process.env.REDIS_HOST || 'localhost',
         redisPort: process.env.REDIS_PORT || 6379,
         maxWorkers: process.env.MAX_WORKERS || 8,
-        maxConcurrentJobs: process.env.MAX_CONCURRENT_JOBS || 50
-      });
-      
-      await globalScheduler.initialize();
+        maxConcurrentJobs: process.env.MAX_CONCURRENT_JOBS || 50,
+      })
+
+      await globalScheduler.initialize()
     }
-    
+
     res.json({
       success: true,
       message: 'Distributed scheduler initialized',
-      stats: await globalScheduler.getStats()
-    });
+      stats: await globalScheduler.getStats(),
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Submit distributed N-1 contingency analysis
@@ -48,11 +48,11 @@ exports.initializeScheduler = async (req, res) => {
 exports.submitN1Contingency = async (req, res) => {
   try {
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    const { system, options = {} } = req.body;
-    
+    const { system, options = {} } = req.body
+
     // Create job specification
     const jobSpec = {
       type: 'contingency',
@@ -61,32 +61,36 @@ exports.submitN1Contingency = async (req, res) => {
         options: {
           ...options,
           type: 'N-1',
-          maxContingencies: options.maxContingencies || 20
-        }
+          maxContingencies: options.maxContingencies || 20,
+        },
       },
-      priority: options.priority || 'normal'
-    };
+      priority: options.priority || 'normal',
+    }
 
-    const jobId = await globalScheduler.scheduleJob(jobSpec.type, jobSpec.data, {
-      priority: jobSpec.priority,
-      timeout: options.timeout || 300000 // 5 minutes
-    });
+    const jobId = await globalScheduler.scheduleJob(
+      jobSpec.type,
+      jobSpec.data,
+      {
+        priority: jobSpec.priority,
+        timeout: options.timeout || 300000, // 5 minutes
+      }
+    )
 
     res.json({
       success: true,
       data: {
         jobId,
         message: 'N-1 contingency analysis submitted',
-        estimatedTime: '2-5 minutes'
-      }
-    });
+        estimatedTime: '2-5 minutes',
+      },
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Submit distributed N-2 contingency analysis
@@ -96,11 +100,11 @@ exports.submitN1Contingency = async (req, res) => {
 exports.submitN2Contingency = async (req, res) => {
   try {
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    const { system, options = {} } = req.body;
-    
+    const { system, options = {} } = req.body
+
     // Create job specification
     const jobSpec = {
       type: 'contingency',
@@ -109,32 +113,36 @@ exports.submitN2Contingency = async (req, res) => {
         options: {
           ...options,
           type: 'N-2',
-          maxContingencies: options.maxContingencies || 50
-        }
+          maxContingencies: options.maxContingencies || 50,
+        },
       },
-      priority: options.priority || 'low' // N-2 is lower priority
-    };
+      priority: options.priority || 'low', // N-2 is lower priority
+    }
 
-    const jobId = await globalScheduler.scheduleJob(jobSpec.type, jobSpec.data, {
-      priority: jobSpec.priority,
-      timeout: options.timeout || 600000 // 10 minutes
-    });
+    const jobId = await globalScheduler.scheduleJob(
+      jobSpec.type,
+      jobSpec.data,
+      {
+        priority: jobSpec.priority,
+        timeout: options.timeout || 600000, // 10 minutes
+      }
+    )
 
     res.json({
       success: true,
       data: {
         jobId,
         message: 'N-2 contingency analysis submitted',
-        estimatedTime: '10-20 minutes'
-      }
-    });
+        estimatedTime: '10-20 minutes',
+      },
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Submit distributed Monte Carlo analysis
@@ -144,41 +152,45 @@ exports.submitN2Contingency = async (req, res) => {
 exports.submitMonteCarlo = async (req, res) => {
   try {
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    const { system, scenarios, options = {} } = req.body;
-    
+    const { system, scenarios, options = {} } = req.body
+
     // Create job specification
     const jobSpec = {
       type: 'monte-carlo',
       data: {
         system,
-        scenarios: scenarios || generateMonteCarloScenarios(system, options)
+        scenarios: scenarios || generateMonteCarloScenarios(system, options),
       },
-      priority: options.priority || 'low'
-    };
+      priority: options.priority || 'low',
+    }
 
-    const jobId = await globalScheduler.scheduleJob(jobSpec.type, jobSpec.data, {
-      priority: jobSpec.priority,
-      timeout: options.timeout || 1800000 // 30 minutes
-    });
+    const jobId = await globalScheduler.scheduleJob(
+      jobSpec.type,
+      jobSpec.data,
+      {
+        priority: jobSpec.priority,
+        timeout: options.timeout || 1800000, // 30 minutes
+      }
+    )
 
     res.json({
       success: true,
       data: {
         jobId,
         message: 'Monte Carlo analysis submitted',
-        estimatedTime: `${scenarios.length * 2}-${scenarios.length * 5} minutes`
-      }
-    });
+        estimatedTime: `${scenarios.length * 2}-${scenarios.length * 5} minutes`,
+      },
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Submit distributed transient stability analysis
@@ -188,41 +200,45 @@ exports.submitMonteCarlo = async (req, res) => {
 exports.submitTransientStability = async (req, res) => {
   try {
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    const { system, events, options = {} } = req.body;
-    
+    const { system, events, options = {} } = req.body
+
     // Create job specification
     const jobSpec = {
       type: 'stability',
       data: {
         system,
-        events: events || generateStabilityEvents(system, options)
+        events: events || generateStabilityEvents(system, options),
       },
-      priority: options.priority || 'high'
-    };
+      priority: options.priority || 'high',
+    }
 
-    const jobId = await globalScheduler.scheduleJob(jobSpec.type, jobSpec.data, {
-      priority: jobSpec.priority,
-      timeout: options.timeout || 900000 // 15 minutes
-    });
+    const jobId = await globalScheduler.scheduleJob(
+      jobSpec.type,
+      jobSpec.data,
+      {
+        priority: jobSpec.priority,
+        timeout: options.timeout || 900000, // 15 minutes
+      }
+    )
 
     res.json({
       success: true,
       data: {
         jobId,
         message: 'Transient stability analysis submitted',
-        estimatedTime: `${events.length * 1}-${events.length * 3} minutes`
-      }
-    });
+        estimatedTime: `${events.length * 1}-${events.length * 3} minutes`,
+      },
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Get job status
@@ -231,25 +247,25 @@ exports.submitTransientStability = async (req, res) => {
  */
 exports.getJobStatus = async (req, res) => {
   try {
-    const { jobId } = req.params;
-    
+    const { jobId } = req.params
+
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    const status = await globalScheduler.getJobStatus(jobId);
-    
+    const status = await globalScheduler.getJobStatus(jobId)
+
     res.json({
       success: true,
-      data: status
-    });
+      data: status,
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Cancel job
@@ -258,25 +274,25 @@ exports.getJobStatus = async (req, res) => {
  */
 exports.cancelJob = async (req, res) => {
   try {
-    const { jobId } = req.params;
-    
+    const { jobId } = req.params
+
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    const result = await globalScheduler.cancelJob(jobId);
-    
+    const result = await globalScheduler.cancelJob(jobId)
+
     res.json({
       success: true,
-      data: result
-    });
+      data: result,
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Get scheduler statistics
@@ -286,22 +302,22 @@ exports.cancelJob = async (req, res) => {
 exports.getSchedulerStats = async (req, res) => {
   try {
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    const stats = await globalScheduler.getStats();
-    
+    const stats = await globalScheduler.getStats()
+
     res.json({
       success: true,
-      data: stats
-    });
+      data: stats,
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Shutdown scheduler
@@ -311,23 +327,23 @@ exports.getSchedulerStats = async (req, res) => {
 exports.shutdownScheduler = async (req, res) => {
   try {
     if (!globalScheduler) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
-    await globalScheduler.shutdown();
-    globalScheduler = null;
-    
+    await globalScheduler.shutdown()
+    globalScheduler = null
+
     res.json({
       success: true,
-      message: 'Distributed scheduler shutdown'
-    });
+      message: 'Distributed scheduler shutdown',
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
 
 /**
  * Generate Monte Carlo scenarios
@@ -340,38 +356,39 @@ function generateMonteCarloScenarios(system, options = {}) {
     numScenarios = 100,
     loadVariation = 0.1,
     lineOutageProbability = 0.05,
-    generatorOutageProbability = 0.02
-  } = options;
+    generatorOutageProbability = 0.02,
+  } = options
 
-  const scenarios = [];
-  
+  const scenarios = []
+
   for (let i = 0; i < numScenarios; i++) {
     const scenario = {
       id: `mc_${i}`,
       loadVariations: [],
       lineOutages: [],
-      generatorOutages: []
-    };
+      generatorOutages: [],
+    }
 
     // Random load variations
     system.buses.forEach((bus, busIndex) => {
-      if (Math.random() < 0.3) { // 30% chance of load variation
+      if (Math.random() < 0.3) {
+        // 30% chance of load variation
         scenario.loadVariations.push({
           busId: busIndex,
-          factor: 1 + (Math.random() - 0.5) * 2 * loadVariation
-        });
+          factor: 1 + (Math.random() - 0.5) * 2 * loadVariation,
+        })
       }
-    });
+    })
 
     // Random line outages
     system.branches.forEach((branch, branchIndex) => {
       if (Math.random() < lineOutageProbability) {
         scenario.lineOutages.push({
           lineId: branchIndex,
-          removed: true
-        });
+          removed: true,
+        })
       }
-    });
+    })
 
     // Random generator outages
     system.buses.forEach((bus, busIndex) => {
@@ -379,15 +396,15 @@ function generateMonteCarloScenarios(system, options = {}) {
         scenario.generatorOutages.push({
           busId: busIndex,
           reduced: true,
-          reductionFactor: Math.random() * 0.5 // 0-50% reduction
-        });
+          reductionFactor: Math.random() * 0.5, // 0-50% reduction
+        })
       }
-    });
+    })
 
-    scenarios.push(scenario);
+    scenarios.push(scenario)
   }
 
-  return scenarios;
+  return scenarios
 }
 
 /**
@@ -401,33 +418,35 @@ function generateStabilityEvents(system, options = {}) {
     numEvents = 10,
     faultTypes = ['3phase', '1phase', 'line_to_line'],
     faultLocations = ['bus', 'line'],
-    clearingTimes = [0.1, 0.2, 0.3] // seconds
-  } = options;
+    clearingTimes = [0.1, 0.2, 0.3], // seconds
+  } = options
 
-  const events = [];
-  
+  const events = []
+
   for (let i = 0; i < numEvents; i++) {
-    const faultType = faultTypes[Math.floor(Math.random() * faultTypes.length)];
-    const faultLocation = faultLocations[Math.floor(Math.random() * faultLocations.length)];
-    const clearingTime = clearingTimes[Math.floor(Math.random() * clearingTimes.length)];
-    
+    const faultType = faultTypes[Math.floor(Math.random() * faultTypes.length)]
+    const faultLocation =
+      faultLocations[Math.floor(Math.random() * faultLocations.length)]
+    const clearingTime =
+      clearingTimes[Math.floor(Math.random() * clearingTimes.length)]
+
     let event = {
       id: `stability_${i}`,
       type: faultType,
       clearingTime,
-      location: faultLocation
-    };
-
-    if (faultLocation === 'bus') {
-      const busIndex = Math.floor(Math.random() * system.buses.length);
-      event.bus = busIndex;
-    } else if (faultLocation === 'line') {
-      const lineIndex = Math.floor(Math.random() * system.branches.length);
-      event.line = lineIndex;
+      location: faultLocation,
     }
 
-    events.push(event);
+    if (faultLocation === 'bus') {
+      const busIndex = Math.floor(Math.random() * system.buses.length)
+      event.bus = busIndex
+    } else if (faultLocation === 'line') {
+      const lineIndex = Math.floor(Math.random() * system.branches.length)
+      event.line = lineIndex
+    }
+
+    events.push(event)
   }
 
-  return events;
-};
+  return events
+}

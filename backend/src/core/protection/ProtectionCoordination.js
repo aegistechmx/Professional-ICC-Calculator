@@ -94,9 +94,12 @@ function analyzeCoordination(upstream, downstream, options = {}) {
   let minMargin = Infinity
 
   // Check coordination at each fault current
-  faultCurrents.forEach(current => { // current (A)
-    const t_upstream = upstream.getOperatingTime(current) // current (A)
-    const t_downstream = downstream.getOperatingTime(current) // current (A)
+  faultCurrents.forEach(current => {
+    // current (A)
+    const t_upstream = upstream.getOperatingTime(current)
+    // current (A)
+    const t_downstream = downstream.getOperatingTime(current)
+    // current (A)
 
     const margin = (t_upstream - t_downstream) / t_downstream
 
@@ -201,7 +204,8 @@ function analyzeCascadeCoordination(devices, options = {}) {
 function buildSelectivityMatrix(devices, faultCurrents) {
   const matrix = []
 
-  faultCurrents.forEach(current => { // current (A)
+  faultCurrents.forEach(current => {
+    // current (A)
     const tripTimes = devices.map(device => ({
       device: device.name,
       time: device.getOperatingTime(current),

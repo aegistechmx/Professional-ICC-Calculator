@@ -1,11 +1,11 @@
 /**
  * application/services/opf.js - OPF business logic
- * 
+ *
  * Responsibility: Business logic for optimal power flow operations
  */
 
-const { solveOPF } = require('@/core/opf/algorithms');
-const { runPowerFlow } = require('./powerflow');
+const { solveOPF } = require('@/core/opf/algorithms')
+const { runPowerFlow } = require('./powerflow')
 
 /**
  * Run optimal power flow analysis
@@ -18,16 +18,17 @@ async function runOPF(system, options = {}) {
     tolerance = 1e-6,
     maxIterations = 30,
     alpha = 0.5,
-    powerFlowMethod = 'FDLF'
-  } = options;
+    powerFlowMethod = 'FDLF',
+  } = options
 
-  console.log('⚡ OPF: Running economic dispatch optimization...');
+  // eslint-disable-next-line no-console
+  console.log('⚡ OPF: Running economic dispatch optimization...')
 
   // Get base power flow solution
-  const pfResult = await runPowerFlow(system, { method: powerFlowMethod });
-  
+  const pfResult = await runPowerFlow(system, { method: powerFlowMethod })
+
   if (!pfResult.converged) {
-    throw new Error('Base power flow did not converge');
+    throw new Error('Base power flow did not converge')
   }
 
   // Run OPF optimization
@@ -35,11 +36,19 @@ async function runOPF(system, options = {}) {
     tolerance,
     maxIterations,
     alpha,
-    baseSolution: pfResult
-  });
+    baseSolution: pfResult,
+  })
 
-  console.log('⚡ OPF: ' + (result.converged ? 'CONVERGED' : 'NOT CONVERGED') + ' in ' + result.iterations + ' iterations');
-  console.log('⚡ OPF: Final cost: $' + result.cost.toFixed(2));
+  // eslint-disable-next-line no-console
+  console.log(
+    '⚡ OPF: ' +
+    (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +
+    ' in ' +
+    result.iterations +
+    ' iterations'
+  )
+  // eslint-disable-next-line no-console
+  console.log('⚡ OPF: Final cost: $' + result.cost.toFixed(2))
 
   return {
     converged: result.converged,
@@ -51,8 +60,8 @@ async function runOPF(system, options = {}) {
     basePowerFlow: pfResult,
     system,
     options,
-    timestamp: new Date().toISOString()
-  };
+    timestamp: new Date().toISOString(),
+  }
 }
 
-module.exports = { runOPF };
+module.exports = { runOPF }

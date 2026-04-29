@@ -279,7 +279,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * generator.js - Generator model for OPF with cost functions
- * 
+ *
  * Responsibility: Model generator cost curves and constraints
  * NO Express, NO axios, NO UI logic
  */
@@ -301,21 +301,21 @@ class Generator {
    * @param {number} params.bus - Bus ID where generator is connected
    */
 <span class="fstat-no" title="function not covered" >  co</span>nstructor({ id, Pmin, Pmax, cost, bus }) {
-<span class="cstat-no" title="statement not covered" >    this.id = id;</span>
-<span class="cstat-no" title="statement not covered" >    this.Pmin = Pmin;</span>
-<span class="cstat-no" title="statement not covered" >    this.Pmax = Pmax;</span>
-<span class="cstat-no" title="statement not covered" >    this.bus = bus;</span>
+<span class="cstat-no" title="statement not covered" >    this.id = id</span>
+<span class="cstat-no" title="statement not covered" >    this.Pmin = Pmin</span>
+<span class="cstat-no" title="statement not covered" >    this.Pmax = Pmax</span>
+<span class="cstat-no" title="statement not covered" >    this.bus = bus</span>
 &nbsp;
     // Cost function: C(P) = a*P² + b*P + c
 <span class="cstat-no" title="statement not covered" >    this.cost = {</span>
       a: cost.a || 0.01,
       b: cost.b || 10.0,
-      c: cost.c || 100.0
-    };
+      c: cost.c || 100.0,
+    }
 &nbsp;
     // Current operating point
-<span class="cstat-no" title="statement not covered" >    this.P = Pmin; </span>// Start at minimum
-<span class="cstat-no" title="statement not covered" >    this.Q = 0; </span>   // Reactive power
+<span class="cstat-no" title="statement not covered" >    this.P = Pmin </span>// Start at minimum
+<span class="cstat-no" title="statement not covered" >    this.Q = 0 </span>// Reactive power
   }
 &nbsp;
   /**
@@ -324,8 +324,8 @@ class Generator {
    * @returns {number} Cost ($/hour)
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tCost(P = <span class="branch-0 cbranch-no" title="branch not covered" >this.P)</span> {
-    const { a, b, c } = <span class="cstat-no" title="statement not covered" >this.cost;</span>
-<span class="cstat-no" title="statement not covered" >    return a * P * P + b * P + c;</span>
+    const { a, b, c } = <span class="cstat-no" title="statement not covered" >this.cost</span>
+<span class="cstat-no" title="statement not covered" >    return a * P * P + b * P + c</span>
   }
 &nbsp;
   /**
@@ -334,8 +334,8 @@ class Generator {
    * @returns {number} Marginal cost ($/MWh)
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tMarginalCost(P = <span class="branch-0 cbranch-no" title="branch not covered" >this.P)</span> {
-    const { a, b } = <span class="cstat-no" title="statement not covered" >this.cost;</span>
-<span class="cstat-no" title="statement not covered" >    return 2 * a * P + b;</span>
+    const { a, b } = <span class="cstat-no" title="statement not covered" >this.cost</span>
+<span class="cstat-no" title="statement not covered" >    return 2 * a * P + b</span>
   }
 &nbsp;
   /**
@@ -344,8 +344,8 @@ class Generator {
    * @returns {number} Clipped generation
    */
 <span class="fstat-no" title="function not covered" >  se</span>tGeneration(P) {
-<span class="cstat-no" title="statement not covered" >    this.P = Math.max(this.Pmin, Math.min(this.Pmax, P));</span>
-<span class="cstat-no" title="statement not covered" >    return this.P;</span>
+<span class="cstat-no" title="statement not covered" >    this.P = Math.max(this.Pmin, Math.min(this.Pmax, P))</span>
+<span class="cstat-no" title="statement not covered" >    return this.P</span>
   }
 &nbsp;
   /**
@@ -353,7 +353,7 @@ class Generator {
    * @returns {boolean} True if within limits
    */
 <span class="fstat-no" title="function not covered" >  is</span>WithinLimits() {
-<span class="cstat-no" title="statement not covered" >    return this.P &gt;= this.Pmin &amp;&amp; this.P &lt;= this.Pmax;</span>
+<span class="cstat-no" title="statement not covered" >    return this.P &gt;= this.Pmin &amp;&amp; this.P &lt;= this.Pmax</span>
   }
 &nbsp;
   /**
@@ -370,20 +370,20 @@ class Generator {
       Pmax: this.Pmax,
       cost: this.getCost(),
       marginalCost: this.getMarginalCost(),
-      withinLimits: this.isWithinLimits()
-    };
+      withinLimits: this.isWithinLimits(),
+    }
   }
 &nbsp;
   /**
    * Reset to initial conditions
    */
 <span class="fstat-no" title="function not covered" >  re</span>set() {
-<span class="cstat-no" title="statement not covered" >    this.P = this.Pmin;</span>
-<span class="cstat-no" title="statement not covered" >    this.Q = 0;</span>
+<span class="cstat-no" title="statement not covered" >    this.P = this.Pmin</span>
+<span class="cstat-no" title="statement not covered" >    this.Q = 0</span>
   }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = Generator;</span>
+<span class="cstat-no" title="statement not covered" >module.exports = Generator</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -391,7 +391,7 @@ class Generator {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.680Z
+                at 2026-04-29T07:48:07.940Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

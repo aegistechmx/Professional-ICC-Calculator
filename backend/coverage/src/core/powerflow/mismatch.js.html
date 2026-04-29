@@ -129,13 +129,7 @@
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L67'></a><a href='#L67'>67</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -177,13 +171,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -209,10 +197,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * calcMismatch.js - Pure mathematical power mismatch calculation
- * 
+ *
  * Responsibility: ONLY calculates P and Q mismatches from voltages and G/B matrices
  * NO Express, NO axios, NO UI logic
- * 
+ *
  * Architecture:
  * Voltages + G/B matrices → Power Injections → Mismatch Vector
  */
@@ -226,59 +214,53 @@
  * @returns {Object} Object with { P, Q, dP, dQ }
  */
 function <span class="fstat-no" title="function not covered" >calcMismatch(</span>V, G, B, buses) {
-  const n = <span class="cstat-no" title="statement not covered" >V.length;</span>
+  const n = <span class="cstat-no" title="statement not covered" >V.length</span>
 &nbsp;
   // Calculate power injections
-  const P = <span class="cstat-no" title="statement not covered" >Array(n).fill(0);</span>
-  const Q = <span class="cstat-no" title="statement not covered" >Array(n).fill(0);</span>
+  const P = <span class="cstat-no" title="statement not covered" >Array(n).fill(0)</span>
+  const Q = <span class="cstat-no" title="statement not covered" >Array(n).fill(0)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; n; i++) {</span>
-    const Vi = <span class="cstat-no" title="statement not covered" >V[i];</span>
-    const magVi = <span class="cstat-no" title="statement not covered" >Math.hypot(Vi.re, Vi.im);</span>
-    const angVi = <span class="cstat-no" title="statement not covered" >Math.atan2(Vi.im, Vi.re);</span>
+    const Vi = <span class="cstat-no" title="statement not covered" >V[i]</span>
+    const magVi = <span class="cstat-no" title="statement not covered" >Math.hypot(Vi.re, Vi.im)</span>
+    const angVi = <span class="cstat-no" title="statement not covered" >Math.atan2(Vi.im, Vi.re)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let j = <span class="cstat-no" title="statement not covered" >0;</span> j &lt; n; j++) {</span>
-      const Vj = <span class="cstat-no" title="statement not covered" >V[j];</span>
-      const Gij = <span class="cstat-no" title="statement not covered" >G[i][j];</span>
-      const Bij = <span class="cstat-no" title="statement not covered" >B[i][j];</span>
+      const Vj = <span class="cstat-no" title="statement not covered" >V[j]</span>
+      const Gij = <span class="cstat-no" title="statement not covered" >G[i][j]</span>
+      const Bij = <span class="cstat-no" title="statement not covered" >B[i][j]</span>
 &nbsp;
-      const magVj = <span class="cstat-no" title="statement not covered" >Math.hypot(Vj.re, Vj.im);</span>
-      const angVj = <span class="cstat-no" title="statement not covered" >Math.atan2(Vj.im, Vj.re);</span>
+      const magVj = <span class="cstat-no" title="statement not covered" >Math.hypot(Vj.re, Vj.im)</span>
+      const angVj = <span class="cstat-no" title="statement not covered" >Math.atan2(Vj.im, Vj.re)</span>
 &nbsp;
-      const theta = <span class="cstat-no" title="statement not covered" >angVi - angVj;</span>
+      const theta = <span class="cstat-no" title="statement not covered" >angVi - angVj</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      P[i] += magVi * magVj * (</span>
-        Gij * Math.cos(theta) +
-        Bij * Math.sin(theta)
-      );
+<span class="cstat-no" title="statement not covered" >      P[i] += magVi * magVj * (Gij * Math.cos(theta) + Bij * Math.sin(theta))</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      Q[i] += magVi * magVj * (</span>
-        Gij * Math.sin(theta) -
-        Bij * Math.cos(theta)
-      );
+<span class="cstat-no" title="statement not covered" >      Q[i] += magVi * magVj * (Gij * Math.sin(theta) - Bij * Math.cos(theta))</span>
     }
   }
 &nbsp;
   // Calculate mismatches
-  const dP = <span class="cstat-no" title="statement not covered" >[];</span>
-  const dQ = <span class="cstat-no" title="statement not covered" >[];</span>
+  const dP = <span class="cstat-no" title="statement not covered" >[]</span>
+  const dQ = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>us, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (bus.type !== "Slack") {</span>
-<span class="cstat-no" title="statement not covered" >      dP.push(bus.P - P[i]);</span>
+<span class="cstat-no" title="statement not covered" >    if (bus.type !== 'Slack') {</span>
+<span class="cstat-no" title="statement not covered" >      dP.push(bus.P - P[i])</span>
     }
-  });
+  })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>us, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (bus.type === "PQ") {</span>
-<span class="cstat-no" title="statement not covered" >      dQ.push(bus.Q - Q[i]);</span>
+<span class="cstat-no" title="statement not covered" >    if (bus.type === 'PQ') {</span>
+<span class="cstat-no" title="statement not covered" >      dQ.push(bus.Q - Q[i])</span>
     }
-  });
+  })
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return { P, Q, dP, dQ };</span>
+<span class="cstat-no" title="statement not covered" >  return { P, Q, dP, dQ }</span>
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = { calcMismatch };</span>
+<span class="cstat-no" title="statement not covered" >module.exports = { calcMismatch }</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -286,7 +268,7 @@ function <span class="fstat-no" title="function not covered" >calcMismatch(</spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

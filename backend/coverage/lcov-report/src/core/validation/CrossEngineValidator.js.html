@@ -1113,7 +1113,7 @@ class CrossEngineValidator {
 &nbsp;
       // Compare voltages
       const voltageDiff = <span class="cstat-no" title="statement not covered" >this.compareVoltages(</span>
- // voltage (V)
+        // voltage (V)
         nrResult.voltages,
         opfResult.voltages
       )
@@ -1123,15 +1123,15 @@ class CrossEngineValidator {
 &nbsp;
       // Compare power flows
       const powerDiff = <span class="cstat-no" title="statement not covered" >this.comparePowerFlows(nrResult.P, opfResult.P)</span>
- // power (W)
+      // power (W)
 &nbsp;
       // Check if within tolerance
       const tolerance = <span class="cstat-no" title="statement not covered" >this.options.tolerance</span>
       const voltageOK = <span class="cstat-no" title="statement not covered" >voltageDiff &lt; tolerance</span>
- // voltage (V)
+      // voltage (V)
       const angleOK = <span class="cstat-no" title="statement not covered" >angleDiff &lt; tolerance</span>
       const powerOK = <span class="cstat-no" title="statement not covered" >powerDiff &lt; tolerance</span>
- // power (W)
+      // power (W)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (voltageOK &amp;&amp; angleOK &amp;&amp; powerOK) {</span>
 <span class="cstat-no" title="statement not covered" >        this.results.passed.push({</span>
@@ -1209,7 +1209,7 @@ class CrossEngineValidator {
 &nbsp;
       // Compare fault currents
       const currentDiff = <span class="cstat-no" title="statement not covered" >this.compareFaultCurrents(</span>
- // current (A)
+        // current (A)
         iccResult.currents,
         iccFromZbus
       )
@@ -1217,7 +1217,7 @@ class CrossEngineValidator {
       // Check if within tolerance
       const tolerance = <span class="cstat-no" title="statement not covered" >this.options.tolerance</span>
       const currentOK = <span class="cstat-no" title="statement not covered" >currentDiff &lt; tolerance</span>
- // current (A)
+      // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (currentOK) {</span>
 <span class="cstat-no" title="statement not covered" >        this.results.passed.push({</span>
@@ -1279,9 +1279,9 @@ class CrossEngineValidator {
 &nbsp;
       // Check if initial dynamics voltages match NR
       const initialVoltages = <span class="cstat-no" title="statement not covered" >dynamicsResult.voltages[0]</span>
- // voltage (V)
+      // voltage (V)
       const voltageDiff = <span class="cstat-no" title="statement not covered" >this.compareVoltages(</span>
- // voltage (V)
+        // voltage (V)
         nrResult.voltages,
         initialVoltages
       )
@@ -1297,7 +1297,7 @@ class CrossEngineValidator {
       // Check if within tolerance
       const tolerance = <span class="cstat-no" title="statement not covered" >this.options.tolerance</span>
       const voltageOK = <span class="cstat-no" title="statement not covered" >voltageDiff &lt; tolerance</span>
- // voltage (V)
+      // voltage (V)
       const angleOK = <span class="cstat-no" title="statement not covered" >angleDiff &lt; tolerance</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (voltageOK &amp;&amp; angleOK) {</span>
@@ -1356,7 +1356,7 @@ class CrossEngineValidator {
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateICCFromZbus(Zbus, system) {
     const currents = <span class="cstat-no" title="statement not covered" >[]</span>
- // current (A)
+    // current (A)
 &nbsp;
     // Calculate fault currents using Zbus
     // I_fault = V_prefault / Z_fault
@@ -1384,18 +1384,18 @@ class CrossEngineValidator {
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
     const minLen = <span class="cstat-no" title="statement not covered" >Math.min(voltagesA.length, voltagesB.length)</span>
- // voltage (V)
+    // voltage (V)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
       const valA =
 <span class="cstat-no" title="statement not covered" >        typeof voltagesA[i] === 'object'</span>
- // voltage (V)
-          ? Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2)
+          ? // voltage (V)
+            Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2)
           : voltagesA[i]
       const valB =
 <span class="cstat-no" title="statement not covered" >        typeof voltagesB[i] === 'object'</span>
- // voltage (V)
-          ? Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2)
+          ? // voltage (V)
+            Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2)
           : voltagesB[i]
 &nbsp;
       const diff = <span class="cstat-no" title="statement not covered" >Math.abs(valA - valB)</span>
@@ -1436,11 +1436,11 @@ class CrossEngineValidator {
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
     const minLen = <span class="cstat-no" title="statement not covered" >Math.min(powerA.length, powerB.length)</span>
- // power (W)
+    // power (W)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
       const diff = <span class="cstat-no" title="statement not covered" >Math.abs(powerA[i] - powerB[i])</span>
- // power (W)
+      // power (W)
 <span class="cstat-no" title="statement not covered" >      maxDiff = Math.max(maxDiff, diff)</span>
     }
 &nbsp;
@@ -1458,11 +1458,11 @@ class CrossEngineValidator {
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
     const minLen = <span class="cstat-no" title="statement not covered" >Math.min(currentsA.length, currentsB.length)</span>
- // current (A)
+    // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
       const diff = <span class="cstat-no" title="statement not covered" >Math.abs(currentsA[i] - currentsB[i])</span>
- // current (A)
+      // current (A)
 <span class="cstat-no" title="statement not covered" >      maxDiff = Math.max(maxDiff, diff)</span>
     }
 &nbsp;
@@ -1489,7 +1489,7 @@ class CrossEngineValidator {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.680Z
+                at 2026-04-29T07:48:07.940Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

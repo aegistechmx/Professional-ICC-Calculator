@@ -1,10 +1,10 @@
 /**
  * debug/tracer.js - Professional function tracing system
- * 
+ *
  * Responsibility: Function execution tracing with performance monitoring
  */
 
-const { logDebug, logError, logInfo } = require('./logger');
+const { logDebug, logError, logInfo } = require('./logger')
 
 /**
  * Trace function execution
@@ -13,36 +13,36 @@ const { logDebug, logError, logInfo } = require('./logger');
  * @returns {Function} Wrapped function with tracing
  */
 function traceStep(name, fn) {
-  return function(...args) {
-    const startTime = performance.now();
-    
-    logDebug(`${name}:START`, { 
+  return function (...args) {
+    const startTime = performance.now()
+
+    logDebug(`${name}:START`, {
       args: args.length > 0 ? args : undefined,
-      type: typeof fn
-    });
-    
+      type: typeof fn,
+    })
+
     try {
-      const result = fn.apply(this, args);
-      const duration = performance.now() - startTime;
-      
-      logInfo(`${name}:END`, { 
+      const result = fn.apply(this, args)
+      const duration = performance.now() - startTime
+
+      logInfo(`${name}:END`, {
         duration: `${duration.toFixed(2)}ms`,
-        success: true
-      });
-      
-      return result;
+        success: true,
+      })
+
+      return result
     } catch (error) {
-      const duration = performance.now() - startTime;
-      
-      logError(`${name}:ERROR`, { 
+      const duration = performance.now() - startTime
+
+      logError(`${name}:ERROR`, {
         duration: `${duration.toFixed(2)}ms`,
         message: error.message,
-        stack: error.stack
-      });
-      
-      throw error;
+        stack: error.stack,
+      })
+
+      throw error
     }
-  };
+  }
 }
 
 /**
@@ -52,38 +52,38 @@ function traceStep(name, fn) {
  * @returns {Function} Wrapped async function with tracing
  */
 function traceAsync(name, fn) {
-  return async function(...args) {
-    const startTime = performance.now();
-    
-    logDebug(`${name}:START`, { 
+  return async function (...args) {
+    const startTime = performance.now()
+
+    logDebug(`${name}:START`, {
       args: args.length > 0 ? args : undefined,
-      type: 'async'
-    });
-    
+      type: 'async',
+    })
+
     try {
-      const result = await fn.apply(this, args);
-      const duration = performance.now() - startTime;
-      
-      logInfo(`${name}:END`, { 
+      const result = await fn.apply(this, args)
+      const duration = performance.now() - startTime
+
+      logInfo(`${name}:END`, {
         duration: `${duration.toFixed(2)}ms`,
         success: true,
-        async: true
-      });
-      
-      return result;
+        async: true,
+      })
+
+      return result
     } catch (error) {
-      const duration = performance.now() - startTime;
-      
-      logError(`${name}:ERROR`, { 
+      const duration = performance.now() - startTime
+
+      logError(`${name}:ERROR`, {
         duration: `${duration.toFixed(2)}ms`,
         message: error.message,
         stack: error.stack,
-        async: true
-      });
-      
-      throw error;
+        async: true,
+      })
+
+      throw error
     }
-  };
+  }
 }
 
 /**
@@ -94,8 +94,8 @@ function traceAsync(name, fn) {
  * @returns {Function} Wrapped method with tracing
  */
 function traceMethod(className, methodName, method) {
-  const fullName = `${className}.${methodName}`;
-  return traceStep(fullName, method);
+  const fullName = `${className}.${methodName}`
+  return traceStep(fullName, method)
 }
 
 /**
@@ -103,7 +103,7 @@ function traceMethod(className, methodName, method) {
  */
 class Profiler {
   constructor() {
-    this.profiles = new Map();
+    this.profiles = new Map()
   }
 
   /**
@@ -115,8 +115,8 @@ class Profiler {
       start: performance.now(),
       calls: 0,
       totalTime: 0,
-      errors: 0
-    });
+      errors: 0,
+    })
   }
 
   /**
@@ -126,15 +126,15 @@ class Profiler {
    * @returns {number} Duration in milliseconds
    */
   end(name, success = true) {
-    const profile = this.profiles.get(name);
-    if (!profile) return 0;
+    const profile = this.profiles.get(name)
+    if (!profile) return 0
 
-    const duration = performance.now() - profile.start;
-    profile.calls++;
-    profile.totalTime += duration;
-    if (!success) profile.errors++;
+    const duration = performance.now() - profile.start
+    profile.calls++
+    profile.totalTime += duration
+    if (!success) profile.errors++
 
-    return duration;
+    return duration
   }
 
   /**
@@ -143,8 +143,8 @@ class Profiler {
    * @returns {Object} Profile statistics
    */
   getProfile(name) {
-    const profile = this.profiles.get(name);
-    if (!profile) return null;
+    const profile = this.profiles.get(name)
+    if (!profile) return null
 
     return {
       name,
@@ -152,8 +152,8 @@ class Profiler {
       totalTime: profile.totalTime,
       averageTime: profile.totalTime / profile.calls,
       errors: profile.errors,
-      errorRate: profile.errors / profile.calls
-    };
+      errorRate: profile.errors / profile.calls,
+    }
   }
 
   /**
@@ -161,14 +161,14 @@ class Profiler {
    * @returns {Array} Array of profile statistics
    */
   getAllProfiles() {
-    return Array.from(this.profiles.keys()).map(name => this.getProfile(name));
+    return Array.from(this.profiles.keys()).map(name => this.getProfile(name))
   }
 
   /**
    * Clear all profiles
    */
   clear() {
-    this.profiles.clear();
+    this.profiles.clear()
   }
 
   /**
@@ -178,30 +178,30 @@ class Profiler {
    * @returns {Function} Profiled function
    */
   profile(name, fn) {
-    return function(...args) {
-      this.start(name);
+    return function (...args) {
+      this.start(name)
       try {
-        const result = fn.apply(this, args);
-        this.end(name, true);
-        return result;
+        const result = fn.apply(this, args)
+        this.end(name, true)
+        return result
       } catch (error) {
-        this.end(name, false);
-        throw error;
+        this.end(name, false)
+        throw error
       }
-    }.bind(this);
+    }.bind(this)
   }
 }
 
 /**
  * Global profiler instance
  */
-const globalProfiler = new Profiler();
+const globalProfiler = new Profiler()
 
 /**
  * Convenience functions
  */
-const trace = traceStep;
-const traceAsyncFunction = traceAsync;
+const trace = traceStep
+const traceAsyncFunction = traceAsync
 
 /**
  * Export
@@ -213,5 +213,5 @@ module.exports = {
   Profiler,
   globalProfiler,
   trace,
-  traceAsyncFunction
-};
+  traceAsyncFunction,
+}

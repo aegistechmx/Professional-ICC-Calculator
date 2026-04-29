@@ -605,22 +605,22 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * newtonRaphson.js - Pure mathematical Newton-Raphson solver
- * 
+ *
  * Responsibility: ONLY solves power flow using Newton-Raphson method
  * NO Express, NO axios, NO UI logic
- * 
+ *
  * Architecture:
  * System → Ybus (G/B) → Initialize Voltages → Loop:
  *   Mismatch (P/Q) → Jacobian (G/B/P/Q) → Solve Linear System → Update Voltages
  * → Converged?
  */
 &nbsp;
-const { buildYbus } = <span class="cstat-no" title="statement not covered" >require('../ybus/buildYbus');</span>
-const { calcMismatch } = <span class="cstat-no" title="statement not covered" >require('./mismatch');</span>
-const { buildJacobian } = <span class="cstat-no" title="statement not covered" >require('./jacobian');</span>
-const { enforcePVLimits } = <span class="cstat-no" title="statement not covered" >require('./pvControl');</span>
-const { lineSearch } = <span class="cstat-no" title="statement not covered" >require('./lineSearch');</span>
-const { applyTrustRegion } = <span class="cstat-no" title="statement not covered" >require('./trustRegion');</span>
+const { buildYbus } = <span class="cstat-no" title="statement not covered" >require('../ybus/buildYbus')</span>
+const { calcMismatch } = <span class="cstat-no" title="statement not covered" >require('./mismatch')</span>
+const { buildJacobian } = <span class="cstat-no" title="statement not covered" >require('./jacobian')</span>
+const { enforcePVLimits } = <span class="cstat-no" title="statement not covered" >require('./pvControl')</span>
+const { lineSearch } = <span class="cstat-no" title="statement not covered" >require('./lineSearch')</span>
+const { applyTrustRegion } = <span class="cstat-no" title="statement not covered" >require('./trustRegion')</span>
 &nbsp;
 /**
  * Solve linear system J * x = b using Gaussian elimination
@@ -629,59 +629,59 @@ const { applyTrustRegion } = <span class="cstat-no" title="statement not covered
  * @returns {Array} Solution vector x
  */
 function <span class="fstat-no" title="function not covered" >solveLinearSystem(</span>J, b) {
-  const n = <span class="cstat-no" title="statement not covered" >b.length;</span>
-  const augmented = <span class="cstat-no" title="statement not covered" >Array.from({ length: n }, <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >Array(n + 1).fill(0))</span>;</span>
+  const n = <span class="cstat-no" title="statement not covered" >b.length</span>
+  const augmented = <span class="cstat-no" title="statement not covered" >Array.from({ length: n }, <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >Array(n + 1).fill(0))</span></span>
 &nbsp;
   // Build augmented matrix
 <span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; n; i++) {</span>
 <span class="cstat-no" title="statement not covered" >    for (let j = <span class="cstat-no" title="statement not covered" >0;</span> j &lt; n; j++) {</span>
-<span class="cstat-no" title="statement not covered" >      augmented[i][j] = J[i][j];</span>
+<span class="cstat-no" title="statement not covered" >      augmented[i][j] = J[i][j]</span>
     }
-<span class="cstat-no" title="statement not covered" >    augmented[i][n] = b[i];</span>
+<span class="cstat-no" title="statement not covered" >    augmented[i][n] = b[i]</span>
   }
 &nbsp;
   // Gaussian elimination with partial pivoting
 <span class="cstat-no" title="statement not covered" >  for (let k = <span class="cstat-no" title="statement not covered" >0;</span> k &lt; n; k++) {</span>
     // Find pivot
-    let maxRow = <span class="cstat-no" title="statement not covered" >k;</span>
-    let maxVal = <span class="cstat-no" title="statement not covered" >Math.abs(augmented[k][k]);</span>
+    let maxRow = <span class="cstat-no" title="statement not covered" >k</span>
+    let maxVal = <span class="cstat-no" title="statement not covered" >Math.abs(augmented[k][k])</span>
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >k + 1;</span> i &lt; n; i++) {</span>
 <span class="cstat-no" title="statement not covered" >      if (Math.abs(augmented[i][k]) &gt; maxVal) {</span>
-<span class="cstat-no" title="statement not covered" >        maxVal = Math.abs(augmented[i][k]);</span>
-<span class="cstat-no" title="statement not covered" >        maxRow = i;</span>
+<span class="cstat-no" title="statement not covered" >        maxVal = Math.abs(augmented[i][k])</span>
+<span class="cstat-no" title="statement not covered" >        maxRow = i</span>
       }
     }
 &nbsp;
     // Swap rows
 <span class="cstat-no" title="statement not covered" >    if (maxRow !== k) {</span>
-<span class="cstat-no" title="statement not covered" >      [augmented[k], augmented[maxRow]] = [augmented[maxRow], augmented[k]];</span>
+      ;<span class="cstat-no" title="statement not covered" >[augmented[k], augmented[maxRow]] = [augmented[maxRow], augmented[k]]</span>
     }
 &nbsp;
     // Handle singular matrix
 <span class="cstat-no" title="statement not covered" >    if (Math.abs(augmented[k][k]) &lt; 1e-12) {</span>
-<span class="cstat-no" title="statement not covered" >      augmented[k][k] = augmented[k][k] !== 0 ? augmented[k][k] + 1e-10 : 1e-10;</span>
+<span class="cstat-no" title="statement not covered" >      augmented[k][k] = augmented[k][k] !== 0 ? augmented[k][k] + 1e-10 : 1e-10</span>
     }
 &nbsp;
     // Eliminate column
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >k + 1;</span> i &lt; n; i++) {</span>
-      const factor = <span class="cstat-no" title="statement not covered" >augmented[i][k] / augmented[k][k];</span>
+      const factor = <span class="cstat-no" title="statement not covered" >augmented[i][k] / augmented[k][k]</span>
 <span class="cstat-no" title="statement not covered" >      for (let j = <span class="cstat-no" title="statement not covered" >k;</span> j &lt;= n; j++) {</span>
-<span class="cstat-no" title="statement not covered" >        augmented[i][j] -= factor * augmented[k][j];</span>
+<span class="cstat-no" title="statement not covered" >        augmented[i][j] -= factor * augmented[k][j]</span>
       }
     }
   }
 &nbsp;
   // Back substitution
-  const x = <span class="cstat-no" title="statement not covered" >Array(n).fill(0);</span>
+  const x = <span class="cstat-no" title="statement not covered" >Array(n).fill(0)</span>
 <span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >n - 1;</span> i &gt;= 0; i--) {</span>
-    let sum = <span class="cstat-no" title="statement not covered" >augmented[i][n];</span>
+    let sum = <span class="cstat-no" title="statement not covered" >augmented[i][n]</span>
 <span class="cstat-no" title="statement not covered" >    for (let j = <span class="cstat-no" title="statement not covered" >i + 1;</span> j &lt; n; j++) {</span>
-<span class="cstat-no" title="statement not covered" >      sum -= augmented[i][j] * x[j];</span>
+<span class="cstat-no" title="statement not covered" >      sum -= augmented[i][j] * x[j]</span>
     }
-<span class="cstat-no" title="statement not covered" >    x[i] = sum / augmented[i][i];</span>
+<span class="cstat-no" title="statement not covered" >    x[i] = sum / augmented[i][i]</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return x;</span>
+<span class="cstat-no" title="statement not covered" >  return x</span>
 }
 &nbsp;
 /**
@@ -690,30 +690,30 @@ function <span class="fstat-no" title="function not covered" >solveLinearSystem(
  * @returns {Array} Voltage vector with complex numbers { re, im }
  */
 function <span class="fstat-no" title="function not covered" >initializeVoltages(</span>buses) {
-<span class="cstat-no" title="statement not covered" >  return buses.map(<span class="fstat-no" title="function not covered" >(b</span>us) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  return buses.map(<span class="fstat-no" title="function not covered" >bu</span>s =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (bus.type === 'Slack') {</span>
-      const mag = <span class="cstat-no" title="statement not covered" >bus.voltage?.magnitude || 1.0;</span>
- // voltage (V)
-      const ang = <span class="cstat-no" title="statement not covered" >(bus.voltage?.angle || 0) * Math.PI / 180;</span>
- // voltage (V)
+      const mag = <span class="cstat-no" title="statement not covered" >bus.voltage?.magnitude || 1.0</span>
+      // voltage (V)
+      const ang = <span class="cstat-no" title="statement not covered" >((bus.voltage?.angle || 0) * Math.PI) / 180</span>
+      // voltage (V)
 <span class="cstat-no" title="statement not covered" >      return {</span>
         re: mag * Math.cos(ang),
-        im: mag * Math.sin(ang)
-      };
+        im: mag * Math.sin(ang),
+      }
     } else <span class="cstat-no" title="statement not covered" >if (bus.type === 'PV') {</span>
-      const mag = <span class="cstat-no" title="statement not covered" >bus.voltage?.magnitude || 1.0;</span>
- // voltage (V)
-      const ang = <span class="cstat-no" title="statement not covered" >(bus.voltage?.angle || 0) * Math.PI / 180;</span>
- // voltage (V)
+      const mag = <span class="cstat-no" title="statement not covered" >bus.voltage?.magnitude || 1.0</span>
+      // voltage (V)
+      const ang = <span class="cstat-no" title="statement not covered" >((bus.voltage?.angle || 0) * Math.PI) / 180</span>
+      // voltage (V)
 <span class="cstat-no" title="statement not covered" >      return {</span>
         re: mag * Math.cos(ang),
-        im: mag * Math.sin(ang)
-      };
+        im: mag * Math.sin(ang),
+      }
     } else {
       // PQ: flat start at 1.0∠0°
-<span class="cstat-no" title="statement not covered" >      return { re: 1.0, im: 0.0 };</span>
+<span class="cstat-no" title="statement not covered" >      return { re: 1.0, im: 0.0 }</span>
     }
-  });
+  })
 }
 &nbsp;
 /**
@@ -724,53 +724,53 @@ function <span class="fstat-no" title="function not covered" >initializeVoltages
  * @returns {Array} Updated voltage vector
  */
 function <span class="fstat-no" title="function not covered" >applyCorrections(</span>V, corrections, buses) {
-  const newV = <span class="cstat-no" title="statement not covered" >V.map(<span class="fstat-no" title="function not covered" >v </span>=&gt; (<span class="cstat-no" title="statement not covered" >{ ...v })</span>);</span>
-  let correctionIndex = <span class="cstat-no" title="statement not covered" >0;</span>
+  const newV = <span class="cstat-no" title="statement not covered" >V.map(<span class="fstat-no" title="function not covered" >v </span>=&gt; (<span class="cstat-no" title="statement not covered" >{ ...v })</span>)</span>
+  let correctionIndex = <span class="cstat-no" title="statement not covered" >0</span>
 &nbsp;
   // Identify bus types
-  const slack = <span class="cstat-no" title="statement not covered" >[];</span>
-  const pq = <span class="cstat-no" title="statement not covered" >[];</span>
-  const pv = <span class="cstat-no" title="statement not covered" >[];</span>
+  const slack = <span class="cstat-no" title="statement not covered" >[]</span>
+  const pq = <span class="cstat-no" title="statement not covered" >[]</span>
+  const pv = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (b.type === 'Slack') <span class="cstat-no" title="statement not covered" >slack.push(i);</span></span>
-    else <span class="cstat-no" title="statement not covered" >if (b.type === 'PQ') <span class="cstat-no" title="statement not covered" >pq.push(i);</span></span>
-    else <span class="cstat-no" title="statement not covered" >if (b.type === 'PV') <span class="cstat-no" title="statement not covered" >pv.push(i);</span></span>
-  });
+<span class="cstat-no" title="statement not covered" >    if (b.type === 'Slack') <span class="cstat-no" title="statement not covered" >slack.push(i)</span></span>
+    else <span class="cstat-no" title="statement not covered" >if (b.type === 'PQ') <span class="cstat-no" title="statement not covered" >pq.push(i)</span></span>
+    else <span class="cstat-no" title="statement not covered" >if (b.type === 'PV') <span class="cstat-no" title="statement not covered" >pv.push(i)</span></span>
+  })
 &nbsp;
-  const slackIndex = <span class="cstat-no" title="statement not covered" >slack.length &gt; 0 ? slack[0] : -1;</span>
+  const slackIndex = <span class="cstat-no" title="statement not covered" >slack.length &gt; 0 ? slack[0] : -1</span>
 &nbsp;
   // Apply angle corrections (all buses except slack)
 <span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; buses.length; i++) {</span>
-<span class="cstat-no" title="statement not covered" >    if (i === slackIndex) <span class="cstat-no" title="statement not covered" >continue;</span></span>
+<span class="cstat-no" title="statement not covered" >    if (i === slackIndex) <span class="cstat-no" title="statement not covered" >continue</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (correctionIndex &lt; corrections.length) {</span>
-      const dTheta = <span class="cstat-no" title="statement not covered" >corrections[correctionIndex];</span>
-      const currentMag = <span class="cstat-no" title="statement not covered" >Math.hypot(V[i].re, V[i].im);</span>
-      const currentAng = <span class="cstat-no" title="statement not covered" >Math.atan2(V[i].im, V[i].re);</span>
-      const newAng = <span class="cstat-no" title="statement not covered" >currentAng + dTheta;</span>
-      
-<span class="cstat-no" title="statement not covered" >      newV[i].re = currentMag * Math.cos(newAng);</span>
-<span class="cstat-no" title="statement not covered" >      newV[i].im = currentMag * Math.sin(newAng);</span>
-<span class="cstat-no" title="statement not covered" >      correctionIndex++;</span>
+      const dTheta = <span class="cstat-no" title="statement not covered" >corrections[correctionIndex]</span>
+      const currentMag = <span class="cstat-no" title="statement not covered" >Math.hypot(V[i].re, V[i].im)</span>
+      const currentAng = <span class="cstat-no" title="statement not covered" >Math.atan2(V[i].im, V[i].re)</span>
+      const newAng = <span class="cstat-no" title="statement not covered" >currentAng + dTheta</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      newV[i].re = currentMag * Math.cos(newAng)</span>
+<span class="cstat-no" title="statement not covered" >      newV[i].im = currentMag * Math.sin(newAng)</span>
+<span class="cstat-no" title="statement not covered" >      correctionIndex++</span>
     }
   }
 &nbsp;
   // Apply magnitude corrections (only PQ buses)
 <span class="cstat-no" title="statement not covered" >  pq.forEach(<span class="fstat-no" title="function not covered" >i </span>=&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (correctionIndex &lt; corrections.length) {</span>
-      const dV = <span class="cstat-no" title="statement not covered" >corrections[correctionIndex];</span>
-      const currentMag = <span class="cstat-no" title="statement not covered" >Math.hypot(newV[i].re, newV[i].im);</span>
-      const currentAng = <span class="cstat-no" title="statement not covered" >Math.atan2(newV[i].im, newV[i].re);</span>
-      const newMag = <span class="cstat-no" title="statement not covered" >currentMag + dV;</span>  // No clamping
-      
-<span class="cstat-no" title="statement not covered" >      newV[i].re = newMag * Math.cos(currentAng);</span>
-<span class="cstat-no" title="statement not covered" >      newV[i].im = newMag * Math.sin(currentAng);</span>
-<span class="cstat-no" title="statement not covered" >      correctionIndex++;</span>
-    }
-  });
+      const dV = <span class="cstat-no" title="statement not covered" >corrections[correctionIndex]</span>
+      const currentMag = <span class="cstat-no" title="statement not covered" >Math.hypot(newV[i].re, newV[i].im)</span>
+      const currentAng = <span class="cstat-no" title="statement not covered" >Math.atan2(newV[i].im, newV[i].re)</span>
+      const newMag = <span class="cstat-no" title="statement not covered" >currentMag + dV </span>// No clamping
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return newV;</span>
+<span class="cstat-no" title="statement not covered" >      newV[i].re = newMag * Math.cos(currentAng)</span>
+<span class="cstat-no" title="statement not covered" >      newV[i].im = newMag * Math.sin(currentAng)</span>
+<span class="cstat-no" title="statement not covered" >      correctionIndex++</span>
+    }
+  })
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return newV</span>
 }
 &nbsp;
 /**
@@ -787,79 +787,79 @@ function <span class="fstat-no" title="function not covered" >solve(</span>syste
   const {
     tolerance = <span class="branch-0 cbranch-no" title="branch not covered" >1e-8,</span>
     maxIterations = <span class="branch-0 cbranch-no" title="branch not covered" >30,</span>
-    damping = <span class="branch-0 cbranch-no" title="branch not covered" >0.8,</span>  // Damping factor for faster convergence
-    _enablePVControl = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>  // Enable PV Q limit enforcement
-    _enableLineSearch = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>  // Enable line search for stability
-    _enableTrustRegion = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>  // Enable trust region control
-    _maxStepSize = <span class="branch-0 cbranch-no" title="branch not covered" >0.2 </span> // Maximum step size for trust region
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+    damping = <span class="branch-0 cbranch-no" title="branch not covered" >0.8,</span> // Damping factor for faster convergence
+    _enablePVControl = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> // Enable PV Q limit enforcement
+    _enableLineSearch = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> // Enable line search for stability
+    _enableTrustRegion = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> // Enable trust region control
+    _maxStepSize = <span class="branch-0 cbranch-no" title="branch not covered" >0.2,</span> // Maximum step size for trust region
+  } = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
   // Build Ybus and extract G/B matrices
-  const { Y: _Y, G, B } = <span class="cstat-no" title="statement not covered" >buildYbus(system);</span>
+  const { Y: _Y, G, B } = <span class="cstat-no" title="statement not covered" >buildYbus(system)</span>
 &nbsp;
   // Identify bus types and track switching
-  let pvBuses = <span class="cstat-no" title="statement not covered" >[];</span>
-  let pqBuses = <span class="cstat-no" title="statement not covered" >[];</span>
-  
+  let pvBuses = <span class="cstat-no" title="statement not covered" >[]</span>
+  let pqBuses = <span class="cstat-no" title="statement not covered" >[]</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  system.buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>us, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (bus.type === 'PV') <span class="cstat-no" title="statement not covered" >pvBuses.push(i);</span></span>
-    else <span class="cstat-no" title="statement not covered" >if (bus.type === 'PQ') <span class="cstat-no" title="statement not covered" >pqBuses.push(i);</span></span>
-  });
+<span class="cstat-no" title="statement not covered" >    if (bus.type === 'PV') <span class="cstat-no" title="statement not covered" >pvBuses.push(i)</span></span>
+    else <span class="cstat-no" title="statement not covered" >if (bus.type === 'PQ') <span class="cstat-no" title="statement not covered" >pqBuses.push(i)</span></span>
+  })
 &nbsp;
   // Initialize voltages
-  let V = <span class="cstat-no" title="statement not covered" >initializeVoltages(system.buses);</span>
+  let V = <span class="cstat-no" title="statement not covered" >initializeVoltages(system.buses)</span>
 &nbsp;
   // Newton-Raphson iteration
-  let converged = <span class="cstat-no" title="statement not covered" >false;</span>
-  let iterations = <span class="cstat-no" title="statement not covered" >0;</span>
-  let maxMismatch = <span class="cstat-no" title="statement not covered" >Infinity;</span>
+  let converged = <span class="cstat-no" title="statement not covered" >false</span>
+  let iterations = <span class="cstat-no" title="statement not covered" >0</span>
+  let maxMismatch = <span class="cstat-no" title="statement not covered" >Infinity</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  for (let iter = <span class="cstat-no" title="statement not covered" >0;</span> iter &lt; maxIterations; iter++) {</span>
-<span class="cstat-no" title="statement not covered" >    iterations = iter + 1;</span>
+<span class="cstat-no" title="statement not covered" >    iterations = iter + 1</span>
 &nbsp;
     // Calculate mismatches and power injections
-    const { P: _P, Q: _Q, dP, dQ } = <span class="cstat-no" title="statement not covered" >calcMismatch(V, G, B, system.buses);</span>
-    const mismatches = <span class="cstat-no" title="statement not covered" >[...dP, ...dQ];</span>
-<span class="cstat-no" title="statement not covered" >    maxMismatch = Math.max(...mismatches.map(Math.abs));</span>
+    const { P: _P, Q: _Q, dP, dQ } = <span class="cstat-no" title="statement not covered" >calcMismatch(V, G, B, system.buses)</span>
+    const mismatches = <span class="cstat-no" title="statement not covered" >[...dP, ...dQ]</span>
+<span class="cstat-no" title="statement not covered" >    maxMismatch = Math.max(...mismatches.map(Math.abs))</span>
 &nbsp;
     // Enforce PV Q limits if enabled
 <span class="cstat-no" title="statement not covered" >    if (_enablePVControl) {</span>
-      const result = <span class="cstat-no" title="statement not covered" >enforcePVLimits(system, _Q, pvBuses, pqBuses);</span>
-<span class="cstat-no" title="statement not covered" >      pvBuses = result.pvBuses;</span>
-<span class="cstat-no" title="statement not covered" >      pqBuses = result.pqBuses;</span>
+      const result = <span class="cstat-no" title="statement not covered" >enforcePVLimits(system, _Q, pvBuses, pqBuses)</span>
+<span class="cstat-no" title="statement not covered" >      pvBuses = result.pvBuses</span>
+<span class="cstat-no" title="statement not covered" >      pqBuses = result.pqBuses</span>
     }
 &nbsp;
     // Check convergence
 <span class="cstat-no" title="statement not covered" >    if (maxMismatch &lt; tolerance) {</span>
-<span class="cstat-no" title="statement not covered" >      converged = true;</span>
-<span class="cstat-no" title="statement not covered" >      break;</span>
+<span class="cstat-no" title="statement not covered" >      converged = true</span>
+<span class="cstat-no" title="statement not covered" >      break</span>
     }
 &nbsp;
     // Build Jacobian with G/B matrices and P/Q injections
-    const J = <span class="cstat-no" title="statement not covered" >buildJacobian(V, G, B, _P, _Q, system.buses);</span>
+    const J = <span class="cstat-no" title="statement not covered" >buildJacobian(V, G, B, _P, _Q, system.buses)</span>
 &nbsp;
     // Solve linear system
-    let corrections = <span class="cstat-no" title="statement not covered" >solveLinearSystem(J, mismatches);</span>
+    let corrections = <span class="cstat-no" title="statement not covered" >solveLinearSystem(J, mismatches)</span>
 &nbsp;
     // Apply trust region control
 <span class="cstat-no" title="statement not covered" >    if (_enableTrustRegion) {</span>
-<span class="cstat-no" title="statement not covered" >      corrections = applyTrustRegion(corrections, _maxStepSize);</span>
+<span class="cstat-no" title="statement not covered" >      corrections = applyTrustRegion(corrections, _maxStepSize)</span>
     }
 &nbsp;
     // Apply line search if enabled
 <span class="cstat-no" title="statement not covered" >    if (_enableLineSearch) {</span>
-      const computeMismatch = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(V</span>) =&gt; {</span>
-        const { P: _P2, Q: _Q2, dP, dQ } = <span class="cstat-no" title="statement not covered" >calcMismatch(V, G, B, system.buses);</span>
-<span class="cstat-no" title="statement not covered" >        return Math.max(...[...dP, ...dQ].map(Math.abs));</span>
-      };
-      
-      const searchResult = <span class="cstat-no" title="statement not covered" >lineSearch(V, corrections, computeMismatch);</span>
-<span class="cstat-no" title="statement not covered" >      V = searchResult.V;</span>
-<span class="cstat-no" title="statement not covered" >      corrections = corrections.map(<span class="fstat-no" title="function not covered" >c </span>=&gt; <span class="cstat-no" title="statement not covered" >c * searchResult.alpha)</span>;</span>
+      const computeMismatch = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >V </span>=&gt; {</span>
+        const { P: _P2, Q: _Q2, dP, dQ } = <span class="cstat-no" title="statement not covered" >calcMismatch(V, G, B, system.buses)</span>
+<span class="cstat-no" title="statement not covered" >        return Math.max(...[...dP, ...dQ].map(Math.abs))</span>
+      }
+&nbsp;
+      const searchResult = <span class="cstat-no" title="statement not covered" >lineSearch(V, corrections, computeMismatch)</span>
+<span class="cstat-no" title="statement not covered" >      V = searchResult.V</span>
+<span class="cstat-no" title="statement not covered" >      corrections = corrections.map(<span class="fstat-no" title="function not covered" >c </span>=&gt; <span class="cstat-no" title="statement not covered" >c * searchResult.alpha)</span></span>
     } else {
       // Apply damping to corrections
-      const dampedCorrections = <span class="cstat-no" title="statement not covered" >corrections.map(<span class="fstat-no" title="function not covered" >c </span>=&gt; <span class="cstat-no" title="statement not covered" >c * damping)</span>;</span>
-<span class="cstat-no" title="statement not covered" >      V = applyCorrections(V, dampedCorrections, system.buses);</span>
+      const dampedCorrections = <span class="cstat-no" title="statement not covered" >corrections.map(<span class="fstat-no" title="function not covered" >c </span>=&gt; <span class="cstat-no" title="statement not covered" >c * damping)</span></span>
+<span class="cstat-no" title="statement not covered" >      V = applyCorrections(V, dampedCorrections, system.buses)</span>
     }
   }
 &nbsp;
@@ -868,11 +868,11 @@ function <span class="fstat-no" title="function not covered" >solve(</span>syste
     iterations,
     maxMismatch,
     voltages: V,
-    solver: 'NewtonRaphson'
-  };
+    solver: 'NewtonRaphson',
+  }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = { solve };</span>
+<span class="cstat-no" title="statement not covered" >module.exports = { solve }</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -880,7 +880,7 @@ function <span class="fstat-no" title="function not covered" >solve(</span>syste
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.680Z
+                at 2026-04-29T07:48:07.940Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -399,7 +399,18 @@
 <a name='L334'></a><a href='#L334'>334</a>
 <a name='L335'></a><a href='#L335'>335</a>
 <a name='L336'></a><a href='#L336'>336</a>
-<a name='L337'></a><a href='#L337'>337</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -474,6 +485,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -569,6 +582,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -578,6 +593,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -640,6 +656,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -650,8 +668,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -662,6 +682,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -737,7 +759,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * stabilityCriteria.js - Stability criteria for TS-SCOPF
- * 
+ *
  * Responsibility: Evaluate system stability using various criteria
  * NO Express, NO axios, NO UI logic
  */
@@ -751,38 +773,38 @@
 function <span class="fstat-no" title="function not covered" >checkAngleStability(</span>generators, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
   const {
     maxAngleDiff = <span class="branch-0 cbranch-no" title="branch not covered" >Math.PI,</span> // 180 degrees
-    referenceGenerator = <span class="branch-0 cbranch-no" title="branch not covered" >0 </span>// Use first generator as reference
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+    referenceGenerator = <span class="branch-0 cbranch-no" title="branch not covered" >0,</span> // Use first generator as reference
+  } = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
-  let maxDifference = <span class="cstat-no" title="statement not covered" >0;</span>
-  let stable = <span class="cstat-no" title="statement not covered" >true;</span>
-  const criticalGenerators = <span class="cstat-no" title="statement not covered" >[];</span>
+  let maxDifference = <span class="cstat-no" title="statement not covered" >0</span>
+  let stable = <span class="cstat-no" title="statement not covered" >true</span>
+  const criticalGenerators = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  generators.forEach(<span class="fstat-no" title="function not covered" >(g</span>en, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (i === referenceGenerator) <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >    if (i === referenceGenerator) <span class="cstat-no" title="statement not covered" >return</span></span>
 &nbsp;
-    const angleDiff = <span class="cstat-no" title="statement not covered" >Math.abs(gen.delta - generators[referenceGenerator].delta);</span>
-<span class="cstat-no" title="statement not covered" >    maxDifference = Math.max(maxDifference, angleDiff);</span>
+    const angleDiff = <span class="cstat-no" title="statement not covered" >Math.abs(gen.delta - generators[referenceGenerator].delta)</span>
+<span class="cstat-no" title="statement not covered" >    maxDifference = Math.max(maxDifference, angleDiff)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (angleDiff &gt; maxAngleDiff) {</span>
-<span class="cstat-no" title="statement not covered" >      stable = false;</span>
+<span class="cstat-no" title="statement not covered" >      stable = false</span>
 <span class="cstat-no" title="statement not covered" >      criticalGenerators.push({</span>
         id: gen.id,
         angleDiff,
-        angleDiffDegrees: angleDiff * 180 / Math.PI,
+        angleDiffDegrees: (angleDiff * 180) / Math.PI,
         delta: gen.delta,
-        referenceDelta: generators[referenceGenerator].delta
-      });
+        referenceDelta: generators[referenceGenerator].delta,
+      })
     }
-  });
+  })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     stable,
     maxAngleDifference: maxDifference,
-    maxAngleDifferenceDegrees: maxDifference * 180 / Math.PI,
+    maxAngleDifferenceDegrees: (maxDifference * 180) / Math.PI,
     criticalGenerators,
-    margin: maxAngleDiff - maxDifference
-  };
+    margin: maxAngleDiff - maxDifference,
+  }
 }
 &nbsp;
 /**
@@ -796,38 +818,40 @@ function <span class="fstat-no" title="function not covered" >checkSpeedStabilit
     nominalSpeed = <span class="branch-0 cbranch-no" title="branch not covered" >1.0,</span> // Synchronous speed
     maxSpeedDeviation = <span class="branch-0 cbranch-no" title="branch not covered" >0.5,</span> // 50% deviation
     minSpeed = <span class="branch-0 cbranch-no" title="branch not covered" >0.5,</span>
-    maxSpeed = <span class="branch-0 cbranch-no" title="branch not covered" >1.5</span>
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+    maxSpeed = <span class="branch-0 cbranch-no" title="branch not covered" >1.5,</span>
+  } = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
-  let maxDeviation = <span class="cstat-no" title="statement not covered" >0;</span>
-  let stable = <span class="cstat-no" title="statement not covered" >true;</span>
-  const criticalGenerators = <span class="cstat-no" title="statement not covered" >[];</span>
+  let maxDeviation = <span class="cstat-no" title="statement not covered" >0</span>
+  let stable = <span class="cstat-no" title="statement not covered" >true</span>
+  const criticalGenerators = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  generators.forEach(<span class="fstat-no" title="function not covered" >ge</span>n =&gt; {</span>
-    const speedDeviation = <span class="cstat-no" title="statement not covered" >Math.abs(gen.omega - nominalSpeed);</span>
-<span class="cstat-no" title="statement not covered" >    maxDeviation = Math.max(maxDeviation, speedDeviation);</span>
+    const speedDeviation = <span class="cstat-no" title="statement not covered" >Math.abs(gen.omega - nominalSpeed)</span>
+<span class="cstat-no" title="statement not covered" >    maxDeviation = Math.max(maxDeviation, speedDeviation)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (speedDeviation &gt; maxSpeedDeviation || </span>
-        gen.omega &lt; minSpeed || 
-        gen.omega &gt; maxSpeed) {
-<span class="cstat-no" title="statement not covered" >      stable = false;</span>
+<span class="cstat-no" title="statement not covered" >    if (</span>
+      speedDeviation &gt; maxSpeedDeviation ||
+      gen.omega &lt; minSpeed ||
+      gen.omega &gt; maxSpeed
+    ) {
+<span class="cstat-no" title="statement not covered" >      stable = false</span>
 <span class="cstat-no" title="statement not covered" >      criticalGenerators.push({</span>
         id: gen.id,
         speedDeviation,
         speedDeviationPercent: speedDeviation * 100,
         omega: gen.omega,
-        nominalSpeed
-      });
+        nominalSpeed,
+      })
     }
-  });
+  })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     stable,
     maxSpeedDeviation,
     maxSpeedDeviationPercent: maxDeviation * 100,
     criticalGenerators,
-    margin: maxSpeedDeviation - maxDeviation
-  };
+    margin: maxSpeedDeviation - maxDeviation,
+  }
 }
 &nbsp;
 /**
@@ -839,50 +863,50 @@ function <span class="fstat-no" title="function not covered" >checkSpeedStabilit
 function <span class="fstat-no" title="function not covered" >checkEqualAreaCriterion(</span>trajectory, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
   const {
     angleLimit = <span class="branch-0 cbranch-no" title="branch not covered" >Math.PI,</span> // 180 degrees
-    timeWindow = <span class="branch-0 cbranch-no" title="branch not covered" >1.0 </span>// seconds to analyze
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+    _timeWindow = <span class="branch-0 cbranch-no" title="branch not covered" >1.0,</span> // seconds to analyze
+  } = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (trajectory.length &lt; 3) {</span>
-<span class="cstat-no" title="statement not covered" >    return { stable: false, reason: 'Insufficient data points' };</span>
+<span class="cstat-no" title="statement not covered" >    return { stable: false, reason: 'Insufficient data points' }</span>
   }
 &nbsp;
   // Find fault clearing point
-  const clearingIndex = <span class="cstat-no" title="statement not covered" >trajectory.findIndex(<span class="fstat-no" title="function not covered" >po</span>int =&gt; <span class="cstat-no" title="statement not covered" >point.faultCleared)</span>;</span>
+  const clearingIndex = <span class="cstat-no" title="statement not covered" >trajectory.findIndex(<span class="fstat-no" title="function not covered" >po</span>int =&gt; <span class="cstat-no" title="statement not covered" >point.faultCleared)</span></span>
 <span class="cstat-no" title="statement not covered" >  if (clearingIndex === -1) {</span>
-<span class="cstat-no" title="statement not covered" >    return { stable: false, reason: 'No fault clearing detected' };</span>
+<span class="cstat-no" title="statement not covered" >    return { stable: false, reason: 'No fault clearing detected' }</span>
   }
 &nbsp;
   // Calculate accelerating area (during fault)
-  let acceleratingArea = <span class="cstat-no" title="statement not covered" >0;</span>
+  let acceleratingArea = <span class="cstat-no" title="statement not covered" >0</span>
 <span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; clearingIndex; i++) {</span>
-    const point = <span class="cstat-no" title="statement not covered" >trajectory[i];</span>
-    const nextPoint = <span class="cstat-no" title="statement not covered" >trajectory[i + 1];</span>
+    const point = <span class="cstat-no" title="statement not covered" >trajectory[i]</span>
+    const nextPoint = <span class="cstat-no" title="statement not covered" >trajectory[i + 1]</span>
 <span class="cstat-no" title="statement not covered" >    if (nextPoint) {</span>
-      const delta = <span class="cstat-no" title="statement not covered" >point.delta;</span>
-      const nextDelta = <span class="cstat-no" title="statement not covered" >nextPoint.delta;</span>
-      const power = <span class="cstat-no" title="statement not covered" >point.Pe || point.power;</span>
-      
+      const delta = <span class="cstat-no" title="statement not covered" >point.delta</span>
+      const nextDelta = <span class="cstat-no" title="statement not covered" >nextPoint.delta</span>
+      const power = <span class="cstat-no" title="statement not covered" >point.Pe || point.power</span>
+&nbsp;
       // Trapezoidal integration
-<span class="cstat-no" title="statement not covered" >      acceleratingArea += (delta + nextDelta) * power / 2;</span>
+<span class="cstat-no" title="statement not covered" >      acceleratingArea += ((delta + nextDelta) * power) / 2</span>
     }
   }
 &nbsp;
   // Calculate decelerating area (after fault)
-  let deceleratingArea = <span class="cstat-no" title="statement not covered" >0;</span>
+  let deceleratingArea = <span class="cstat-no" title="statement not covered" >0</span>
 <span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >clearingIndex;</span> i &lt; trajectory.length - 1; i++) {</span>
-    const point = <span class="cstat-no" title="statement not covered" >trajectory[i];</span>
-    const nextPoint = <span class="cstat-no" title="statement not covered" >trajectory[i + 1];</span>
+    const point = <span class="cstat-no" title="statement not covered" >trajectory[i]</span>
+    const nextPoint = <span class="cstat-no" title="statement not covered" >trajectory[i + 1]</span>
 <span class="cstat-no" title="statement not covered" >    if (nextPoint) {</span>
-      const delta = <span class="cstat-no" title="statement not covered" >point.delta;</span>
-      const nextDelta = <span class="cstat-no" title="statement not covered" >nextPoint.delta;</span>
-      const power = <span class="cstat-no" title="statement not covered" >point.Pe || point.power;</span>
-      
-<span class="cstat-no" title="statement not covered" >      deceleratingArea += (delta + nextDelta) * power / 2;</span>
+      const delta = <span class="cstat-no" title="statement not covered" >point.delta</span>
+      const nextDelta = <span class="cstat-no" title="statement not covered" >nextPoint.delta</span>
+      const power = <span class="cstat-no" title="statement not covered" >point.Pe || point.power</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      deceleratingArea += ((delta + nextDelta) * power) / 2</span>
     }
   }
 &nbsp;
-  const stable = <span class="cstat-no" title="statement not covered" >acceleratingArea &lt;= deceleratingArea;</span>
-  const margin = <span class="cstat-no" title="statement not covered" >deceleratingArea - acceleratingArea;</span>
+  const stable = <span class="cstat-no" title="statement not covered" >acceleratingArea &lt;= deceleratingArea</span>
+  const margin = <span class="cstat-no" title="statement not covered" >deceleratingArea - acceleratingArea</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     stable,
@@ -891,8 +915,10 @@ function <span class="fstat-no" title="function not covered" >checkEqualAreaCrit
     margin,
     clearingIndex,
     angleLimit,
-    reason: stable ? 'Equal area criterion satisfied' : 'Equal area criterion violated'
-  };
+    reason: stable
+      ? 'Equal area criterion satisfied'
+      : 'Equal area criterion violated',
+  }
 }
 &nbsp;
 /**
@@ -904,38 +930,39 @@ function <span class="fstat-no" title="function not covered" >checkEqualAreaCrit
 function <span class="fstat-no" title="function not covered" >checkKineticEnergy(</span>generators, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
   const {
     maxKineticEnergy = <span class="branch-0 cbranch-no" title="branch not covered" >2.0,</span> // Maximum relative kinetic energy
-    nominalSpeed = <span class="branch-0 cbranch-no" title="branch not covered" >1.0</span>
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+    nominalSpeed = <span class="branch-0 cbranch-no" title="branch not covered" >1.0,</span>
+  } = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
-  let maxEnergy = <span class="cstat-no" title="statement not covered" >0;</span>
-  let stable = <span class="cstat-no" title="statement not covered" >true;</span>
-  const criticalGenerators = <span class="cstat-no" title="statement not covered" >[];</span>
+  let maxEnergy = <span class="cstat-no" title="statement not covered" >0</span>
+  let stable = <span class="cstat-no" title="statement not covered" >true</span>
+  const criticalGenerators = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  generators.forEach(<span class="fstat-no" title="function not covered" >ge</span>n =&gt; {</span>
     // Kinetic energy: KE = 0.5 * M * ω²
-    const speedDeviation = <span class="cstat-no" title="statement not covered" >gen.omega - nominalSpeed;</span>
-    const kineticEnergy = <span class="cstat-no" title="statement not covered" >0.5 * (gen.inertia || 5.0) * speedDeviation * speedDeviation;</span>
-    
-<span class="cstat-no" title="statement not covered" >    maxEnergy = Math.max(maxEnergy, kineticEnergy);</span>
+    const speedDeviation = <span class="cstat-no" title="statement not covered" >gen.omega - nominalSpeed</span>
+    const kineticEnergy =
+<span class="cstat-no" title="statement not covered" >      0.5 * (gen.inertia || 5.0) * speedDeviation * speedDeviation</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    maxEnergy = Math.max(maxEnergy, kineticEnergy)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (kineticEnergy &gt; maxKineticEnergy) {</span>
-<span class="cstat-no" title="statement not covered" >      stable = false;</span>
+<span class="cstat-no" title="statement not covered" >      stable = false</span>
 <span class="cstat-no" title="statement not covered" >      criticalGenerators.push({</span>
         id: gen.id,
         kineticEnergy,
         speedDeviation,
         omega: gen.omega,
-        inertia: gen.inertia || 5.0
-      });
+        inertia: gen.inertia || 5.0,
+      })
     }
-  });
+  })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     stable,
     maxKineticEnergy,
     criticalGenerators,
-    margin: maxKineticEnergy - maxEnergy
-  };
+    margin: maxKineticEnergy - maxEnergy,
+  }
 }
 &nbsp;
 /**
@@ -945,11 +972,11 @@ function <span class="fstat-no" title="function not covered" >checkKineticEnergy
  * @param {Object} options - Stability options
  * @returns {Object} Comprehensive stability assessment
  */
-function <span class="fstat-no" title="function not covered" >checkSystemStability(</span>generators, trajectory = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span> options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+function <span class="fstat-no" title="function not covered" >checkSystemStability(</span>generators, _trajectory = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span> options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
   const {
     criteria = <span class="branch-0 cbranch-no" title="branch not covered" >['angle', 'speed', 'energy'],</span> // Which criteria to use
-    strictMode = <span class="branch-0 cbranch-no" title="branch not covered" >false </span>// All criteria must pass
-  } = <span class="cstat-no" title="statement not covered" >options;</span>
+    strictMode = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> // All criteria must pass
+  } = <span class="cstat-no" title="statement not covered" >options</span>
 &nbsp;
   const results = <span class="cstat-no" title="statement not covered" >{</span>
     overallStable: true,
@@ -959,64 +986,70 @@ function <span class="fstat-no" title="function not covered" >checkSystemStabili
     summary: {
       totalCriteria: criteria.length,
       passedCriteria: 0,
-      failedCriteria: 0
-    }
-  };
+      failedCriteria: 0,
+    },
+  }
 &nbsp;
   // Check each criterion
 <span class="cstat-no" title="statement not covered" >  if (criteria.includes('angle')) {</span>
-<span class="cstat-no" title="statement not covered" >    results.criteria.angle = checkAngleStability(generators, options);</span>
+<span class="cstat-no" title="statement not covered" >    results.criteria.angle = checkAngleStability(generators, options)</span>
 <span class="cstat-no" title="statement not covered" >    if (results.criteria.angle.stable) {</span>
-<span class="cstat-no" title="statement not covered" >      results.summary.passedCriteria++;</span>
+<span class="cstat-no" title="statement not covered" >      results.summary.passedCriteria++</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      results.summary.failedCriteria++;</span>
-<span class="cstat-no" title="statement not covered" >      results.overallStable = false;</span>
+<span class="cstat-no" title="statement not covered" >      results.summary.failedCriteria++</span>
+<span class="cstat-no" title="statement not covered" >      results.overallStable = false</span>
     }
-<span class="cstat-no" title="statement not covered" >    results.margins.angle = results.criteria.angle.margin;</span>
-<span class="cstat-no" title="statement not covered" >    results.criticalGenerators.push(...results.criteria.angle.criticalGenerators);</span>
+<span class="cstat-no" title="statement not covered" >    results.margins.angle = results.criteria.angle.margin</span>
+<span class="cstat-no" title="statement not covered" >    results.criticalGenerators.push(</span>
+      ...results.criteria.angle.criticalGenerators
+    )
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (criteria.includes('speed')) {</span>
-<span class="cstat-no" title="statement not covered" >    results.criteria.speed = checkSpeedStability(generators, options);</span>
+<span class="cstat-no" title="statement not covered" >    results.criteria.speed = checkSpeedStability(generators, options)</span>
 <span class="cstat-no" title="statement not covered" >    if (results.criteria.speed.stable) {</span>
-<span class="cstat-no" title="statement not covered" >      results.summary.passedCriteria++;</span>
+<span class="cstat-no" title="statement not covered" >      results.summary.passedCriteria++</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      results.summary.failedCriteria++;</span>
-<span class="cstat-no" title="statement not covered" >      results.overallStable = false;</span>
+<span class="cstat-no" title="statement not covered" >      results.summary.failedCriteria++</span>
+<span class="cstat-no" title="statement not covered" >      results.overallStable = false</span>
     }
-<span class="cstat-no" title="statement not covered" >    results.margins.speed = results.criteria.speed.margin;</span>
-<span class="cstat-no" title="statement not covered" >    results.criticalGenerators.push(...results.criteria.speed.criticalGenerators);</span>
+<span class="cstat-no" title="statement not covered" >    results.margins.speed = results.criteria.speed.margin</span>
+<span class="cstat-no" title="statement not covered" >    results.criticalGenerators.push(</span>
+      ...results.criteria.speed.criticalGenerators
+    )
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (criteria.includes('energy')) {</span>
-<span class="cstat-no" title="statement not covered" >    results.criteria.energy = checkKineticEnergy(generators, options);</span>
+<span class="cstat-no" title="statement not covered" >    results.criteria.energy = checkKineticEnergy(generators, options)</span>
 <span class="cstat-no" title="statement not covered" >    if (results.criteria.energy.stable) {</span>
-<span class="cstat-no" title="statement not covered" >      results.summary.passedCriteria++;</span>
+<span class="cstat-no" title="statement not covered" >      results.summary.passedCriteria++</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      results.summary.failedCriteria++;</span>
-<span class="cstat-no" title="statement not covered" >      results.overallStable = false;</span>
+<span class="cstat-no" title="statement not covered" >      results.summary.failedCriteria++</span>
+<span class="cstat-no" title="statement not covered" >      results.overallStable = false</span>
     }
-<span class="cstat-no" title="statement not covered" >    results.margins.energy = results.criteria.energy.margin;</span>
-<span class="cstat-no" title="statement not covered" >    results.criticalGenerators.push(...results.criteria.energy.criticalGenerators);</span>
+<span class="cstat-no" title="statement not covered" >    results.margins.energy = results.criteria.energy.margin</span>
+<span class="cstat-no" title="statement not covered" >    results.criticalGenerators.push(</span>
+      ...results.criteria.energy.criticalGenerators
+    )
   }
 &nbsp;
   // Remove duplicate critical generators
-  const uniqueCriticalGenerators = <span class="cstat-no" title="statement not covered" >[];</span>
-  const seenIds = <span class="cstat-no" title="statement not covered" >new Set();</span>
+  const uniqueCriticalGenerators = <span class="cstat-no" title="statement not covered" >[]</span>
+  const seenIds = <span class="cstat-no" title="statement not covered" >new Set()</span>
 <span class="cstat-no" title="statement not covered" >  results.criticalGenerators.forEach(<span class="fstat-no" title="function not covered" >ge</span>n =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (!seenIds.has(gen.id)) {</span>
-<span class="cstat-no" title="statement not covered" >      uniqueCriticalGenerators.push(gen);</span>
-<span class="cstat-no" title="statement not covered" >      seenIds.add(gen.id);</span>
+<span class="cstat-no" title="statement not covered" >      uniqueCriticalGenerators.push(gen)</span>
+<span class="cstat-no" title="statement not covered" >      seenIds.add(gen.id)</span>
     }
-  });
-<span class="cstat-no" title="statement not covered" >  results.criticalGenerators = uniqueCriticalGenerators;</span>
+  })
+<span class="cstat-no" title="statement not covered" >  results.criticalGenerators = uniqueCriticalGenerators</span>
 &nbsp;
   // Overall stability in strict mode
 <span class="cstat-no" title="statement not covered" >  if (strictMode) {</span>
-<span class="cstat-no" title="statement not covered" >    results.overallStable = results.summary.failedCriteria === 0;</span>
+<span class="cstat-no" title="statement not covered" >    results.overallStable = results.summary.failedCriteria === 0</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return results;</span>
+<span class="cstat-no" title="statement not covered" >  return results</span>
 }
 &nbsp;
 /**
@@ -1029,38 +1062,38 @@ function <span class="fstat-no" title="function not covered" >calculateStability
     stabilityIndex: 0, // 0 = unstable, 1 = marginally stable, 2 = stable
     criticalityIndex: 0, // Number of critical generators
     marginIndex: 0, // Minimum margin across all criteria
-    overallScore: 0 // Combined stability score
-  };
+    overallScore: 0, // Combined stability score
+  }
 &nbsp;
   // Calculate stability index
 <span class="cstat-no" title="statement not covered" >  if (stabilityResult.overallStable) {</span>
-    const minMargin = <span class="cstat-no" title="statement not covered" >Math.min(...Object.values(stabilityResult.margins));</span>
+    const minMargin = <span class="cstat-no" title="statement not covered" >Math.min(...Object.values(stabilityResult.margins))</span>
 <span class="cstat-no" title="statement not covered" >    if (minMargin &gt; 0.5) {</span>
-<span class="cstat-no" title="statement not covered" >      indices.stabilityIndex = 2; </span>// Stable
+<span class="cstat-no" title="statement not covered" >      indices.stabilityIndex = 2 </span>// Stable
     } else <span class="cstat-no" title="statement not covered" >if (minMargin &gt; 0.1) {</span>
-<span class="cstat-no" title="statement not covered" >      indices.stabilityIndex = 1; </span>// Marginally stable
+<span class="cstat-no" title="statement not covered" >      indices.stabilityIndex = 1 </span>// Marginally stable
     } else {
-<span class="cstat-no" title="statement not covered" >      indices.stabilityIndex = 0; </span>// Unstable
+<span class="cstat-no" title="statement not covered" >      indices.stabilityIndex = 0 </span>// Unstable
     }
   }
 &nbsp;
   // Calculate criticality index
-<span class="cstat-no" title="statement not covered" >  indices.criticalityIndex = stabilityResult.criticalGenerators.length;</span>
+<span class="cstat-no" title="statement not covered" >  indices.criticalityIndex = stabilityResult.criticalGenerators.length</span>
 &nbsp;
   // Calculate margin index
-<span class="cstat-no" title="statement not covered" >  indices.marginIndex = Math.min(...Object.values(stabilityResult.margins));</span>
+<span class="cstat-no" title="statement not covered" >  indices.marginIndex = Math.min(...Object.values(stabilityResult.margins))</span>
 &nbsp;
   // Calculate overall score (0-100)
-  const stabilityWeight = <span class="cstat-no" title="statement not covered" >0.5;</span>
-  const marginWeight = <span class="cstat-no" title="statement not covered" >0.3;</span>
-  const criticalityWeight = <span class="cstat-no" title="statement not covered" >0.2;</span>
+  const stabilityWeight = <span class="cstat-no" title="statement not covered" >0.5</span>
+  const marginWeight = <span class="cstat-no" title="statement not covered" >0.3</span>
+  const criticalityWeight = <span class="cstat-no" title="statement not covered" >0.2</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  indices.overallScore = </span>
+<span class="cstat-no" title="statement not covered" >  indices.overallScore =</span>
     (indices.stabilityIndex / 2) * stabilityWeight * 100 +
     Math.max(0, Math.min(1, indices.marginIndex)) * marginWeight * 100 +
-    Math.max(0, 1 - indices.criticalityIndex / 10) * criticalityWeight * 100;
+    Math.max(0, 1 - indices.criticalityIndex / 10) * criticalityWeight * 100
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return indices;</span>
+<span class="cstat-no" title="statement not covered" >  return indices</span>
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >module.exports = {</span>
@@ -1069,8 +1102,8 @@ function <span class="fstat-no" title="function not covered" >calculateStability
   checkEqualAreaCriterion,
   checkKineticEnergy,
   checkSystemStability,
-  calculateStabilityIndices
-};
+  calculateStabilityIndices,
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -1078,7 +1111,7 @@ function <span class="fstat-no" title="function not covered" >calculateStability
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -1,6 +1,6 @@
 /**
  * swingEquation.js - Generator swing equation for TS-SCOPF
- * 
+ *
  * Responsibility: Implement swing equation for generator dynamics
  * NO Express, NO axios, NO UI logic
  */
@@ -15,15 +15,15 @@
  * @returns {Object} Derivatives {dDelta, dOmega}
  */
 function swingEquation(generator, delta, omega, Pe) {
-  const M = generator.inertia || 5.0; // Inertia constant (H)
-  const D = generator.damping || 2.0; // Damping coefficient
-  const Pm = generator.Pm || generator.P || 0.8; // Mechanical power
+  const M = generator.inertia || 5.0 // Inertia constant (H)
+  const D = generator.damping || 2.0 // Damping coefficient
+  const Pm = generator.Pm || generator.P || 0.8 // Mechanical power
 
   // Swing equation: M d²δ/dt² = Pm - Pe - D dδ/dt
-  const dDelta = omega; // dδ/dt = ω
-  const dOmega = (Pm - Pe - D * omega) / M; // dω/dt = (Pm - Pe - Dω)/M
+  const dDelta = omega // dδ/dt = ω
+  const dOmega = (Pm - Pe - D * omega) / M // dω/dt = (Pm - Pe - Dω)/M
 
-  return { dDelta, dOmega };
+  return { dDelta, dOmega }
 }
 
 /**
@@ -35,14 +35,14 @@ function swingEquation(generator, delta, omega, Pe) {
  * @returns {number} Electrical power (pu)
  */
 function calculateElectricalPower(generator, delta, Vmag, Vang) {
-  const xd = generator.xd || 0.3; // Direct axis reactance
-  const Eq = generator.Eq || 1.0; // Internal voltage
+  const xd = generator.xd || 0.3 // Direct axis reactance
+  const Eq = generator.Eq || 1.0 // Internal voltage
 
   // Simplified electrical power calculation
   // Pe = (Eq * Vmag / xd) * sin(delta - Vang)
-  const Pe = (Eq * Vmag / xd) * Math.sin(delta - Vang);
+  const Pe = ((Eq * Vmag) / xd) * Math.sin(delta - Vang)
 
-  return Pe;
+  return Pe
 }
 
 /**
@@ -55,31 +55,31 @@ function calculateElectricalPower(generator, delta, Vmag, Vang) {
  */
 function updateGeneratorState(generator, dt, Vmag, Vang) {
   // Current state
-  const delta = generator.delta || 0;
-  const omega = generator.omega || 1.0;
+  const delta = generator.delta || 0
+  const omega = generator.omega || 1.0
 
   // Calculate electrical power
-  const Pe = calculateElectricalPower(generator, delta, Vmag, Vang);
+  const Pe = calculateElectricalPower(generator, delta, Vmag, Vang)
 
   // Calculate derivatives
-  const { dDelta, dOmega } = swingEquation(generator, delta, omega, Pe);
+  const { dDelta, dOmega } = swingEquation(generator, delta, omega, Pe)
 
   // Update state (simple Euler integration)
-  const newDelta = delta + dDelta * dt;
-  const newOmega = omega + dOmega * dt;
+  const newDelta = delta + dDelta * dt
+  const newOmega = omega + dOmega * dt
 
   // Update generator state
-  generator.delta = newDelta;
-  generator.omega = newOmega;
-  generator.Pe = Pe;
+  generator.delta = newDelta
+  generator.omega = newOmega
+  generator.Pe = Pe
 
   return {
     delta: newDelta,
     omega: newOmega,
     Pe: Pe,
     dDelta,
-    dOmega
-  };
+    dOmega,
+  }
 }
 
 /**
@@ -89,12 +89,11 @@ function updateGeneratorState(generator, dt, Vmag, Vang) {
  */
 function isGeneratorStable(generator) {
   // Check angle difference from synchronous reference
-  const maxAngleDiff = Math.PI; // 180 degrees
-  const angleDiff = Math.abs(generator.delta - (generator.referenceAngle || 0));
-  
+  const maxAngleDiff = Math.PI // 180 degrees
+  const angleDiff = Math.abs(generator.delta - (generator.referenceAngle || 0))
+
   // Check if within stability limits
-  return angleDiff < maxAngleDiff && 
-         Math.abs(generator.omega - 1.0) < 0.5; // Within 50% of synchronous speed
+  return angleDiff < maxAngleDiff && Math.abs(generator.omega - 1.0) < 0.5 // Within 50% of synchronous speed
 }
 
 /**
@@ -105,24 +104,26 @@ function isGeneratorStable(generator) {
  * @returns {number} Critical clearing time (seconds)
  */
 function calculateCriticalClearingTime(generator, faultPower, postFaultPower) {
-  const M = generator.inertia || 5.0;
-  const Pm = generator.Pm || generator.P || 0.8;
-  
+  const M = generator.inertia || 5.0
+  const Pm = generator.Pm || generator.P || 0.8
+
   // Simplified equal area criterion
   // t_cr = sqrt(2M * (δ_max - δ_0) / (Pm - P_fault))
-  const delta0 = 0; // Initial angle
-  const deltaMax = Math.PI; // Maximum angle before instability
-  
-  const acceleratingArea = (Pm - faultPower) * (deltaMax - delta0);
-  const deceleratingArea = (postFaultPower - Pm) * (deltaMax - delta0);
-  
+  const delta0 = 0 // Initial angle
+  const deltaMax = Math.PI // Maximum angle before instability
+
+  const acceleratingArea = (Pm - faultPower) * (deltaMax - delta0)
+  const deceleratingArea = (postFaultPower - Pm) * (deltaMax - delta0)
+
   if (acceleratingArea <= deceleratingArea) {
-    return Infinity; // System is stable for any clearing time
+    return Infinity // System is stable for any clearing time
   }
-  
-  const tCritical = Math.sqrt(2 * M * (deltaMax - delta0) / Math.abs(Pm - faultPower));
-  
-  return tCritical;
+
+  const tCritical = Math.sqrt(
+    (2 * M * (deltaMax - delta0)) / Math.abs(Pm - faultPower)
+  )
+
+  return tCritical
 }
 
 /**
@@ -131,17 +132,17 @@ function calculateCriticalClearingTime(generator, faultPower, postFaultPower) {
  * @returns {number} Damping ratio
  */
 function calculateDampingRatio(generator) {
-  const M = generator.inertia || 5.0;
-  const D = generator.damping || 2.0;
-  const xd = generator.xd || 0.3;
-  
-  // Natural frequency: ω_n = sqrt(1/(M*xd))
-  const omegaN = Math.sqrt(1 / (M * xd));
-  
+  const M = generator.inertia || 5.0
+  const D = generator.damping || 2.0
+  const xd = generator.xd || 0.3
+
+  // Natural frequency: 1/(M*xd))
+  const _omegaN = Math.sqrt(1 / (M * xd))
+
   // Damping ratio: ζ = D / (2 * sqrt(M/xd))
-  const dampingRatio = D / (2 * Math.sqrt(M / xd));
-  
-  return dampingRatio;
+  const dampingRatio = D / (2 * Math.sqrt(M / xd))
+
+  return dampingRatio
 }
 
 module.exports = {
@@ -150,5 +151,5 @@ module.exports = {
   updateGeneratorState,
   isGeneratorStable,
   calculateCriticalClearingTime,
-  calculateDampingRatio
-};
+  calculateDampingRatio,
+}

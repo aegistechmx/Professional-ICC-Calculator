@@ -217,7 +217,8 @@
 <a name='L152'></a><a href='#L152'>152</a>
 <a name='L153'></a><a href='#L153'>153</a>
 <a name='L154'></a><a href='#L154'>154</a>
-<a name='L155'></a><a href='#L155'>155</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -323,7 +324,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -340,6 +340,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -373,7 +375,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * swingEquation.js - Generator swing equation for TS-SCOPF
- * 
+ *
  * Responsibility: Implement swing equation for generator dynamics
  * NO Express, NO axios, NO UI logic
  */
@@ -388,15 +390,15 @@
  * @returns {Object} Derivatives {dDelta, dOmega}
  */
 function <span class="fstat-no" title="function not covered" >swingEquation(</span>generator, delta, omega, Pe) {
-  const M = <span class="cstat-no" title="statement not covered" >generator.inertia || 5.0;</span> // Inertia constant (H)
-  const D = <span class="cstat-no" title="statement not covered" >generator.damping || 2.0;</span> // Damping coefficient
-  const Pm = <span class="cstat-no" title="statement not covered" >generator.Pm || generator.P || 0.8;</span> // Mechanical power
+  const M = <span class="cstat-no" title="statement not covered" >generator.inertia || 5.0 </span>// Inertia constant (H)
+  const D = <span class="cstat-no" title="statement not covered" >generator.damping || 2.0 </span>// Damping coefficient
+  const Pm = <span class="cstat-no" title="statement not covered" >generator.Pm || generator.P || 0.8 </span>// Mechanical power
 &nbsp;
   // Swing equation: M d²δ/dt² = Pm - Pe - D dδ/dt
-  const dDelta = <span class="cstat-no" title="statement not covered" >omega;</span> // dδ/dt = ω
-  const dOmega = <span class="cstat-no" title="statement not covered" >(Pm - Pe - D * omega) / M;</span> // dω/dt = (Pm - Pe - Dω)/M
+  const dDelta = <span class="cstat-no" title="statement not covered" >omega </span>// dδ/dt = ω
+  const dOmega = <span class="cstat-no" title="statement not covered" >(Pm - Pe - D * omega) / M </span>// dω/dt = (Pm - Pe - Dω)/M
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return { dDelta, dOmega };</span>
+<span class="cstat-no" title="statement not covered" >  return { dDelta, dOmega }</span>
 }
 &nbsp;
 /**
@@ -408,14 +410,14 @@ function <span class="fstat-no" title="function not covered" >swingEquation(</sp
  * @returns {number} Electrical power (pu)
  */
 function <span class="fstat-no" title="function not covered" >calculateElectricalPower(</span>generator, delta, Vmag, Vang) {
-  const xd = <span class="cstat-no" title="statement not covered" >generator.xd || 0.3;</span> // Direct axis reactance
-  const Eq = <span class="cstat-no" title="statement not covered" >generator.Eq || 1.0;</span> // Internal voltage
+  const xd = <span class="cstat-no" title="statement not covered" >generator.xd || 0.3 </span>// Direct axis reactance
+  const Eq = <span class="cstat-no" title="statement not covered" >generator.Eq || 1.0 </span>// Internal voltage
 &nbsp;
   // Simplified electrical power calculation
   // Pe = (Eq * Vmag / xd) * sin(delta - Vang)
-  const Pe = <span class="cstat-no" title="statement not covered" >(Eq * Vmag / xd) * Math.sin(delta - Vang);</span>
+  const Pe = <span class="cstat-no" title="statement not covered" >((Eq * Vmag) / xd) * Math.sin(delta - Vang)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return Pe;</span>
+<span class="cstat-no" title="statement not covered" >  return Pe</span>
 }
 &nbsp;
 /**
@@ -428,31 +430,31 @@ function <span class="fstat-no" title="function not covered" >calculateElectrica
  */
 function <span class="fstat-no" title="function not covered" >updateGeneratorState(</span>generator, dt, Vmag, Vang) {
   // Current state
-  const delta = <span class="cstat-no" title="statement not covered" >generator.delta || 0;</span>
-  const omega = <span class="cstat-no" title="statement not covered" >generator.omega || 1.0;</span>
+  const delta = <span class="cstat-no" title="statement not covered" >generator.delta || 0</span>
+  const omega = <span class="cstat-no" title="statement not covered" >generator.omega || 1.0</span>
 &nbsp;
   // Calculate electrical power
-  const Pe = <span class="cstat-no" title="statement not covered" >calculateElectricalPower(generator, delta, Vmag, Vang);</span>
+  const Pe = <span class="cstat-no" title="statement not covered" >calculateElectricalPower(generator, delta, Vmag, Vang)</span>
 &nbsp;
   // Calculate derivatives
-  const { dDelta, dOmega } = <span class="cstat-no" title="statement not covered" >swingEquation(generator, delta, omega, Pe);</span>
+  const { dDelta, dOmega } = <span class="cstat-no" title="statement not covered" >swingEquation(generator, delta, omega, Pe)</span>
 &nbsp;
   // Update state (simple Euler integration)
-  const newDelta = <span class="cstat-no" title="statement not covered" >delta + dDelta * dt;</span>
-  const newOmega = <span class="cstat-no" title="statement not covered" >omega + dOmega * dt;</span>
+  const newDelta = <span class="cstat-no" title="statement not covered" >delta + dDelta * dt</span>
+  const newOmega = <span class="cstat-no" title="statement not covered" >omega + dOmega * dt</span>
 &nbsp;
   // Update generator state
-<span class="cstat-no" title="statement not covered" >  generator.delta = newDelta;</span>
-<span class="cstat-no" title="statement not covered" >  generator.omega = newOmega;</span>
-<span class="cstat-no" title="statement not covered" >  generator.Pe = Pe;</span>
+<span class="cstat-no" title="statement not covered" >  generator.delta = newDelta</span>
+<span class="cstat-no" title="statement not covered" >  generator.omega = newOmega</span>
+<span class="cstat-no" title="statement not covered" >  generator.Pe = Pe</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     delta: newDelta,
     omega: newOmega,
     Pe: Pe,
     dDelta,
-    dOmega
-  };
+    dOmega,
+  }
 }
 &nbsp;
 /**
@@ -462,12 +464,11 @@ function <span class="fstat-no" title="function not covered" >updateGeneratorSta
  */
 function <span class="fstat-no" title="function not covered" >isGeneratorStable(</span>generator) {
   // Check angle difference from synchronous reference
-  const maxAngleDiff = <span class="cstat-no" title="statement not covered" >Math.PI;</span> // 180 degrees
-  const angleDiff = <span class="cstat-no" title="statement not covered" >Math.abs(generator.delta - (generator.referenceAngle || 0));</span>
-  
+  const maxAngleDiff = <span class="cstat-no" title="statement not covered" >Math.PI </span>// 180 degrees
+  const angleDiff = <span class="cstat-no" title="statement not covered" >Math.abs(generator.delta - (generator.referenceAngle || 0))</span>
+&nbsp;
   // Check if within stability limits
-<span class="cstat-no" title="statement not covered" >  return angleDiff &lt; maxAngleDiff &amp;&amp; </span>
-         Math.abs(generator.omega - 1.0) &lt; 0.5; // Within 50% of synchronous speed
+<span class="cstat-no" title="statement not covered" >  return angleDiff &lt; maxAngleDiff &amp;&amp; Math.abs(generator.omega - 1.0) &lt; 0.5 </span>// Within 50% of synchronous speed
 }
 &nbsp;
 /**
@@ -478,24 +479,26 @@ function <span class="fstat-no" title="function not covered" >isGeneratorStable(
  * @returns {number} Critical clearing time (seconds)
  */
 function <span class="fstat-no" title="function not covered" >calculateCriticalClearingTime(</span>generator, faultPower, postFaultPower) {
-  const M = <span class="cstat-no" title="statement not covered" >generator.inertia || 5.0;</span>
-  const Pm = <span class="cstat-no" title="statement not covered" >generator.Pm || generator.P || 0.8;</span>
-  
+  const M = <span class="cstat-no" title="statement not covered" >generator.inertia || 5.0</span>
+  const Pm = <span class="cstat-no" title="statement not covered" >generator.Pm || generator.P || 0.8</span>
+&nbsp;
   // Simplified equal area criterion
   // t_cr = sqrt(2M * (δ_max - δ_0) / (Pm - P_fault))
-  const delta0 = <span class="cstat-no" title="statement not covered" >0;</span> // Initial angle
-  const deltaMax = <span class="cstat-no" title="statement not covered" >Math.PI;</span> // Maximum angle before instability
-  
-  const acceleratingArea = <span class="cstat-no" title="statement not covered" >(Pm - faultPower) * (deltaMax - delta0);</span>
-  const deceleratingArea = <span class="cstat-no" title="statement not covered" >(postFaultPower - Pm) * (deltaMax - delta0);</span>
-  
+  const delta0 = <span class="cstat-no" title="statement not covered" >0 </span>// Initial angle
+  const deltaMax = <span class="cstat-no" title="statement not covered" >Math.PI </span>// Maximum angle before instability
+&nbsp;
+  const acceleratingArea = <span class="cstat-no" title="statement not covered" >(Pm - faultPower) * (deltaMax - delta0)</span>
+  const deceleratingArea = <span class="cstat-no" title="statement not covered" >(postFaultPower - Pm) * (deltaMax - delta0)</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >  if (acceleratingArea &lt;= deceleratingArea) {</span>
-<span class="cstat-no" title="statement not covered" >    return Infinity; </span>// System is stable for any clearing time
+<span class="cstat-no" title="statement not covered" >    return Infinity </span>// System is stable for any clearing time
   }
-  
-  const tCritical = <span class="cstat-no" title="statement not covered" >Math.sqrt(2 * M * (deltaMax - delta0) / Math.abs(Pm - faultPower));</span>
-  
-<span class="cstat-no" title="statement not covered" >  return tCritical;</span>
+&nbsp;
+  const tCritical = <span class="cstat-no" title="statement not covered" >Math.sqrt(</span>
+    (2 * M * (deltaMax - delta0)) / Math.abs(Pm - faultPower)
+  )
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return tCritical</span>
 }
 &nbsp;
 /**
@@ -504,17 +507,17 @@ function <span class="fstat-no" title="function not covered" >calculateCriticalC
  * @returns {number} Damping ratio
  */
 function <span class="fstat-no" title="function not covered" >calculateDampingRatio(</span>generator) {
-  const M = <span class="cstat-no" title="statement not covered" >generator.inertia || 5.0;</span>
-  const D = <span class="cstat-no" title="statement not covered" >generator.damping || 2.0;</span>
-  const xd = <span class="cstat-no" title="statement not covered" >generator.xd || 0.3;</span>
-  
-  // Natural frequency: ω_n = sqrt(1/(M*xd))
-  const omegaN = <span class="cstat-no" title="statement not covered" >Math.sqrt(1 / (M * xd));</span>
-  
+  const M = <span class="cstat-no" title="statement not covered" >generator.inertia || 5.0</span>
+  const D = <span class="cstat-no" title="statement not covered" >generator.damping || 2.0</span>
+  const xd = <span class="cstat-no" title="statement not covered" >generator.xd || 0.3</span>
+&nbsp;
+  // Natural frequency: 1/(M*xd))
+  const _omegaN = <span class="cstat-no" title="statement not covered" >Math.sqrt(1 / (M * xd))</span>
+&nbsp;
   // Damping ratio: ζ = D / (2 * sqrt(M/xd))
-  const dampingRatio = <span class="cstat-no" title="statement not covered" >D / (2 * Math.sqrt(M / xd));</span>
-  
-<span class="cstat-no" title="statement not covered" >  return dampingRatio;</span>
+  const dampingRatio = <span class="cstat-no" title="statement not covered" >D / (2 * Math.sqrt(M / xd))</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return dampingRatio</span>
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >module.exports = {</span>
@@ -523,8 +526,8 @@ function <span class="fstat-no" title="function not covered" >calculateDampingRa
   updateGeneratorState,
   isGeneratorStable,
   calculateCriticalClearingTime,
-  calculateDampingRatio
-};
+  calculateDampingRatio,
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -532,7 +535,7 @@ function <span class="fstat-no" title="function not covered" >calculateDampingRa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T05:44:56.824Z
+                at 2026-04-29T07:48:08.126Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

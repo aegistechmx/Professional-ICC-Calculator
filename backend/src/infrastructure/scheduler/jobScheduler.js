@@ -1,12 +1,12 @@
 /**
  * infrastructure/scheduler/jobScheduler.js - Professional distributed job scheduler
- * 
+ *
  * Responsibility: High-performance job scheduling and orchestration
  */
 
-const DistributedQueue = require('../queue/queue');
-const WorkerPool = require('../workers/workerPool');
-const path = require('path');
+const DistributedQueue = require('../queue/queue')
+const WorkerPool = require('../workers/workerPool')
+const path = require('path')
 
 class JobScheduler {
   constructor(options = {}) {
@@ -16,43 +16,45 @@ class JobScheduler {
       jobTimeout: options.jobTimeout || 300000, // 5 minutes
       retryAttempts: options.retryAttempts || 3,
       retryDelay: options.retryDelay || 5000,
-      ...options
-    };
+      ...options,
+    }
 
     this.queue = new DistributedQueue({
       redisHost: options.redisHost || 'localhost',
-      redisPort: options.redisPort || 6379
-    });
+      redisPort: options.redisPort || 6379,
+    })
 
     this.workerPool = new WorkerPool(
       path.resolve(__dirname, '../workers/job.worker.js'),
       { maxSize: options.maxWorkers || 8 }
-    );
+    )
 
-    this.jobs = new Map();
+    this.jobs = new Map()
     this.stats = {
       scheduled: 0,
       running: 0,
       completed: 0,
       failed: 0,
       avgExecutionTime: 0,
-      throughput: 0
-    };
+      throughput: 0,
+    }
 
-    this.isRunning = false;
+    this.isRunning = false
   }
 
   /**
    * Initialize scheduler
    */
   async initialize() {
-    console.log('🚀 Initializing distributed job scheduler...');
-    
-    await this.queue.initialize();
-    await this.workerPool.initialize();
-    
-    this.isRunning = true;
-    console.log('✅ Job scheduler initialized successfully');
+    // eslint-disable-next-line no-console
+    console.log('🚀 Initializing distributed job scheduler...')
+
+    await this.queue.initialize()
+    await this.workerPool.initialize()
+
+    this.isRunning = true
+    // eslint-disable-next-line no-console
+    console.log('✅ Job scheduler initialized successfully')
   }
 
   /**
@@ -64,7 +66,7 @@ class JobScheduler {
    */
   async scheduleJob(type, data, options = {}) {
     if (!this.isRunning) {
-      throw new Error('Scheduler not initialized');
+      throw new Error('Scheduler not initialized')
     }
 
     const {
@@ -72,8 +74,8 @@ class JobScheduler {
       delay = 0,
       timeout = this.config.jobTimeout,
       attempts = this.config.retryAttempts,
-      dependencies = []
-    } = options;
+      dependencies = [],
+    } = options
 
     const jobData = {
       id: this.generateJobId(),
@@ -84,28 +86,31 @@ class JobScheduler {
       timeout,
       attempts,
       dependencies,
-      createdAt: new Date().toISOString()
-    };
+      createdAt: new Date().toISOString(),
+    }
 
     // Add to queue based on priority
-    const queueName = this.getQueueName(priority);
+    const queueName = this.getQueueName(priority)
     const job = await this.queue.add(queueName, jobData, {
       priority: this.getPriorityValue(priority),
       delay,
       removeOnComplete: true,
-      attempts
-    });
+      attempts,
+    })
 
     this.jobs.set(job.id, {
       ...jobData,
       status: 'queued',
-      queuedAt: new Date().toISOString()
-    });
+      queuedAt: new Date().toISOString(),
+    })
 
-    this.stats.scheduled++;
-    console.log(`📤 Job scheduled: ${job.id} (${type}) with priority ${priority}`);
+    this.stats.scheduled++
+    // eslint-disable-next-line no-console
+    console.log(
+      `📤 Job scheduled: ${job.id} (${type}) with priority ${priority}`
+    )
 
-    return job.id;
+    return job.id
   }
 
   /**
@@ -115,38 +120,43 @@ class JobScheduler {
    * @returns {Promise<Array>} Job IDs
    */
   async scheduleBatch(jobs, options = {}) {
-    const { 
+    const {
       executeInParallel = true,
-      maxConcurrency = this.config.maxConcurrentJobs 
-    } = options;
+      maxConcurrency = this.config.maxConcurrentJobs,
+    } = options
 
-    console.log(`📤 Scheduling batch of ${jobs.length} jobs...`);
+    // eslint-disable-next-line no-console
+    console.log(`📤 Scheduling batch of ${jobs.length} jobs...`)
 
     if (executeInParallel) {
       // Check dependencies and execute in parallel
-      const orderedJobs = this.resolveDependencies(jobs);
+      const orderedJobs = this.resolveDependencies(jobs)
       const jobIds = await Promise.all(
-        orderedJobs.map(job => this.scheduleJob(job.type, job.data, {
-          ...job.options,
-          priority: job.priority
-        }))
-      );
+        orderedJobs.map(job =>
+          this.scheduleJob(job.type, job.data, {
+            ...job.options,
+            priority: job.priority,
+          })
+        )
+      )
 
-      console.log(`✅ Batch scheduled: ${jobIds.length} jobs`);
-      return jobIds;
+      // eslint-disable-next-line no-console
+      console.log(`✅ Batch scheduled: ${jobIds.length} jobs`)
+      return jobIds
     } else {
       // Execute sequentially respecting dependencies
-      const jobIds = [];
+      const jobIds = []
       for (const job of jobs) {
         const jobId = await this.scheduleJob(job.type, job.data, {
           ...job.options,
-          priority: job.priority
-        });
-        jobIds.push(jobId);
+          priority: job.priority,
+        })
+        jobIds.push(jobId)
       }
 
-      console.log(`✅ Batch scheduled: ${jobIds.length} jobs`);
-      return jobIds;
+      // eslint-disable-next-line no-console
+      console.log(`✅ Batch scheduled: ${jobIds.length} jobs (sequential)`)
+      return jobIds
     }
   }
 
@@ -163,8 +173,8 @@ class JobScheduler {
       cron = '0 */5 * * *', // Every 5 minutes
       timezone = 'UTC',
       maxRuns = null,
-      removeOnComplete = false
-    } = schedule;
+      removeOnComplete = false,
+    } = schedule
 
     const jobData = {
       id: this.generateJobId(),
@@ -172,24 +182,27 @@ class JobScheduler {
       data,
       schedule: { cron, timezone, maxRuns, removeOnComplete },
       ...options,
-      recurring: true
-    };
+      recurring: true,
+    }
 
-    const queueName = this.getQueueName(options.priority || 'normal');
+    const queueName = this.getQueueName(options.priority || 'normal')
     const job = await this.queue.add(queueName, jobData, {
       priority: this.getPriorityValue(options.priority || 'normal'),
-      repeat: { cron: schedule.cron, timezone: schedule.timezone }
-    });
+      repeat: { cron: schedule.cron, timezone: schedule.timezone },
+    })
 
     this.jobs.set(job.id, {
       ...jobData,
       status: 'scheduled',
-      scheduledAt: new Date().toISOString()
-    });
+      scheduledAt: new Date().toISOString(),
+    })
 
-    console.log(`📤 Recurring job scheduled: ${job.id} (${type}) with schedule ${cron}`);
+    // eslint-disable-next-line no-console
+    console.log(
+      `📤 Recurring job scheduled: ${job.id} (${type}) with schedule ${cron}`
+    )
 
-    return job.id;
+    return job.id
   }
 
   /**
@@ -198,24 +211,24 @@ class JobScheduler {
    * @returns {Promise<Object>} Job status
    */
   async getJobStatus(jobId) {
-    const job = this.jobs.get(jobId);
+    const job = this.jobs.get(jobId)
     if (!job) {
-      throw new Error(`Job ${jobId} not found`);
+      throw new Error(`Job ${jobId} not found`)
     }
 
     // Try to get from queue first
     try {
-      const queueJob = await this.queue.getJob('any', jobId);
+      const queueJob = await this.queue.getJob('any', jobId)
       if (queueJob) {
         return {
           ...job,
           ...queueJob,
-          queueStatus: queueJob.finishedOn ? 'completed' : 'processing'
-        };
+          queueStatus: queueJob.finishedOn ? 'completed' : 'processing',
+        }
       }
     } catch (error) {
       // Return stored job status
-      return job;
+      return job
     }
   }
 
@@ -225,25 +238,27 @@ class JobScheduler {
    * @returns {Promise} Cancel result
    */
   async cancelJob(jobId) {
-    const job = this.jobs.get(jobId);
+    const job = this.jobs.get(jobId)
     if (!job) {
-      throw new Error(`Job ${jobId} not found`);
+      throw new Error(`Job ${jobId} not found`)
     }
 
     try {
       // Remove from queue
-      await this.queue.removeJob('any', jobId);
-      
+      await this.queue.removeJob('any', jobId)
+
       // Update job status
-      job.status = 'cancelled';
-      job.cancelledAt = new Date().toISOString();
-      
-      console.log(`❌ Job cancelled: ${jobId}`);
-      
-      return { success: true, jobId };
+      job.status = 'cancelled'
+      job.cancelledAt = new Date().toISOString()
+
+      // eslint-disable-next-line no-console
+      console.log(`❌ Job cancelled: ${jobId}`)
+
+      return { success: true, jobId }
     } catch (error) {
-      console.error(`❌ Failed to cancel job ${jobId}:`, error);
-      return { success: false, error: error.message, jobId };
+      // eslint-disable-next-line no-console
+      console.error(`❌ Failed to cancel job ${jobId}:`, error)
+      return { success: false, error: error.message, jobId }
     }
   }
 
@@ -252,23 +267,31 @@ class JobScheduler {
    * @returns {Object} Scheduler statistics
    */
   async getStats() {
-    const queueStats = await this.queue.getAllStats();
-    const workerStats = this.workerPool.getStats();
+    const queueStats = await this.queue.getAllStats()
+    const workerStats = this.workerPool.getStats()
 
     return {
       scheduler: {
         ...this.stats,
         uptime: this.isRunning ? Date.now() - this.startTime : 0,
-        isRunning: this.isRunning
+        isRunning: this.isRunning,
       },
       queue: queueStats,
       workers: workerStats,
       performance: {
-        throughput: this.stats.completed > 0 ? this.stats.completed / ((Date.now() - this.startTime) / 1000) : 0,
+        throughput:
+          this.stats.completed > 0
+            ? this.stats.completed / ((Date.now() - this.startTime) / 1000)
+            : 0,
         avgExecutionTime: this.stats.avgExecutionTime,
-        successRate: this.stats.completed > 0 ? (this.stats.completed / (this.stats.completed + this.stats.failed)) * 100 : 0
-      }
-    };
+        successRate:
+          this.stats.completed > 0
+            ? (this.stats.completed /
+                (this.stats.completed + this.stats.failed)) *
+              100
+            : 0,
+      },
+    }
   }
 
   /**
@@ -281,10 +304,10 @@ class JobScheduler {
       critical: 'critical-jobs',
       high: 'high-priority-jobs',
       normal: 'normal-jobs',
-      low: 'low-priority-jobs'
-    };
+      low: 'low-priority-jobs',
+    }
 
-    return queueMap[priority] || queueMap.normal;
+    return queueMap[priority] || queueMap.normal
   }
 
   /**
@@ -297,10 +320,10 @@ class JobScheduler {
       critical: 10,
       high: 8,
       normal: 5,
-      low: 2
-    };
+      low: 2,
+    }
 
-    return priorityMap[priority] || 5;
+    return priorityMap[priority] || 5
   }
 
   /**
@@ -309,31 +332,33 @@ class JobScheduler {
    * @returns {Array>} Ordered jobs
    */
   resolveDependencies(jobs) {
-    const resolved = [];
-    const visited = new Set();
+    const resolved = []
+    const visited = new Set()
 
-    const resolveJob = (job) => {
-      if (visited.has(job.id)) return;
-      visited.add(job.id);
+    const resolveJob = job => {
+      if (visited.has(job.id)) return
+      visited.add(job.id)
 
       // Check if all dependencies are resolved
-      const allDepsResolved = (job.dependencies || []).every(depId => 
+      const allDepsResolved = (job.dependencies || []).every(depId =>
         resolved.some(r => r.id === depId)
-      );
+      )
 
       if (allDepsResolved) {
-        resolved.push(job);
+        resolved.push(job)
         // Find jobs that depend on this one
-        const dependents = jobs.filter(j => 
+        const dependents = jobs.filter(j =>
           (j.dependencies || []).includes(job.id)
-        );
+        )
         // Recursively resolve dependents
-        const resolvedDependents = dependents.flatMap(d => resolveJob(d));
-        resolved.push(...resolvedDependents);
+        const resolvedDependents = dependents.flatMap(d => resolveJob(d))
+        resolved.push(...resolvedDependents)
       }
-    };
+    }
 
-    return jobs.filter(job => !visited.has(job.id)).flatMap(job => resolveJob(job));
+    return jobs
+      .filter(job => !visited.has(job.id))
+      .flatMap(job => resolveJob(job))
   }
 
   /**
@@ -341,25 +366,24 @@ class JobScheduler {
    * @returns {string} Job ID
    */
   generateJobId() {
-    return `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
   /**
    * Shutdown scheduler
    */
   async shutdown() {
-    console.log('🛑 Shutting down job scheduler...');
-    
-    this.isRunning = false;
-    
-    // Shutdown queue and worker pool
-    await Promise.all([
-      this.queue.shutdown(),
-      this.workerPool.shutdown()
-    ]);
+    // eslint-disable-next-line no-console
+    console.log('🛑 Shutting down job scheduler...')
 
-    console.log('✅ Job scheduler shutdown complete');
+    this.isRunning = false
+
+    // Shutdown queue and worker pool
+    await Promise.all([this.queue.shutdown(), this.workerPool.shutdown()])
+
+    // eslint-disable-next-line no-console
+    console.log('✅ Job scheduler shutdown complete')
   }
 }
 
-module.exports = JobScheduler;
+module.exports = JobScheduler
