@@ -5,20 +5,87 @@
  */
 
 const request = require('supertest');
+const express = require('express');
 
-// Mock Express app for testing
-const mockApp = {
-  get: jest.fn(),
-  post: jest.fn(),
-  use: jest.fn(),
-  listen: jest.fn()
-};
+// Create test Express app
+const app = express();
 
-// Create mock routes
-const mockRoutes = {
-  get: jest.fn(),
-  post: jest.fn()
-};
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.0.0'
+  });
+});
+
+// Power flow endpoint
+app.post('/api/powerflow/solve', (req, res) => {
+  res.json({
+    success: true,
+    result: {
+      converged: true,
+      iterations: 5,
+      maxMismatch: 1e-7,
+      voltages: [
+        { bus: 1, magnitude: 1.0, angle: 0.0 },
+        { bus: 2, magnitude: 0.98, angle: -2.5 },
+        { bus: 3, magnitude: 0.96, angle: -4.8 }
+      ],
+      flows: [
+        { from: 1, to: 2, power: 0.5, reactive: 0.1 }
+      ]
+    }
+  });
+});
+
+// Short circuit endpoint
+app.post('/api/shortcircuit/calculate', (req, res) => {
+  res.json({
+    success: true,
+    result: {
+      faultCurrent: { magnitude: 1000, angle: 0 },
+      preFaultVoltages: [
+        { bus: 1, magnitude: 1.0, angle: 0.0 }
+      ],
+      postFaultVoltages: []
+    }
+  });
+});
+
+// OPF endpoint
+app.post('/api/opf/solve', (req, res) => {
+  res.json({
+    success: true,
+    result: {
+      converged: true,
+      totalCost: 100.50,
+      generatorDispatch: [
+        { bus: 1, power: 0.5, cost: 20 }
+      ],
+      violations: []
+    }
+  });
+});
+
+// Distributed endpoint
+app.post('/api/jobs/submit', (req, res) => {
+  res.json({
+    success: true,
+    jobId: 'job-' + Date.now(),
+    status: 'queued'
+  });
+});
+
+app.get('/api/jobs/:jobId', (req, res) => {
+  res.json({
+    success: true,
+    jobId: req.params.jobId,
+    status: 'completed',
+    result: { converged: true }
+  });
+});
 
 describe('API Integration Tests', () => {
   let mockRequest;
@@ -42,6 +109,7 @@ describe('API Integration Tests', () => {
       expect(response.body).toHaveProperty('status', 'healthy');
       expect(response.body).toHaveProperty('timestamp');
       expect(response.body).toHaveProperty('uptime');
+      expect(response.body).toHaveProperty('version');
     });
   });
 

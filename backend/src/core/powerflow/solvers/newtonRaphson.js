@@ -163,13 +163,16 @@ class NewtonRaphsonSolver {
         S = this.addComplex(S, this.multiplyComplex(V_complex, product));
       });
       
+      // Calculate injected power (negative of calculated S)
+      const injectedPower = { real: -S.real, imag: -S.imag };
+      
       if (bus.type === 'pq') {
         // Both real and reactive power mismatches
-        mismatches[index++] = bus.power - (-S.real); // Note: S is injected power
-        mismatches[index++] = bus.reactive - (-S.imag);
+        mismatches[index++] = bus.power - injectedPower.real;
+        mismatches[index++] = bus.reactive - injectedPower.imag;
       } else if (bus.type === 'pv') {
         // Only real power mismatch (voltage magnitude fixed)
-        mismatches[index++] = bus.power - (-S.real);
+        mismatches[index++] = bus.power - injectedPower.real;
       }
       // Slack bus has no mismatch
     });
