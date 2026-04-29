@@ -6,6 +6,7 @@
 
 const { PowerFlowSolver } = require('../src/core/powerflow/solvers');
 const { Profiler: SystemProfiler } = require('../src/debug/tracer');
+const request = require('supertest');
 
 describe('Performance Tests', () => {
   let solver;

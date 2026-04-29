@@ -4,7 +4,7 @@
  * Responsibility: HTTP controller for distributed simulation services
  */
 
-const JobScheduler = require('@/infrastructure/scheduler/jobScheduler');
+const JobScheduler = require('../../infrastructure/scheduler/jobScheduler');
 
 // Global scheduler instance
 let globalScheduler = null;

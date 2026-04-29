@@ -5,7 +5,7 @@
  */
 
 const { solveLoadFlowRobust } = require('@/core/powerflow/newton');
-const { solveFDLF } = require('@/core/powerflow/fastDecoupled');
+const { solveFDLF } = require('@/core/powerflow/solvers');
 
 module.exports = {
   name: 'powerflow',

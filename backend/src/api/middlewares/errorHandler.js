@@ -11,7 +11,7 @@
  * @property {Object} [details] - Additional error details
  */
 
-const logger = require('@/infrastructure/logger/logger')
+const logger = require('@/shared/utils/formatting')
 
 /**
  * Error handler middleware

@@ -5,7 +5,7 @@
  */
 
 const { PowerFlowSolver } = require('../src/core/powerflow/solvers');
-const { Complex } = require('../src/shared/math/Complex');
+const Complex = require('../src/shared/math/Complex');
 
 describe('Power Flow Calculations', () => {
   let solver;
@@ -23,9 +23,9 @@ describe('Power Flow Calculations', () => {
           { id: 3, type: 'pq', power: -0.3, reactive: -0.1 }
         ],
         branches: [
-          { from: 1, to: 2, impedance: new Complex(0.01, 0.03) },
-          { from: 2, to: 3, impedance: new Complex(0.02, 0.04) },
-          { from: 1, to: 3, impedance: new Complex(0.03, 0.06) }
+          { from: 1, to: 2, impedance: { real: 0.01, imag: 0.03 } },
+          { from: 2, to: 3, impedance: { real: 0.02, imag: 0.04 } },
+          { from: 1, to: 3, impedance: { real: 0.03, imag: 0.06 } }
         ]
       };
 
@@ -49,7 +49,7 @@ describe('Power Flow Calculations', () => {
           { id: 2, type: 'pq', power: -0.5, reactive: -0.2 }
         ],
         branches: [
-          { from: 1, to: 2, impedance: new Complex(0.01, 0.02) }
+          { from: 1, to: 2, impedance: { real: 0.01, imag: 0.02 } }
         ]
       };
 
@@ -71,13 +71,13 @@ describe('Power Flow Calculations', () => {
           { id: 5, type: 'pq', power: -0.4, reactive: -0.15 }
         ],
         branches: [
-          { from: 1, to: 2, impedance: new Complex(0.02, 0.06) },
-          { from: 1, to: 3, impedance: new Complex(0.08, 0.24) },
-          { from: 2, to: 3, impedance: new Complex(0.06, 0.18) },
-          { from: 2, to: 4, impedance: new Complex(0.06, 0.18) },
-          { from: 2, to: 5, impedance: new Complex(0.04, 0.12) },
-          { from: 3, to: 4, impedance: new Complex(0.01, 0.03) },
-          { from: 4, to: 5, impedance: new Complex(0.08, 0.24) }
+          { from: 1, to: 2, impedance: { real: 0.02, imag: 0.06 } },
+          { from: 1, to: 3, impedance: { real: 0.08, imag: 0.24 } },
+          { from: 2, to: 3, impedance: { real: 0.06, imag: 0.18 } },
+          { from: 2, to: 4, impedance: { real: 0.06, imag: 0.18 } },
+          { from: 2, to: 5, impedance: { real: 0.04, imag: 0.12 } },
+          { from: 3, to: 4, impedance: { real: 0.01, imag: 0.03 } },
+          { from: 4, to: 5, impedance: { real: 0.08, imag: 0.24 } }
         ]
       };
 
@@ -104,7 +104,7 @@ describe('Power Flow Calculations', () => {
           { id: 2, type: 'pq', power: -0.1, reactive: -0.05 }
         ],
         branches: [
-          { from: 1, to: 2, impedance: new Complex(0.001, 0.001) }
+          { from: 1, to: 2, impedance: { real: 0.001, imag: 0.001 } }
         ]
       };
 
@@ -122,7 +122,7 @@ describe('Power Flow Calculations', () => {
           { id: 3, type: 'pq', power: -0.2, reactive: -0.1 }
         ],
         branches: [
-          { from: 1, to: 2, impedance: new Complex(0.01, 0.02) }
+          { from: 1, to: 2, impedance: { real: 0.01, imag: 0.02 } }
           // Bus 3 is isolated
         ]
       };
@@ -140,8 +140,8 @@ describe('Power Flow Calculations', () => {
           { id: 3, type: 'pq', power: -0.3, reactive: -0.1 }
         ],
         branches: [
-          { from: 1, to: 2, impedance: new Complex(0.01, 0.02) },
-          { from: 2, to: 3, impedance: new Complex(0.02, 0.04) }
+          { from: 1, to: 2, impedance: { real: 0.01, imag: 0.02 } },
+          { from: 2, to: 3, impedance: { real: 0.02, imag: 0.04 } }
         ]
       };
 
@@ -174,7 +174,7 @@ describe('Power Flow Calculations', () => {
           branches.push({
             from: i,
             to: j,
-            impedance: new Complex(0.01 * Math.random(), 0.03 * Math.random())
+            impedance: { real: 0.01 * Math.random(), imag: 0.03 * Math.random() }
           });
         }
       }
@@ -197,9 +197,9 @@ describe('Power Flow Calculations', () => {
           { id: 3, type: 'pq', power: -0.001, reactive: -0.001 }
         ],
         branches: [
-          { from: 1, to: 2, impedance: new Complex(0.0001, 0.0001) },
-          { from: 2, to: 3, impedance: new Complex(100, 100) },
-          { from: 1, to: 3, impedance: new Complex(0.0001, 0.0001) }
+          { from: 1, to: 2, impedance: { real: 0.0001, imag: 0.0001 } },
+          { from: 2, to: 3, impedance: { real: 100, imag: 100 } },
+          { from: 1, to: 3, impedance: { real: 0.0001, imag: 0.0001 } }
         ]
       };
 
@@ -212,6 +212,12 @@ describe('Power Flow Calculations', () => {
 });
 
 describe('Short Circuit Calculations', () => {
+  let solver;
+
+  beforeEach(() => {
+    solver = new PowerFlowSolver();
+  });
+
   test('should calculate three-phase fault current', () => {
     const system = {
       buses: [
@@ -219,7 +225,7 @@ describe('Short Circuit Calculations', () => {
         { id: 2, type: 'pq', power: -0.5, reactive: -0.2 }
       ],
       branches: [
-        { from: 1, to: 2, impedance: new Complex(0.01, 0.03) }
+        { from: 1, to: 2, impedance: { real: 0.01, imag: 0.03 } }
       ],
       generators: [
         { bus: 1, power: 1.0, reactance: 0.2 }
@@ -229,7 +235,7 @@ describe('Short Circuit Calculations', () => {
     const faultCurrent = solver.calculateShortCircuit(system, {
       type: '3phase',
       location: 2,
-      impedance: new Complex(0, 0)
+      impedance: { real: 0, imag: 0 }
     });
 
     expect(faultCurrent.magnitude).toBeGreaterThan(0);
@@ -243,7 +249,7 @@ describe('Short Circuit Calculations', () => {
         { id: 2, type: 'pq', power: -0.5, reactive: -0.2 }
       ],
       branches: [
-        { from: 1, to: 2, impedance: new Complex(0.01, 0.03) }
+        { from: 1, to: 2, impedance: { real: 0.01, imag: 0.03 } }
       ],
       generators: [
         { bus: 1, power: 1.0, reactance: 0.2 }
@@ -253,7 +259,7 @@ describe('Short Circuit Calculations', () => {
     const faultCurrent = solver.calculateShortCircuit(system, {
       type: 'slg',
       location: 2,
-      impedance: new Complex(0, 0)
+      impedance: { real: 0, imag: 0 }
     });
 
     expect(faultCurrent.magnitude).toBeGreaterThan(0);
@@ -264,6 +270,12 @@ describe('Short Circuit Calculations', () => {
 });
 
 describe('OPF Calculations', () => {
+  let solver;
+
+  beforeEach(() => {
+    solver = new PowerFlowSolver();
+  });
+
   test('should solve optimal power flow', () => {
     const system = {
       buses: [
@@ -272,9 +284,9 @@ describe('OPF Calculations', () => {
         { id: 3, type: 'pq', power: -0.3, reactive: -0.1 }
       ],
       branches: [
-        { from: 1, to: 2, impedance: new Complex(0.01, 0.03) },
-        { from: 2, to: 3, impedance: new Complex(0.02, 0.04) },
-        { from: 1, to: 3, impedance: new Complex(0.03, 0.06) }
+        { from: 1, to: 2, impedance: { real: 0.01, imag: 0.03 } },
+        { from: 2, to: 3, impedance: { real: 0.02, imag: 0.04 } },
+        { from: 1, to: 3, impedance: { real: 0.03, imag: 0.06 } }
       ],
       costs: {
         1: { a: 0, b: 20, c: 0.01 },
