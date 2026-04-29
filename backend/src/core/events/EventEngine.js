@@ -1,18 +1,20 @@
 /**
  * EventEngine - Industrial Event-Based Simulation Engine
- * 
+ *
  * This module provides a robust event-driven simulation system with:
  * - Priority Queue for time-ordered event processing
  * - Deterministic event ordering
  * - Real-time simulation loop
  * - Event scheduling and cancellation
  * - State change tracking
- * 
+ *
  * Architecture:
  * Events → Priority Queue → Event Loop → State Updates → New Events
- * 
+ *
  * @class EventEngine
  */
+
+const logger = require('@/infrastructure/logger/logger')
 
 /**
  * Priority Queue for time-ordered event processing
@@ -20,8 +22,8 @@
  */
 class PriorityQueue {
   constructor() {
-    this.queue = [];
-    this.size = 0;
+    this.queue = []
+    this.size = 0
   }
 
   /**
@@ -31,14 +33,14 @@ class PriorityQueue {
    */
   push(event) {
     if (!event.id) {
-      event.id = this.generateId();
+      event.id = this.generateId()
     }
-    
-    this.queue.push(event);
-    this.size++;
-    this.bubbleUp(this.size - 1);
-    
-    return event.id;
+
+    this.queue.push(event)
+    this.size++
+    this.bubbleUp(this.size - 1)
+
+    return event.id
   }
 
   /**
@@ -46,18 +48,18 @@ class PriorityQueue {
    * @returns {Object} Event or null if empty
    */
   pop() {
-    if (this.size === 0) return null;
-    
-    const min = this.queue[0];
-    const end = this.queue.pop();
-    this.size--;
-    
+    if (this.size === 0) return null
+
+    const min = this.queue[0]
+    const end = this.queue.pop()
+    this.size--
+
     if (this.size > 0) {
-      this.queue[0] = end;
-      this.sinkDown(0);
+      this.queue[0] = end
+      this.sinkDown(0)
     }
-    
-    return min;
+
+    return min
   }
 
   /**
@@ -65,7 +67,7 @@ class PriorityQueue {
    * @returns {Object} Event or null if empty
    */
   peek() {
-    return this.size > 0 ? this.queue[0] : null;
+    return this.size > 0 ? this.queue[0] : null
   }
 
   /**
@@ -74,25 +76,28 @@ class PriorityQueue {
    * @returns {boolean} True if removed, false if not found
    */
   remove(eventId) {
-    const index = this.queue.findIndex(e => e.id === eventId);
-    if (index === -1) return false;
-    
+    const index = this.queue.findIndex(e => e.id === eventId)
+    if (index === -1) return false
+
     // Remove and replace with last element
-    const end = this.queue.pop();
-    this.size--;
-    
+    const end = this.queue.pop()
+    this.size--
+
     if (index < this.size) {
-      this.queue[index] = end;
-      
+      this.queue[index] = end
+
       // Try to bubble up first, if that doesn't work, sink down
-      if (index > 0 && this.queue[index].time < this.queue[Math.floor((index - 1) / 2)].time) {
-        this.bubbleUp(index);
+      if (
+        index > 0 &&
+        this.queue[index].time < this.queue[Math.floor((index - 1) / 2)].time
+      ) {
+        this.bubbleUp(index)
       } else {
-        this.sinkDown(index);
+        this.sinkDown(index)
       }
     }
-    
-    return true;
+
+    return true
   }
 
   /**
@@ -100,7 +105,7 @@ class PriorityQueue {
    * @returns {boolean}
    */
   empty() {
-    return this.size === 0;
+    return this.size === 0
   }
 
   /**
@@ -108,15 +113,15 @@ class PriorityQueue {
    * @returns {number}
    */
   getSize() {
-    return this.size;
+    return this.size
   }
 
   /**
    * Clear all events
    */
   clear() {
-    this.queue = [];
-    this.size = 0;
+    this.queue = []
+    this.size = 0
   }
 
   /**
@@ -124,7 +129,7 @@ class PriorityQueue {
    * @returns {string}
    */
   generateId() {
-    return `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
   /**
@@ -132,21 +137,23 @@ class PriorityQueue {
    * @param {number} index - Index to bubble up
    */
   bubbleUp(index) {
-    const element = this.queue[index];
-    
+    const element = this.queue[index]
+
     while (index > 0) {
-      const parentIndex = Math.floor((index - 1) / 2);
-      const parent = this.queue[parentIndex];
-      
+      const parentIndex = Math.floor((index - 1) / 2)
+      const parent = this.queue[parentIndex]
+
       // Compare by time first, then by priority if times are equal
-      if (element.time > parent.time) break;
-      if (element.time === parent.time && element.priority <= parent.priority) break;
-      
-      this.queue[index] = parent;
-      index = parentIndex;
+      if (element.time > parent.time) break
+      if (element.time === parent.time && element.priority <= parent.priority) {
+        break
+      }
+
+      this.queue[index] = parent
+      index = parentIndex
     }
-    
-    this.queue[index] = element;
+
+    this.queue[index] = element
   }
 
   /**
@@ -154,44 +161,51 @@ class PriorityQueue {
    * @param {number} index - Index to sink down
    */
   sinkDown(index) {
-    const length = this.size;
-    const element = this.queue[index];
-    
+    const length = this.size
+    const element = this.queue[index]
+
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const leftChildIndex = 2 * index + 1;
-      const rightChildIndex = 2 * index + 2;
-      let swapIndex = null;
-      let leftChild, rightChild;
-      
+      const leftChildIndex = 2 * index + 1
+      const rightChildIndex = 2 * index + 2
+      let swapIndex = null
+      let leftChild, rightChild
+
       if (leftChildIndex < length) {
-        leftChild = this.queue[leftChildIndex];
+        leftChild = this.queue[leftChildIndex]
         if (leftChild.time < element.time) {
-          swapIndex = leftChildIndex;
-        } else if (leftChild.time === element.time && leftChild.priority > element.priority) {
-          swapIndex = leftChildIndex;
+          swapIndex = leftChildIndex
+        } else if (
+          leftChild.time === element.time &&
+          leftChild.priority > element.priority
+        ) {
+          swapIndex = leftChildIndex
         }
       }
-      
+
       if (rightChildIndex < length) {
-        rightChild = this.queue[rightChildIndex];
+        rightChild = this.queue[rightChildIndex]
         if (
           (swapIndex === null && rightChild.time < element.time) ||
-          (swapIndex === null && rightChild.time === element.time && rightChild.priority > element.priority) ||
+          (swapIndex === null &&
+            rightChild.time === element.time &&
+            rightChild.priority > element.priority) ||
           (swapIndex !== null && rightChild.time < leftChild.time) ||
-          (swapIndex !== null && rightChild.time === leftChild.time && rightChild.priority > leftChild.priority)
+          (swapIndex !== null &&
+            rightChild.time === leftChild.time &&
+            rightChild.priority > leftChild.priority)
         ) {
-          swapIndex = rightChildIndex;
+          swapIndex = rightChildIndex
         }
       }
-      
-      if (swapIndex === null) break;
-      
-      this.queue[index] = this.queue[swapIndex];
-      index = swapIndex;
+
+      if (swapIndex === null) break
+
+      this.queue[index] = this.queue[swapIndex]
+      index = swapIndex
     }
-    
-    this.queue[index] = element;
+
+    this.queue[index] = element
   }
 }
 
@@ -210,21 +224,21 @@ class EventEngine {
    * @param {number} options.timeStep - Default time step for event scheduling
    */
   constructor(options = {}) {
-    this.queue = new PriorityQueue();
-    this.system = options.system || null;
-    this.applyEvent = options.applyEvent || null;
-    this.recomputeSystem = options.recomputeSystem || null;
-    this.maxTime = options.maxTime || Infinity;
-    this.timeStep = options.timeStep || 0.01;
-    
+    this.queue = new PriorityQueue()
+    this.system = options.system || null
+    this.applyEvent = options.applyEvent || null
+    this.recomputeSystem = options.recomputeSystem || null
+    this.maxTime = options.maxTime || Infinity
+    this.timeStep = options.timeStep || 0.01
+
     // Engine state
-    this.currentTime = 0;
-    this.eventCount = 0;
-    this.processedEvents = [];
-    this.isRunning = false;
-    
+    this.currentTime = 0 // current (A)
+    this.eventCount = 0
+    this.processedEvents = []
+    this.isRunning = false
+
     // Event handlers
-    this.handlers = new Map();
+    this.handlers = new Map()
   }
 
   /**
@@ -238,17 +252,17 @@ class EventEngine {
    */
   schedule(event) {
     if (!event.time) {
-      event.time = this.currentTime + this.timeStep;
+      event.time = this.currentTime + this.timeStep // current (A)
     }
-    
+
     if (!event.priority) {
-      event.priority = 0;
+      event.priority = 0
     }
-    
-    const eventId = this.queue.push(event);
-    this.eventCount++;
-    
-    return eventId;
+
+    const eventId = this.queue.push(event)
+    this.eventCount++
+
+    return eventId
   }
 
   /**
@@ -257,7 +271,7 @@ class EventEngine {
    * @returns {boolean} True if cancelled, false if not found
    */
   cancel(eventId) {
-    return this.queue.remove(eventId);
+    return this.queue.remove(eventId)
   }
 
   /**
@@ -269,74 +283,70 @@ class EventEngine {
    * @returns {Object} Run results
    */
   run(options = {}) {
-    const {
-      maxTime = this.maxTime,
-      onEvent = null,
-      onStep = null
-    } = options;
-    
-    this.isRunning = true;
-    this.currentTime = 0;
-    const startTime = Date.now();
-    
+    const { maxTime = this.maxTime, onEvent = null, onStep = null } = options
+
+    this.isRunning = true
+    this.currentTime = 0 // current (A)
+    const startTime = Date.now()
+
     const results = {
       processed: 0,
       cancelled: 0,
       skipped: 0,
       endTime: 0,
       duration: 0,
-      events: []
-    };
-    
+      events: [],
+    }
+
     // Main event loop
     while (!this.queue.empty()) {
-      const event = this.queue.peek();
-      
+      const event = this.queue.peek()
+
       // Check if we've reached max time
       if (event.time > maxTime) {
-        break;
+        break
       }
-      
+
       // Update current time
-      this.currentTime = event.time;
-      
+      this.currentTime = event.time // current (A)
+
       // Process event
-      const processed = this.processEvent(event);
-      
+      const processed = this.processEvent(event)
+
       if (processed) {
-        results.processed++;
+        results.processed++
         results.events.push({
           ...event,
           processed: true,
-          timestamp: this.currentTime
-        });
-        
+          timestamp: this.currentTime,
+        })
+
         if (onEvent) {
-          onEvent(event, this.currentTime);
+          onEvent(event, this.currentTime)
         }
       } else {
-        results.skipped++;
+        results.skipped++
       }
-      
+
       // Remove event from queue
-      this.queue.pop();
-      
+      this.queue.pop()
+
       // Recompute system state
       if (this.recomputeSystem) {
-        this.recomputeSystem(this.system);
+        this.recomputeSystem(this.system)
       }
-      
+
       // Call step callback
       if (onStep) {
-        onStep(this.currentTime, this.system);
+        onStep(this.currentTime, this.system)
       }
     }
-    
-    this.isRunning = false;
-    results.endTime = this.currentTime;
-    results.duration = (Date.now() - startTime) / 1000;
-    
-    return results;
+
+    this.isRunning = false
+    results.endTime = this.currentTime // current (A)
+    results.duration = (Date.now() - startTime) / 1000
+
+    return results
   }
 
   /**
@@ -347,29 +357,29 @@ class EventEngine {
   processEvent(event) {
     try {
       // Check if handler exists for this event type
-      const handler = this.handlers.get(event.type);
-      
+      const handler = this.handlers.get(event.type)
+
       if (handler) {
         // Use registered handler
-        handler(event, this.system, this.currentTime);
+        handler(event, this.system, this.currentTime)
       } else if (this.applyEvent) {
         // Use default apply function
-        this.applyEvent(event, this.system, this.currentTime);
+        this.applyEvent(event, this.system, this.currentTime)
       } else {
-        console.warn(`No handler for event type: ${event.type}`);
-        return false;
+        logger.warn(`No handler for event type: ${event.type}`)
+        return false
       }
-      
+
       // Store in processed events
       this.processedEvents.push({
         ...event,
-        processedAt: this.currentTime
-      });
-      
-      return true;
+        processedAt: this.currentTime,
+      })
+
+      return true
     } catch (error) {
-      console.error(`Error processing event ${event.id}:`, error);
-      return false;
+      logger.error(`Error processing event ${event.id}:`, error)
+      return false
     }
   }
 
@@ -379,7 +389,7 @@ class EventEngine {
    * @param {Function} handler - Handler function
    */
   registerHandler(eventType, handler) {
-    this.handlers.set(eventType, handler);
+    this.handlers.set(eventType, handler)
   }
 
   /**
@@ -387,7 +397,7 @@ class EventEngine {
    * @param {string} eventType - Event type to unregister
    */
   unregisterHandler(eventType) {
-    this.handlers.delete(eventType);
+    this.handlers.delete(eventType)
   }
 
   /**
@@ -395,7 +405,7 @@ class EventEngine {
    * @returns {number}
    */
   getCurrentTime() {
-    return this.currentTime;
+    return this.currentTime
   }
 
   /**
@@ -408,8 +418,8 @@ class EventEngine {
       currentTime: this.currentTime,
       eventCount: this.eventCount,
       processedCount: this.processedEvents.length,
-      isRunning: this.isRunning
-    };
+      isRunning: this.isRunning,
+    }
   }
 
   /**
@@ -417,7 +427,7 @@ class EventEngine {
    * @returns {Array} Array of pending events
    */
   getPendingEvents() {
-    return [...this.queue.queue];
+    return [...this.queue.queue]
   }
 
   /**
@@ -425,32 +435,32 @@ class EventEngine {
    * @returns {Array} Array of processed events
    */
   getProcessedEvents() {
-    return [...this.processedEvents];
+    return [...this.processedEvents]
   }
 
   /**
    * Reset engine to initial state
    */
   reset() {
-    this.queue.clear();
-    this.currentTime = 0;
-    this.eventCount = 0;
-    this.processedEvents = [];
-    this.isRunning = false;
+    this.queue.clear()
+    this.currentTime = 0 // current (A)
+    this.eventCount = 0
+    this.processedEvents = []
+    this.isRunning = false
   }
 
   /**
    * Pause the event loop
    */
   pause() {
-    this.isRunning = false;
+    this.isRunning = false
   }
 
   /**
    * Resume the event loop
    */
   resume() {
-    this.isRunning = true;
+    this.isRunning = true
   }
 }
 
@@ -469,11 +479,11 @@ const EventTypes = {
   FREQUENCY_DEVIATION: 'frequency_deviation',
   VOLTAGE_DIP: 'voltage_dip',
   ISLANDING: 'islanding',
-  SYNCHRONIZATION: 'synchronization'
-};
+  SYNCHRONIZATION: 'synchronization',
+}
 
 module.exports = {
   PriorityQueue,
   EventEngine,
-  EventTypes
-};
+  EventTypes,
+}

@@ -1,0 +1,77 @@
+name: Electrical Calculation Validation
+
+on:
+  push:
+    paths:
+      - 'backend/src/**/*electrical*'
+      - 'backend/src/**/*calculation*'
+      - 'backend/src/**/*solver*'
+  pull_request:
+    paths:
+      - 'backend/src/**/*electrical*'
+      - 'backend/src/**/*calculation*'
+      - 'backend/src/**/*solver*'
+  schedule:
+    - cron: '0 2 * * 1' # Weekly on Monday at 2 AM
+
+jobs:
+  electrical-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+    
+    - name: Validate electrical inputs
+      run: node scripts/validate-electrical-inputs.js
+    
+    - name: Check unit consistency
+      run: node scripts/check-unit-consistency.js
+    
+    - name: Run electrical standards tests
+      run: |
+        cd backend && npm run test:electrical-standards
+        npm run test:short-circuit-accuracy
+        npm run test:mathematical-precision
+    
+    - name: Validate IEEE/IEC compliance
+      run: |
+        cd backend && npm run validate:ieee-1584
+        npm run validate:iec-60909
+        npm run validate:nec-compliance
+    
+    - name: Test complex calculations
+      run: |
+        cd backend && npm run test:complex-numbers
+        npm run test:matrix-calculations
+        npm run test:large-systems
+    
+    - name: Test edge cases
+      run: |
+        cd backend && npm run test:zero-impedance
+        npm run test:infinite-impedance
+        npm run test:boundary-conditions
+    
+    - name: Performance validation
+      run: |
+        cd backend && npm run test:convergence-criteria
+        npm run measure:api-performance
+    
+    - name: Generate validation report
+      run: node scripts/electrical-validation-report.js
+    
+    - name: Upload validation report
+      uses: actions/upload-artifact@v3
+      with:
+        name: electrical-validation-report
+        path: reports/electrical-validation-*.json

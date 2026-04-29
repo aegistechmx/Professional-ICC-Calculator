@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React from 'react'
 
 /**
  * Performance utilities for optimization
@@ -13,15 +13,15 @@ import React from 'react';
  * @returns {Function} Debounced function
  */
 export function debounce(func, wait = 300) {
-  let timeout;
+  let timeout
   return function executedFunction(...args) {
     const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
+      clearTimeout(timeout)
+      func(...args)
+    }
+    clearTimeout(timeout)
+    timeout = setTimeout(later, wait)
+  }
 }
 
 /**
@@ -31,14 +31,14 @@ export function debounce(func, wait = 300) {
  * @returns {Function} Throttled function
  */
 export function throttle(func, limit = 100) {
-  let inThrottle;
-  return function(...args) {
+  let inThrottle
+  return function (...args) {
     if (!inThrottle) {
-      func.apply(this, args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      func.apply(this, args)
+      inThrottle = true
+      setTimeout(() => (inThrottle = false), limit)
     }
-  };
+  }
 }
 
 /**
@@ -47,16 +47,16 @@ export function throttle(func, limit = 100) {
  * @returns {Function} Memoized function
  */
 export function memoize(fn) {
-  const cache = new Map();
-  return function(...args) {
-    const key = JSON.stringify(args);
+  const cache = new Map()
+  return function (...args) {
+    const key = JSON.stringify(args)
     if (cache.has(key)) {
-      return cache.get(key);
+      return cache.get(key)
     }
-    const result = fn.apply(this, args);
-    cache.set(key, result);
-    return result;
-  };
+    const result = fn.apply(this, args)
+    cache.set(key, result)
+    return result
+  }
 }
 
 /**
@@ -67,10 +67,12 @@ export function memoize(fn) {
 export function lazyLoad(importFunc) {
   return React.lazy(() => {
     return importFunc().catch(err => {
-      console.error('Failed to load component:', err);
-      return { default: () => <div>Error loading component</div> };
-    });
-  });
+      if (import.meta.env.DEV) {
+        console.error('Failed to load component:', err)
+      }
+      return { default: () => <div>Error loading component</div> }
+    })
+  })
 }
 
 /**
@@ -80,11 +82,11 @@ export function lazyLoad(importFunc) {
  * @returns {Array[]} Array of chunks
  */
 export function chunkArray(array, size = 100) {
-  const chunks = [];
+  const chunks = []
   for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
+    chunks.push(array.slice(i, i + size))
   }
-  return chunks;
+  return chunks
 }
 
 /**
@@ -94,26 +96,31 @@ export function chunkArray(array, size = 100) {
  * @param {number} chunkSize - Items per chunk
  * @param {number} delayMs - Delay between chunks
  */
-export async function processInChunks(items, processor, chunkSize = 50, delayMs = 0) {
-  const chunks = chunkArray(items, chunkSize);
-  const results = [];
-  
+export async function processInChunks(
+  items,
+  processor,
+  chunkSize = 50,
+  delayMs = 0
+) {
+  const chunks = chunkArray(items, chunkSize)
+  const results = []
+
   for (let i = 0; i < chunks.length; i++) {
-    const chunkResults = await Promise.all(chunks[i].map(processor));
-    results.push(...chunkResults);
-    
+    const chunkResults = await Promise.all(chunks[i].map(processor))
+    results.push(...chunkResults)
+
     // Yield control to UI thread
     if (delayMs > 0 && i < chunks.length - 1) {
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise(resolve => setTimeout(resolve, delayMs))
     }
-    
+
     // Allow browser to render
     if (typeof window !== 'undefined' && window.requestAnimationFrame) {
-      await new Promise(resolve => requestAnimationFrame(resolve));
+      await new Promise(resolve => requestAnimationFrame(resolve))
     }
   }
-  
-  return results;
+
+  return results
 }
 
 /**
@@ -123,13 +130,15 @@ export async function processInChunks(items, processor, chunkSize = 50, delayMs 
  * @returns {Function} Wrapped function with timing
  */
 export function measurePerformance(fn, label = 'Performance') {
-  return function(...args) {
-    const start = performance.now();
-    const result = fn.apply(this, args);
-    const end = performance.now();
-    console.log(`${label}: ${(end - start).toFixed(2)}ms`);
-    return result;
-  };
+  return function (...args) {
+    const start = performance.now()
+    const result = fn.apply(this, args)
+    const end = performance.now()
+    if (import.meta.env.DEV) {
+      console.log(`${label}: ${(end - start).toFixed(2)}ms`)
+    }
+    return result
+  }
 }
 
 /**
@@ -137,29 +146,29 @@ export function measurePerformance(fn, label = 'Performance') {
  */
 export class CalculationCache {
   constructor(maxSize = 100) {
-    this.cache = new Map();
-    this.maxSize = maxSize;
+    this.cache = new Map()
+    this.maxSize = maxSize
   }
 
   get(key) {
-    return this.cache.get(key);
+    return this.cache.get(key)
   }
 
   set(key, value) {
     if (this.cache.size >= this.maxSize) {
       // LRU eviction - remove oldest entry
-      const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      const firstKey = this.cache.keys().next().value
+      this.cache.delete(firstKey)
     }
-    this.cache.set(key, value);
+    this.cache.set(key, value)
   }
 
   has(key) {
-    return this.cache.has(key);
+    return this.cache.has(key)
   }
 
   clear() {
-    this.cache.clear();
+    this.cache.clear()
   }
 }
 
@@ -171,17 +180,20 @@ export class CalculationCache {
  * @returns {Array} Optimized node array
  */
 export function optimizeNodeUpdates(currentNodes, newNodes) {
-  const currentMap = new Map(currentNodes.map(n => [n.id, n]));
-  const updates = [];
+  const currentMap = new Map(currentNodes.map(n => [n.id, n]))
+  const updates = []
 
   for (const newNode of newNodes) {
-    const currentNode = currentMap.get(newNode.id);
-    if (!currentNode || JSON.stringify(currentNode) !== JSON.stringify(newNode)) {
-      updates.push(newNode);
+    const currentNode = currentMap.get(newNode.id)
+    if (
+      !currentNode ||
+      JSON.stringify(currentNode) !== JSON.stringify(newNode)
+    ) {
+      updates.push(newNode)
     }
   }
 
-  return updates;
+  return updates
 }
 
 /**
@@ -190,20 +202,19 @@ export function optimizeNodeUpdates(currentNodes, newNodes) {
  * @returns {Function} Function that returns a Promise
  */
 export function createWorker(workerFunction) {
-  const blob = new Blob(
-    [`(${workerFunction.toString()})()`],
-    { type: 'application/javascript' }
-  );
-  const workerUrl = URL.createObjectURL(blob);
-  
+  const blob = new Blob([`(${workerFunction.toString()})()`], {
+    type: 'application/javascript',
+  })
+  const workerUrl = URL.createObjectURL(blob)
+
   return function postMessage(data) {
     return new Promise((resolve, reject) => {
-      const worker = new Worker(workerUrl);
-      worker.onmessage = (e) => resolve(e.data);
-      worker.onerror = reject;
-      worker.postMessage(data);
-    });
-  };
+      const worker = new Worker(workerUrl)
+      worker.onmessage = e => resolve(e.data)
+      worker.onerror = reject
+      worker.postMessage(data)
+    })
+  }
 }
 
 export default {
@@ -216,5 +227,5 @@ export default {
   measurePerformance,
   CalculationCache,
   optimizeNodeUpdates,
-  createWorker
-};
+  createWorker,
+}

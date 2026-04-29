@@ -1,46 +1,80 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Error Panel Component
  * Displays color-coded warnings and errors from simulation
  */
-export default function ErrorPanel({ errors = [], warnings = [], validationErrors = [] }) {
-  if (errors.length === 0 && warnings.length === 0 && validationErrors.length === 0) {
-    return null;
+export default function ErrorPanel({
+  errors = [],
+  warnings = [],
+  validationErrors = [],
+}) {
+  if (
+    errors.length === 0 &&
+    warnings.length === 0 &&
+    validationErrors.length === 0
+  ) {
+    return null
   }
 
-  const getErrorColor = (type) => {
+  const getErrorColor = type => {
     switch (type) {
-      case 'critical': return 'bg-red-50 border-red-200 text-red-800';
-      case 'error': return 'bg-red-100 border-red-300 text-red-900';
-      case 'warning': return 'bg-amber-50 border-amber-200 text-amber-800';
-      case 'info': return 'bg-blue-50 border-blue-200 text-blue-800';
-      default: return 'bg-gray-50 border-gray-200 text-gray-800';
+      case 'critical':
+        return 'bg-red-50 border-red-200 text-red-800'
+      case 'error':
+        return 'bg-red-100 border-red-300 text-red-900'
+      case 'warning':
+        return 'bg-amber-50 border-amber-200 text-amber-800'
+      case 'info':
+        return 'bg-blue-50 border-blue-200 text-blue-800'
+      default:
+        return 'bg-gray-50 border-gray-200 text-gray-800'
     }
-  };
+  }
 
-  const getErrorIcon = (type) => {
+  const getErrorIcon = type => {
     switch (type) {
-      case 'critical': return '🔴';
-      case 'error': return '❌';
-      case 'warning': return '⚠️';
-      case 'info': return 'ℹ️';
-      default: return '📝';
+      case 'critical':
+        return '🔴'
+      case 'error':
+        return '❌'
+      case 'warning':
+        return '⚠️'
+      case 'info':
+        return 'ℹ️'
+      default:
+        return '📝'
     }
-  };
+  }
 
-  const categorizeErrors = (items) => {
-    const critical = items.filter(e => e.includes('crítico') || e.includes('peligro') || e.includes('extremo'));
-    const error = items.filter(e => !e.includes('crítico') && !e.includes('peligro') && !e.includes('extremo') && (e.includes('error') || e.includes('inválido') || e.includes('falla')));
-    const warning = items.filter(e => e.includes('advertencia') || e.includes('recomendación') || e.includes('considerar'));
-    const info = items.filter(e => !critical.includes(e) && !error.includes(e) && !warning.includes(e));
+  const categorizeErrors = items => {
+    const critical = items.filter(
+      e =>
+        e.includes('crítico') || e.includes('peligro') || e.includes('extremo')
+    )
+    const error = items.filter(
+      e =>
+        !e.includes('crítico') &&
+        !e.includes('peligro') &&
+        !e.includes('extremo') &&
+        (e.includes('error') || e.includes('inválido') || e.includes('falla'))
+    )
+    const warning = items.filter(
+      e =>
+        e.includes('advertencia') ||
+        e.includes('recomendación') ||
+        e.includes('considerar')
+    )
+    const info = items.filter(
+      e => !critical.includes(e) && !error.includes(e) && !warning.includes(e)
+    )
 
-    return { critical, error, warning, info };
-  };
+    return { critical, error, warning, info }
+  }
 
-  const allErrors = [...errors, ...validationErrors];
-  const categorized = categorizeErrors(allErrors);
+  const allErrors = [...errors, ...validationErrors]
+  const categorized = categorizeErrors(allErrors)
 
   return (
     <div className="fixed top-4 left-4 right-4 z-50 max-h-96 overflow-y-auto">
@@ -78,13 +112,17 @@ export default function ErrorPanel({ errors = [], warnings = [], validationError
             </h4>
             <div className="space-y-2">
               {categorized.critical.map((error, index) => (
-                <div key={`critical-${index}`} className={`p-3 rounded-lg border ${getErrorColor('critical')}`}>
+                <div
+                  key={`critical-${index}`}
+                  className={`p-3 rounded-lg border ${getErrorColor('critical')}`}
+                >
                   <div className="flex items-start gap-2">
                     <span className="text-lg">{getErrorIcon('critical')}</span>
                     <div className="flex-1">
                       <p className="text-sm font-medium">{error}</p>
                       <p className="text-xs mt-1 opacity-75">
-                        ⚡ Requiere acción inmediata - Puede afectar la seguridad del sistema
+                        ⚡ Requiere acción inmediata - Puede afectar la
+                        seguridad del sistema
                       </p>
                     </div>
                   </div>
@@ -103,7 +141,10 @@ export default function ErrorPanel({ errors = [], warnings = [], validationError
             </h4>
             <div className="space-y-2">
               {categorized.error.map((error, index) => (
-                <div key={`error-${index}`} className={`p-3 rounded-lg border ${getErrorColor('error')}`}>
+                <div
+                  key={`error-${index}`}
+                  className={`p-3 rounded-lg border ${getErrorColor('error')}`}
+                >
                   <div className="flex items-start gap-2">
                     <span className="text-lg">{getErrorIcon('error')}</span>
                     <div className="flex-1">
@@ -128,7 +169,10 @@ export default function ErrorPanel({ errors = [], warnings = [], validationError
             </h4>
             <div className="space-y-2">
               {categorized.warning.map((warning, index) => (
-                <div key={`warning-${index}`} className={`p-3 rounded-lg border ${getErrorColor('warning')}`}>
+                <div
+                  key={`warning-${index}`}
+                  className={`p-3 rounded-lg border ${getErrorColor('warning')}`}
+                >
                   <div className="flex items-start gap-2">
                     <span className="text-lg">{getErrorIcon('warning')}</span>
                     <div className="flex-1">
@@ -153,7 +197,10 @@ export default function ErrorPanel({ errors = [], warnings = [], validationError
             </h4>
             <div className="space-y-2">
               {categorized.info.map((info, index) => (
-                <div key={`info-${index}`} className={`p-3 rounded-lg border ${getErrorColor('info')}`}>
+                <div
+                  key={`info-${index}`}
+                  className={`p-3 rounded-lg border ${getErrorColor('info')}`}
+                >
                   <div className="flex items-start gap-2">
                     <span className="text-lg">{getErrorIcon('info')}</span>
                     <div className="flex-1">
@@ -178,7 +225,10 @@ export default function ErrorPanel({ errors = [], warnings = [], validationError
             </h4>
             <div className="space-y-2">
               {warnings.map((warning, index) => (
-                <div key={`system-warning-${index}`} className={`p-3 rounded-lg border ${getErrorColor('warning')}`}>
+                <div
+                  key={`system-warning-${index}`}
+                  className={`p-3 rounded-lg border ${getErrorColor('warning')}`}
+                >
                   <div className="flex items-start gap-2">
                     <span className="text-lg">{getErrorIcon('warning')}</span>
                     <div className="flex-1">
@@ -221,11 +271,11 @@ export default function ErrorPanel({ errors = [], warnings = [], validationError
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 ErrorPanel.propTypes = {
   errors: PropTypes.array,
   warnings: PropTypes.array,
-  validationErrors: PropTypes.array
-};
+  validationErrors: PropTypes.array,
+}

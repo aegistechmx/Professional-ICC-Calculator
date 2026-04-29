@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { useEffect, useRef } from 'react';
-import { useStore } from '../store/useStore';
+import { useEffect, useRef } from 'react'
+import { useStore } from '../store/useStore'
 
 /**
  * Auto-save hook for projects
@@ -9,40 +9,40 @@ import { useStore } from '../store/useStore';
  * @param {number} delay - Debounce delay in milliseconds (default: 2000)
  */
 export function useAutoSave(projectId, delay = 2000) {
-  const nodes = useStore((state) => state.nodes);
-  const edges = useStore((state) => state.edges);
-  const saveSystem = useStore((state) => state.saveSystem);
-  const timeoutRef = useRef(null);
-  const isSavingRef = useRef(false);
+  const nodes = useStore(state => state.nodes)
+  const edges = useStore(state => state.edges)
+  const saveSystem = useStore(state => state.saveSystem)
+  const timeoutRef = useRef(null)
+  const isSavingRef = useRef(false)
 
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId) return
 
     // Clear previous timeout
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current)
     }
 
     // Set new timeout
     timeoutRef.current = setTimeout(async () => {
-      if (isSavingRef.current) return;
+      if (isSavingRef.current) return
 
-      isSavingRef.current = true;
+      isSavingRef.current = true
       try {
-        await saveSystem(`Project-${projectId}`);
+        await saveSystem(`Project-${projectId}`)
         // Auto-save completed
       } catch (error) {
-        console.error('Auto-save failed:', error);
+        console.error('Auto-save failed:', error)
       } finally {
-        isSavingRef.current = false;
+        isSavingRef.current = false
       }
-    }, delay);
+    }, delay)
 
     // Cleanup on unmount
     return () => {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        clearTimeout(timeoutRef.current)
       }
-    };
-  }, [nodes, edges, projectId, saveSystem, delay]);
+    }
+  }, [nodes, edges, projectId, saveSystem, delay])
 }

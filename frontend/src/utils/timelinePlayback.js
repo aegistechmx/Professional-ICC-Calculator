@@ -15,32 +15,32 @@ export async function playTimeline(timeline, set, options = {}) {
     speed = 1, // Playback speed multiplier
     delay = 300, // Delay between steps (ms)
     onStep = null, // Callback for each step
-    onComplete = null // Callback when complete
-  } = options;
-  
+    onComplete = null, // Callback when complete
+  } = options
+
   for (let i = 0; i < timeline.length; i++) {
-    const step = timeline[i];
-    
+    const step = timeline[i]
+
     // Update ReactFlow with current state
     set({
       nodes: step.state.nodes,
       edges: step.state.edges,
       currentTime: step.time,
-      currentEvent: step.event
-    });
-    
+      currentEvent: step.event,
+    })
+
     // Call step callback if provided
     if (onStep) {
-      onStep(step, i);
+      onStep(step, i)
     }
-    
+
     // Wait before next step
-    await new Promise(resolve => setTimeout(resolve, delay / speed));
+    await new Promise(resolve => setTimeout(resolve, delay / speed))
   }
-  
+
   // Call complete callback if provided
   if (onComplete) {
-    onComplete();
+    onComplete()
   }
 }
 
@@ -56,17 +56,20 @@ export function getTimelineStats(timeline) {
       duration: 0,
       faultEvent: null,
       tripEvents: [],
-      maxCurrent: 0
-    };
+      maxCurrent: 0,
+    }
   }
-  
-  const faultEvent = timeline.find(t => t.event.type === 'fault');
-  const tripEvents = timeline.filter(t => t.event.type === 'trip');
+
+  const faultEvent = timeline.find(t => t.event.type === 'fault')
+  const tripEvents = timeline.filter(t => t.event.type === 'trip')
   const maxCurrent = timeline.reduce((max, step) => {
-    const maxFlow = step.flows.reduce((flowMax, f) => Math.max(flowMax, f.IkA || 0), 0);
-    return Math.max(max, maxFlow);
-  }, 0);
-  
+    const maxFlow = step.flows.reduce(
+      (flowMax, f) => Math.max(flowMax, f.IkA || 0),
+      0
+    )
+    return Math.max(max, maxFlow)
+  }, 0)
+
   return {
     totalSteps: timeline.length,
     duration: timeline[timeline.length - 1].time,
@@ -76,6 +79,6 @@ export function getTimelineStats(timeline) {
     totalTrips: tripEvents.length,
     maxCurrent,
     faultEvent,
-    tripEvents
-  };
+    tripEvents,
+  }
 }

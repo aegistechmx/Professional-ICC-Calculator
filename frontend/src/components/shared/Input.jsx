@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Reusable Input component with label and error handling
@@ -47,9 +48,20 @@ export default function Input({
         } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         {...props}
       />
-      {error && (
-        <span className="text-xs text-red-500">{error}</span>
-      )}
+      {error && <span className="text-xs text-red-500">{error}</span>}
     </div>
-  );
+  )
+}
+
+Input.propTypes = {
+  label: PropTypes.string,
+  type: PropTypes.string,
+  name: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onChange: PropTypes.func,
+  placeholder: PropTypes.string,
+  error: PropTypes.string,
+  required: PropTypes.bool,
+  disabled: PropTypes.bool,
+  className: PropTypes.string,
 }

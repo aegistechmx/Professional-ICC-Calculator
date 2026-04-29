@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useShortCircuit } from '../hooks/useShortCircuit';
+import React, { useState } from 'react'
+import { useShortCircuit } from '../hooks/useShortCircuit'
 
 const ShortCircuitCalculator = () => {
-  const [formError, setFormError] = useState(null);
+  const [formError, setFormError] = useState(null)
   const [params, setParams] = useState({
     V_ll: '220',
     mode: 'conocido',
@@ -14,19 +14,19 @@ const ShortCircuitCalculator = () => {
     trafo_vp: '13200',
     trafo_vs: '480',
     grounding_type: 'yg_solido',
-    r_tierra: '0'
-  });
+    r_tierra: '0',
+  })
 
-  const { calculateShortCircuit, loading, error, data } = useShortCircuit();
+  const { calculateShortCircuit, loading, error, data } = useShortCircuit()
 
-  const toFiniteNumber = (value) => {
-    const n = Number(value);
-    return Number.isFinite(n) ? n : null;
-  };
+  const toFiniteNumber = value => {
+    const n = Number(value)
+    return Number.isFinite(n) ? n : null
+  }
 
   const handleCalculate = async () => {
     try {
-      setFormError(null);
+      setFormError(null)
 
       const payload = {
         V_ll: toFiniteNumber(params.V_ll),
@@ -34,47 +34,58 @@ const ShortCircuitCalculator = () => {
         xr_source: toFiniteNumber(params.xr_source),
         grounding_type: params.grounding_type,
         r_tierra: toFiniteNumber(params.r_tierra),
-      };
-
-      if (payload.V_ll == null || payload.V_ll <= 0) throw new Error('Voltage must be a number > 0');
-      if (payload.xr_source == null || payload.xr_source <= 0) throw new Error('X/R Source must be a number > 0');
-      if (payload.r_tierra == null || payload.r_tierra < 0) throw new Error('Ground resistance must be a number ≥ 0');
-
-      if (params.mode === 'conocido') {
-        payload.isc_known_kA = toFiniteNumber(params.isc_known_kA);
-        if (payload.isc_known_kA == null || payload.isc_known_kA <= 0) throw new Error('Isc Known must be a number > 0 (kA)');
-      } else {
-        payload.isc_source_kA = toFiniteNumber(params.isc_source_kA);
-        payload.trafo_kva = toFiniteNumber(params.trafo_kva);
-        payload.trafo_z = toFiniteNumber(params.trafo_z);
-        payload.trafo_vp = toFiniteNumber(params.trafo_vp);
-        payload.trafo_vs = toFiniteNumber(params.trafo_vs);
-
-        if (payload.isc_source_kA == null || payload.isc_source_kA <= 0) throw new Error('Isc Source must be a number > 0 (kA)');
-        if (payload.trafo_kva == null || payload.trafo_kva <= 0) throw new Error('Trafo kVA must be a number > 0');
-        if (payload.trafo_z == null || payload.trafo_z <= 0) throw new Error('Trafo Z% must be a number > 0');
-        if (payload.trafo_vp == null || payload.trafo_vp <= 0) throw new Error('Trafo V Primary must be a number > 0');
-        if (payload.trafo_vs == null || payload.trafo_vs <= 0) throw new Error('Trafo V Secondary must be a number > 0');
       }
 
-      await calculateShortCircuit(payload);
-    } catch (err) {
-      setFormError(err.message || 'Invalid input');
-    }
-  };
+      if (payload.V_ll == null || payload.V_ll <= 0)
+        throw new Error('Voltage must be a number > 0')
+      if (payload.xr_source == null || payload.xr_source <= 0)
+        throw new Error('X/R Source must be a number > 0')
+      if (payload.r_tierra == null || payload.r_tierra < 0)
+        throw new Error('Ground resistance must be a number ≥ 0')
 
-  const handleChange = (e) => {
-    setFormError(null);
+      if (params.mode === 'conocido') {
+        payload.isc_known_kA = toFiniteNumber(params.isc_known_kA)
+        if (payload.isc_known_kA == null || payload.isc_known_kA <= 0)
+          throw new Error('Isc Known must be a number > 0 (kA)')
+      } else {
+        payload.isc_source_kA = toFiniteNumber(params.isc_source_kA)
+        payload.trafo_kva = toFiniteNumber(params.trafo_kva)
+        payload.trafo_z = toFiniteNumber(params.trafo_z)
+        payload.trafo_vp = toFiniteNumber(params.trafo_vp)
+        payload.trafo_vs = toFiniteNumber(params.trafo_vs)
+
+        if (payload.isc_source_kA == null || payload.isc_source_kA <= 0)
+          throw new Error('Isc Source must be a number > 0 (kA)')
+        if (payload.trafo_kva == null || payload.trafo_kva <= 0)
+          throw new Error('Trafo kVA must be a number > 0')
+        if (payload.trafo_z == null || payload.trafo_z <= 0)
+          throw new Error('Trafo Z% must be a number > 0')
+        if (payload.trafo_vp == null || payload.trafo_vp <= 0)
+          throw new Error('Trafo V Primary must be a number > 0')
+        if (payload.trafo_vs == null || payload.trafo_vs <= 0)
+          throw new Error('Trafo V Secondary must be a number > 0')
+      }
+
+      await calculateShortCircuit(payload)
+    } catch (err) {
+      setFormError(err.message || 'Invalid input')
+    }
+  }
+
+  const handleChange = e => {
+    setFormError(null)
     setParams({
       ...params,
-      [e.target.name]: e.target.value
-    });
-  };
+      [e.target.name]: e.target.value,
+    })
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">Short Circuit Calculator (API)</h2>
-      
+      <h2 className="text-2xl font-bold mb-4">
+        Short Circuit Calculator (API)
+      </h2>
+
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium mb-1">Voltage (V)</label>
@@ -86,7 +97,7 @@ const ShortCircuitCalculator = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-1">Mode</label>
           <select
@@ -103,7 +114,9 @@ const ShortCircuitCalculator = () => {
         {params.mode === 'conocido' && (
           <>
             <div>
-              <label className="block text-sm font-medium mb-1">Isc Known (kA)</label>
+              <label className="block text-sm font-medium mb-1">
+                Isc Known (kA)
+              </label>
               <input
                 type="number"
                 name="isc_known_kA"
@@ -113,7 +126,9 @@ const ShortCircuitCalculator = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">X/R Source</label>
+              <label className="block text-sm font-medium mb-1">
+                X/R Source
+              </label>
               <input
                 type="number"
                 name="xr_source"
@@ -128,7 +143,9 @@ const ShortCircuitCalculator = () => {
         {params.mode === 'completo' && (
           <>
             <div>
-              <label className="block text-sm font-medium mb-1">Isc Source (kA)</label>
+              <label className="block text-sm font-medium mb-1">
+                Isc Source (kA)
+              </label>
               <input
                 type="number"
                 name="isc_source_kA"
@@ -138,7 +155,9 @@ const ShortCircuitCalculator = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Trafo kVA</label>
+              <label className="block text-sm font-medium mb-1">
+                Trafo kVA
+              </label>
               <input
                 type="number"
                 name="trafo_kva"
@@ -158,7 +177,9 @@ const ShortCircuitCalculator = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Trafo V Primary</label>
+              <label className="block text-sm font-medium mb-1">
+                Trafo V Primary
+              </label>
               <input
                 type="number"
                 name="trafo_vp"
@@ -168,7 +189,9 @@ const ShortCircuitCalculator = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Trafo V Secondary</label>
+              <label className="block text-sm font-medium mb-1">
+                Trafo V Secondary
+              </label>
               <input
                 type="number"
                 name="trafo_vs"
@@ -181,7 +204,9 @@ const ShortCircuitCalculator = () => {
         )}
 
         <div>
-          <label className="block text-sm font-medium mb-1">Grounding Type</label>
+          <label className="block text-sm font-medium mb-1">
+            Grounding Type
+          </label>
           <select
             name="grounding_type"
             value={params.grounding_type}
@@ -219,14 +244,26 @@ const ShortCircuitCalculator = () => {
         <div className="mt-6 p-4 bg-gray-50 rounded">
           <h3 className="text-lg font-semibold mb-3">Results</h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div><strong>I_3F:</strong> {data.I_3F_kA.toFixed(4)} kA</div>
-            <div><strong>I_LG:</strong> {data.I_LG_kA.toFixed(4)} kA</div>
-            <div><strong>I_LL:</strong> {data.I_LL_kA.toFixed(4)} kA</div>
-            <div><strong>I_LLG:</strong> {data.I_LLG_kA.toFixed(4)} kA</div>
-            <div><strong>I_3F Peak:</strong> {data.I_3F_peak_kA.toFixed(4)} kA</div>
-            <div><strong>X/R:</strong> {data.XR.toFixed(2)}</div>
+            <div>
+              <strong>I_3F:</strong> {data.I_3F_kA.toFixed(4)} kA
+            </div>
+            <div>
+              <strong>I_LG:</strong> {data.I_LG_kA.toFixed(4)} kA
+            </div>
+            <div>
+              <strong>I_LL:</strong> {data.I_LL_kA.toFixed(4)} kA
+            </div>
+            <div>
+              <strong>I_LLG:</strong> {data.I_LLG_kA.toFixed(4)} kA
+            </div>
+            <div>
+              <strong>I_3F Peak:</strong> {data.I_3F_peak_kA.toFixed(4)} kA
+            </div>
+            <div>
+              <strong>X/R:</strong> {data.XR.toFixed(2)}
+            </div>
           </div>
-          
+
           {data.warnings && data.warnings.length > 0 && (
             <div className="mt-3 p-2 bg-yellow-100 text-yellow-800 rounded">
               <strong>Warnings:</strong>
@@ -240,7 +277,7 @@ const ShortCircuitCalculator = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ShortCircuitCalculator;
+export default ShortCircuitCalculator

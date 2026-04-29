@@ -28,15 +28,14 @@ export const conductoresCu = [
   { calibre: '1250', ampacidad: 590 },
   { calibre: '1500', ampacidad: 625 },
   { calibre: '1750', ampacidad: 650 },
-  { calibre: '2000', ampacidad: 665 }
-];
+  { calibre: '2000', ampacidad: 665 },
+]
 
 export function formatCalibreLabel(calibre) {
-  const s = String(calibre);
+  const s = String(calibre)
   // Heuristic: treat 14..1 as AWG, 'x/0' and >= 250 as kcmil label (common usage)
-  const n = Number(s);
-  if (Number.isFinite(n) && n <= 14) return `AWG ${s}`;
-  if (s.includes('/0')) return `${s} AWG`;
-  return `${s} kcmil`;
+  const n = Number(s)
+  if (Number.isFinite(n) && n <= 14) return `AWG ${s}`
+  if (s.includes('/0')) return `${s} AWG`
+  return `${s} kcmil`
 }
-

@@ -13,8 +13,8 @@
 function polarToRect(V, theta) {
   return {
     re: V * Math.cos(theta),
-    im: V * Math.sin(theta)
-  };
+    im: V * Math.sin(theta),
+  }
 }
 
 /**
@@ -26,8 +26,8 @@ function polarToRect(V, theta) {
 function multiplyComplex(a, b) {
   return {
     re: a.re * b.re - a.im * b.im,
-    im: a.re * b.im + a.im * b.re
-  };
+    im: a.re * b.im + a.im * b.re,
+  }
 }
 
 /**
@@ -39,8 +39,8 @@ function multiplyComplex(a, b) {
 function subtractComplex(a, b) {
   return {
     re: a.re - b.re,
-    im: a.im - b.im
-  };
+    im: a.im - b.im,
+  }
 }
 
 /**
@@ -51,8 +51,8 @@ function subtractComplex(a, b) {
 function conjugateComplex(a) {
   return {
     re: a.re,
-    im: -a.im
-  };
+    im: -a.im,
+  }
 }
 
 /**
@@ -65,28 +65,25 @@ function conjugateComplex(a) {
  * @returns {Array} Array of flow results
  */
 export function calcLineFlows(branches, Ybus, V, theta, indexMap) {
-  const flows = [];
-  
+  const flows = []
+
   for (const br of branches) {
-    const i = indexMap[br.from];
-    const j = indexMap[br.to];
-    
-    if (i === undefined || j === undefined) continue;
-    
-    const Vi = polarToRect(V[i], theta[i]);
-    const Vj = polarToRect(V[j], theta[j]);
-    
-    const Y = Ybus[i][j]; // Complex admittance
-    
+    const i = indexMap[br.from]
+    const j = indexMap[br.to]
+
+    if (i === undefined || j === undefined) continue
+
+    const Vi = polarToRect(V[i], theta[i])
+    const Vj = polarToRect(V[j], theta[j])
+
+    const Y = Ybus[i][j] // Complex admittance
+
     // Current flow: Iij = (Vi - Vj) * Yij
-    const Iij = multiplyComplex(
-      subtractComplex(Vi, Vj),
-      Y
-    );
-    
+    const Iij = multiplyComplex(subtractComplex(Vi, Vj), Y)
+
     // Power flow: Sij = Vi * conj(Iij)
-    const Sij = multiplyComplex(Vi, conjugateComplex(Iij));
-    
+    const Sij = multiplyComplex(Vi, conjugateComplex(Iij))
+
     flows.push({
       from: br.from,
       to: br.to,
@@ -94,43 +91,38 @@ export function calcLineFlows(branches, Ybus, V, theta, indexMap) {
       Q: Sij.im, // Reactive power (pu)
       magnitude: Math.sqrt(Sij.re ** 2 + Sij.im ** 2), // Apparent power (pu)
       current: Math.sqrt(Iij.re ** 2 + Iij.im ** 2), // Current magnitude (pu)
-      Iij // Complex current (pu)
-    });
+      Iij, // Complex current (pu)
+    })
   }
-  
-  return flows;
+
+  return flows
 }
 
 /**
  * Calculate actual currents in kA from per-unit flows
  * Formula: Ibase = Sbase / (√3 × Vbase)
  * I_actual = I_pu × Ibase
- * 
+ *
  * @param {Array} flows - Line flows with current in pu
  * @param {Array} V - Voltage magnitudes (pu)
  * @param {Object} base - Base system { Sbase_MVA, Vbase_kV }
- * @param {Object} indexMap - Bus index map
  * @returns {Array} Flows with actual currents in kA
  */
-export function calcCurrents(flows, V, base, indexMap) {
+export function calcCurrents(flows, V, base) {
   return flows.map(f => {
-    const busIndex = indexMap[f.from];
-    const Vpu = V[busIndex];
-    
-    const Vbase_kV = base.Vbase_kV[f.from] || 13.8;
-    const Ibase = base.Sbase_MVA / (Math.sqrt(3) * Vbase_kV); // kA
-    
-    const Spu = Math.sqrt(f.P ** 2 + f.Q ** 2);
-    const Ipu = f.current;
-    
-    const IkA = Ipu * Ibase;
-    
+    const Vbase_kV = base.Vbase_kV[f.from] || 13.8
+    const Ibase = base.Sbase_MVA / (Math.sqrt(3) * Vbase_kV) // kA
+
+    const Ipu = f.current
+
+    const IkA = Ipu * Ibase
+
     return {
       ...f,
       IkA,
-      Ibase_kA: Ibase
-    };
-  });
+      Ibase_kA: Ibase,
+    }
+  })
 }
 
 /**
@@ -139,9 +131,9 @@ export function calcCurrents(flows, V, base, indexMap) {
  * @returns {string} CSS color code
  */
 export function getFlowColor(S) {
-  if (S < 0.5) return '#00cc00'; // Light load (green)
-  if (S < 1.0) return '#ffcc00'; // Medium load (yellow)
-  return '#ff0000'; // Heavy load (red)
+  if (S < 0.5) return '#00cc00' // Light load (green)
+  if (S < 1.0) return '#ffcc00' // Medium load (yellow)
+  return '#ff0000' // Heavy load (red)
 }
 
 /**
@@ -154,6 +146,6 @@ export function getFlowEdgeStyle(magnitude) {
     stroke: getFlowColor(magnitude),
     strokeWidth: 2 + Math.min(magnitude * 5, 6),
     strokeLinejoin: 'round',
-    strokeLinecap: 'round'
-  };
+    strokeLinecap: 'round',
+  }
 }

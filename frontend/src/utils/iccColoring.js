@@ -16,8 +16,8 @@ export function getICCLevel(isc_kA) {
       bgColor: '#f3f4f6',
       textColor: '#1f2937',
       description: 'Sin datos',
-      range: 'N/A'
-    };
+      range: 'N/A',
+    }
   }
 
   // ICC Level Classification (based on typical industrial systems)
@@ -29,8 +29,8 @@ export function getICCLevel(isc_kA) {
       textColor: '#7f1d1d',
       description: 'Muy Bajo',
       range: '< 1 kA',
-      warning: 'Corriente de falla muy baja - verificar parámetros'
-    };
+      warning: 'Corriente de falla muy baja - verificar parámetros',
+    }
   } else if (isc_kA < 5) {
     return {
       level: 'low',
@@ -39,8 +39,8 @@ export function getICCLevel(isc_kA) {
       textColor: '#92400e',
       description: 'Bajo',
       range: '1-5 kA',
-      warning: 'Corriente de falla baja - posible subdimensionamiento'
-    };
+      warning: 'Corriente de falla baja - posible subdimensionamiento',
+    }
   } else if (isc_kA < 10) {
     return {
       level: 'normal',
@@ -49,8 +49,8 @@ export function getICCLevel(isc_kA) {
       textColor: '#92400e',
       description: 'Normal',
       range: '5-10 kA',
-      status: 'Adecuado para la mayoría de aplicaciones'
-    };
+      status: 'Adecuado para la mayoría de aplicaciones',
+    }
   } else if (isc_kA < 25) {
     return {
       level: 'high',
@@ -59,8 +59,8 @@ export function getICCLevel(isc_kA) {
       textColor: '#14532d',
       description: 'Alto',
       range: '10-25 kA',
-      status: 'Adecuado para sistemas industriales'
-    };
+      status: 'Adecuado para sistemas industriales',
+    }
   } else if (isc_kA < 42) {
     return {
       level: 'very_high',
@@ -69,8 +69,8 @@ export function getICCLevel(isc_kA) {
       textColor: '#14532d',
       description: 'Muy Alto',
       range: '25-42 kA',
-      status: 'Requiere breakers de alta capacidad'
-    };
+      status: 'Requiere breakers de alta capacidad',
+    }
   } else {
     return {
       level: 'extreme',
@@ -79,9 +79,10 @@ export function getICCLevel(isc_kA) {
       textColor: '#7f1d1d',
       description: 'Extremo',
       range: '> 42 kA',
-      warning: 'Corriente de falla extremadamente alta - verificar equipamiento',
-      critical: 'Peligro de arco flash - revisar PPE'
-    };
+      warning:
+        'Corriente de falla extremadamente alta - verificar equipamiento',
+      critical: 'Peligro de arco flash - revisar PPE',
+    }
   }
 }
 
@@ -91,7 +92,7 @@ export function getICCLevel(isc_kA) {
  * @returns {string} Hex color code
  */
 export function getICCColor(isc_kA) {
-  return getICCLevel(isc_kA).color;
+  return getICCLevel(isc_kA).color
 }
 
 /**
@@ -100,7 +101,7 @@ export function getICCColor(isc_kA) {
  * @returns {string} Hex background color code
  */
 export function getICCBackgroundColor(isc_kA) {
-  return getICCLevel(isc_kA).bgColor;
+  return getICCLevel(isc_kA).bgColor
 }
 
 /**
@@ -109,7 +110,7 @@ export function getICCBackgroundColor(isc_kA) {
  * @returns {string} Hex text color code
  */
 export function getICCTextColor(isc_kA) {
-  return getICCLevel(isc_kA).textColor;
+  return getICCLevel(isc_kA).textColor
 }
 
 /**
@@ -118,24 +119,31 @@ export function getICCTextColor(isc_kA) {
  * @returns {Object} Breaker recommendation
  */
 export function getBreakerRecommendation(isc_kA) {
-  const level = getICCLevel(isc_kA);
-  
+  const level = getICCLevel(isc_kA)
+
   // Minimum breaker rating should be 125% of available fault current
-  const minRating = isc_kA * 1.25;
-  
+  const minRating = isc_kA * 1.25
+
   // Standard breaker ratings (kA)
-  const standardRatings = [0.5, 1, 2, 3, 5, 10, 15, 20, 25, 32, 40, 50, 63, 80, 100, 125];
-  
+  const standardRatings = [
+    0.5, 1, 2, 3, 5, 10, 15, 20, 25, 32, 40, 50, 63, 80, 100, 125,
+  ]
+
   // Find next standard rating
-  const recommendedRating = standardRatings.find(rating => rating >= minRating) || standardRatings[standardRatings.length - 1];
-  
+  const recommendedRating =
+    standardRatings.find(rating => rating >= minRating) ||
+    standardRatings[standardRatings.length - 1]
+
   return {
     minRating: minRating,
     recommendedRating: recommendedRating,
     level: level.level,
     adequate: recommendedRating >= minRating,
-    message: level.warning || level.status || 'Breaker adecuado para el nivel de corriente de falla'
-  };
+    message:
+      level.warning ||
+      level.status ||
+      'Breaker adecuado para el nivel de corriente de falla',
+  }
 }
 
 /**
@@ -145,8 +153,8 @@ export function getBreakerRecommendation(isc_kA) {
  * @returns {Object} Formatted value with styling
  */
 export function formatICCWithColor(isc_kA, decimals = 2) {
-  const level = getICCLevel(isc_kA);
-  
+  const level = getICCLevel(isc_kA)
+
   return {
     value: isc_kA.toFixed(decimals),
     unit: 'kA',
@@ -159,10 +167,10 @@ export function formatICCWithColor(isc_kA, decimals = 2) {
       borderRadius: '4px',
       fontSize: '12px',
       display: 'inline-block',
-      border: `1px solid ${level.color}20`
+      border: `1px solid ${level.color}20`,
     },
-    levelInfo: level
-  };
+    levelInfo: level,
+  }
 }
 
 /**
@@ -172,7 +180,7 @@ export function formatICCWithColor(isc_kA, decimals = 2) {
  */
 export function getArcFlashRisk(isc_kA) {
   if (!isc_kA || isc_kA <= 0) {
-    return { risk: 'unknown', description: 'Sin datos', color: '#6b7280' };
+    return { risk: 'unknown', description: 'Sin datos', color: '#6b7280' }
   }
 
   // Simplified arc flash risk based on incident energy
@@ -182,31 +190,31 @@ export function getArcFlashRisk(isc_kA) {
       description: 'Bajo riesgo',
       color: '#16a34a',
       ppeCategory: '0',
-      workingDistance: 'Seguro'
-    };
+      workingDistance: 'Seguro',
+    }
   } else if (isc_kA < 15) {
     return {
       risk: 'moderate',
       description: 'Riesgo moderado',
       color: '#eab308',
       ppeCategory: '1-2',
-      workingDistance: 'Mantenimiento'
-    };
+      workingDistance: 'Mantenimiento',
+    }
   } else if (isc_kA < 30) {
     return {
       risk: 'high',
       description: 'Alto riesgo',
       color: '#f59e0b',
       ppeCategory: '2-3',
-      workingDistance: 'Precaución'
-    };
+      workingDistance: 'Precaución',
+    }
   } else {
     return {
       risk: 'extreme',
       description: 'Riesgo extremo',
       color: '#dc2626',
       ppeCategory: '3-4',
-      workingDistance: 'Solo personal autorizado'
-    };
+      workingDistance: 'Solo personal autorizado',
+    }
   }
 }

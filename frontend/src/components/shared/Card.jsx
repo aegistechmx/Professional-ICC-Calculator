@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Reusable Card component for content containers
@@ -8,17 +9,29 @@ import React from 'react';
  * @param {string} [props.className] - Additional CSS classes
  * @param {boolean} [props.noPadding=false] - Remove default padding
  */
-export default function Card({ title, children, className = '', noPadding = false }) {
+export default function Card({
+  title,
+  children,
+  className = '',
+  noPadding = false,
+}) {
   return (
-    <div className={`bg-white rounded-lg shadow-md border border-gray-200 ${className}`}>
+    <div
+      className={`bg-white rounded-lg shadow-md border border-gray-200 ${className}`}
+    >
       {title && (
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         </div>
       )}
-      <div className={noPadding ? '' : 'p-6'}>
-        {children}
-      </div>
+      <div className={noPadding ? '' : 'p-6'}>{children}</div>
     </div>
-  );
+  )
+}
+
+Card.propTypes = {
+  title: PropTypes.string,
+  children: PropTypes.node,
+  className: PropTypes.string,
+  noPadding: PropTypes.bool,
 }

@@ -9,28 +9,30 @@
  * @returns {Object} Mismatch data
  */
 export function calculateMismatches(powerFlowResults) {
-  const mismatches = [];
-  
+  const mismatches = []
+
   powerFlowResults.buses.forEach((bus, i) => {
-    const P_calc = powerFlowResults.P[i];
-    const Q_calc = powerFlowResults.Q[i];
-    const P_spec = bus.P || 0;
-    const Q_spec = bus.Q || 0;
-    
-    const P_mismatch = P_calc - P_spec;
-    const Q_mismatch = Q_calc - Q_spec;
-    const totalMismatch = Math.sqrt(P_mismatch * P_mismatch + Q_mismatch * Q_mismatch);
-    
+    const P_calc = powerFlowResults.P[i]
+    const Q_calc = powerFlowResults.Q[i]
+    const P_spec = bus.P || 0
+    const Q_spec = bus.Q || 0
+
+    const P_mismatch = P_calc - P_spec
+    const Q_mismatch = Q_calc - Q_spec
+    const totalMismatch = Math.sqrt(
+      P_mismatch * P_mismatch + Q_mismatch * Q_mismatch
+    )
+
     mismatches.push({
       busId: bus.id,
       P_mismatch,
       Q_mismatch,
       totalMismatch,
-      converged: totalMismatch < 0.01
-    });
-  });
-  
-  return mismatches;
+      converged: totalMismatch < 0.01,
+    })
+  })
+
+  return mismatches
 }
 
 /**
@@ -44,8 +46,8 @@ export function getSolverStats(solverResult) {
     converged: solverResult.converged,
     finalTolerance: solverResult.tolerance,
     maxMismatch: solverResult.maxMismatch || 0,
-    convergenceRate: calculateConvergenceRate(solverResult.iterations)
-  };
+    convergenceRate: calculateConvergenceRate(solverResult.iterations),
+  }
 }
 
 /**
@@ -54,10 +56,10 @@ export function getSolverStats(solverResult) {
  * @returns {string} Convergence rate description
  */
 function calculateConvergenceRate(iterations) {
-  if (iterations <= 3) return 'fast';
-  if (iterations <= 6) return 'normal';
-  if (iterations <= 10) return 'slow';
-  return 'very slow';
+  if (iterations <= 3) return 'fast'
+  if (iterations <= 6) return 'normal'
+  if (iterations <= 10) return 'slow'
+  return 'very slow'
 }
 
 /**
@@ -66,19 +68,19 @@ function calculateConvergenceRate(iterations) {
  * @returns {Object} Voltage profile
  */
 export function getVoltageProfile(powerFlowResults) {
-  const profile = [];
-  
+  const profile = []
+
   powerFlowResults.buses.forEach((bus, i) => {
     profile.push({
       busId: bus.id,
       voltage: powerFlowResults.V[i],
       angle: powerFlowResults.theta[i],
       status: getVoltageStatus(powerFlowResults.V[i]),
-      deviation: (powerFlowResults.V[i] - 1.0) * 100 // % deviation from nominal
-    });
-  });
-  
-  return profile;
+      deviation: (powerFlowResults.V[i] - 1.0) * 100, // % deviation from nominal
+    })
+  })
+
+  return profile
 }
 
 /**
@@ -87,9 +89,9 @@ export function getVoltageProfile(powerFlowResults) {
  * @returns {string} Status
  */
 function getVoltageStatus(voltage) {
-  if (voltage < 0.95) return 'low';
-  if (voltage > 1.05) return 'high';
-  return 'normal';
+  if (voltage < 0.95) return 'low'
+  if (voltage > 1.05) return 'high'
+  return 'normal'
 }
 
 /**
@@ -99,13 +101,13 @@ function getVoltageStatus(voltage) {
  * @returns {Object} Line loading
  */
 export function getLineLoading(powerFlowResults, lines) {
-  const loading = [];
-  
+  const loading = []
+
   lines.forEach(line => {
-    const limit = line.thermalLimit || 100;
-    const flow = line.current || 0;
-    const loadingPercent = (flow / limit) * 100;
-    
+    const limit = line.thermalLimit || 100
+    const flow = line.current || 0
+    const loadingPercent = (flow / limit) * 100
+
     loading.push({
       lineId: line.id,
       fromBus: line.fromBus,
@@ -113,11 +115,11 @@ export function getLineLoading(powerFlowResults, lines) {
       flow: flow,
       limit: limit,
       loadingPercent: loadingPercent,
-      status: getLoadingStatus(loadingPercent)
-    });
-  });
-  
-  return loading;
+      status: getLoadingStatus(loadingPercent),
+    })
+  })
+
+  return loading
 }
 
 /**
@@ -126,10 +128,10 @@ export function getLineLoading(powerFlowResults, lines) {
  * @returns {string} Status
  */
 function getLoadingStatus(percent) {
-  if (percent > 100) return 'overloaded';
-  if (percent > 90) return 'critical';
-  if (percent > 70) return 'high';
-  return 'normal';
+  if (percent > 100) return 'overloaded'
+  if (percent > 90) return 'critical'
+  if (percent > 70) return 'high'
+  return 'normal'
 }
 
 /**
@@ -138,11 +140,14 @@ function getLoadingStatus(percent) {
  * @returns {Object} Dashboard data
  */
 export function generateEngineerDashboard(simulationData) {
-  const mismatches = calculateMismatches(simulationData.powerFlow);
-  const solverStats = getSolverStats(simulationData.powerFlow);
-  const voltageProfile = getVoltageProfile(simulationData.powerFlow);
-  const lineLoading = getLineLoading(simulationData.powerFlow, simulationData.lines);
-  
+  const mismatches = calculateMismatches(simulationData.powerFlow)
+  const solverStats = getSolverStats(simulationData.powerFlow)
+  const voltageProfile = getVoltageProfile(simulationData.powerFlow)
+  const lineLoading = getLineLoading(
+    simulationData.powerFlow,
+    simulationData.lines
+  )
+
   return {
     solver: solverStats,
     mismatches: mismatches,
@@ -151,10 +156,12 @@ export function generateEngineerDashboard(simulationData) {
     summary: {
       totalBuses: simulationData.powerFlow.buses.length,
       convergedBuses: mismatches.filter(m => m.converged).length,
-      overloadedLines: lineLoading.filter(l => l.status === 'overloaded').length,
-      voltageViolations: voltageProfile.filter(v => v.status !== 'normal').length
-    }
-  };
+      overloadedLines: lineLoading.filter(l => l.status === 'overloaded')
+        .length,
+      voltageViolations: voltageProfile.filter(v => v.status !== 'normal')
+        .length,
+    },
+  }
 }
 
 /**
@@ -163,8 +170,8 @@ export function generateEngineerDashboard(simulationData) {
  * @returns {string} Formatted string
  */
 export function formatMismatch(value) {
-  if (Math.abs(value) < 0.001) return '0';
-  return value.toFixed(4);
+  if (Math.abs(value) < 0.001) return '0'
+  return value.toFixed(4)
 }
 
 /**
@@ -173,7 +180,7 @@ export function formatMismatch(value) {
  * @returns {string} Hex color
  */
 export function getConvergenceColor(converged) {
-  return converged ? '#00cc00' : '#ff0000';
+  return converged ? '#00cc00' : '#ff0000'
 }
 
 /**
@@ -186,7 +193,7 @@ export function getLoadingColor(status) {
     normal: '#00cc00',
     high: '#ffcc00',
     critical: '#ff6600',
-    overloaded: '#ff0000'
-  };
-  return colors[status] || '#999999';
+    overloaded: '#ff0000',
+  }
+  return colors[status] || '#999999'
 }

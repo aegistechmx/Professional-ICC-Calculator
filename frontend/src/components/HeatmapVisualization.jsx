@@ -1,41 +1,49 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * HeatmapVisualization - Heatmap for voltage, current, and overload
- * 
+ *
  * Displays color-coded visualization of:
  * - Voltage levels (green = normal, yellow = marginal, red = critical)
  * - Current loading (green = normal, orange = high, red = overload)
  * - Overload conditions (red = critical)
- * 
+ *
  * @param {Object} props - Component props
  * @param {Object} props.data - Simulation data
  * @param {string} props.type - Heatmap type ('voltage', 'current', 'overload')
  * @param {Object} props.style - Additional styles
  */
-export default function HeatmapVisualization({ data, type = 'voltage', style = {} }) {
+export default function HeatmapVisualization({
+  data,
+  type = 'voltage',
+  style = {},
+}) {
   const heatmapData = useMemo(() => {
-    if (!data || !data.buses) return null;
-    
+    if (!data || !data.buses) return null
+
     return data.buses.map((bus, index) => {
-      const value = getHeatmapValue(bus, data, type, index);
-      const color = getHeatmapColor(value, type);
-      
+      const value = getHeatmapValue(bus, data, type, index)
+      const color = getHeatmapColor(value, type)
+
       return {
         id: bus.id,
         value,
         color,
-        position: bus.position || { x: 0, y: 0 }
-      };
-    });
-  }, [data, type]);
+        position: bus.position || { x: 0, y: 0 },
+      }
+    })
+  }, [data, type])
 
   if (!heatmapData || heatmapData.length === 0) {
     return (
-      <div className="p-4 bg-gray-100 rounded-lg text-center text-gray-500" style={style}>
+      <div
+        className="p-4 bg-gray-100 rounded-lg text-center text-gray-500"
+        style={style}
+      >
         No data available for heatmap
       </div>
-    );
+    )
   }
 
   return (
@@ -46,18 +54,21 @@ export default function HeatmapVisualization({ data, type = 'voltage', style = {
         </h3>
         <Legend type={type} />
       </div>
-      
-      <div className="relative" style={{ height: '400px', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+
+      <div
+        className="relative"
+        style={{
+          height: '400px',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+        }}
+      >
         {heatmapData.map(point => (
-          <HeatmapPoint
-            key={point.id}
-            point={point}
-            type={type}
-          />
+          <HeatmapPoint key={point.id} point={point} type={type} />
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -67,17 +78,17 @@ function HeatmapPoint({ point, type }) {
   const getPosition = () => {
     // Calculate position based on index if not provided
     if (point.position.x === 0 && point.position.y === 0) {
-      const angle = (point.id.split('_')[1] || 0) * (2 * Math.PI / 10);
-      const radius = 150;
+      const angle = (point.id.split('_')[1] || 0) * ((2 * Math.PI) / 10)
+      const radius = 150
       return {
         x: 200 + radius * Math.cos(angle),
-        y: 200 + radius * Math.sin(angle)
-      };
+        y: 200 + radius * Math.sin(angle),
+      }
     }
-    return point.position;
-  };
+    return point.position
+  }
 
-  const position = getPosition();
+  const position = getPosition()
 
   return (
     <div
@@ -90,7 +101,7 @@ function HeatmapPoint({ point, type }) {
         height: '20px',
         borderRadius: '50%',
         border: '2px solid white',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
       }}
       title={`${point.id}: ${type} = ${point.value.toFixed(3)}`}
     >
@@ -98,14 +109,14 @@ function HeatmapPoint({ point, type }) {
         {point.id}: {type} = {point.value.toFixed(3)}
       </div>
     </div>
-  );
+  )
 }
 
 /**
  * Legend - Heatmap legend
  */
 function Legend({ type }) {
-  const legendItems = getLegendItems(type);
+  const legendItems = getLegendItems(type)
 
   return (
     <div className="flex items-center gap-2">
@@ -119,7 +130,24 @@ function Legend({ type }) {
         </div>
       ))}
     </div>
-  );
+  )
+}
+
+Legend.propTypes = {
+  type: PropTypes.string,
+}
+
+HeatmapPoint.propTypes = {
+  point: PropTypes.shape({
+    id: PropTypes.string,
+    position: PropTypes.shape({
+      x: PropTypes.number,
+      y: PropTypes.number,
+    }),
+    value: PropTypes.number,
+    color: PropTypes.string,
+  }),
+  type: PropTypes.string,
 }
 
 /**
@@ -128,26 +156,26 @@ function Legend({ type }) {
 function getHeatmapValue(bus, data, type, index) {
   switch (type) {
     case 'voltage':
-      return bus.voltage?.magnitude || bus.V_pu || 1.0;
-    
+      return bus.voltage?.magnitude || bus.V_pu || 1.0
+
     case 'current':
       // Get current from flows if available
       if (data.flows && data.flows[index]) {
-        return data.flows[index].current || data.flows[index].I || 0;
+        return data.flows[index].current || data.flows[index].I || 0
       }
-      return bus.current || 0;
-    
+      return bus.current || 0
+
     case 'overload':
       // Calculate loading percentage
       if (data.flows && data.flows[index]) {
-        const current = data.flows[index].current || data.flows[index].I || 0;
-        const rating = data.lines?.[index]?.rating || 100;
-        return (current / rating) * 100;
+        const current = data.flows[index].current || data.flows[index].I || 0
+        const rating = data.lines?.[index]?.rating || 100
+        return (current / rating) * 100
       }
-      return 0;
-    
+      return 0
+
     default:
-      return 0;
+      return 0
   }
 }
 
@@ -157,30 +185,30 @@ function getHeatmapValue(bus, data, type, index) {
 function getHeatmapColor(value, type) {
   switch (type) {
     case 'voltage':
-      if (value < 0.90) return '#ef4444'; // Red - Critical
-      if (value < 0.95) return '#f59e0b'; // Orange - Warning
-      if (value > 1.10) return '#ef4444'; // Red - Critical
-      if (value > 1.05) return '#f59e0b'; // Orange - Warning
-      return '#22c55e'; // Green - Normal
-    
+      if (value < 0.9) return '#ef4444' // Red - Critical
+      if (value < 0.95) return '#f59e0b' // Orange - Warning
+      if (value > 1.1) return '#ef4444' // Red - Critical
+      if (value > 1.05) return '#f59e0b' // Orange - Warning
+      return '#22c55e' // Green - Normal
+
     case 'current': {
-      const loading = value;
-      if (loading > 120) return '#ef4444'; // Red - Overload
-      if (loading > 100) return '#f59e0b'; // Orange - High
-      if (loading > 80) return '#eab308'; // Yellow - Moderate
-      return '#22c55e'; // Green - Normal
+      const loading = value
+      if (loading > 120) return '#ef4444' // Red - Overload
+      if (loading > 100) return '#f59e0b' // Orange - High
+      if (loading > 80) return '#eab308' // Yellow - Moderate
+      return '#22c55e' // Green - Normal
     }
-    
+
     case 'overload': {
-      const overload = value;
-      if (overload > 100) return '#ef4444'; // Red - Critical
-      if (overload > 80) return '#f59e0b'; // Orange - Warning
-      if (overload > 50) return '#eab308'; // Yellow - Moderate
-      return '#22c55e'; // Green - Normal
+      const overload = value
+      if (overload > 100) return '#ef4444' // Red - Critical
+      if (overload > 80) return '#f59e0b' // Orange - Warning
+      if (overload > 50) return '#eab308' // Yellow - Moderate
+      return '#22c55e' // Green - Normal
     }
-    
+
     default:
-      return '#9ca3af'; // Gray
+      return '#9ca3af' // Gray
   }
 }
 
@@ -193,27 +221,27 @@ function getLegendItems(type) {
       return [
         { color: '#ef4444', label: '< 0.90 / > 1.10' },
         { color: '#f59e0b', label: '0.90-0.95 / 1.05-1.10' },
-        { color: '#22c55e', label: '0.95-1.05' }
-      ];
-    
+        { color: '#22c55e', label: '0.95-1.05' },
+      ]
+
     case 'current':
       return [
         { color: '#ef4444', label: '> 120%' },
         { color: '#f59e0b', label: '100-120%' },
         { color: '#eab308', label: '80-100%' },
-        { color: '#22c55e', label: '< 80%' }
-      ];
-    
+        { color: '#22c55e', label: '< 80%' },
+      ]
+
     case 'overload':
       return [
         { color: '#ef4444', label: '> 100%' },
         { color: '#f59e0b', label: '80-100%' },
         { color: '#eab308', label: '50-80%' },
-        { color: '#22c55e', label: '< 50%' }
-      ];
-    
+        { color: '#22c55e', label: '< 50%' },
+      ]
+
     default:
-      return [];
+      return []
   }
 }
 
@@ -222,18 +250,19 @@ function getLegendItems(type) {
  */
 export function AnimatedCurrentFlow({ data, currentTime = 0 }) {
   const flows = useMemo(() => {
-    if (!data || !data.flows) return [];
-    
+    if (!data || !data.flows) return []
+
     return data.flows.map((flow, index) => ({
+      id: flow.id || `flow-${index}`,
       from: flow.from,
       to: flow.to,
       current: flow.current || flow.I || 0,
-      direction: flow.direction || 1
-    }));
-  }, [data]);
+      direction: flow.direction || 1,
+    }))
+  }, [data])
 
   if (flows.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -241,21 +270,20 @@ export function AnimatedCurrentFlow({ data, currentTime = 0 }) {
       {flows.map((flow, index) => (
         <FlowLine
           key={`${flow.from}-${flow.to}`}
-          flow={flow}
           currentTime={currentTime}
           delay={index * 0.1}
         />
       ))}
     </div>
-  );
+  )
 }
 
 /**
  * FlowLine - Animated flow line
  */
-function FlowLine({ flow, currentTime, delay }) {
-  const offset = (currentTime + delay) % 1;
-  
+function FlowLine({ currentTime, delay }) {
+  const offset = (currentTime + delay) % 1
+
   return (
     <div
       className="flow-line"
@@ -268,10 +296,15 @@ function FlowLine({ flow, currentTime, delay }) {
           transparent ${offset * 100 + 20}%, 
           transparent 100%)`,
         backgroundSize: '200% 100%',
-        animation: 'flowAnimation 2s linear infinite'
+        animation: 'flowAnimation 2s linear infinite',
       }}
     />
-  );
+  )
+}
+
+FlowLine.propTypes = {
+  currentTime: PropTypes.number,
+  delay: PropTypes.number,
 }
 
 /**
@@ -279,16 +312,16 @@ function FlowLine({ flow, currentTime, delay }) {
  */
 export function TripIndicator({ devices, currentTime = 0 }) {
   const trippedDevices = useMemo(() => {
-    if (!devices) return [];
-    
+    if (!devices) return []
+
     return devices.filter(device => {
-      if (device.tripTime === undefined) return false;
-      return device.tripTime <= currentTime && device.tripped;
-    });
-  }, [devices, currentTime]);
+      if (device.tripTime === undefined) return false
+      return device.tripTime <= currentTime && device.tripped
+    })
+  }, [devices, currentTime])
 
   if (trippedDevices.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -299,7 +332,7 @@ export function TripIndicator({ devices, currentTime = 0 }) {
           {trippedDevices.length} Device(s) Tripped
         </span>
       </div>
-      
+
       {trippedDevices.map(device => (
         <div
           key={device.id}
@@ -313,5 +346,23 @@ export function TripIndicator({ devices, currentTime = 0 }) {
         </div>
       ))}
     </div>
-  );
+  )
+}
+
+AnimatedCurrentFlow.propTypes = {
+  data: PropTypes.object,
+  currentTime: PropTypes.number,
+}
+
+TripIndicator.propTypes = {
+  devices: PropTypes.array,
+  currentTime: PropTypes.number,
+}
+
+HeatmapVisualization.propTypes = {
+  data: PropTypes.shape({
+    buses: PropTypes.array,
+  }),
+  type: PropTypes.string,
+  style: PropTypes.object,
 }

@@ -18,25 +18,25 @@ export function openBreaker(state, relayId) {
           ...edge.data,
           status: 'open',
           tripped: true,
-          tripTime: state.currentTime || 0
+          tripTime: state.currentTime || 0,
         },
         style: {
           ...edge.style,
           stroke: '#ff0000',
           strokeWidth: 1,
           strokeDasharray: 'none',
-          animated: false
-        }
-      };
+          animated: false,
+        },
+      }
     }
-    return edge;
-  });
-  
+    return edge
+  })
+
   return {
     ...state,
     edges: newEdges,
-    trippedRelays: [...(state.trippedRelays || []), relayId]
-  };
+    trippedRelays: [...(state.trippedRelays || []), relayId],
+  }
 }
 
 /**
@@ -54,24 +54,24 @@ export function closeBreaker(state, relayId) {
           ...edge.data,
           status: 'closed',
           tripped: false,
-          closeTime: state.currentTime || 0
+          closeTime: state.currentTime || 0,
         },
         style: {
           ...edge.style,
           stroke: '#00cc00',
           strokeWidth: 2,
-          animated: true
-        }
-      };
+          animated: true,
+        },
+      }
     }
-    return edge;
-  });
-  
+    return edge
+  })
+
   return {
     ...state,
     edges: newEdges,
-    trippedRelays: (state.trippedRelays || []).filter(id => id !== relayId)
-  };
+    trippedRelays: (state.trippedRelays || []).filter(id => id !== relayId),
+  }
 }
 
 /**
@@ -90,25 +90,25 @@ export function applyFault(state, busId, faultData = {}) {
           ...node.data,
           fault: true,
           faultType: faultData.faultType || '3P',
-          faultImpedance: faultData.impedance || 0
+          faultImpedance: faultData.impedance || 0,
         },
         style: {
           ...node.style,
           background: '#ff0000',
-          border: '4px solid #8b0000'
-        }
-      };
+          border: '4px solid #8b0000',
+        },
+      }
     }
-    return node;
-  });
-  
+    return node
+  })
+
   return {
     ...state,
     nodes: newNodes,
     faultBus: busId,
     faultActive: true,
-    faultData
-  };
+    faultData,
+  }
 }
 
 /**
@@ -123,25 +123,25 @@ export function clearFault(state) {
         ...node,
         data: {
           ...node.data,
-          fault: false
+          fault: false,
         },
         style: {
           ...node.style,
           background: node.style.originalBackground || '#ffffff',
-          border: '2px solid #222'
-        }
-      };
+          border: '2px solid #222',
+        },
+      }
     }
-    return node;
-  });
-  
+    return node
+  })
+
   return {
     ...state,
     nodes: newNodes,
     faultBus: null,
     faultActive: false,
-    faultData: null
-  };
+    faultData: null,
+  }
 }
 
 /**
@@ -150,12 +150,12 @@ export function clearFault(state) {
  * @returns {Object} Updated system state with open breakers removed
  */
 export function removeOpenBreakers(state) {
-  const activeEdges = state.edges.filter(edge => edge.data.status !== 'open');
-  
+  const activeEdges = state.edges.filter(edge => edge.data.status !== 'open')
+
   return {
     ...state,
-    edges: activeEdges
-  };
+    edges: activeEdges,
+  }
 }
 
 /**
@@ -169,21 +169,21 @@ export function restoreAllBreakers(state) {
     data: {
       ...edge.data,
       status: 'closed',
-      tripped: false
+      tripped: false,
     },
     style: {
       ...edge.style,
       stroke: '#00cc00',
       strokeWidth: 2,
-      animated: true
-    }
-  }));
-  
+      animated: true,
+    },
+  }))
+
   return {
     ...state,
     edges: newEdges,
-    trippedRelays: []
-  };
+    trippedRelays: [],
+  }
 }
 
 /**
@@ -192,16 +192,16 @@ export function restoreAllBreakers(state) {
  * @returns {Object} Switching state summary
  */
 export function getSwitchingState(state) {
-  const totalBreakers = state.edges.filter(e => e.data.relayId).length;
-  const openBreakers = state.edges.filter(e => e.data.status === 'open').length;
-  const closedBreakers = totalBreakers - openBreakers;
-  
+  const totalBreakers = state.edges.filter(e => e.data.relayId).length
+  const openBreakers = state.edges.filter(e => e.data.status === 'open').length
+  const closedBreakers = totalBreakers - openBreakers
+
   return {
     totalBreakers,
     openBreakers,
     closedBreakers,
     faultActive: state.faultActive || false,
     faultBus: state.faultBus || null,
-    trippedRelays: state.trippedRelays || []
-  };
+    trippedRelays: state.trippedRelays || [],
+  }
 }

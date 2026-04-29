@@ -1,12 +1,14 @@
 {
   "name": "icc-backend",
   "version": "1.0.0",
-  "main": "src/server.js",
+  "main": "src/server-new.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "dev": "set PORT=3001 && nodemon src/server-new.js",
+    "start": "set PORT=3001 && node src/server-new.js",
     "lint": "eslint src/**/*.js",
     "lint:fix": "eslint src/**/*.js --fix",
+    "format": "prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\"",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -31,10 +33,21 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "eslint": "^8.57.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^7.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-standard": "^5.0.0",
     "jest": "^30.3.0",
     "nodemon": "^3.0.2",
+    "prettier": "^3.8.3",
     "prisma": "^5.10.0",
     "supertest": "^7.2.2",
     "typescript": "^6.0.3"
+  },
+  "_moduleAliases": {
+    "@": "src"
   }
 }

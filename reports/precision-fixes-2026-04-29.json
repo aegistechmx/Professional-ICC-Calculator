@@ -1,0 +1,603 @@
+{
+  "scanned": 149,
+  "modified": 29,
+  "errors": 0,
+  "files": [
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\api\\controllers\\powerflow.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\api\\controllers\\proteccion.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\api\\routes\\powerflow.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\api\\routes\\proteccion.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\app.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\config\\db.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\auth.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\calculo.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\coordinacion.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\loadflow.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\proyecto.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\reporte\\reporte.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\simulacion.controller.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\sqd_real.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\controllers\\template.controller.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\DynamicMotorModel.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\EconomicDispatch.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\ElectricalState.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\ElectricalSystem.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\FaultAnalysisV2.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\FullOPF.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\index.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverV2.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\OPFNR_Coupling.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\OptimalPowerFlow.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\PerformanceOptimizer.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\PerUnitSystem.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\PowerFlowOrchestrator.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\ReactFlowConverter.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\SimulationEngine.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\SimulationTest.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\SymmetricalComponents.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\TopologyValidator.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\TransientStability.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\UnifiedSimulationEngine.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\ValidationSuite.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\electrical\\YbusBuilderV2.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\events\\EventEngine.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\index.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\loadflow\\bus.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\loadflow\\jacobiano.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\loadflow\\newton.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\loadflow\\pq.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\loadflow\\ybus.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\math\\Complex.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\index.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\JacobianBuilder.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\MismatchCalculator.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\newton\\index.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\newton\\jacobian.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\newton\\mismatch.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\newton\\solver.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\NewtonRaphsonSolver.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\VoltageUpdater.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\auto_ajuste.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\coordinacion.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\coordinacion_multi.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\DirectionalProtection.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\index.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\interpolacion.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\PhaseGroundProtection.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\ProtectionCoordination.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\selector.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\sqd_curve.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\sqd_real.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\tcc.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\TCCCurves.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\scenarios\\ScenarioSystem.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\simulation\\DynamicSimulation.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\simulation\\index.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\simulation\\PowerFlowEngine.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\simulation\\SimulationCore.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\solver\\index.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\solver\\NewtonRaphsonSolver.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\solver\\SparseMatrix.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\system\\ElectricalSystem.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\CascadeTest.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\ConsistencyValidator.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\EdgeCasesTest.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\ExternalValidation.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\index.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\StressTest.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\SystemValidator.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\ybus\\buildYbus.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\core\\ybus\\YbusBuilder.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\data\\sqd_breakers.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\data\\templates.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\domain\\ybus\\YbusBuilder.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\infra\\config\\index.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\infra\\config\\ToleranceConfig.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\infra\\logger\\logger.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\middleware\\auth.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\middleware\\auth.middleware.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\middleware\\errorHandler.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\middleware\\rateLimiter.middleware.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\modules\\powerflow\\powerflow.service.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\modules\\protections\\coordinacion.service.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\modules\\protections\\proteccion.service.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\modules\\protections\\sqd_real.service.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\modules\\shortcircuit\\shortCircuitCalculator.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\auth.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\calculo.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\coordinacion.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\cortocircuito.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\icc.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\loadflow.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\projects.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\proyecto.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\reporte\\reporte.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\simulacion.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\sqd_real.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\routes\\template.routes.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\server-new.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\server.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\services\\calculo.service.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\services\\electricalEngine.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\services\\iccFromGraph.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\services\\reporte\\pdf.service.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\services\\reporte\\reporte.service.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\services\\simulacion.service.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\shared\\math\\Complex.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\shared\\utils\\apiResponse.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\shared\\utils\\csvParser.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\shared\\utils\\solver.js"
+    },
+    {
+      "modified": true,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\validators\\calculo.schema.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\validators\\coordinacion.schema.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\validators\\proteccion.schema.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\validators\\simulacion.schema.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\workers\\pdf.worker.js"
+    },
+    {
+      "modified": false,
+      "path": "C:\\Professional ICC Calculator\\backend\\src\\workers\\simulation.worker.js"
+    }
+  ]
+}

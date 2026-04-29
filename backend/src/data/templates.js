@@ -5,7 +5,8 @@
 const templates = [
   {
     nombre: 'Subestación Industrial',
-    descripcion: 'Subestación típica con transformador principal y distribución',
+    descripcion:
+      'Subestación típica con transformador principal y distribución',
     categoria: 'substation',
     nodes: [
       {
@@ -18,9 +19,9 @@ const templates = [
             kVA: 500,
             primario: 13800,
             secundario: 480,
-            Z: 5.75
-          }
-        }
+            Z: 5.75,
+          },
+        },
       },
       {
         id: 'breaker-1',
@@ -31,9 +32,9 @@ const templates = [
           parameters: {
             In: 600,
             Icu: 50000,
-            tipo: 'air_circuit'
-          }
-        }
+            tipo: 'air_circuit',
+          },
+        },
       },
       {
         id: 'panel-1',
@@ -43,15 +44,15 @@ const templates = [
           label: 'Tablero Principal',
           parameters: {
             tension: 480,
-            fases: 3
-          }
-        }
-      }
+            fases: 3,
+          },
+        },
+      },
     ],
     edges: [
       { id: 'e1', source: 'transformer-1', target: 'breaker-1' },
-      { id: 'e2', source: 'breaker-1', target: 'panel-1' }
-    ]
+      { id: 'e2', source: 'breaker-1', target: 'panel-1' },
+    ],
   },
   {
     nombre: 'Tablero de Distribución',
@@ -66,9 +67,9 @@ const templates = [
           label: 'Tablero',
           parameters: {
             tension: 480,
-            fases: 3
-          }
-        }
+            fases: 3,
+          },
+        },
       },
       {
         id: 'breaker-1',
@@ -79,9 +80,9 @@ const templates = [
           parameters: {
             In: 100,
             Icu: 25000,
-            tipo: 'molded_case'
-          }
-        }
+            tipo: 'molded_case',
+          },
+        },
       },
       {
         id: 'breaker-2',
@@ -92,9 +93,9 @@ const templates = [
           parameters: {
             In: 100,
             Icu: 25000,
-            tipo: 'molded_case'
-          }
-        }
+            tipo: 'molded_case',
+          },
+        },
       },
       {
         id: 'load-1',
@@ -104,9 +105,9 @@ const templates = [
           label: 'Carga 1',
           parameters: {
             potencia_kW: 50,
-            fp: 0.85
-          }
-        }
+            fp: 0.85,
+          },
+        },
       },
       {
         id: 'load-2',
@@ -116,17 +117,17 @@ const templates = [
           label: 'Carga 2',
           parameters: {
             potencia_kW: 75,
-            fp: 0.9
-          }
-        }
-      }
+            fp: 0.9,
+          },
+        },
+      },
     ],
     edges: [
       { id: 'e1', source: 'panel-1', target: 'breaker-1' },
       { id: 'e2', source: 'panel-1', target: 'breaker-2' },
       { id: 'e3', source: 'breaker-1', target: 'load-1' },
-      { id: 'e4', source: 'breaker-2', target: 'load-2' }
-    ]
+      { id: 'e4', source: 'breaker-2', target: 'load-2' },
+    ],
   },
   {
     nombre: 'Sistema con Motores',
@@ -143,9 +144,9 @@ const templates = [
             kVA: 1000,
             primario: 13800,
             secundario: 480,
-            Z: 5.75
-          }
-        }
+            Z: 5.75,
+          },
+        },
       },
       {
         id: 'breaker-1',
@@ -156,9 +157,9 @@ const templates = [
           parameters: {
             In: 1200,
             Icu: 65000,
-            tipo: 'air_circuit'
-          }
-        }
+            tipo: 'air_circuit',
+          },
+        },
       },
       {
         id: 'panel-1',
@@ -168,9 +169,9 @@ const templates = [
           label: 'Tablero Motores',
           parameters: {
             tension: 480,
-            fases: 3
-          }
-        }
+            fases: 3,
+          },
+        },
       },
       {
         id: 'motor-1',
@@ -181,9 +182,9 @@ const templates = [
           parameters: {
             hp: 100,
             voltaje: 480,
-            eficiencia: 0.92
-          }
-        }
+            eficiencia: 0.92,
+          },
+        },
       },
       {
         id: 'motor-2',
@@ -194,18 +195,18 @@ const templates = [
           parameters: {
             hp: 150,
             voltaje: 480,
-            eficiencia: 0.94
-          }
-        }
-      }
+            eficiencia: 0.94,
+          },
+        },
+      },
     ],
     edges: [
       { id: 'e1', source: 'transformer-1', target: 'breaker-1' },
       { id: 'e2', source: 'breaker-1', target: 'panel-1' },
       { id: 'e3', source: 'panel-1', target: 'motor-1' },
-      { id: 'e4', source: 'panel-1', target: 'motor-2' }
-    ]
-  }
-];
+      { id: 'e4', source: 'panel-1', target: 'motor-2' },
+    ],
+  },
+]
 
-module.exports = templates;
+module.exports = templates

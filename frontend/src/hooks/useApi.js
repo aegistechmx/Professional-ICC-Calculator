@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'
 
 /**
  * Custom hook for API calls with loading and error states
@@ -12,11 +12,11 @@ export function useApi(endpoint) {
     data: null,
     loading: false,
     error: null,
-  });
+  })
 
   const execute = useCallback(
     async (options = {}) => {
-      setState({ data: null, loading: true, error: null });
+      setState({ data: null, loading: true, error: null })
 
       try {
         const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -26,26 +26,27 @@ export function useApi(endpoint) {
             ...options.headers,
           },
           body: options.body ? JSON.stringify(options.body) : undefined,
-        });
+        })
 
-        const result = await response.json();
+        const result = await response.json()
 
         if (!response.ok || !result.success) {
-          throw new Error(result.error || 'API request failed');
+          throw new Error(result.error || 'API request failed')
         }
 
-        setState({ data: result.data, loading: false, error: null });
-        return result.data;
+        setState({ data: result.data, loading: false, error: null })
+        return result.data
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setState({ data: null, loading: false, error: errorMessage });
-        throw err;
+        const errorMessage =
+          err instanceof Error ? err.message : 'Unknown error'
+        setState({ data: null, loading: false, error: errorMessage })
+        throw err
       }
     },
     [endpoint]
-  );
+  )
 
-  return { ...state, execute };
+  return { ...state, execute }
 }
 
 /**
@@ -54,16 +55,16 @@ export function useApi(endpoint) {
  * @returns {Object} Object with data, loading, error, and execute function
  */
 export function usePost(endpoint) {
-  const { data, loading, error, execute } = useApi(endpoint);
+  const { data, loading, error, execute } = useApi(endpoint)
 
   const post = React.useCallback(
-    async (body) => {
-      return execute({ method: 'POST', body });
+    async body => {
+      return execute({ method: 'POST', body })
     },
     [execute]
-  );
+  )
 
-  return { data, loading, error, execute: post };
+  return { data, loading, error, execute: post }
 }
 
 /**
@@ -72,11 +73,11 @@ export function usePost(endpoint) {
  * @returns {Object} Object with data, loading, error, and execute function
  */
 export function useGet(endpoint) {
-  const { data, loading, error, execute } = useApi(endpoint);
+  const { data, loading, error, execute } = useApi(endpoint)
 
   const get = useCallback(async () => {
-    return execute({ method: 'GET' });
-  }, [execute]);
+    return execute({ method: 'GET' })
+  }, [execute])
 
-  return { data, loading, error, execute: get };
+  return { data, loading, error, execute: get }
 }

@@ -1,13 +1,12 @@
+/* eslint-disable no-console */
 /**
  * Cascade Simulation Engine
  * Dynamic simulation of protection system response to faults
  */
 
-import { EventQueue, createTripEvent, EVENT_TYPES } from './eventEngine';
-import { calcTripTime } from './protection';
-import { applyFault } from './switching';
-import { calcLineFlows, calcCurrents } from './lineFlows';
-import { applySimulationResults } from './applyResults';
+import { EventQueue, createTripEvent, EVENT_TYPES } from './eventEngine'
+import { calcTripTime } from './protection'
+import { calcLineFlows } from './lineFlows'
 
 /**
  * Evaluate relays and determine trip times
@@ -17,26 +16,26 @@ import { applySimulationResults } from './applyResults';
  * @returns {Array} Array of trip events
  */
 export function evaluateRelays(relays, flows, currentTime) {
-  const trips = [];
-  
+  const trips = []
+
   for (const relay of relays) {
-    const flow = flows.find(f => f.from === relay.bus);
-    if (!flow) continue;
-    
-    const tripTime = calcTripTime(flow.IkA, relay);
-    
+    const flow = flows.find(f => f.from === relay.bus)
+    if (!flow) continue
+
+    const tripTime = calcTripTime(flow.IkA, relay)
+
     if (tripTime !== Infinity) {
       trips.push({
         relayId: relay.id,
         time: currentTime + tripTime,
         tripTime,
         current: flow.IkA,
-        pickup: relay.pickup_kA
-      });
+        pickup: relay.pickup_kA,
+      })
     }
   }
-  
-  return trips;
+
+  return trips
 }
 
 /**
@@ -54,24 +53,24 @@ export function applyFaultToState(state, busId, faultData = {}) {
         data: {
           ...node.data,
           fault: true,
-          faultType: faultData.faultType || '3P'
+          faultType: faultData.faultType || '3P',
         },
         style: {
           ...node.style,
           background: '#ff0000',
-          border: '4px solid #8b0000'
-        }
-      };
+          border: '4px solid #8b0000',
+        },
+      }
     }
-    return node;
-  });
-  
+    return node
+  })
+
   return {
     ...state,
     nodes: newNodes,
     faultBus: busId,
-    faultActive: true
-  };
+    faultActive: true,
+  }
 }
 
 /**
@@ -90,25 +89,25 @@ export function openBreaker(state, relayId) {
           ...edge.data,
           status: 'open',
           tripped: true,
-          tripTime: state.currentTime
+          tripTime: state.currentTime,
         },
         style: {
           ...edge.style,
           stroke: '#ff0000',
           strokeWidth: 1,
           strokeDasharray: 'none',
-          animated: false
-        }
-      };
+          animated: false,
+        },
+      }
     }
-    return edge;
-  });
-  
+    return edge
+  })
+
   return {
     ...state,
     edges: newEdges,
-    trippedRelays: [...(state.trippedRelays || []), relayId]
-  };
+    trippedRelays: [...(state.trippedRelays || []), relayId],
+  }
 }
 
 /**
@@ -119,45 +118,50 @@ export function openBreaker(state, relayId) {
  * @param {Object} options - Simulation options
  * @returns {Object} Simulation timeline and results
  */
-export async function simulateCascade(initialState, relays, faultBus, options = {}) {
+export async function simulateCascade(
+  initialState,
+  relays,
+  faultBus,
+  options = {}
+) {
   const {
     maxTime = 2.0,
     timeStep = 0.01,
     solvePowerFlow,
-    calculateCurrents
-  } = options;
-  
-  const eventQueue = new EventQueue();
+    calculateCurrents,
+  } = options
+
+  const eventQueue = new EventQueue()
   eventQueue.add({
     time: 0,
     type: EVENT_TYPES.FAULT,
-    elementId: faultBus
-  });
-  
-  let state = { ...initialState, currentTime: 0, trippedRelays: [] };
-  const timeline = [];
-  
+    elementId: faultBus,
+  })
+
+  let state = { ...initialState, currentTime: 0, trippedRelays: [] }
+  const timeline = []
+
   while (!eventQueue.isEmpty() && state.currentTime < maxTime) {
-    const event = eventQueue.getNext();
-    state.currentTime = event.time;
-    
+    const event = eventQueue.getNext()
+    state.currentTime = event.time
+
     // Apply event
     if (event.type === EVENT_TYPES.FAULT) {
-      state = applyFaultToState(state, event.elementId, event.data);
+      state = applyFaultToState(state, event.elementId, event.data)
     } else if (event.type === EVENT_TYPES.TRIP) {
-      state = openBreaker(state, event.elementId);
+      state = openBreaker(state, event.elementId)
     }
-    
+
     // Recalculate system (new currents after fault/trip)
     const powerFlowResult = await solvePowerFlow(state.nodes, state.edges, {
-      Sbase_MVA: 100
-    });
-    
+      Sbase_MVA: 100,
+    })
+
     if (!powerFlowResult.success) {
-      console.warn('Power flow failed during cascade simulation');
-      break;
+      console.warn('Power flow failed during cascade simulation')
+      break
     }
-    
+
     // Calculate flows
     const branches = state.edges.map(e => ({
       from: e.source,
@@ -165,55 +169,55 @@ export async function simulateCascade(initialState, relays, faultBus, options = 
       R: e.data.R || 0.01,
       X: e.data.X || 0.1,
       B: e.data.B || 0,
-      tap: e.data.tap || 1
-    }));
-    
+      tap: e.data.tap || 1,
+    }))
+
     const flows = calcLineFlows(
       branches,
       powerFlowResult.Y,
       powerFlowResult.V,
       powerFlowResult.theta,
       powerFlowResult.index
-    );
-    
+    )
+
     const flowsWithI = calculateCurrents(
       flows,
       powerFlowResult.V,
       powerFlowResult.base,
       powerFlowResult.index
-    );
-    
+    )
+
     // Evaluate relays
-    const trips = evaluateRelays(relays, flowsWithI, state.currentTime);
-    
+    const trips = evaluateRelays(relays, flowsWithI, state.currentTime)
+
     // Add trip events for relays that haven't tripped yet
     for (const trip of trips) {
       if (!state.trippedRelays.includes(trip.relayId)) {
-        eventQueue.add(createTripEvent(trip.relayId, trip.time));
+        eventQueue.add(createTripEvent(trip.relayId, trip.time))
       }
     }
-    
+
     // Record timeline step
     timeline.push({
       time: state.currentTime,
       state: { ...state },
       flows: flowsWithI,
       powerFlow: powerFlowResult,
-      event
-    });
-    
+      event,
+    })
+
     // Advance time if no more events
     if (eventQueue.isEmpty() && state.currentTime < maxTime) {
-      state.currentTime = Math.min(state.currentTime + timeStep, maxTime);
+      state.currentTime = Math.min(state.currentTime + timeStep, maxTime)
     }
   }
-  
+
   return {
     timeline,
     finalState: state,
     trippedRelays: state.trippedRelays || [],
-    simulationTime: state.currentTime
-  };
+    simulationTime: state.currentTime,
+  }
 }
 
 /**
@@ -222,11 +226,11 @@ export async function simulateCascade(initialState, relays, faultBus, options = 
  * @returns {Object} Summary statistics
  */
 export function getSimulationSummary(simulationResult) {
-  const { timeline, trippedRelays, simulationTime } = simulationResult;
-  
-  const faultEvent = timeline.find(t => t.event.type === EVENT_TYPES.FAULT);
-  const tripEvents = timeline.filter(t => t.event.type === EVENT_TYPES.TRIP);
-  
+  const { timeline, trippedRelays, simulationTime } = simulationResult
+
+  const faultEvent = timeline.find(t => t.event.type === EVENT_TYPES.FAULT)
+  const tripEvents = timeline.filter(t => t.event.type === EVENT_TYPES.TRIP)
+
   return {
     totalEvents: timeline.length,
     faultTime: faultEvent?.time || 0,
@@ -236,7 +240,7 @@ export function getSimulationSummary(simulationResult) {
     simulationDuration: simulationTime,
     trippedSequence: tripEvents.map(t => ({
       relayId: t.event.elementId,
-      time: t.event.time
-    }))
-  };
+      time: t.event.time,
+    })),
+  }
 }

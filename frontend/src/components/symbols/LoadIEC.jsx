@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * IEC standard load symbol
@@ -10,7 +11,15 @@ export default function LoadIEC({ size = 60 }) {
       {/* Input line */}
       <line x1="30" y1="0" x2="30" y2="15" stroke="black" strokeWidth="2" />
       {/* Load box */}
-      <rect x="15" y="15" width="30" height="20" stroke="black" strokeWidth="2" fill="none" />
+      <rect
+        x="15"
+        y="15"
+        width="30"
+        height="20"
+        stroke="black"
+        strokeWidth="2"
+        fill="none"
+      />
       {/* Load arrow pointing down */}
       <polygon points="30,18 25,28 35,28" fill="black" />
       <line x1="30" y1="28" x2="30" y2="35" stroke="black" strokeWidth="2" />
@@ -19,5 +28,9 @@ export default function LoadIEC({ size = 60 }) {
       <line x1="23" y1="38" x2="37" y2="38" stroke="black" strokeWidth="2" />
       <line x1="26" y1="41" x2="34" y2="41" stroke="black" strokeWidth="2" />
     </svg>
-  );
+  )
+}
+
+LoadIEC.propTypes = {
+  size: PropTypes.number,
 }

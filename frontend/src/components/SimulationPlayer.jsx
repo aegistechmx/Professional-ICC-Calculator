@@ -1,54 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { useSimStore } from '../store/simStore';
+import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import { useSimStore } from '../store/simStore'
 
 /**
  * Simulation timeline player
  * Controls playback of time-based simulation (0-200ms)
  */
 export default function SimulationPlayer({ simulationData }) {
-  const { tiempo, isPlaying, playbackSpeed, setTiempo, setPlaying, setPlaybackSpeed, reset, setSimulationData } = useSimStore();
-  const [localTime, setLocalTime] = useState(0);
+  const {
+    isPlaying,
+    playbackSpeed,
+    setTiempo,
+    setPlaying,
+    setPlaybackSpeed,
+    setSimulationData,
+  } = useSimStore()
+  const [localTime, setLocalTime] = useState(0)
 
   useEffect(() => {
     if (simulationData) {
-      setSimulationData(simulationData);
+      setSimulationData(simulationData)
     }
-  }, [simulationData]);
+  }, [simulationData, setSimulationData])
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying) return
 
-    let t = localTime;
+    let t = localTime
     const interval = setInterval(() => {
-      t += 0.001 * playbackSpeed;
+      t += 0.001 * playbackSpeed
 
       if (t >= 0.2) {
-        t = 0.2;
-        setPlaying(false);
+        t = 0.2
+        setPlaying(false)
       }
 
-      setLocalTime(t);
-      setTiempo(t);
-    }, 20);
+      setLocalTime(t)
+      setTiempo(t)
+    }, 20)
 
-    return () => clearInterval(interval);
-  }, [isPlaying, playbackSpeed, setPlaying, setTiempo]);
+    return () => clearInterval(interval)
+  }, [isPlaying, playbackSpeed, setPlaying, setTiempo, localTime])
 
   const handlePlayPause = () => {
-    setPlaying(!isPlaying);
-  };
+    setPlaying(!isPlaying)
+  }
 
   const handleReset = () => {
-    setLocalTime(0);
-    setTiempo(0);
-    setPlaying(false);
-  };
+    setLocalTime(0)
+    setTiempo(0)
+    setPlaying(false)
+  }
 
-  const handleSliderChange = (e) => {
-    const value = parseFloat(e.target.value);
-    setLocalTime(value);
-    setTiempo(value);
-  };
+  const handleSliderChange = e => {
+    const value = parseFloat(e.target.value)
+    setLocalTime(value)
+    setTiempo(value)
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
@@ -69,7 +77,7 @@ export default function SimulationPlayer({ simulationData }) {
           <label className="text-sm text-gray-600">Velocidad:</label>
           <select
             value={playbackSpeed}
-            onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
+            onChange={e => setPlaybackSpeed(parseFloat(e.target.value))}
             className="px-2 py-1 border border-gray-300 rounded-md text-sm"
           >
             <option value={0.5}>0.5x</option>
@@ -96,5 +104,9 @@ export default function SimulationPlayer({ simulationData }) {
         t = {localTime.toFixed(3)} s
       </div>
     </div>
-  );
+  )
+}
+
+SimulationPlayer.propTypes = {
+  simulationData: PropTypes.object,
 }

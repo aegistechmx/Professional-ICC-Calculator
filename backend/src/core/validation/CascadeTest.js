@@ -1,15 +1,15 @@
 /**
  * CascadeTest - Cascading Failure Testing Module
- * 
+ *
  * This module implements cascading failure testing:
  * - Fault → Trip → Redistribution → New Fault
  * - Sequential fault simulation
  * - Protection coordination validation
  * - System resilience assessment
- * 
+ *
  * Architecture:
  * Fault Event → Protection Trip → Load Redistribution → New Fault → Cascade Analysis
- * 
+ *
  * @class CascadeTest
  */
 
@@ -21,14 +21,14 @@ class CascadeTest {
   constructor(options = {}) {
     this.options = {
       maxCascadeSteps: options.maxCascadeSteps || 5,
-      ...options
-    };
-    
+      ...options,
+    }
+
     this.results = {
       cascadeSteps: [],
       finalState: null,
-      overallStable: true
-    };
+      overallStable: true,
+    }
   }
 
   /**
@@ -39,45 +39,55 @@ class CascadeTest {
    * @returns {Object} Cascade simulation results
    */
   runCascadeSimulation(system, engines, initialFault) {
-    const cascadeSteps = [];
-    let currentSystem = system;
-    let currentFault = initialFault;
-    let step = 0;
-    let overallStable = true;
-    
+    const cascadeSteps = []
+    let currentSystem = system // current (A)
+    let currentFault = initialFault // current (A)
+    let step = 0
+    let overallStable = true
+
     while (step < this.options.maxCascadeSteps && overallStable) {
-      step++;
-      
+      step++
+
       // Run fault analysis
-      const faultResult = engines.fault ? engines.fault.calculate(currentFault) : null;
-      
+      const faultResult = engines.fault
+        ? engines.fault.calculate(currentFault)
+        : null
+
       // Check protection trip
-      const protectionResult = this.evaluateProtection(currentSystem, currentFault, faultResult);
-      
+      const protectionResult = this.evaluateProtection(
+        currentSystem,
+        currentFault,
+        faultResult
+      )
+
       if (!protectionResult.trip) {
         // No trip, cascade stops
         cascadeSteps.push({
           step,
           fault: currentFault,
           trip: false,
-          message: 'No protection trip, cascade stopped'
-        });
-        break;
+          message: 'No protection trip, cascade stopped',
+        })
+        break
       }
-      
+
       // Apply protection trip (open line/breaker)
-      const trippedElement = protectionResult.trippedElement;
-      const postTripSystem = this.applyTrip(currentSystem, trippedElement);
-      
+      const trippedElement = protectionResult.trippedElement
+      const postTripSystem = this.applyTrip(currentSystem, trippedElement) // current (A)
+
       // Run power flow after trip
-      const pfResult = engines.powerFlow ? engines.powerFlow.run(postTripSystem) : null;
-      
+      const pfResult = engines.powerFlow // power (W)
+        ? engines.powerFlow.run(postTripSystem)
+        : null
+
       // Check stability after redistribution
-      const stable = pfResult ? pfResult.converged && this.checkVoltageStability(pfResult) : false;
-      
+      const stable = pfResult
+        ? pfResult.converged && this.checkVoltageStability(pfResult)
+        : false
+
       // Check for new fault (overload, under/over voltage)
-      const newFault = this.detectNewFault(postTripSystem, pfResult);
-      
+      const newFault = this.detectNewFault(postTripSystem, pfResult)
+
       cascadeSteps.push({
         step,
         fault: currentFault,
@@ -85,38 +95,38 @@ class CascadeTest {
         trippedElement,
         postTripStable: stable,
         newFault: newFault !== null,
-        nextFault: newFault
-      });
-      
+        nextFault: newFault,
+      })
+
       // Update for next iteration
-      currentSystem = postTripSystem;
-      currentFault = newFault;
-      overallStable = stable && newFault !== null;
-      
+      currentSystem = postTripSystem // current (A)
+      currentFault = newFault // current (A)
+      overallStable = stable && newFault !== null
+
       if (!stable) {
-        overallStable = false;
-        break;
+        overallStable = false
+        break
       }
-      
+
       if (newFault === null) {
         // No new fault, cascade stopped
-        break;
+        break
       }
     }
-    
-    this.results.cascadeSteps = cascadeSteps;
+
+    this.results.cascadeSteps = cascadeSteps
     this.results.finalState = {
       system: currentSystem,
       stable: overallStable,
-      totalSteps: cascadeSteps.length
-    };
-    this.results.overallStable = overallStable;
-    
+      totalSteps: cascadeSteps.length,
+    }
+    this.results.overallStable = overallStable
+
     return {
       cascadeSteps,
       finalState: this.results.finalState,
-      overallStable
-    };
+      overallStable,
+    }
   }
 
   /**
@@ -129,29 +139,31 @@ class CascadeTest {
   evaluateProtection(system, fault, faultResult) {
     // Simplified protection evaluation
     // In real implementation, this would use LSIGBreaker or similar
-    
-    const faultCurrent = faultResult ? faultResult.current || 1000 : 1000;
-    const ratedCurrent = 100;
-    const current_pu = faultCurrent / ratedCurrent;
-    
+
+    const faultCurrent = faultResult ? faultResult.current || 1000 : 1000 // current (A)
+    const ratedCurrent = 100
+    const current_pu = faultCurrent / ratedCurrent // current (A)
+
     // Check if current exceeds pickup
-    const pickup = 6.0; // pu
-    const trip = current_pu >= pickup;
-    
+    const pickup = 6.0 // pu
+    const trip = current_pu >= pickup // current (A)
+
     // Determine which element trips
-    const trippedElement = trip ? {
-      type: 'line',
-      id: fault.busId + '_line',
-      from: fault.busId,
-      to: system.buses.find(b => b.id !== fault.busId)?.id || 'bus_1'
-    } : null;
-    
+    const trippedElement = trip
+      ? {
+          type: 'line',
+          id: fault.busId + '_line',
+          from: fault.busId,
+          to: system.buses.find(b => b.id !== fault.busId)?.id || 'bus_1',
+        }
+      : null
+
     return {
       trip,
       trippedElement,
       current_pu,
-      pickup
-    };
+      pickup,
+    }
   }
 
   /**
@@ -161,25 +173,25 @@ class CascadeTest {
    * @returns {Object} Modified system
    */
   applyTrip(system, trippedElement) {
-    if (!trippedElement) return system;
-    
+    if (!trippedElement) return system
+
     // Clone system
-    const { ElectricalSystem } = require('../electrical/ElectricalSystem');
-    const modifiedSystem = new ElectricalSystem();
-    
+    const { ElectricalSystem } = require('../../core')
+    const modifiedSystem = new ElectricalSystem()
+
     // Add buses
     system.buses.forEach(bus => {
-      modifiedSystem.addBus({ ...bus });
-    });
-    
+      modifiedSystem.addBus({ ...bus })
+    })
+
     // Add lines (except tripped line)
     system.lines.forEach(line => {
       if (line.id !== trippedElement.id) {
-        modifiedSystem.addLine({ ...line });
+        modifiedSystem.addLine({ ...line })
       }
-    });
-    
-    return modifiedSystem;
+    })
+
+    return modifiedSystem
   }
 
   /**
@@ -188,12 +200,13 @@ class CascadeTest {
    * @returns {boolean} True if voltages are stable
    */
   checkVoltageStability(pfResult) {
-    if (!pfResult.voltages) return false;
-    
-    return pfResult.voltages.every(v => {
-      const mag = typeof v === 'object' ? Math.sqrt(v.re * v.re + v.im * v.im) : v;
-      return mag > 0.85 && mag < 1.15;
-    });
+    if (!pfResult.voltages) return false
+
+    return pfResult.voltages.every(v => { // voltage (V)
+      const mag =
+        typeof v === 'object' ? Math.sqrt(v.re * v.re + v.im * v.im) : v
+      return mag > 0.85 && mag < 1.15
+    })
   }
 
   /**
@@ -203,47 +216,48 @@ class CascadeTest {
    * @returns {Object|null} New fault or null
    */
   detectNewFault(system, pfResult) {
-    if (!pfResult.voltages) return null;
-    
+    if (!pfResult.voltages) return null
+
     // Check for undervoltage
-    for (let i = 0; i < pfResult.voltages.length; i++) {
-      const v = pfResult.voltages[i];
-      const mag = typeof v === 'object' ? Math.sqrt(v.re * v.re + v.im * v.im) : v;
-      
+    for (let i = 0; i < pfResult.voltages.length; i++) { // voltage (V)
+      const v = pfResult.voltages[i] // voltage (V)
+      const mag =
+        typeof v === 'object' ? Math.sqrt(v.re * v.re + v.im * v.im) : v
+
       if (mag < 0.9) {
         return {
           type: 'undervoltage',
           busId: system.buses[i].id,
-          voltage: mag
-        };
+          voltage: mag,
+        }
       }
-      
+
       if (mag > 1.1) {
         return {
           type: 'overvoltage',
           busId: system.buses[i].id,
-          voltage: mag
-        };
+          voltage: mag,
+        }
       }
     }
-    
+
     // Check for line overload
     if (pfResult.lineFlows) {
       for (let i = 0; i < pfResult.lineFlows.length; i++) {
-        const flow = pfResult.lineFlows[i];
-        const line = system.lines[i];
+        const flow = pfResult.lineFlows[i]
+        const line = system.lines[i]
         if (flow > line.rating * 1.2) {
           return {
             type: 'overload',
             lineId: line.id,
             flow,
-            rating: line.rating
-          };
+            rating: line.rating,
+          }
         }
       }
     }
-    
-    return null;
+
+    return null
   }
 
   /**
@@ -258,8 +272,8 @@ class CascadeTest {
       cascadeSteps: results.cascadeSteps,
       finalState: results.finalState,
       overallStable: results.overallStable,
-      recommendations: this.generateRecommendations(results)
-    };
+      recommendations: this.generateRecommendations(results),
+    }
   }
 
   /**
@@ -268,38 +282,43 @@ class CascadeTest {
    * @returns {Array} Recommendations
    */
   generateRecommendations(results) {
-    const recommendations = [];
-    
+    const recommendations = []
+
     if (!results.overallStable) {
       recommendations.push({
         type: 'stability',
         severity: 'error',
         message: 'System experienced cascading failure',
-        suggestion: 'Implement automatic load shedding and islanding schemes to prevent cascade'
-      });
+        suggestion:
+          'Implement automatic load shedding and islanding schemes to prevent cascade',
+      })
     }
-    
+
     if (results.finalState && results.finalState.totalSteps > 3) {
       recommendations.push({
         type: 'protection',
         severity: 'warning',
         message: `Cascade continued for ${results.finalState.totalSteps} steps`,
-        suggestion: 'Review protection coordination to limit cascade propagation'
-      });
+        suggestion:
+          'Review protection coordination to limit cascade propagation',
+      })
     }
-    
-    const overloadSteps = results.cascadeSteps.filter(s => s.nextFault && s.nextFault.type === 'overload');
+
+    const overloadSteps = results.cascadeSteps.filter(
+      s => s.nextFault && s.nextFault.type === 'overload'
+    )
     if (overloadSteps.length > 0) {
       recommendations.push({
         type: 'overload',
         severity: 'warning',
         message: 'Overload conditions triggered cascade',
-        suggestion: 'Implement automatic generation re-dispatch and load transfer'
-      });
+        suggestion:
+          'Implement automatic generation re-dispatch and load transfer',
+      })
     }
-    
-    return recommendations;
+
+    return recommendations
   }
 }
 
-module.exports = CascadeTest;
+module.exports = CascadeTest

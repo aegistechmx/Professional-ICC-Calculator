@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-04-29T02:35:55.737Z",
+  "bundle": {
+    "totalSize": 421406,
+    "files": [
+      {
+        "path": "assets\\index-KzBBnIQb.js",
+        "size": 393523,
+        "sizeKB": 384.3,
+        "sizeMB": 0.38
+      },
+      {
+        "path": "assets\\index-DWZdf4_q.css",
+        "size": 27456,
+        "sizeKB": 26.81,
+        "sizeMB": 0.03
+      },
+      {
+        "path": "index.html",
+        "size": 427,
+        "sizeKB": 0.42,
+        "sizeMB": 0
+      }
+    ],
+    "recommendations": []
+  },
+  "loadTime": {
+    "firstContentfulPaint": 1.2,
+    "largestContentfulPaint": 2.1,
+    "timeToInteractive": 2.8,
+    "cumulativeLayoutShift": 0.05,
+    "firstInputDelay": 0.08
+  },
+  "dependencies": {
+    "root": {
+      "total": 2,
+      "dependencies": 1,
+      "devDependencies": 1,
+      "largest": [
+        "@xyflow/react"
+      ]
+    },
+    "frontend": {
+      "total": 22,
+      "dependencies": 8,
+      "devDependencies": 14,
+      "largest": [
+        "autoprefixer",
+        "axios",
+        "postcss",
+        "react",
+        "react-dom"
+      ]
+    },
+    "backend": {
+      "total": 31,
+      "dependencies": 14,
+      "devDependencies": 17,
+      "largest": [
+        "@prisma/client",
+        "bcrypt",
+        "bullmq",
+        "cors",
+        "dotenv"
+      ]
+    },
+    "recommendations": []
+  },
+  "score": 100
+}

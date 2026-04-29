@@ -11,8 +11,8 @@
 export function snapToGrid(position, gridSize = 20) {
   return {
     x: Math.round(position.x / gridSize) * gridSize,
-    y: Math.round(position.y / gridSize) * gridSize
-  };
+    y: Math.round(position.y / gridSize) * gridSize,
+  }
 }
 
 /**
@@ -23,20 +23,20 @@ export function snapToGrid(position, gridSize = 20) {
  * @returns {Object} Snapped position
  */
 export function snapToOtherNodes(pos, nodes, threshold = 10) {
-  let snapped = { ...pos };
+  let snapped = { ...pos }
 
   nodes.forEach(n => {
     // Snap X alignment
     if (Math.abs(n.position.x - pos.x) < threshold) {
-      snapped.x = n.position.x;
+      snapped.x = n.position.x
     }
     // Snap Y alignment
     if (Math.abs(n.position.y - pos.y) < threshold) {
-      snapped.y = n.position.y;
+      snapped.y = n.position.y
     }
-  });
+  })
 
-  return snapped;
+  return snapped
 }
 
 /**
@@ -48,9 +48,9 @@ export function snapToOtherNodes(pos, nodes, threshold = 10) {
  * @returns {Object} Snapped position
  */
 export function snap(position, nodes, gridSize = 20, threshold = 10) {
-  const gridSnapped = snapToGrid(position, gridSize);
-  const nodeSnapped = snapToOtherNodes(gridSnapped, nodes, threshold);
-  return nodeSnapped;
+  const gridSnapped = snapToGrid(position, gridSize)
+  const nodeSnapped = snapToOtherNodes(gridSnapped, nodes, threshold)
+  return nodeSnapped
 }
 
 /**
@@ -63,6 +63,6 @@ export function snap(position, nodes, gridSize = 20, threshold = 10) {
 export function checkAlignment(pos1, pos2, threshold = 5) {
   return {
     xAligned: Math.abs(pos1.x - pos2.x) < threshold,
-    yAligned: Math.abs(pos1.y - pos2.y) < threshold
-  };
+    yAligned: Math.abs(pos1.y - pos2.y) < threshold,
+  }
 }

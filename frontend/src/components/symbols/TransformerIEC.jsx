@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * IEC standard transformer symbol
@@ -10,11 +11,29 @@ export default function TransformerIEC({ size = 60 }) {
       {/* Input line */}
       <line x1="0" y1="20" x2="10" y2="20" stroke="black" strokeWidth="2" />
       {/* Primary winding */}
-      <circle cx="20" cy="20" r="10" stroke="black" strokeWidth="2" fill="none" />
+      <circle
+        cx="20"
+        cy="20"
+        r="10"
+        stroke="black"
+        strokeWidth="2"
+        fill="none"
+      />
       {/* Secondary winding */}
-      <circle cx="40" cy="20" r="10" stroke="black" strokeWidth="2" fill="none" />
+      <circle
+        cx="40"
+        cy="20"
+        r="10"
+        stroke="black"
+        strokeWidth="2"
+        fill="none"
+      />
       {/* Output line */}
       <line x1="50" y1="20" x2="60" y2="20" stroke="black" strokeWidth="2" />
     </svg>
-  );
+  )
+}
+
+TransformerIEC.propTypes = {
+  size: PropTypes.number,
 }

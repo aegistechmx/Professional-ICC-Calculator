@@ -1,19 +1,19 @@
-import React from 'react';
-import { useStore } from '../store/useStore';
+import React from 'react'
+import { useStore } from '../store/useStore'
 
 /**
  * ValidationOverlay - Shows visual warnings for invalid connections
  * and validation errors on the React Flow canvas
  */
 export default function ValidationOverlay() {
-  const invalidConnections = useStore((s) => s.invalidConnections);
-  const validationErrors = useStore((s) => s.validationErrors);
-  const clearInvalidConnections = useStore((s) => s.clearInvalidConnections);
-  const clearValidationErrors = useStore((s) => s.clearValidationErrors);
+  const invalidConnections = useStore(s => s.invalidConnections)
+  const validationErrors = useStore(s => s.validationErrors)
+  const clearInvalidConnections = useStore(s => s.clearInvalidConnections)
+  const clearValidationErrors = useStore(s => s.clearValidationErrors)
 
   // Don't render if no validation issues
   if (invalidConnections.length === 0 && validationErrors.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -25,7 +25,9 @@ export default function ValidationOverlay() {
             <div className="flex items-center">
               <span className="text-2xl mr-2">⚠️</span>
               <div>
-                <h4 className="font-semibold text-red-900">Conexiones Inválidas</h4>
+                <h4 className="font-semibold text-red-900">
+                  Conexiones Inválidas
+                </h4>
                 <p className="text-sm text-red-700">
                   {invalidConnections.length} intento(s) de conexión inválido
                 </p>
@@ -55,7 +57,9 @@ export default function ValidationOverlay() {
             <div className="flex items-center">
               <span className="text-2xl mr-2">🔍</span>
               <div>
-                <h4 className="font-semibold text-orange-900">Errores de Validación</h4>
+                <h4 className="font-semibold text-orange-900">
+                  Errores de Validación
+                </h4>
                 <p className="text-sm text-orange-700">
                   {validationErrors.length} error(es) encontrado(s)
                 </p>
@@ -83,5 +87,5 @@ export default function ValidationOverlay() {
         </div>
       )}
     </div>
-  );
+  )
 }

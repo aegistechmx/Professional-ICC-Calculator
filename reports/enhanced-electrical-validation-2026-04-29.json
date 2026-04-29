@@ -1,0 +1,3359 @@
+{
+  "scanned": 149,
+  "functions": [
+    {
+      "name": "power",
+      "line": 61,
+      "file": "..\\backend\\src\\api\\controllers\\powerflow.controller.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "power",
+      "line": 174,
+      "file": "..\\backend\\src\\api\\controllers\\powerflow.controller.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "power",
+      "line": 249,
+      "file": "..\\backend\\src\\api\\controllers\\powerflow.controller.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "solver",
+      "line": 39,
+      "file": "..\\backend\\src\\controllers\\loadflow.controller.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "impedance",
+      "line": 125,
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "impedance *",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 4,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current *",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 128,
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current *",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "resonantFrequency",
+      "line": 198,
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Frequency /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 1,
+          "type": "missing_unit",
+          "pattern": "missing_unit_0",
+          "match": "Frequency / 60",
+          "suggestion": "Add explicit unit declaration",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 83,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 31,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 634,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 665,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 4,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 7,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 666,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 3,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 6,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 22,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 641,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 688,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 4,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 7,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 689,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 3,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 6,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 83,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 165,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 555,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 573,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 4,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 7,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 574,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 3,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 6,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 33,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "applyVoltage",
+      "line": 311,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "applyVoltage",
+      "line": 341,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 359,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 371,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "applyVoltage",
+      "line": 762,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 84,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 85,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 84,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "maxVoltage",
+      "line": 260,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 31,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 369,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newAng - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 8,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newAng - currentAng) * maxVoltage",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 396,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 6,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.abs(newMag - current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 9,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sign(newMag - currentMag) * maxVoltage",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 175,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverV2.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 272,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverV2.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 290,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverV2.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 298,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverV2.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 307,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverV2.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 308,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverV2.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 86,
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "solvePower",
+      "line": 111,
+      "file": "..\\backend\\src\\core\\electrical\\PowerFlowOrchestrator.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "solvePower",
+      "line": 221,
+      "file": "..\\backend\\src\\core\\electrical\\PowerFlowOrchestrator.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 33,
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "runFaultAnalysis",
+      "line": 223,
+      "file": "..\\backend\\src\\core\\electrical\\SimulationEngine.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "runCompleteAnalysis",
+      "line": 233,
+      "file": "..\\backend\\src\\core\\electrical\\SimulationEngine.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "getDrivingPointImpedance",
+      "line": 44,
+      "file": "..\\backend\\src\\core\\electrical\\SymmetricalComponents.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "getDrivingPointImpedance",
+      "line": 45,
+      "file": "..\\backend\\src\\core\\electrical\\SymmetricalComponents.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "getDrivingPointImpedance",
+      "line": 46,
+      "file": "..\\backend\\src\\core\\electrical\\SymmetricalComponents.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "getDrivingPointImpedance",
+      "line": 174,
+      "file": "..\\backend\\src\\core\\electrical\\SymmetricalComponents.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "acceleratingPower",
+      "line": 110,
+      "file": "..\\backend\\src\\core\\electrical\\TransientStability.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Power /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 247,
+      "file": "..\\backend\\src\\core\\electrical\\YbusBuilderV2.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "resolver",
+      "line": 50,
+      "file": "..\\backend\\src\\core\\loadflow\\newton.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "initializeVoltage",
+      "line": 84,
+      "file": "..\\backend\\src\\core\\powerflow\\newton\\solver.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 126,
+      "file": "..\\backend\\src\\core\\powerflow\\newton\\solver.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "power",
+      "line": 156,
+      "file": "..\\backend\\src\\core\\powerflow\\NewtonRaphsonSolver.js",
+      "hasPrecisionHandling": true,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": null
+    },
+    {
+      "name": "current",
+      "line": 33,
+      "file": "..\\backend\\src\\core\\powerflow\\VoltageUpdater.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "primaryCurrent",
+      "line": 56,
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 114,
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 142,
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 179,
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 216,
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "groundCurrent",
+      "line": 245,
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 69,
+      "file": "..\\backend\\src\\core\\protection\\TCCCurves.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 48,
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current *",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 56,
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 278,
+      "file": "..\\backend\\src\\core\\simulation\\DynamicSimulation.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 279,
+      "file": "..\\backend\\src\\core\\simulation\\DynamicSimulation.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 164,
+      "file": "..\\backend\\src\\core\\solver\\NewtonRaphsonSolver.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 13,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.cos(current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 14,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sin(current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 175,
+      "file": "..\\backend\\src\\core\\solver\\NewtonRaphsonSolver.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.cos(current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 3,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sin(current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "faultCurrent",
+      "line": 145,
+      "file": "..\\backend\\src\\core\\validation\\CascadeTest.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Current /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 149,
+      "file": "..\\backend\\src\\core\\validation\\CascadeTest.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 116,
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "power",
+      "line": 118,
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "current",
+      "line": 202,
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "voltage",
+      "line": 279,
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "simCurrent",
+      "line": 262,
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "refCurrent",
+      "line": 263,
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 231,
+      "file": "..\\backend\\src\\core\\ybus\\YbusBuilder.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "NewtonRaphsonSolver",
+      "line": 36,
+      "file": "..\\backend\\src\\modules\\powerflow\\powerflow.service.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateConductorImpedance",
+      "line": 121,
+      "file": "..\\backend\\src\\services\\electricalEngine.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateVoltage",
+      "line": 194,
+      "file": "..\\backend\\src\\services\\electricalEngine.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 9,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sqrt(3) * I * effective_impedance",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateConductorImpedance",
+      "line": 252,
+      "file": "..\\backend\\src\\services\\electricalEngine.js",
+      "hasPrecisionHandling": true,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": null
+    },
+    {
+      "name": "calculateConductorImpedance",
+      "line": 790,
+      "file": "..\\backend\\src\\services\\electricalEngine.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateVoltage",
+      "line": 820,
+      "file": "..\\backend\\src\\services\\electricalEngine.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "getNodeVoltage",
+      "line": 25,
+      "file": "..\\backend\\src\\services\\iccFromGraph.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "getNodeVoltage",
+      "line": 177,
+      "file": "..\\backend\\src\\services\\iccFromGraph.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_3",
+          "match": "Number(p.potencia_kW ?? 0))\r // power",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "getNodeVoltage",
+      "line": 297,
+      "file": "..\\backend\\src\\services\\iccFromGraph.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "resolver",
+      "line": 12,
+      "file": "..\\backend\\src\\shared\\utils\\solver.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "resolver",
+      "line": 64,
+      "file": "..\\backend\\src\\shared\\utils\\solver.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "resolver",
+      "line": 126,
+      "file": "..\\backend\\src\\shared\\utils\\solver.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "convertVoltage",
+      "line": 33,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 5,
+      "issues": [
+        {
+          "line": 1,
+          "type": "missing_unit",
+          "pattern": "missing_unit_1",
+          "match": "Voltage = 1.0",
+          "suggestion": "Add explicit unit declaration",
+          "severity": "warning"
+        },
+        {
+          "line": 12,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Voltage *",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 12,
+          "type": "missing_unit",
+          "pattern": "missing_unit_0",
+          "match": "Voltage * 1000",
+          "suggestion": "Add explicit unit declaration",
+          "severity": "warning"
+        },
+        {
+          "line": 19,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Voltage *",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 19,
+          "type": "missing_unit",
+          "pattern": "missing_unit_0",
+          "match": "Voltage * 1000",
+          "suggestion": "Add explicit unit declaration",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "convertCurrent",
+      "line": 64,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "convertPower",
+      "line": 82,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 0,
+      "issues": [],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "convertImpedance",
+      "line": 104,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 1,
+          "type": "missing_unit",
+          "pattern": "missing_unit_1",
+          "match": "Impedance = 1.0",
+          "suggestion": "Add explicit unit declaration",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 134,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 3,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "Power /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateReactivePower",
+      "line": 145,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.pow(apparentPower, 2) - Math.pow(activePower",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateApparentPower",
+      "line": 157,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 3,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.pow(activePower, 2) + Math.pow(reactivePower",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateShortCircuitCurrent",
+      "line": 235,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 2,
+      "issues": [
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.sqrt(3) * impedance",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        },
+        {
+          "line": 5,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "voltage /",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculateVoltage",
+      "line": 249,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_1",
+          "match": "current *",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    },
+    {
+      "name": "calculatePower",
+      "line": 259,
+      "file": "..\\backend\\src\\utils\\electricalUtils.js",
+      "hasPrecisionHandling": false,
+      "precisionIssues": 1,
+      "issues": [
+        {
+          "line": 2,
+          "type": "precision_issue",
+          "pattern": "precision_0",
+          "match": "Math.pow(current",
+          "suggestion": "Use toFixed(6) for IEEE standard precision",
+          "severity": "warning"
+        }
+      ],
+      "recommendation": "Add IEEE standard precision handling"
+    }
+  ],
+  "issues": [
+    {
+      "line": 128,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(e.impedance.x) < e.impedance",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\api\\controllers\\powerflow.controller.js"
+    },
+    {
+      "line": 353,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(e.impedance.x) < e.impedance",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\api\\controllers\\powerflow.controller.js"
+    },
+    {
+      "line": 418,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "impedance\r /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\api\\controllers\\powerflow.controller.js"
+    },
+    {
+      "line": 80,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\DynamicMotorModel.js"
+    },
+    {
+      "line": 82,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "power /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\DynamicMotorModel.js"
+    },
+    {
+      "line": 40,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 105,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.pow(h.current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 125,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "impedance *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 128,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 155,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.pow(v.voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 169,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.pow(systemVoltage, 2) / reactivePower",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 173,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "frequency = 60",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 198,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Frequency /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 198,
+      "type": "missing_unit",
+      "pattern": "missing_unit_0",
+      "match": "Frequency / 60",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\HarmonicAnalysis.js"
+    },
+    {
+      "line": 579,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 581,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 622,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 624,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 645,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 647,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 649,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - currentMag) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 651,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverCorrected.js"
+    },
+    {
+      "line": 579,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 582,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 635,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 638,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 668,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 671,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 674,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 676,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinal.js"
+    },
+    {
+      "line": 595,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 598,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 642,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 645,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 691,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 694,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 697,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 699,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalFixed.js"
+    },
+    {
+      "line": 583,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 585,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 626,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 628,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 649,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 651,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 653,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - currentMag) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 655,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverFinalWorking.js"
+    },
+    {
+      "line": 67,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 68,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 70,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "impedance /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 73,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "impedance /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 515,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 556,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 559,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 576,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 579,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 582,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 585,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrial.js"
+    },
+    {
+      "line": 775,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(0.1, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js"
+    },
+    {
+      "line": 777,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverIndustrialGrade.js"
+    },
+    {
+      "line": 648,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 650,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 694,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 696,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 719,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 721,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 723,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - currentMag) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 725,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProduction.js"
+    },
+    {
+      "line": 603,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 605,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 647,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 649,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 670,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 672,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 674,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - currentMag) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 676,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFinal.js"
+    },
+    {
+      "line": 573,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 575,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 629,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 631,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 656,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 658,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 660,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - currentMag) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 662,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverProductionFixed.js"
+    },
+    {
+      "line": 213,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 216,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 261,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 264,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 282,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 285,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 292,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.cos(current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 293,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sin(current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobust.js"
+    },
+    {
+      "line": 326,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js"
+    },
+    {
+      "line": 329,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js"
+    },
+    {
+      "line": 373,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js"
+    },
+    {
+      "line": 376,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js"
+    },
+    {
+      "line": 401,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js"
+    },
+    {
+      "line": 404,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverRobustFixed.js"
+    },
+    {
+      "line": 577,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(1.0, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 579,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(dampingFactor, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 621,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 623,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 644,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newAng - currentAng) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 646,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newAng - currentAng) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 648,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(newMag - currentMag) > maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 650,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sign(newMag - currentMag) * maxVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\NewtonRaphsonSolverWorking.js"
+    },
+    {
+      "line": 74,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(maxChange, Math.abs(gen.current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\OptimalPowerFlow.js"
+    },
+    {
+      "line": 27,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "frequency = 60",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\ReactFlowConverter.js"
+    },
+    {
+      "line": 93,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.tan(Math.acos(motor.power",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\ReactFlowConverter.js"
+    },
+    {
+      "line": 27,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 33,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 99,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 104,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 104,
+      "type": "missing_unit",
+      "pattern": "missing_unit_0",
+      "match": "current * 0.01",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 124,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 128,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "Current = 10",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 132,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 132,
+      "type": "missing_unit",
+      "pattern": "missing_unit_0",
+      "match": "Current - 1",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 199,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\RealIECCurves.js"
+    },
+    {
+      "line": 31,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "Voltage = 1.0",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\SymmetricalComponents.js"
+    },
+    {
+      "line": 110,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\TransientStability.js"
+    },
+    {
+      "line": 137,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\UnifiedSimulationEngine.js"
+    },
+    {
+      "line": 418,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(-voltageLimit, Math.min(voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\UnifiedSimulationEngine.js"
+    },
+    {
+      "line": 63,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(bus2.V - expected.bus2_voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\ValidationSuite.js"
+    },
+    {
+      "line": 79,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(bus3.V - expected.bus3_voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\electrical\\ValidationSuite.js"
+    },
+    {
+      "line": 138,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(0.9, Math.min(1.1, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\powerflow\\newton\\solver.js"
+    },
+    {
+      "line": 140,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.cos(current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\powerflow\\newton\\solver.js"
+    },
+    {
+      "line": 141,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sin(current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\powerflow\\newton\\solver.js"
+    },
+    {
+      "line": 44,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.max(0.9, Math.min(1.1, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\powerflow\\VoltageUpdater.js"
+    },
+    {
+      "line": 20,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Voltage -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 51,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 56,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 91,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "voltage -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 103,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "voltage -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 107,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.exp(-a * overVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 109,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.tanh(b / overVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 111,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.pow(overVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 113,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.exp(-a * overVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 223,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 227,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\CTSaturation.js"
+    },
+    {
+      "line": 105,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 114,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 134,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 142,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 171,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 179,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 208,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 216,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 237,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 245,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\LSIGBreaker.js"
+    },
+    {
+      "line": 233,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "Current = 10000",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ProtectionCoordination.js"
+    },
+    {
+      "line": 301,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ProtectionCoordination.js"
+    },
+    {
+      "line": 69,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\TCCCurves.js"
+    },
+    {
+      "line": 21,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "line": 41,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "line": 48,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "line": 208,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "line": 208,
+      "type": "missing_unit",
+      "pattern": "missing_unit_0",
+      "match": "Current * 6",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "line": 214,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "line": 214,
+      "type": "missing_unit",
+      "pattern": "missing_unit_0",
+      "match": "Current * 10",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\protection\\ThermalMemory.js"
+    },
+    {
+      "line": 161,
+      "type": "precision_issue",
+      "pattern": "precision_2",
+      "match": "parseFloat(result.V[i].toFixed(6))), // Voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\simulation\\SimulationCore.js"
+    },
+    {
+      "line": 163,
+      "type": "precision_issue",
+      "pattern": "precision_2",
+      "match": "parseFloat(result.P[i].toFixed(6))), // Active Power",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\simulation\\SimulationCore.js"
+    },
+    {
+      "line": 164,
+      "type": "precision_issue",
+      "pattern": "precision_2",
+      "match": "parseFloat(result.Q[i].toFixed(6))), // Reactive Power",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\simulation\\SimulationCore.js"
+    },
+    {
+      "line": 358,
+      "type": "precision_issue",
+      "pattern": "precision_2",
+      "match": "parseFloat((l.current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\simulation\\SimulationCore.js"
+    },
+    {
+      "line": 176,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.cos(current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\solver\\NewtonRaphsonSolver.js"
+    },
+    {
+      "line": 177,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sin(current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\solver\\NewtonRaphsonSolver.js"
+    },
+    {
+      "line": 144,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "Current = 100",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CascadeTest.js"
+    },
+    {
+      "line": 145,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Current /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CascadeTest.js"
+    },
+    {
+      "line": 382,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(currentsA.length, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ConsistencyValidator.js"
+    },
+    {
+      "line": 385,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(currentsA[i] - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ConsistencyValidator.js"
+    },
+    {
+      "line": 402,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(voltagesA.length, voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ConsistencyValidator.js"
+    },
+    {
+      "line": 405,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(voltagesA[i] - voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ConsistencyValidator.js"
+    },
+    {
+      "line": 364,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(voltagesA.length, voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "line": 369,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sqrt(voltagesA[i].re ** 2 + voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "line": 373,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sqrt(voltagesB[i].re ** 2 + voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "line": 413,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(powerA.length, power",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "line": 416,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(powerA[i] - power",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "line": 433,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(currentsA.length, current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "line": 436,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.abs(currentsA[i] - current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\CrossEngineValidator.js"
+    },
+    {
+      "line": 208,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(simVoltages.length, refVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js"
+    },
+    {
+      "line": 213,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sqrt(simVoltages[i].re ** 2 + simVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js"
+    },
+    {
+      "line": 217,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sqrt(refVoltages[i].re ** 2 + refVoltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js"
+    },
+    {
+      "line": 259,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.min(simCurrents.length, refCurrent",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js"
+    },
+    {
+      "line": 407,
+      "type": "precision_issue",
+      "pattern": "precision_2",
+      "match": "parseFloat(row.voltage",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js"
+    },
+    {
+      "line": 412,
+      "type": "precision_issue",
+      "pattern": "precision_2",
+      "match": "parseFloat(row.current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\core\\validation\\ExternalValidation.js"
+    },
+    {
+      "line": 22,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "voltage/",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\infra\\config\\ToleranceConfig.js"
+    },
+    {
+      "line": 41,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "impedance-",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\services\\calculo.service.js"
+    },
+    {
+      "line": 202,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sqrt(3) * I * effective_impedance",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\services\\electricalEngine.js"
+    },
+    {
+      "line": 181,
+      "type": "precision_issue",
+      "pattern": "precision_3",
+      "match": "Number(p.potencia_kW ?? 0))\r // power",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\services\\iccFromGraph.js"
+    },
+    {
+      "line": 30,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Voltage -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 33,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "Voltage = 1.0",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 44,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Voltage *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 44,
+      "type": "missing_unit",
+      "pattern": "missing_unit_0",
+      "match": "Voltage * 1000",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 51,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Voltage *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 51,
+      "type": "missing_unit",
+      "pattern": "missing_unit_0",
+      "match": "Voltage * 1000",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 101,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Impedance -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 104,
+      "type": "missing_unit",
+      "pattern": "missing_unit_1",
+      "match": "Impedance = 1.0",
+      "suggestion": "Add explicit unit declaration",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 130,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 131,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 136,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 141,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 142,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 146,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.pow(apparentPower, 2) - Math.pow(activePower",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 153,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 154,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "Power -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 159,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.pow(activePower, 2) + Math.pow(reactivePower",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 231,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "voltage -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 232,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "impedance -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 239,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.sqrt(3) * impedance",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 239,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "voltage /",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 244,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 245,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "impedance -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 250,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current *",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 255,
+      "type": "precision_issue",
+      "pattern": "precision_1",
+      "match": "current -",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    },
+    {
+      "line": 260,
+      "type": "precision_issue",
+      "pattern": "precision_0",
+      "match": "Math.pow(current",
+      "suggestion": "Use toFixed(6) for IEEE standard precision",
+      "severity": "warning",
+      "file": "..\\backend\\src\\utils\\electricalUtils.js"
+    }
+  ],
+  "summary": {
+    "totalIssues": 214,
+    "precisionIssues": 199,
+    "unitMixing": 0,
+    "missingUnits": 15,
+    "functionsWithoutPrecision": 99
+  }
+}

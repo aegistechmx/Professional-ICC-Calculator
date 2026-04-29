@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Loading spinner component
@@ -10,8 +11,8 @@ export default function Loading({ size = 'md', message }) {
   const sizes = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
-    lg: 'h-12 w-12'
-  };
+    lg: 'h-12 w-12',
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
@@ -37,5 +38,10 @@ export default function Loading({ size = 'md', message }) {
       </svg>
       {message && <p className="text-sm text-gray-600">{message}</p>}
     </div>
-  );
+  )
+}
+
+Loading.propTypes = {
+  size: PropTypes.oneOf(['sm', 'md', 'lg']),
+  message: PropTypes.string,
 }

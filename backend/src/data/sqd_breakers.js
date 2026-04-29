@@ -1,7 +1,7 @@
 /**
  * sqd_breakers.js - Schneider Electric / Square D Breaker Database
  * Base de datos de breakers con ajustes LSIG (Long, Short, Instantaneous, Ground)
- * 
+ *
  * LSIG Zones:
  * - L (Long-time): Protección térmica para sobrecarga
  * - S (Short-time): Retardo para fallas de corta duración
@@ -26,10 +26,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.5, default: 0.2 }, // Short delay (seg)
       Ii: { min: 1.5, max: 12, default: 10 }, // Instantáneo (×In)
       Igf: { min: 0.2, max: 0.8, default: 0.5 }, // Ground pickup (×In) - opcional
-      tg: { min: 0.1, max: 0.5, default: 0.2 } // Ground delay (seg) - opcional
+      tg: { min: 0.1, max: 0.5, default: 0.2 }, // Ground delay (seg) - opcional
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-nsx160',
@@ -47,10 +47,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.5, default: 0.2 },
       Ii: { min: 1.5, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-nsx250',
@@ -68,10 +68,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.5, default: 0.2 },
       Ii: { min: 1.5, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-nsx400',
@@ -89,10 +89,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.5, default: 0.2 },
       Ii: { min: 1.5, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-nsx630',
@@ -110,10 +110,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.5, default: 0.2 },
       Ii: { min: 1.5, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-mt-n1-125',
@@ -131,10 +131,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.4, default: 0.2 },
       Ii: { min: 2, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-mt-n2-250',
@@ -152,10 +152,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.4, default: 0.2 },
       Ii: { min: 2, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-mt-n3-400',
@@ -173,10 +173,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.4, default: 0.2 },
       Ii: { min: 2, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-mt-n3-630',
@@ -194,10 +194,10 @@ module.exports = [
       tsd: { min: 0.1, max: 0.4, default: 0.2 },
       Ii: { min: 2, max: 12, default: 10 },
       Igf: { min: 0.2, max: 0.8, default: 0.5 },
-      tg: { min: 0.1, max: 0.5, default: 0.2 }
+      tg: { min: 0.1, max: 0.5, default: 0.2 },
     },
     curva: 'lsig',
-    categoria: 'baja_tension'
+    categoria: 'baja_tension',
   },
   {
     id: 'sqd-easy9-125',
@@ -213,9 +213,9 @@ module.exports = [
       tr: { min: 1, max: 16, default: 5 },
       Isd: { min: 2, max: 10, default: 6 },
       tsd: { min: 0.1, max: 0.4, default: 0.2 },
-      Ii: { min: 2, max: 12, default: 10 }
+      Ii: { min: 2, max: 12, default: 10 },
     },
     curva: 'lsig',
-    categoria: 'residencial'
-  }
-];
+    categoria: 'residencial',
+  },
+]

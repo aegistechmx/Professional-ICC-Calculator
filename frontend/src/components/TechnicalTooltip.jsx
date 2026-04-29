@@ -1,27 +1,29 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { getICCLevel } from '../utils/iccColoring';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { getICCLevel } from '../utils/iccColoring'
 
 /**
  * Technical Tooltip Component
  * Displays detailed electrical parameters with proper formatting
  */
 export default function TechnicalTooltip({ data, type = 'node' }) {
-  if (!data) return null;
+  if (!data) return null
 
   const renderNodeTooltip = () => {
-    const { results, parameters } = data;
-    
+    const { results, parameters } = data
+
     return (
       <div className="p-3 bg-white rounded-lg shadow-lg border border-gray-200 min-w-64">
         <h4 className="text-sm font-semibold text-gray-900 mb-2 border-b border-gray-200 pb-1">
           📊 Parámetros Técnicos
         </h4>
-        
+
         {/* ICC Information */}
         {results?.isc && (
           <div className="mb-3">
-            <h5 className="text-xs font-medium text-gray-700 mb-1">Corriente de Falla (ICC)</h5>
+            <h5 className="text-xs font-medium text-gray-700 mb-1">
+              Corriente de Falla (ICC)
+            </h5>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">ICC (A):</span>
@@ -31,11 +33,11 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">ICC (kA):</span>
-                <span 
+                <span
                   className="font-mono font-semibold px-1 rounded"
                   style={{
                     backgroundColor: getICCLevel(results.isc / 1000).bgColor,
-                    color: getICCLevel(results.isc / 1000).textColor
+                    color: getICCLevel(results.isc / 1000).textColor,
                   }}
                 >
                   {(results.isc / 1000).toFixed(2)}
@@ -43,11 +45,11 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Nivel:</span>
-                <span 
+                <span
                   className="px-1 rounded text-xs"
                   style={{
                     backgroundColor: getICCLevel(results.isc / 1000).bgColor,
-                    color: getICCLevel(results.isc / 1000).textColor
+                    color: getICCLevel(results.isc / 1000).textColor,
                   }}
                 >
                   {getICCLevel(results.isc / 1000).description}
@@ -60,7 +62,9 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
         {/* Impedance Information */}
         {results?.impedance && (
           <div className="mb-3">
-            <h5 className="text-xs font-medium text-gray-700 mb-1">Impedancia Total</h5>
+            <h5 className="text-xs font-medium text-gray-700 mb-1">
+              Impedancia Total
+            </h5>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Z (Ω):</span>
@@ -95,7 +99,9 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
         {/* Voltage Drop Information */}
         {results?.voltageDrop !== undefined && (
           <div className="mb-3">
-            <h5 className="text-xs font-medium text-gray-700 mb-1">Caída de Tensión</h5>
+            <h5 className="text-xs font-medium text-gray-700 mb-1">
+              Caída de Tensión
+            </h5>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-600">Caída (V):</span>
@@ -116,7 +122,9 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
         {/* Design Current */}
         {results?.I_diseño && (
           <div className="mb-3">
-            <h5 className="text-xs font-medium text-gray-700 mb-1">Corriente de Diseño</h5>
+            <h5 className="text-xs font-medium text-gray-700 mb-1">
+              Corriente de Diseño
+            </h5>
             <div className="flex justify-between text-xs">
               <span className="text-gray-600">I Diseño (A):</span>
               <span className="font-mono font-semibold text-teal-600">
@@ -129,14 +137,18 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
         {/* Status Information */}
         {results?.estado && (
           <div className="mb-3">
-            <h5 className="text-xs font-medium text-gray-700 mb-1">Estado de Validación</h5>
+            <h5 className="text-xs font-medium text-gray-700 mb-1">
+              Estado de Validación
+            </h5>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-600">Resultado:</span>
-              <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                results.estado === 'OK' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}>
+              <span
+                className={`px-2 py-1 text-xs font-semibold rounded ${
+                  results.estado === 'OK'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
                 {results.estado}
               </span>
             </div>
@@ -146,7 +158,9 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
         {/* Node-specific parameters */}
         {parameters && (
           <div className="border-t border-gray-200 pt-2">
-            <h5 className="text-xs font-medium text-gray-700 mb-1">Parámetros del Componente</h5>
+            <h5 className="text-xs font-medium text-gray-700 mb-1">
+              Parámetros del Componente
+            </h5>
             <div className="space-y-1">
               {Object.entries(parameters).map(([key, value]) => (
                 <div key={key} className="flex justify-between text-xs">
@@ -160,21 +174,23 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
           </div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
   const renderEdgeTooltip = () => {
-    const { results, material, calibre, longitud, paralelo } = data;
-    
+    const { results, material, calibre, longitud, paralelo } = data
+
     return (
       <div className="p-3 bg-white rounded-lg shadow-lg border border-gray-200 min-w-64">
         <h4 className="text-sm font-semibold text-gray-900 mb-2 border-b border-gray-200 pb-1">
           📊 Parámetros del Cable
         </h4>
-        
+
         {/* Cable Information */}
         <div className="mb-3">
-          <h5 className="text-xs font-medium text-gray-700 mb-1">Características del Cable</h5>
+          <h5 className="text-xs font-medium text-gray-700 mb-1">
+            Características del Cable
+          </h5>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
               <span className="text-gray-600">Material:</span>
@@ -206,7 +222,9 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
         {/* Results Information */}
         {results && (
           <div className="mb-3">
-            <h5 className="text-xs font-medium text-gray-700 mb-1">Resultados del Cálculo</h5>
+            <h5 className="text-xs font-medium text-gray-700 mb-1">
+              Resultados del Cálculo
+            </h5>
             <div className="space-y-1">
               {results.impedance && (
                 <>
@@ -249,11 +267,13 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
               {results.estado && (
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-xs text-gray-600">Estado:</span>
-                  <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                    results.estado === 'OK' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 text-xs font-semibold rounded ${
+                      results.estado === 'OK'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
                     {results.estado}
                   </span>
                 </div>
@@ -262,13 +282,13 @@ export default function TechnicalTooltip({ data, type = 'node' }) {
           </div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
-  return type === 'edge' ? renderEdgeTooltip() : renderNodeTooltip();
+  return type === 'edge' ? renderEdgeTooltip() : renderNodeTooltip()
 }
 
 TechnicalTooltip.propTypes = {
   data: PropTypes.object,
-  type: PropTypes.oneOf(['node', 'edge'])
-};
+  type: PropTypes.oneOf(['node', 'edge']),
+}

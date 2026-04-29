@@ -9,11 +9,11 @@
  * @returns {string} CSS color code
  */
 export function getVoltageColor(Vpu) {
-  if (Vpu < 0.9) return '#ff0000';     // Critical (undervoltage)
-  if (Vpu < 0.95) return '#ff9900';    // Low voltage
-  if (Vpu <= 1.05) return '#00cc00';   // Normal (green)
-  if (Vpu <= 1.1) return '#3399ff';    // High voltage
-  return '#9900ff';                    // Overvoltage (purple)
+  if (Vpu < 0.9) return '#ff0000' // Critical (undervoltage)
+  if (Vpu < 0.95) return '#ff9900' // Low voltage
+  if (Vpu <= 1.05) return '#00cc00' // Normal (green)
+  if (Vpu <= 1.1) return '#3399ff' // High voltage
+  return '#9900ff' // Overvoltage (purple)
 }
 
 /**
@@ -22,11 +22,11 @@ export function getVoltageColor(Vpu) {
  * @returns {string} Status description
  */
 export function getVoltageStatus(Vpu) {
-  if (Vpu < 0.9) return 'CRÍTICO';
-  if (Vpu < 0.95) return 'BAJO';
-  if (Vpu <= 1.05) return 'NORMAL';
-  if (Vpu <= 1.1) return 'ALTO';
-  return 'SOBREVOLTAJE';
+  if (Vpu < 0.9) return 'CRÍTICO'
+  if (Vpu < 0.95) return 'BAJO'
+  if (Vpu <= 1.05) return 'NORMAL'
+  if (Vpu <= 1.1) return 'ALTO'
+  return 'SOBREVOLTAJE'
 }
 
 /**
@@ -40,6 +40,6 @@ export function getVoltageNodeStyle(Vpu) {
     color: '#fff',
     border: '2px solid #222',
     fontSize: '12px',
-    fontWeight: 'bold'
-  };
+    fontWeight: 'bold',
+  }
 }

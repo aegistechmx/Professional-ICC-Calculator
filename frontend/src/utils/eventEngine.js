@@ -11,8 +11,8 @@ export const EVENT_TYPES = {
   TRIP: 'trip',
   RECLOSER: 'recloser',
   OPEN: 'open',
-  CLOSE: 'close'
-};
+  CLOSE: 'close',
+}
 
 /**
  * Create a fault event
@@ -29,9 +29,9 @@ export function createFaultEvent(busId, time = 0, faultData = {}) {
     data: {
       faultType: faultData.faultType || '3P',
       impedance: faultData.impedance || 0,
-      ...faultData
-    }
-  };
+      ...faultData,
+    },
+  }
 }
 
 /**
@@ -44,8 +44,8 @@ export function createTripEvent(relayId, time) {
   return {
     time,
     type: EVENT_TYPES.TRIP,
-    elementId: relayId
-  };
+    elementId: relayId,
+  }
 }
 
 /**
@@ -58,8 +58,8 @@ export function createOpenEvent(breakerId, time) {
   return {
     time,
     type: EVENT_TYPES.OPEN,
-    elementId: breakerId
-  };
+    elementId: breakerId,
+  }
 }
 
 /**
@@ -74,8 +74,8 @@ export function createRecloseEvent(relayId, time, attempt = 1) {
     time,
     type: EVENT_TYPES.RECLOSER,
     elementId: relayId,
-    data: { attempt }
-  };
+    data: { attempt },
+  }
 }
 
 /**
@@ -84,7 +84,7 @@ export function createRecloseEvent(relayId, time, attempt = 1) {
  * @returns {Array} Sorted events
  */
 export function sortEventsByTime(events) {
-  return [...events].sort((a, b) => a.time - b.time);
+  return [...events].sort((a, b) => a.time - b.time)
 }
 
 /**
@@ -94,7 +94,7 @@ export function sortEventsByTime(events) {
  * @returns {Array} Filtered events
  */
 export function filterEventsByType(events, type) {
-  return events.filter(e => e.type === type);
+  return events.filter(e => e.type === type)
 }
 
 /**
@@ -104,7 +104,7 @@ export function filterEventsByType(events, type) {
  * @returns {Object|null} Next event or null
  */
 export function getNextEvent(events, currentTime) {
-  return events.find(e => e.time > currentTime) || null;
+  return events.find(e => e.time > currentTime) || null
 }
 
 /**
@@ -112,51 +112,51 @@ export function getNextEvent(events, currentTime) {
  */
 export class EventQueue {
   constructor() {
-    this.events = [];
-    this.currentTime = 0;
+    this.events = []
+    this.currentTime = 0
   }
-  
+
   /**
    * Add event to queue
    */
   add(event) {
-    this.events.push(event);
-    this.events.sort((a, b) => a.time - b.time);
+    this.events.push(event)
+    this.events.sort((a, b) => a.time - b.time)
   }
-  
+
   /**
    * Get next event
    */
   getNext() {
-    return this.events.shift() || null;
+    return this.events.shift() || null
   }
-  
+
   /**
    * Peek at next event without removing
    */
   peek() {
-    return this.events[0] || null;
+    return this.events[0] || null
   }
-  
+
   /**
    * Check if queue is empty
    */
   isEmpty() {
-    return this.events.length === 0;
+    return this.events.length === 0
   }
-  
+
   /**
    * Get all events
    */
   getAll() {
-    return [...this.events];
+    return [...this.events]
   }
-  
+
   /**
    * Clear queue
    */
   clear() {
-    this.events = [];
-    this.currentTime = 0;
+    this.events = []
+    this.currentTime = 0
   }
 }

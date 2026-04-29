@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * IEC standard breaker symbol
@@ -16,5 +17,9 @@ export default function BreakerIEC({ size = 60 }) {
       {/* Trip indicator circle */}
       <circle cx="30" cy="20" r="3" fill="black" />
     </svg>
-  );
+  )
+}
+
+BreakerIEC.propTypes = {
+  size: PropTypes.number,
 }

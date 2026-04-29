@@ -1,13 +1,14 @@
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Visual snap feedback component
  * Shows guide lines when nodes are aligned with other nodes
  */
 export default function SnapGuideLines({ position, nodes, threshold = 10 }) {
-  const guideLines = [];
+  const guideLines = []
 
-  if (!position) return null;
+  if (!position) return null
 
   nodes.forEach(node => {
     // Check X alignment
@@ -15,8 +16,8 @@ export default function SnapGuideLines({ position, nodes, threshold = 10 }) {
       guideLines.push({
         type: 'vertical',
         x: node.position.x,
-        color: '#3b82f6'
-      });
+        color: '#3b82f6',
+      })
     }
 
     // Check Y alignment
@@ -24,12 +25,12 @@ export default function SnapGuideLines({ position, nodes, threshold = 10 }) {
       guideLines.push({
         type: 'horizontal',
         y: node.position.y,
-        color: '#3b82f6'
-      });
+        color: '#3b82f6',
+      })
     }
-  });
+  })
 
-  if (guideLines.length === 0) return null;
+  if (guideLines.length === 0) return null
 
   return (
     <svg
@@ -40,7 +41,7 @@ export default function SnapGuideLines({ position, nodes, threshold = 10 }) {
         width: '100%',
         height: '100%',
         pointerEvents: 'none',
-        zIndex: 1000
+        zIndex: 1000,
       }}
     >
       {guideLines.map((line, index) => (
@@ -57,5 +58,14 @@ export default function SnapGuideLines({ position, nodes, threshold = 10 }) {
         />
       ))}
     </svg>
-  );
+  )
+}
+
+SnapGuideLines.propTypes = {
+  position: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
+  nodes: PropTypes.array,
+  threshold: PropTypes.number,
 }

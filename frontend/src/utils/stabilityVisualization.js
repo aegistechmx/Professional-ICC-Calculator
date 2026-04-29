@@ -9,21 +9,21 @@
  * @returns {Object} Trajectory visualization data
  */
 export function generateRotorAngleTrajectory(stabilityResult) {
-  const { results, isStable } = stabilityResult;
-  
+  const { results, isStable } = stabilityResult
+
   const trajectory = results.map(r => ({
     time: r.time,
     delta: r.delta,
     omega: r.omega,
-    isStable: r.delta < 180
-  }));
-  
+    isStable: r.delta < 180,
+  }))
+
   return {
     trajectory,
     isStable,
     maxAngle: Math.max(...results.map(r => r.delta)),
-    maxSpeed: Math.max(...results.map(r => r.omega))
-  };
+    maxSpeed: Math.max(...results.map(r => r.omega)),
+  }
 }
 
 /**
@@ -32,14 +32,14 @@ export function generateRotorAngleTrajectory(stabilityResult) {
  * @returns {Object} Swing curve data
  */
 export function generateSwingCurve(stabilityResult) {
-  const { results } = stabilityResult;
-  
+  const { results } = stabilityResult
+
   return {
     time: results.map(r => r.time),
     delta: results.map(r => r.delta),
     omega: results.map(r => r.omega),
-    acceleratingPower: results.map(r => r.acceleratingPower)
-  };
+    acceleratingPower: results.map(r => r.acceleratingPower),
+  }
 }
 
 /**
@@ -48,15 +48,15 @@ export function generateSwingCurve(stabilityResult) {
  * @returns {Object} CCT visualization data
  */
 export function generateCCTVisualization(marginResult) {
-  const { criticalClearingTime, actualClearingTime, margin } = marginResult;
-  
+  const { criticalClearingTime, actualClearingTime, margin } = marginResult
+
   return {
     criticalClearingTime: criticalClearingTime.toFixed(3) + ' s',
     actualClearingTime: actualClearingTime.toFixed(3) + ' s',
     margin: margin.toFixed(3) + ' s',
     marginPercent: marginResult.marginPercent.toFixed(1) + '%',
-    safe: margin > 0
-  };
+    safe: margin > 0,
+  }
 }
 
 /**
@@ -65,13 +65,13 @@ export function generateCCTVisualization(marginResult) {
  * @returns {Object} Mode visualization data
  */
 export function generateOscillationModeVisualization(oscillationModes) {
-  if (!oscillationModes) return null;
-  
+  if (!oscillationModes) return null
+
   return {
     frequency: oscillationModes.oscillationFreq.toFixed(2) + ' Hz',
     dampingRatio: (oscillationModes.dampingRatio * 100).toFixed(1) + '%',
-    modeShape: oscillationModes.modeShape
-  };
+    modeShape: oscillationModes.modeShape,
+  }
 }
 
 /**
@@ -80,7 +80,7 @@ export function generateOscillationModeVisualization(oscillationModes) {
  * @returns {string} Hex color
  */
 export function getStabilityColor(isStable) {
-  return isStable ? '#00cc00' : '#ff0000';
+  return isStable ? '#00cc00' : '#ff0000'
 }
 
 /**
@@ -94,6 +94,6 @@ export function generateMultiMachineComparison(results) {
     isStable: r.stability.isStable,
     maxAngle: r.stability.maxAngle,
     margin: r.margin.margin,
-    color: getStabilityColor(r.stability.isStable)
-  }));
+    color: getStabilityColor(r.stability.isStable),
+  }))
 }

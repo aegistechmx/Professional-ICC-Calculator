@@ -3,7 +3,7 @@
  * Creates and manages fault scenarios for dynamic simulation
  */
 
-import { createFaultEvent, EVENT_TYPES } from './eventEngine';
+import { createFaultEvent } from './eventEngine'
 
 /**
  * Fault types
@@ -12,8 +12,8 @@ export const FAULT_TYPES = {
   THREE_PHASE: '3P',
   LINE_TO_GROUND: 'LG',
   LINE_TO_LINE: 'LL',
-  DOUBLE_LINE_TO_GROUND: 'LLG'
-};
+  DOUBLE_LINE_TO_GROUND: 'LLG',
+}
 
 /**
  * Create a fault scenario
@@ -25,9 +25,9 @@ export function createFaultScenario(scenario) {
     busId,
     faultType = FAULT_TYPES.THREE_PHASE,
     startTime = 0,
-    impedance = 0
-  } = scenario;
-  
+    impedance = 0,
+  } = scenario
+
   return {
     id: `fault_${busId}_${Date.now()}`,
     busId,
@@ -37,11 +37,11 @@ export function createFaultScenario(scenario) {
     events: [
       createFaultEvent(busId, startTime, {
         faultType,
-        impedance
-      })
+        impedance,
+      }),
     ],
-    status: 'pending'
-  };
+    status: 'pending',
+  }
 }
 
 /**
@@ -54,15 +54,17 @@ export function createFaultScenarios(buses, options = {}) {
   const {
     faultType = FAULT_TYPES.THREE_PHASE,
     startTime = 0,
-    impedance = 0
-  } = options;
-  
-  return buses.map(busId => createFaultScenario({
-    busId,
-    faultType,
-    startTime,
-    impedance
-  }));
+    impedance = 0,
+  } = options
+
+  return buses.map(busId =>
+    createFaultScenario({
+      busId,
+      faultType,
+      startTime,
+      impedance,
+    })
+  )
 }
 
 /**
@@ -77,8 +79,8 @@ export function createN1Scenarios(branches) {
     elementId: branch.id || `${branch.from}-${branch.to}`,
     from: branch.from,
     to: branch.to,
-    status: 'pending'
-  }));
+    status: 'pending',
+  }))
 }
 
 /**
@@ -87,34 +89,34 @@ export function createN1Scenarios(branches) {
  * @returns {Object} Validation result
  */
 export function validateFaultScenario(scenario) {
-  const errors = [];
-  const warnings = [];
-  
+  const errors = []
+  const warnings = []
+
   if (!scenario.busId) {
-    errors.push('Bus ID is required');
+    errors.push('Bus ID is required')
   }
-  
+
   if (!scenario.faultType) {
-    errors.push('Fault type is required');
+    errors.push('Fault type is required')
   }
-  
+
   if (!Object.values(FAULT_TYPES).includes(scenario.faultType)) {
-    warnings.push(`Unknown fault type: ${scenario.faultType}`);
+    warnings.push(`Unknown fault type: ${scenario.faultType}`)
   }
-  
+
   if (scenario.startTime < 0) {
-    errors.push('Start time cannot be negative');
+    errors.push('Start time cannot be negative')
   }
-  
+
   if (scenario.impedance < 0) {
-    errors.push('Fault impedance cannot be negative');
+    errors.push('Fault impedance cannot be negative')
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
-    warnings
-  };
+    warnings,
+  }
 }
 
 /**
@@ -125,10 +127,10 @@ export function validateFaultScenario(scenario) {
 export function getFaultTypeDescription(faultType) {
   const descriptions = {
     '3P': 'Three-Phase Fault',
-    'LG': 'Line-to-Ground Fault',
-    'LL': 'Line-to-Line Fault',
-    'LLG': 'Double Line-to-Ground Fault'
-  };
-  
-  return descriptions[faultType] || 'Unknown Fault Type';
+    LG: 'Line-to-Ground Fault',
+    LL: 'Line-to-Line Fault',
+    LLG: 'Double Line-to-Ground Fault',
+  }
+
+  return descriptions[faultType] || 'Unknown Fault Type'
 }

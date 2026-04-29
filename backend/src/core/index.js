@@ -1,13 +1,13 @@
 /**
  * Core Electrical Simulation Engine
- * 
+ *
  * This module exports the unified electrical simulation system
  * that transforms the ICC Calculator from a calculator to an
  * industrial-grade power system simulator.
- * 
+ *
  * Architecture:
  * ReactFlow Editor → ElectricalSystem → Solver Engine → Results
- * 
+ *
  * Phases Implemented:
  * Phase 1: Unified Model + Load Flow ✓
  * Phase 2: Fault Analysis + Topology Validation ✓
@@ -24,25 +24,25 @@ const {
   Transformer,
   Load,
   Motor,
-  Generator
-} = require('./electrical/ElectricalSystem');
+  Generator,
+} = require('../../core')
 
 const {
   convertToElectricalSystem,
-  applySimulationResults
-} = require('./electrical/ReactFlowConverter');
+  applySimulationResults,
+} = require('../../core')
 
 const {
   buildYbus,
   buildSequenceYbus,
   buildZeroSequenceYbus,
-  calculatePowerFlow
-} = require('./electrical/YbusBuilder');
+  calculatePowerFlow,
+} = require('../../core')
 
 const {
   solveLoadFlow,
-  buildJacobian
-} = require('./electrical/NewtonRaphsonSolver');
+  buildJacobian,
+} = require('../../core')
 
 // Phase 2: Fault Analysis & Topology
 const {
@@ -53,8 +53,8 @@ const {
   addComplex,
   subtractComplex,
   multiplyComplex,
-  divideComplex
-} = require('./electrical/SymmetricalComponents');
+  divideComplex,
+} = require('../../core')
 
 const {
   validateTopology,
@@ -63,8 +63,8 @@ const {
   validateTransformerRatios,
   checkThermalLimits,
   validateGrounding,
-  validateSolvability
-} = require('./electrical/TopologyValidator');
+  validateSolvability,
+} = require('../../core')
 
 // Phase 3: Protection & Scenarios
 const {
@@ -77,8 +77,8 @@ const {
   calculateLSIGCoordination,
   getCurveConstants,
   getAvailableCurves,
-  compareCurves
-} = require('./protections/TCCCurves');
+  compareCurves,
+} = require('./protection/TCCCurves')
 
 const {
   ProtectionDevice,
@@ -87,34 +87,27 @@ const {
   buildSelectivityMatrix,
   autoAdjustSettings,
   evaluateSelectivity,
-  generateCoordinationReport
-} = require('./protections/ProtectionCoordination');
+  generateCoordinationReport,
+} = require('./protection/ProtectionCoordination')
 
 const {
   Scenario,
   ScenarioManager,
-  createFaultScenarios
-} = require('./scenarios/ScenarioSystem');
+  createFaultScenarios,
+} = require('./scenarios/ScenarioSystem')
 
 // Phase 5: Industrial Simulation Core (NEW)
-const {
-  SimulationCore,
-  EventQueue
-} = require('./simulation/SimulationCore');
+const { SimulationCore, EventQueue } = require('./simulation/SimulationCore')
 
 const {
   PriorityQueue,
   EventEngine,
-  EventTypes
-} = require('./events/EventEngine');
+  EventTypes,
+} = require('./events/EventEngine')
 
-const {
-  PowerFlowEngine
-} = require('./simulation/PowerFlowEngine');
+const { PowerFlowEngine } = require('./simulation/PowerFlowEngine')
 
-const {
-  DynamicSimulation
-} = require('./simulation/DynamicSimulation');
+const { DynamicSimulation } = require('./simulation/DynamicSimulation')
 
 const {
   SystemValidator,
@@ -123,64 +116,57 @@ const {
   StressTest,
   EdgeCasesTest,
   CascadeTest,
-  ExternalValidation
-} = require('./validation');
+  ExternalValidation,
+} = require('./validation')
 
-const {
-  ToleranceConfig
-} = require('./config');
+const { ToleranceConfig } = require('./config')
 
 const {
   SimulationLogger,
   LogLevel,
   getGlobalLogger,
   setGlobalLogger,
-  logEvent
-} = require('./logging');
+  logEvent,
+} = require('./logging')
 
-const {
-  DeterministicReplay
-} = require('./replay');
+const { DeterministicReplay } = require('./replay')
 
 const {
   SimulationQueue,
-  RedisSimulationQueue
-} = require('./queue/SimulationQueue');
+  RedisSimulationQueue,
+} = require('./queue/SimulationQueue')
 
-const {
-  SparseMatrix,
-  SparseSolver
-} = require('./solver/SparseMatrix');
+const { SparseMatrix, SparseSolver } = require('./solver/SparseMatrix')
 
 const {
   EnhancedReportGenerator,
-  ProfessionalReportGenerator
-} = require('./reporting');
+  ProfessionalReportGenerator,
+} = require('./reporting')
 
 const {
   DirectionalProtection,
-  MultiZoneDirectionalProtection
-} = require('./protections/DirectionalProtection');
+  MultiZoneDirectionalProtection,
+} = require('./protection/DirectionalProtection')
 
 const {
   PhaseGroundProtection,
-  GroundFaultProtection
-} = require('./protections/PhaseGroundProtection');
+  GroundFaultProtection,
+} = require('./protection/PhaseGroundProtection')
 
 const {
   LSIGBreaker,
-  LSIGBreakerCoordination
-} = require('./protections/LSIGBreaker');
+  LSIGBreakerCoordination,
+} = require('./protection/LSIGBreaker')
 
 const {
   ThermalMemory,
-  ThermalMemoryProtection
-} = require('./protections/ThermalMemory');
+  ThermalMemoryProtection,
+} = require('./protection/ThermalMemory')
 
 const {
   CTSaturation,
-  CTSaturationProtection
-} = require('./protections/CTSaturation');
+  CTSaturationProtection,
+} = require('./protection/CTSaturation')
 
 module.exports = {
   // Phase 1: Electrical Model
@@ -193,7 +179,7 @@ module.exports = {
   Generator,
   convertToElectricalSystem,
   applySimulationResults,
-  
+
   // Phase 1: Power Flow
   buildYbus,
   buildSequenceYbus,
@@ -201,7 +187,7 @@ module.exports = {
   calculatePowerFlow,
   solveLoadFlow,
   buildJacobian,
-  
+
   // Phase 2: Fault Analysis
   calculateFault,
   calculateFaultScan,
@@ -211,7 +197,7 @@ module.exports = {
   subtractComplex,
   multiplyComplex,
   divideComplex,
-  
+
   // Phase 2: Topology
   validateTopology,
   detectLoops,
@@ -220,7 +206,7 @@ module.exports = {
   checkThermalLimits,
   validateGrounding,
   validateSolvability,
-  
+
   // Phase 3: TCC Curves
   IEC_CURVES,
   ANSI_CURVES,
@@ -232,7 +218,7 @@ module.exports = {
   getCurveConstants,
   getAvailableCurves,
   compareCurves,
-  
+
   // Phase 3: Protection Coordination
   ProtectionDevice,
   analyzeCoordination,
@@ -241,32 +227,32 @@ module.exports = {
   autoAdjustSettings,
   evaluateSelectivity,
   generateCoordinationReport,
-  
+
   // Phase 3: Directional Protection (NEW)
   DirectionalProtection,
   MultiZoneDirectionalProtection,
-  
+
   // Phase 3: Phase/Ground Protection (NEW)
   PhaseGroundProtection,
   GroundFaultProtection,
-  
+
   // Phase 3: LSIG Breaker Protection (NEW)
   LSIGBreaker,
   LSIGBreakerCoordination,
-  
+
   // Phase 3: Thermal Memory (NEW)
   ThermalMemory,
   ThermalMemoryProtection,
-  
+
   // Phase 3: CT Saturation (NEW)
   CTSaturation,
   CTSaturationProtection,
-  
+
   // Phase 3: Scenarios
   Scenario,
   ScenarioManager,
   createFaultScenarios,
-  
+
   // Phase 5: Industrial Simulation Core
   SimulationCore,
   EventQueue,
@@ -275,7 +261,7 @@ module.exports = {
   PriorityQueue,
   PowerFlowEngine,
   DynamicSimulation,
-  
+
   // Validation
   SystemValidator,
   ConsistencyValidator,
@@ -284,29 +270,29 @@ module.exports = {
   EdgeCasesTest,
   CascadeTest,
   ExternalValidation,
-  
+
   // Configuration (NEW)
   ToleranceConfig,
-  
+
   // Logging (NEW)
   SimulationLogger,
   LogLevel,
   getGlobalLogger,
   setGlobalLogger,
   logEvent,
-  
+
   // Replay (NEW)
   DeterministicReplay,
-  
+
   // Job Queue (NEW)
   SimulationQueue,
   RedisSimulationQueue,
-  
+
   // Sparse Solver (NEW)
   SparseMatrix,
   SparseSolver,
-  
+
   // Enhanced Reporting (NEW)
   EnhancedReportGenerator,
-  ProfessionalReportGenerator
-};
+  ProfessionalReportGenerator,
+}

@@ -4,12 +4,12 @@
  */
 
 // Mock dependencies
-const CONSTANTES = {
+const _CONSTANTES = {
   TCC_SCALE_X: 1,
   TCC_SCALE_Y: 1
 };
 
-const Impedancias = {
+const _Impedancias = {
   magnitud: jest.fn((r, x) => Math.sqrt(r * r + x * x))
 };
 
@@ -40,7 +40,7 @@ describe('TCC Digitalizer Tests', () => {
   describe('procesarPaths', () => {
     test('should process moveto and lineto commands', () => {
       // Mock the procesarPaths function
-      const procesarPaths = (paths, viewport) => {
+      const procesarPaths = (paths, _viewport) => {
         const puntosCurva = [];
 
         paths.forEach(path => {
@@ -99,7 +99,7 @@ describe('TCC Digitalizer Tests', () => {
     });
 
     test('should handle empty or invalid paths', () => {
-      const procesarPaths = (paths, viewport) => {
+      const procesarPaths = (paths, _viewport) => {
         const puntosCurva = [];
 
         paths.forEach(path => {
@@ -131,7 +131,7 @@ describe('TCC Digitalizer Tests', () => {
       const originalCv = global.cv;
       delete global.cv;
 
-      const procesarImagenOpenCV = async (canvas) => {
+      const procesarImagenOpenCV = async (_canvas) => {
         return new Promise((resolve) => {
           if (typeof cv === 'undefined') {
             resolve([]);
