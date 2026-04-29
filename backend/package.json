@@ -48,6 +48,10 @@
     "typescript": "^6.0.3"
   },
   "_moduleAliases": {
-    "@": "src"
+    "@": "src",
+    "@core": "src/core",
+    "@app": "src/application",
+    "@infrastructure": "src/infrastructure",
+    "@shared": "src/shared"
   }
 }

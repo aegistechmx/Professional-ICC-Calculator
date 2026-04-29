@@ -1,25 +1,16 @@
+
 /**
- * powerflow.routes.js - Power flow API routes
+ * api/routes/powerflow.routes.js
  * 
- * Routes:
- * POST /api/powerflow/solve - Solve power flow
- * GET  /api/powerflow/health - Health check
+ * Responsibility: HTTP routes for power flow operations
  */
 
-const express = require('express');
-const router = express.Router();
-const PowerFlowController = require('../../core');
+const router = require('express').Router();
+const powerflowController = require('../controllers/powerflow.controller');
 
 /**
- * POST /api/powerflow/solve
- * Solve power flow using Newton-Raphson method
+ * Power flow routes
  */
-router.post('/solve', PowerFlowController.solvePowerFlow);
-
-/**
- * GET /api/powerflow/health
- * Health check endpoint
- */
-router.get('/health', PowerFlowController.healthCheck);
+router.post('/run', powerflowController.run);
 
 module.exports = router;

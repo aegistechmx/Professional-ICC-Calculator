@@ -1,20 +1,19 @@
-
 /**
- * api/controllers/powerflow.controller.js
+ * api/controllers/opf.controller.js
  * 
- * Responsibility: HTTP controller for power flow operations
+ * Responsibility: HTTP controller for optimal power flow operations
  */
 
-const { runPowerFlow } = require('@/app/powerflow/runPowerFlow');
+const { runOPF } = require('@/app/opf/runOPF');
 
 /**
- * Run power flow via HTTP API
+ * Run optimal power flow via HTTP API
  * @param {Object} req - Express request
  * @param {Object} res - Express response
  */
 exports.run = async (req, res) => {
   try {
-    const result = await runPowerFlow(req.body.system, req.body.options);
+    const result = await runOPF(req.body.system, req.body.options);
     res.json({
       success: true,
       data: result
