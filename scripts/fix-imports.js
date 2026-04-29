@@ -39,11 +39,22 @@ const IMPORT_MAPPINGS = [
   { from: './stability/solvers', to: './stability/solvers' },
   { from: './shortcircuit', to: './shortcircuit' },
   
+  // Job worker mappings
+  { from: '../../../core/powerflow/newton/solver', to: '../../../core/powerflow/solvers' },
+  { from: '../../../core/powerflow/fastDecoupled', to: '../../../core/powerflow/solvers' },
+  { from: '../../../core/powerflow/opf/solver', to: '../../../core/opf/algorithms' },
+  { from: '../../../core/powerflow/dynamics/solver', to: '../../../core/stability/solvers' },
+  { from: '../../../core/powerflow/contingency/generator', to: '../../../core/powerflow/contingency' },
+  { from: '../../../core/powerflow/contingency/evaluator', to: '../../../core/powerflow/contingency' },
+  
   // Protection mappings
   { from: '../../modules/protections/proteccion.service', to: '@/core/protection' },
   { from: '../../middleware/errorHandler', to: '@/api/middlewares/errorHandler' },
   { from: '../../middleware/auth.middleware', to: '@/api/middlewares/errorHandler' },
-  { from: '../../middleware/rateLimiter.middleware', to: '@/api/middlewares/errorHandler' }
+  { from: '../../middleware/rateLimiter.middleware', to: '@/api/middlewares/errorHandler' },
+  
+  // Validation mappings
+  { from: '../config/ToleranceConfig', to: '../config' }
 ];
 
 /**
