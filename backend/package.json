@@ -1,10 +1,10 @@
 {
   "name": "icc-backend",
   "version": "1.0.0",
-  "main": "src/server-new.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "set PORT=3001 && nodemon src/server-new.js",
-    "start": "set PORT=3001 && node src/server-new.js",
+    "dev": "set PORT=3001 && nodemon src/server.js",
+    "start": "set PORT=3001 && node src/server.js",
     "lint": "eslint src/**/*.js",
     "lint:fix": "eslint src/**/*.js --fix",
     "format": "prettier --write \"src/**/*.js\"",
