@@ -1,5 +1,4 @@
 const http = require('http')
-const logger = require('@/infrastructure/logger/logger')
 
 // Simple test server - for full API use Express app (app.js)
 const server = http.createServer((req, res) => {
@@ -20,5 +19,5 @@ const server = http.createServer((req, res) => {
 })
 
 server.listen(3001, () => {
-  logger.info('Servidor ICC en puerto 3001')
+  console.log('✅ Servidor ICC en puerto 3001')
 })
