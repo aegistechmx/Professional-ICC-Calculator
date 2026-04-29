@@ -22,9 +22,10 @@ const IMPORT_MAPPINGS = [
   { from: '@/application/services/simulation', to: '@/application/services/simulation' },
   
   // Infrastructure mappings
-  { from: '@/infrastructure/logger/logger', to: '@/shared/utils/logging' },
+  { from: '@/infrastructure/logger/logger', to: '@/shared/utils/formatting' },
   { from: '@/infrastructure/workers/workerPool', to: '@/infrastructure/workers/workerPool' },
   { from: '@/shared/utils/logging', to: '@/shared/utils/formatting' },
+  { from: '@/shared/utils/formatting', to: '@/shared/utils/formatting' },
   
   // Core mappings
   { from: '@/core/powerflow/solver', to: '@/core/powerflow/solvers' },
@@ -33,6 +34,10 @@ const IMPORT_MAPPINGS = [
   { from: '@/core/powerflow/solvers', to: '@/core/powerflow/solvers' },
   { from: '@/core/opf/algorithms', to: '@/core/opf/algorithms' },
   { from: '@/core/math/Complex', to: '@/shared/math/Complex' },
+  { from: './powerflow/solvers', to: './powerflow/solvers' },
+  { from: './opf/algorithms', to: './opf/algorithms' },
+  { from: './stability/solvers', to: './stability/solvers' },
+  { from: './shortcircuit', to: './shortcircuit' },
   
   // Protection mappings
   { from: '../../modules/protections/proteccion.service', to: '@/core/protection' },
