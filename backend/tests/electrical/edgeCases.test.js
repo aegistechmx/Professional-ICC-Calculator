@@ -14,8 +14,8 @@ const {
   validateElectricalValue,
   calculateShortCircuitCurrent,
   calculateVoltageDrop,
-  calculatePowerLoss
-} = require('../../src/utils/electricalUtils');
+  calculatePowerFactor
+} = require('../../src/shared/utils/electricalUtils');
 
 describe('Electrical Edge Cases Tests', () => {
   describe('Zero and Near-Zero Values', () => {

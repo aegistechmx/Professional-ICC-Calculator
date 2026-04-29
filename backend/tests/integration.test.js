@@ -87,6 +87,30 @@ app.get('/api/jobs/:jobId', (req, res) => {
   });
 });
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  res.status(400).json({ error: err.message || 'Bad request' });
+});
+
+// CORS middleware
+app.use((req, res, next) => {
+  res.header('access-control-allow-origin', '*');
+  res.header('access-control-allow-methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  next();
+});
+
+// Security headers middleware
+app.use((req, res, next) => {
+  res.header('x-content-type-options', 'nosniff');
+  res.header('x-frame-options', 'DENY');
+  next();
+});
+
 describe('API Integration Tests', () => {
   let mockRequest;
 
