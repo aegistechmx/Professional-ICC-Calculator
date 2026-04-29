@@ -1,0 +1,109 @@
+digraph G {
+    rankdir=TB;
+    splines=ortho;
+    nodesep=0.5;
+    ranksep=0.8;
+    fontname="Arial";
+    fontsize=10;
+
+    // ===== ELECTRICAL SYSTEM CLUSTER =====
+    subgraph cluster_electrical {
+      label="⚡ ELECTRICAL SYSTEM";
+      style=filled;
+      color="#3b82f6";
+      fillcolor="#1e3a5f";
+      fontcolor="white";
+      fontsize=14;
+
+    bus1 [label="Bus 1\nSubstation A\n(Slack)" shape=ellipse style=filled fillcolor="#ef4444" fontcolor="white"];
+  bus2 [label="Bus 2\nGenerator B\n(PV)" shape=ellipse style=filled fillcolor="#22c55e" fontcolor="white"];
+  bus3 [label="Bus 3\nLoad C\n(PQ)" shape=ellipse style=filled fillcolor="#f59e0b" fontcolor="white"];
+  bus4 [label="Bus 4\nLoad D\n(PQ)" shape=ellipse style=filled fillcolor="#f59e0b" fontcolor="white"];
+  bus5 [label="Bus 5\nGenerator E\n(PV)" shape=ellipse style=filled fillcolor="#22c55e" fontcolor="white"];
+  bus1 -> bus2 [label="Transmission" color="#60a5fa" penwidth=2];
+  bus2 -> bus3 [label="Distribution" color="#34d399" penwidth=2];
+  bus3 -> bus4 [label="Distribution" color="#34d399" penwidth=2];
+  bus1 -> bus5 [label="Transmission" color="#60a5fa" penwidth=2];
+  bus5 -> bus4 [label="Distribution" color="#34d399" penwidth=2];
+  bus1 -> bus3 [label="Transmission" color="#60a5fa" penwidth=2];
+  }
+
+  subgraph cluster_solver {
+    label="🧠 SOLVER PIPELINE";
+    style=filled;
+    color="#22c55e";
+    fillcolor="#1e3a2a";
+    fontcolor="white";
+    fontsize=14;
+
+    NR [label="Newton-Raphson\nPower Flow" shape=box style=filled fillcolor="#4ade80" fontcolor="black"];
+    PV [label="PV Control\nVoltage Regulation" shape=box style=filled fillcolor="#86efac" fontcolor="black"];
+    LS [label="Line Search\nConvergence" shape=box style=filled fillcolor="#bbf7d0" fontcolor="black"];
+    TR [label="Trust Region\nRobustness" shape=box style=filled fillcolor="#dcfce7" fontcolor="black"];
+    FDLF [label="Fast Decoupled\nIterative" shape=box style=filled fillcolor="#f0fdf4" fontcolor="black"];
+    OPF [label="Optimal Power Flow\nEconomic Dispatch" shape=box style=filled fillcolor="#fef08a" fontcolor="black"];
+    SCOPF [label="Security-Constrained\nN-1 Analysis" shape=box style=filled fillcolor="#fde047" fontcolor="black"];
+
+    NR -> PV -> LS -> TR;
+    NR -> FDLF;
+    OPF -> SCOPF;
+    NR -> OPF [style=dashed label="base"];
+  }
+  
+  subgraph cluster_code {
+    label="🧩 CODE STRUCTURE";
+    style=filled;
+    color="#a855f7";
+    fillcolor="#2e1a4d";
+    fontcolor="white";
+    fontsize=14;
+
+    dir0 [label="CORE" shape=folder style=filled fillcolor="#ef4444" fontcolor="white"];
+  dir1 [label="APPLICATION" shape=folder style=filled fillcolor="#22c55e" fontcolor="white"];
+  dir2 [label="INFRASTRUCTURE" shape=folder style=filled fillcolor="#3b82f6" fontcolor="white"];
+  dir3 [label="INTERFACES" shape=folder style=filled fillcolor="#f59e0b" fontcolor="white"];
+  dir4 [label="SHARED" shape=folder style=filled fillcolor="#8b5cf6" fontcolor="white"];
+  dir5 [label="PLUGINS" shape=folder style=filled fillcolor="#ec4899" fontcolor="white"];
+  keyfile0 [label="core/index.js" shape=note style=filled fillcolor="#fbbf24" fontcolor="black"];
+  keyfile1 [label="application/index.js" shape=note style=filled fillcolor="#fbbf24" fontcolor="black"];
+  keyfile2 [label="server.js" shape=note style=filled fillcolor="#fbbf24" fontcolor="black"];
+  keyfile3 [label="app.js" shape=note style=filled fillcolor="#fbbf24" fontcolor="black"];
+  }
+
+  subgraph cluster_distributed {
+    label="🌐 DISTRIBUTED SYSTEM";
+    style=filled;
+    color="#ec4899";
+    fillcolor="#4a1a3a";
+    fontcolor="white";
+    fontsize=14;
+
+    Queue [label="Redis Queue\nJob Management" shape=cylinder style=filled fillcolor="#f472b6" fontcolor="white"];
+    Scheduler [label="Job Scheduler\nOrchestration" shape=box style=filled fillcolor="#fb7185" fontcolor="white"];
+    Workers [label="Worker Pool\nParallel Processing" shape=box3d style=filled fillcolor="#fda4af" fontcolor="white"];
+    Monitor [label="Monitoring\nBull Board" shape=ellipse style=filled fillcolor="#fecdd3" fontcolor="black"];
+
+    Queue -> Scheduler -> Workers;
+    Scheduler -> Monitor [style=dashed];
+  }
+  
+  // Electrical to Solver
+  NR -> bus1 [style=dashed label="solve" color="#fbbf24"];
+  PV -> bus2 [style=dashed color="#fbbf24"];
+  FDLF -> bus3 [style=dashed color="#fbbf24"];
+
+  // Solver to Code
+  NR -> dir0 [style=dotted label="uses" color="#a855f7"];
+  OPF -> dir0 [style=dotted color="#a855f7"];
+  SCOPF -> dir0 [style=dotted color="#a855f7"];
+
+  // Code to Distributed
+  dir2 -> Queue [style=dotted label="creates" color="#ec4899"];
+  Workers -> dir0 [style=dotted label="executes" color="#ec4899"];
+
+  // Key files to directories
+  keyfile0 -> dir0 [style=dashed color="#fbbf24"];
+  keyfile1 -> dir1 [style=dashed color="#fbbf24"];
+  keyfile2 -> dir2 [style=dashed color="#fbbf24"];
+  keyfile3 -> dir2 [style=dashed color="#fbbf24"];
+  }
