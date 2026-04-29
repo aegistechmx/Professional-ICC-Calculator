@@ -16,6 +16,7 @@ const { buildJacobian } = require('./jacobian')
 const { enforcePVLimits } = require('./pvControl')
 const { lineSearch } = require('./lineSearch')
 const { applyTrustRegion } = require('./trustRegion')
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 
 /**
  * Solve linear system J * x = b using Gaussian elimination
@@ -87,26 +88,26 @@ function solveLinearSystem(J, b) {
 function initializeVoltages(buses) {
   return buses.map(bus => {
     if (bus.type === 'Slack') {
-      const mag = parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))
+      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0)
       // voltage (V)
-      const ang = parseFloat(
-        (((bus.voltage?.angle || 0) * Math.PI) / 180).toFixed(6)
+      const ang = toElectricalPrecision(
+        ((bus.voltage?.angle || 0) * Math.PI) / 180
       )
       // voltage (V)
       return {
-        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
-        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
+        re: toElectricalPrecision(mag * Math.cos(ang)),
+        im: toElectricalPrecision(mag * Math.sin(ang)),
       }
     } else if (bus.type === 'PV') {
-      const mag = parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))
+      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0)
       // voltage (V)
-      const ang = parseFloat(
-        (((bus.voltage?.angle || 0) * Math.PI) / 180).toFixed(6)
+      const ang = toElectricalPrecision(
+        ((bus.voltage?.angle || 0) * Math.PI) / 180
       )
       // voltage (V)
       return {
-        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
-        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
+        re: toElectricalPrecision(mag * Math.cos(ang)),
+        im: toElectricalPrecision(mag * Math.sin(ang)),
       }
     } else {
       // PQ: flat start at 1.0∠0°
@@ -144,13 +145,13 @@ function applyCorrections(V, corrections, buses) {
     if (i === slackIndex) continue
 
     if (correctionIndex < corrections.length) {
-      const dTheta = parseFloat(corrections[correctionIndex].toFixed(6))
-      const currentMag = parseFloat(Math.hypot(V[i].re, V[i].im).toFixed(6))
-      const currentAng = parseFloat(Math.atan2(V[i].im, V[i].re).toFixed(6))
-      const newAng = parseFloat((currentAng + dTheta).toFixed(6))
+      const dTheta = toElectricalPrecision(corrections[correctionIndex])
+      const currentMag = toElectricalPrecision(Math.hypot(V[i].re, V[i].im))
+      const currentAng = toElectricalPrecision(Math.atan2(V[i].im, V[i].re))
+      const newAng = toElectricalPrecision(currentAng + dTheta)
 
-      newV[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))
-      newV[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))
+      newV[i].re = toElectricalPrecision(currentMag * Math.cos(newAng))
+      newV[i].im = toElectricalPrecision(currentMag * Math.sin(newAng))
       correctionIndex++
     }
   }
@@ -158,17 +159,17 @@ function applyCorrections(V, corrections, buses) {
   // Apply magnitude corrections (only PQ buses)
   pq.forEach(i => {
     if (correctionIndex < corrections.length) {
-      const dV = parseFloat(corrections[correctionIndex].toFixed(6))
-      const currentMag = parseFloat(
-        Math.hypot(newV[i].re, newV[i].im).toFixed(6)
+      const dV = toElectricalPrecision(corrections[correctionIndex])
+      const currentMag = toElectricalPrecision(
+        Math.hypot(newV[i].re, newV[i].im)
       )
-      const currentAng = parseFloat(
-        Math.atan2(newV[i].im, newV[i].re).toFixed(6)
+      const currentAng = toElectricalPrecision(
+        Math.atan2(newV[i].im, newV[i].re)
       )
-      const newMag = parseFloat((currentMag + dV).toFixed(6)) // No clamping
+      const newMag = toElectricalPrecision(currentMag + dV) // No clamping
 
-      newV[i].re = parseFloat((newMag * Math.cos(currentAng)).toFixed(6))
-      newV[i].im = parseFloat((newMag * Math.sin(currentAng)).toFixed(6))
+      newV[i].re = toElectricalPrecision(newMag * Math.cos(currentAng))
+      newV[i].im = toElectricalPrecision(newMag * Math.sin(currentAng))
       correctionIndex++
     }
   })

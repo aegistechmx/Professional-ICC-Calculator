@@ -1,4 +1,4 @@
-const { toElectricalPrecision } = require('../../utils/electricalUtils')
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * infrastructure/workers/workerPool.js - Professional worker pool management
  *

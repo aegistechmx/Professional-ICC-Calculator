@@ -6,6 +6,7 @@
  * NO Express, NO axios, NO UI logic
  */
 
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 const { buildYbus } = require('../ybus/buildYbus')
 
 /**
@@ -97,13 +98,13 @@ function solveFDLF(system, options = {}) {
   // Initialize voltages
   const V = system.buses.map(bus => {
     if (bus.type === 'Slack') {
-      const mag = parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))
-      const ang = parseFloat(
-        (((bus.voltage?.angle || 0) * Math.PI) / 180).toFixed(6)
+      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0)
+      const ang = toElectricalPrecision(
+        ((bus.voltage?.angle || 0) * Math.PI) / 180
       )
       return {
-        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
-        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
+        re: toElectricalPrecision(mag * Math.cos(ang)),
+        im: toElectricalPrecision(mag * Math.sin(ang)),
       }
     } else {
       return { re: 1.0, im: 0.0 }
@@ -179,13 +180,13 @@ function solveFDLF(system, options = {}) {
     let correctionIndex = 0
     for (let i = 0; i < system.buses.length; i++) {
       if (i !== slackIndex && correctionIndex < deltaTheta.length) {
-        const dTheta_i = deltaTheta[correctionIndex] * acceleration
-        const currentMag = parseFloat(getV(i).toFixed(6))
-        const currentAng = parseFloat(getTheta(i).toFixed(6))
-        const newAng = parseFloat((currentAng + dTheta_i).toFixed(6))
+        const dTheta_i = toElectricalPrecision(deltaTheta[correctionIndex] * acceleration)
+        const currentMag = toElectricalPrecision(getV(i))
+        const currentAng = toElectricalPrecision(getTheta(i))
+        const newAng = toElectricalPrecision(currentAng + dTheta_i)
 
-        V[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))
-        V[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))
+        V[i].re = toElectricalPrecision(currentMag * Math.cos(newAng))
+        V[i].im = toElectricalPrecision(currentMag * Math.sin(newAng))
         correctionIndex++
       }
     }
@@ -195,13 +196,13 @@ function solveFDLF(system, options = {}) {
     for (let i = 0; i < pqBuses.length; i++) {
       if (correctionIndex < deltaV.length) {
         const busIdx = pqBuses[i]
-        const dV_i = deltaV[correctionIndex] * acceleration
-        const currentMag = parseFloat(getV(busIdx).toFixed(6))
-        const currentAng = parseFloat(getTheta(busIdx).toFixed(6))
-        const newMag = parseFloat((currentMag + dV_i).toFixed(6))
+        const dV_i = toElectricalPrecision(deltaV[correctionIndex] * acceleration)
+        const currentMag = toElectricalPrecision(getV(busIdx))
+        const currentAng = toElectricalPrecision(getTheta(busIdx))
+        const newMag = toElectricalPrecision(currentMag + dV_i)
 
-        V[busIdx].re = parseFloat((newMag * Math.cos(currentAng)).toFixed(6))
-        V[busIdx].im = parseFloat((newMag * Math.sin(currentAng)).toFixed(6))
+        V[busIdx].re = toElectricalPrecision(newMag * Math.cos(currentAng))
+        V[busIdx].im = toElectricalPrecision(newMag * Math.sin(currentAng))
         correctionIndex++
       }
     }

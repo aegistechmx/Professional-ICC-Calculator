@@ -41,8 +41,8 @@ function calculateVoltageDrop(current, resistance, reactance, length = 5) {
     imag: current * reactance * length,
   }
 
-  const magnitude = Math.sqrt(voltageDrop.real ** 2 + voltageDrop.imag ** 2)
-  const angle = Math.atan2(voltageDrop.imag, voltageDrop.real)
+  const magnitude = parseFloat(Math.sqrt(voltageDrop.real ** 2 + voltageDrop.imag ** 2).toFixed(6))
+  const angle = parseFloat(Math.atan2(voltageDrop.imag, voltageDrop.real).toFixed(6))
 
   return {
     magnitude: toElectricalPrecision(magnitude),
@@ -84,7 +84,7 @@ function calculateShortCircuitCurrent(voltage, impedance) {
     if (impedance === 0) {
       throw new Error('Impedance cannot be zero for short circuit calculation')
     }
-    const isc = voltage / (Math.sqrt(3) * impedance)
+    const isc = parseFloat((voltage / (Math.sqrt(3) * impedance)).toFixed(6))
     return toElectricalPrecision(isc)
   }
 
@@ -105,7 +105,7 @@ function calculateShortCircuitCurrent(voltage, impedance) {
     throw new Error('Impedance cannot be zero for short circuit calculation')
   }
 
-  const isc = voltage / (Math.sqrt(3) * z)
+  const isc = parseFloat((voltage / (Math.sqrt(3) * z)).toFixed(6))
   return toElectricalPrecision(isc)
 }
 
@@ -142,7 +142,7 @@ function calculateApparentPower(voltage, current) {
     throw new Error('Current must be a valid number')
   }
 
-  const apparentPower = voltage * current * Math.sqrt(3)
+  const apparentPower = parseFloat((voltage * current * Math.sqrt(3)).toFixed(6))
   return toElectricalPrecision(apparentPower / 1000) // Return in kVA
 }
 
@@ -227,7 +227,7 @@ function validateElectricalParams(params) {
 
   // Validate power
   if (params.power !== undefined) {
-    if (Math.abs(params.power) > 10000) {
+    if (parseFloat(Math.abs(params.power).toFixed(6)) > 10000) {
       errors.push('Power magnitude should not exceed 10 MW')
     }
   }

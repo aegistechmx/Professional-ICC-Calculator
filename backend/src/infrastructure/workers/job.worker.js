@@ -17,6 +17,99 @@ const {
 } = require('../../../core/powerflow/contingency')
 
 /**
+ * Apply contingency to system
+ * @param {Object} system - Power system
+ * @param {Object} contingency - Contingency definition
+ * @returns {Object} Modified system
+ */
+function applyContingency(system, contingency) {
+  const modified = JSON.parse(JSON.stringify(system))
+
+  if (contingency.type === 'line_outage') {
+    const branch = modified.branches.find(b => b.id === contingency.line)
+    if (branch) {
+      branch.R = 9999 // Effectively remove line
+      branch.X = 9999
+    }
+  } else if (contingency.type === 'generator_outage') {
+    const bus = modified.buses.find(b => b.id === contingency.bus)
+    if (bus) {
+      bus.P = 0 // Remove generation
+    }
+  }
+
+  return modified
+}
+
+/**
+ * Calculate scenario metrics
+ * @param {Object} system - Modified system
+ * @param {Object} pfResult - Power flow result
+ * @returns {Object} Scenario metrics
+ */
+function calculateScenarioMetrics(system, pfResult) {
+  const totalLoad = system.buses.reduce(
+    (sum, bus) => sum + (bus.P < 0 ? -bus.P : bus.P),
+    0
+  )
+  const totalGeneration = system.buses.reduce(
+    (sum, bus) => sum + (bus.P > 0 ? bus.P : 0),
+    0
+  )
+
+  // Voltage violations
+  let voltageViolations = 0
+  system.buses.forEach(bus => {
+    const voltage = pfResult.voltages[bus.id]
+    if (voltage) {
+      const magnitude = Math.sqrt(
+        voltage.re * voltage.re + voltage.im * voltage.im
+      )
+      if (magnitude < 0.95 || magnitude > 1.05) {
+        voltageViolations++
+      }
+    }
+  })
+
+  // Line overloads
+  let lineOverloads = 0
+  system.branches.forEach(branch => {
+    const flow = pfResult.flows[branch.id]
+    if (flow && Math.abs(flow) > branch.limit) {
+      lineOverloads++
+    }
+  })
+
+  const minVoltage = Math.min(
+    ...system.buses.map(b => {
+      const voltage = pfResult.voltages[b.id]
+      return voltage
+        ? parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im).toFixed(6))
+        : Infinity
+    })
+  )
+
+  const maxVoltage = Math.max(
+    ...system.buses.map(b => {
+      const voltage = pfResult.voltages[b.id]
+      return voltage
+        ? parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im).toFixed(6))
+        : 0
+    })
+  )
+
+  return {
+    totalLoad,
+    totalGeneration,
+    loadGeneration: totalLoad - totalGeneration,
+    voltageViolations,
+    lineOverloads,
+    minVoltage,
+    maxVoltage,
+  }
+}
+
+/**
  * Handle different job types
  * @param {Object} job - Job specification
  */
@@ -80,31 +173,6 @@ async function handleJob(job, _options) {
   }
 
   return result
-}
-
-/**
- * Apply contingency to system
- * @param {Object} system - Power system
- * @param {Object} contingency - Contingency definition
- * @returns {Object} Modified system
- */
-function applyContingency(system, contingency) {
-  const modified = JSON.parse(JSON.stringify(system))
-
-  if (contingency.type === 'line_outage') {
-    const branch = modified.branches.find(b => b.id === contingency.line)
-    if (branch) {
-      branch.R = 9999 // Effectively remove line
-      branch.X = 9999
-    }
-  } else if (contingency.type === 'generator_outage') {
-    const bus = modified.buses.find(b => b.id === contingency.bus)
-    if (bus) {
-      bus.P = 0 // Remove generation
-    }
-  }
-
-  return modified
 }
 
 /**
@@ -217,74 +285,6 @@ function applyScenarioModifications(system, scenario) {
 }
 
 /**
- * Calculate scenario metrics
- * @param {Object} system - Modified system
- * @param {Object} pfResult - Power flow result
- * @returns {Object} Scenario metrics
- */
-function calculateScenarioMetrics(system, pfResult) {
-  const totalLoad = system.buses.reduce(
-    (sum, bus) => sum + (bus.P < 0 ? -bus.P : bus.P),
-    0
-  )
-  const totalGeneration = system.buses.reduce(
-    (sum, bus) => sum + (bus.P > 0 ? bus.P : 0),
-    0
-  )
-
-  // Voltage violations
-  let voltageViolations = 0
-  system.buses.forEach(bus => {
-    const voltage = pfResult.voltages[bus.id]
-    if (voltage) {
-      const magnitude = Math.sqrt(
-        voltage.re * voltage.re + voltage.im * voltage.im
-      )
-      if (magnitude < 0.95 || magnitude > 1.05) {
-        voltageViolations++
-      }
-    }
-  })
-
-  // Line overloads
-  let lineOverloads = 0
-  system.branches.forEach(branch => {
-    const flow = pfResult.flows[branch.id]
-    if (flow && Math.abs(flow) > branch.limit) {
-      lineOverloads++
-    }
-  })
-
-  const minVoltage = Math.min(
-    ...system.buses.map(b => {
-      const voltage = pfResult.voltages[b.id]
-      return voltage
-        ? Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)
-        : Infinity
-    })
-  )
-
-  const maxVoltage = Math.max(
-    ...system.buses.map(b => {
-      const voltage = pfResult.voltages[b.id]
-      return voltage
-        ? Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)
-        : 0
-    })
-  )
-
-  return {
-    totalLoad,
-    totalGeneration,
-    loadGeneration: totalLoad - totalGeneration,
-    voltageViolations,
-    lineOverloads,
-    minVoltage,
-    maxVoltage,
-  }
-}
-
-/**
  * Calculate Monte Carlo statistics
  * @param {Array} results - Scenario results
  * @returns {Object} Monte Carlo statistics
@@ -315,14 +315,14 @@ function calculateMonteCarloStats(results) {
     statistics: {
       loadGenerationImbalance: {
         mean: meanImbalance,
-        min: Math.min(...loadGenImbalances),
-        max: Math.max(...loadGenImbalances),
+        min: parseFloat(Math.min(...loadGenImbalances).toFixed(6)),
+        max: parseFloat(Math.max(...loadGenImbalances).toFixed(6)),
         std: calculateStandardDeviation(loadGenImbalances, meanImbalance),
       },
       voltageViolations: {
         mean: meanVoltageViolations,
-        min: Math.min(...voltageViolations),
-        max: Math.max(...voltageViolations),
+        min: parseFloat(Math.min(...voltageViolations).toFixed(6)),
+        max: parseFloat(Math.max(...voltageViolations).toFixed(6)),
         std: calculateStandardDeviation(
           voltageViolations,
           meanVoltageViolations

@@ -9,6 +9,7 @@ const router = express.Router()
 
 // Import individual route modules
 const distributedRoutes = require('../../api/routes/distributed.routes')
+const iccRoutes = require('../../api/routes/icc.routes')
 
 // Health check route
 router.get('/health', (req, res) => {
@@ -29,6 +30,8 @@ router.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       distributed: '/api/distributed',
+      icc: '/api/icc',
+      iccInfo: '/api/icc/info',
       powerflow: '/api/powerflow (coming soon)',
       shortcircuit: '/api/shortcircuit (coming soon)',
       opf: '/api/opf (coming soon)',
@@ -38,6 +41,7 @@ router.get('/', (req, res) => {
 
 // Mount route modules
 router.use('/api/distributed', distributedRoutes)
+router.use('/api/icc', iccRoutes)
 
 // 404 handler for unknown routes
 router.use('*', (req, res) => {
@@ -45,7 +49,7 @@ router.use('*', (req, res) => {
     error: 'Endpoint not found',
     path: req.originalUrl,
     method: req.method,
-    availableEndpoints: ['/health', '/', '/api/distributed/*'],
+    availableEndpoints: ['/health', '/', '/api/distributed/*', '/api/icc', '/api/icc/info'],
   })
 })
 

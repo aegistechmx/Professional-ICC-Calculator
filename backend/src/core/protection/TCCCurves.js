@@ -1,4 +1,12 @@
 /**
+ * core/protection/TCCCurves.js - Time-Current Curve calculations
+ *
+ * Responsibility: Implement IEEE and IEC standard TCC curves
+ */
+
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
+
+/**
  * TCCCurves - Time-Current Characteristic Curves (IEC/ANSI)
  *
  * Implements standard TCC curves for overcurrent protection:
@@ -100,7 +108,7 @@ function generateTCCCurve(params) {
   const step = (logMax - logMin) / points
 
   for (let i = 0; i <= points; i++) {
-    const current = parseFloat(Math.pow(10, logMin + i * step).toFixed(6))
+    const current = toElectricalPrecision(Math.pow(10, logMin + i * step))
     // current (A)
     const time = calculateOperatingTime({
       pickup,

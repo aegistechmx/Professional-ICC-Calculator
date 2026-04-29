@@ -4,6 +4,8 @@
  * Responsibility: Implement Newton-Raphson algorithm for power flow analysis
  */
 
+const { toElectricalPrecision } = require('../../../shared/utils/electricalUtils')
+
 class NewtonRaphsonSolver {
   constructor(options = {}) {
     this.tolerance = options.tolerance || 1e-6
@@ -335,12 +337,12 @@ class NewtonRaphsonSolver {
       const V_to = voltages[to]
 
       const V_from_complex = this.polarToComplex(
-        parseFloat((V_from.magnitude || 1.0).toFixed(6)),
-        parseFloat((V_from.angle || 0.0).toFixed(6))
+        toElectricalPrecision(V_from.magnitude || 1.0),
+        toElectricalPrecision(V_from.angle || 0.0)
       )
       const V_to_complex = this.polarToComplex(
-        parseFloat((V_to.magnitude || 1.0).toFixed(6)),
-        parseFloat((V_to.angle || 0.0).toFixed(6))
+        toElectricalPrecision(V_to.magnitude || 1.0),
+        toElectricalPrecision(V_to.angle || 0.0)
       )
 
       const y = ybus[from][to] || { real: 0.01, imag: 0.03 }
@@ -473,7 +475,7 @@ class NewtonRaphsonSolver {
 
   calculateLosses(power, _branch) {
     // Simplified loss calculation
-    return parseFloat((Math.abs(power.real) * 0.02).toFixed(6)) // 2% loss assumption
+    return toElectricalPrecision(Math.abs(power.real) * 0.02) // 2% loss assumption
   }
 }
 
