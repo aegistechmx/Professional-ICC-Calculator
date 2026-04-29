@@ -14,7 +14,7 @@
  * @class CrossEngineValidator
  */
 
-const { ToleranceConfig } = require('../config/ToleranceConfig')
+const { ToleranceConfig } = require('../config')
 
 class CrossEngineValidator {
   /**

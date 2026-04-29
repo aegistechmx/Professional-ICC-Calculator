@@ -5,12 +5,8 @@
  */
 
 const { parentPort } = require('worker_threads');
-const { solveNR } = require('@/core')/powerflow/newton/solver');
-const { solveFDLF } = require('@/core')/powerflow/fastDecoupled');
-const { solveOPF } = require('@/core')/powerflow/opf/solver');
-const { simulateDynamics } = require('@/core')/powerflow/dynamics/solver');
-const { generateN1Contingencies } = require('@/core')/powerflow/contingency/generator');
-const { evaluateSecurityConstraints } = require('@/core')/powerflow/contingency/evaluator');
+const { PowerFlowSolver } = require('../../core/powerflow/solvers');
+const SimulationLogger = require('../../debug/simulation');
 
 /**
  * Handle different simulation types
