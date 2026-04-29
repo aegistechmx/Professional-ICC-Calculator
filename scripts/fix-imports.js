@@ -18,19 +18,27 @@ const IMPORT_MAPPINGS = [
   { from: '@/app/powerflow/runPowerFlow', to: '@/application/services/powerflow' },
   { from: '@/app/simulation/runSimulation', to: '@/application/services/simulation' },
   { from: '@/app/services/simulation.service', to: '@/application/services/simulation' },
+  { from: '@/application/services/protection', to: '@/core/protection' },
+  { from: '@/application/services/simulation', to: '@/application/services/simulation' },
   
   // Infrastructure mappings
   { from: '@/infrastructure/logger/logger', to: '@/shared/utils/logging' },
   { from: '@/infrastructure/workers/workerPool', to: '@/infrastructure/workers/workerPool' },
+  { from: '@/shared/utils/logging', to: '@/shared/utils/formatting' },
   
   // Core mappings
   { from: '@/core/powerflow/solver', to: '@/core/powerflow/solvers' },
   { from: '@/core/powerflow/newton/solver', to: '@/core/powerflow/solvers' },
   { from: '@/core/powerflow/fastDecoupled', to: '@/core/powerflow/solvers' },
+  { from: '@/core/powerflow/solvers', to: '@/core/powerflow/solvers' },
+  { from: '@/core/opf/algorithms', to: '@/core/opf/algorithms' },
+  { from: '@/core/math/Complex', to: '@/shared/math/Complex' },
   
   // Protection mappings
-  { from: '../../modules/protections/proteccion.service', to: '@/application/services/protection' },
-  { from: '../../middleware/errorHandler', to: '@/api/middlewares/errorHandler' }
+  { from: '../../modules/protections/proteccion.service', to: '@/core/protection' },
+  { from: '../../middleware/errorHandler', to: '@/api/middlewares/errorHandler' },
+  { from: '../../middleware/auth.middleware', to: '@/api/middlewares/errorHandler' },
+  { from: '../../middleware/rateLimiter.middleware', to: '@/api/middlewares/errorHandler' }
 ];
 
 /**
