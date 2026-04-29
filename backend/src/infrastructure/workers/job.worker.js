@@ -20,7 +20,7 @@ const {
  * Handle different job types
  * @param {Object} job - Job specification
  */
-async function handleJob(job) {
+async function handleJob(job, _options) {
   const { type, data } = job
   let result
 

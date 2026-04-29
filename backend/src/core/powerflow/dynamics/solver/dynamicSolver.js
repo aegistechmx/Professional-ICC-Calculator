@@ -31,7 +31,7 @@ class DynamicPowerFlowSolver {
     // Create generator models
     this.generators = []
     this.generatorStates = [] // Initialize state array
-    model.buses.forEach((bus, i) => {
+    model.buses.forEach((bus, _i) => {
       if (bus.type === 'PV' && bus.P > 0) {
         this.generators.push(
           new Generator({
@@ -95,7 +95,7 @@ class DynamicPowerFlowSolver {
       // Check if state array has values for this generator
       const generatorIndex = i
       if (this.generatorStates.length > generatorIndex * 2 + 1) {
-        const genState = {
+        const _genState = {
           delta: this.generatorStates[generatorIndex * 2], // δ for generator i
           omega: this.generatorStates[generatorIndex * 2 + 1], // ω for generator i
         }
@@ -171,17 +171,17 @@ class DynamicPowerFlowSolver {
       if (adaptiveDt) {
         const step = rk4Adaptive(
           state,
-          s => derivatives,
+          _s => derivatives,
           dt,
           this.options.tolerance
         )
         newState = step.state
       } else {
-        newState = rk4Step(state, s => derivatives, dt)
+        newState = rk4Step(state, _s => derivatives, dt)
       }
 
       // Update generator states
-      this.generators.forEach((gen, i) => {
+      this.generators.forEach((gen, _i) => {
         gen.delta = newState[i * 2]
         gen.omega = newState[i * 2 + 1]
       })

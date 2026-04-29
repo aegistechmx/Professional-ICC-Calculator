@@ -45,13 +45,13 @@ function applyUpdate(V, delta, alpha) {
   // Apply angle corrections
   for (let i = 0; i < V.length; i++) {
     if (correctionIndex < delta.length) {
-      const dTheta = delta[correctionIndex] * alpha
-      const currentMag = Math.hypot(V[i].re, V[i].im)
-      const currentAng = Math.atan2(V[i].im, V[i].re)
-      const newAng = currentAng + dTheta
+      const dTheta = parseFloat((delta[correctionIndex] * alpha).toFixed(6))
+      const currentMag = parseFloat(Math.hypot(V[i].re, V[i].im).toFixed(6))
+      const currentAng = parseFloat(Math.atan2(V[i].im, V[i].re).toFixed(6))
+      const newAng = parseFloat((currentAng + dTheta).toFixed(6))
 
-      newV[i].re = currentMag * Math.cos(newAng)
-      newV[i].im = currentMag * Math.sin(newAng)
+      newV[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))
+      newV[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))
       correctionIndex++
     }
   }

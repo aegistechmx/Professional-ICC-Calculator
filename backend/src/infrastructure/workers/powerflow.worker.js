@@ -5,8 +5,8 @@
  * NO Express, NO axios, NO UI logic
  */
 
-const { parentPort, workerData } = require('worker_threads')
-const { PowerFlowSolver } = require('../../core/powerflow/solvers')
+const { parentPort, _workerData } = require('worker_threads')
+const { _PowerFlowSolver } = require('../../core/powerflow/solvers')
 
 /**
  * Handle worker message

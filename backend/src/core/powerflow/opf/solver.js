@@ -8,9 +8,9 @@
 
 const { solve } = require('../solver')
 const { solveFDLF } = require('../fastDecoupled')
-const { totalCost, costGradient, costHessian } = require('./objective')
+const { totalCost, costGradient, _costHessian } = require('./objective')
 const {
-  enforcePowerBalance,
+  _enforcePowerBalance,
   checkAllConstraints,
   checkGenerationLimits,
 } = require('./constraints')
@@ -62,7 +62,7 @@ class NewtonOPFSolver {
     const { powerFlowMethod, tolerance, maxIterations } = this.options
 
     // Update model with current generation
-    this.generators.forEach((gen, i) => {
+    this.generators.forEach((gen, _i) => {
       const bus = this.model.buses.find(b => b.id === gen.bus)
       if (bus) {
         bus.P = gen.P
@@ -122,7 +122,7 @@ class NewtonOPFSolver {
    * @param {Object} pfResult - Power flow results
    * @returns {Array} Gradient vector
    */
-  buildGradient(pfResult) {
+  buildGradient(_pfResult) {
     const n = this.generators.length
     const gradient = Array(n).fill(0)
 
@@ -133,7 +133,7 @@ class NewtonOPFSolver {
     const Pgen = this.generators.map(g => g.P)
     const loads = this.model.buses.filter(b => b.type === 'PQ').map(b => b.P)
     const totalLoad = loads.reduce((sum, P) => sum + P, 0)
-    const powerMismatch = Pgen.reduce((sum, P) => sum + P, 0) - totalLoad
+    const _powerMismatch = Pgen.reduce((sum, P) => sum + P, 0) - totalLoad
 
     for (let i = 0; i < n; i++) {
       gradient[i] = costGrad[i] + this.lambda * 1 // Power balance
@@ -214,6 +214,7 @@ class NewtonOPFSolver {
       violations: [],
     }
 
+    // eslint-disable-next-line no-console
     console.log('Starting Newton-OPF optimization...')
 
     for (let iter = 0; iter < this.options.maxIterations; iter++) {
@@ -277,9 +278,11 @@ class NewtonOPFSolver {
       this.options
     )
 
+    // eslint-disable-next-line no-console
     console.log(
       `Newton-OPF ${results.converged ? 'converged' : 'did not converge'} in ${results.iterations} iterations`
     )
+    // eslint-disable-next-line no-console
     console.log(`Final cost: $${results.cost.toFixed(2)}`)
 
     return results

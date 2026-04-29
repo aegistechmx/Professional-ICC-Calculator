@@ -100,7 +100,7 @@ function generateTCCCurve(params) {
   const step = (logMax - logMin) / points
 
   for (let i = 0; i <= points; i++) {
-    const current = Math.pow(10, logMin + i * step)
+    const current = parseFloat(Math.pow(10, logMin + i * step).toFixed(6))
     // current (A)
     const time = calculateOperatingTime({
       pickup,

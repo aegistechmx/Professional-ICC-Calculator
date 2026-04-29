@@ -45,6 +45,7 @@ class SCOPFSolver {
 
     // Generate contingencies
     this.contingencies = generateN1Contingencies(model)
+    // eslint-disable-next-line no-console
     console.log(
       `Generated ${this.contingencies.length} N-1 contingencies for SCOPF`
     )
@@ -55,6 +56,7 @@ class SCOPFSolver {
    * @returns {Object} SCOPF results
    */
   solve() {
+    // eslint-disable-next-line no-console
     console.log('Starting SCOPF (Security-Constrained OPF) optimization...')
 
     const results = {
@@ -74,17 +76,20 @@ class SCOPFSolver {
     }
 
     // 1. Solve base case OPF
+    // eslint-disable-next-line no-console
     console.log('1. Solving base case OPF...')
     results.baseOPF = this.opfSolver.solve()
     results.cost = results.baseOPF.cost
     results.iterations = results.baseOPF.iterations
 
     if (!results.baseOPF.converged) {
+      // eslint-disable-next-line no-console
       console.log('Base case OPF did not converge')
       return results
     }
 
     // 2. Evaluate security constraints
+    // eslint-disable-next-line no-console
     console.log('2. Evaluating security constraints...')
     const securityEval = evaluateSecurityConstraints(
       this.model,
@@ -106,6 +111,7 @@ class SCOPFSolver {
     results.summary.secure = securityEval.secure
 
     if (securityEval.secure) {
+      // eslint-disable-next-line no-console
       console.log('Base case is secure - SCOPF complete')
       results.converged = true
       results.secureSolution = results.baseOPF
@@ -113,6 +119,7 @@ class SCOPFSolver {
     }
 
     // 3. Security-constrained optimization
+    // eslint-disable-next-line no-console
     console.log('3. Applying security constraints...')
     results.contingencies = this.applySecurityConstraints(
       results.baseOPF,
@@ -120,6 +127,7 @@ class SCOPFSolver {
     )
 
     // 4. Re-solve OPF with constraints
+    // eslint-disable-next-line no-console
     console.log('4. Re-solving OPF with security constraints...')
     const constrainedOPF = this.solveWithSecurityConstraints(
       results.contingencies
@@ -130,9 +138,11 @@ class SCOPFSolver {
     results.cost = constrainedOPF.cost
     results.iterations += constrainedOPF.iterations
 
+    // eslint-disable-next-line no-console
     console.log(
       `SCOPF ${results.converged ? 'converged' : 'did not converge'} in ${results.iterations} total iterations`
     )
+    // eslint-disable-next-line no-console
     console.log(`Final cost: $${results.cost.toFixed(2)}`)
 
     return results

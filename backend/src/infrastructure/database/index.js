@@ -27,6 +27,7 @@ function createConnection() {
     config,
     connected: false,
     query: async (sql, params) => {
+      // eslint-disable-next-line no-console
       console.log('DB Query:', sql, params)
       return { rows: [] }
     },
@@ -38,12 +39,14 @@ function createConnection() {
  * @returns {Promise} Database initialization
  */
 async function initializeDatabase() {
+  // eslint-disable-next-line no-console
   console.log('Initializing database...')
   const db = createConnection()
 
   // Create tables if they don't exist
   await createTables(db)
 
+  // eslint-disable-next-line no-console
   console.log('Database initialized')
   return db
 }

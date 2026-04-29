@@ -5,8 +5,8 @@
  */
 
 const { parentPort } = require('worker_threads')
-const { PowerFlowSolver } = require('../../core/powerflow/solvers')
-const SimulationLogger = require('../../debug/simulation')
+const { _PowerFlowSolver } = require('../../core/powerflow/solvers')
+const { _SimulationLogger } = require('../../debug/simulation')
 
 /**
  * Handle different simulation types

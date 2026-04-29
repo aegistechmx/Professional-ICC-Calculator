@@ -87,22 +87,26 @@ function solveLinearSystem(J, b) {
 function initializeVoltages(buses) {
   return buses.map(bus => {
     if (bus.type === 'Slack') {
-      const mag = bus.voltage?.magnitude || 1.0
+      const mag = parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))
       // voltage (V)
-      const ang = ((bus.voltage?.angle || 0) * Math.PI) / 180
+      const ang = parseFloat(
+        (((bus.voltage?.angle || 0) * Math.PI) / 180).toFixed(6)
+      )
       // voltage (V)
       return {
-        re: mag * Math.cos(ang),
-        im: mag * Math.sin(ang),
+        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
+        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
       }
     } else if (bus.type === 'PV') {
-      const mag = bus.voltage?.magnitude || 1.0
+      const mag = parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))
       // voltage (V)
-      const ang = ((bus.voltage?.angle || 0) * Math.PI) / 180
+      const ang = parseFloat(
+        (((bus.voltage?.angle || 0) * Math.PI) / 180).toFixed(6)
+      )
       // voltage (V)
       return {
-        re: mag * Math.cos(ang),
-        im: mag * Math.sin(ang),
+        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
+        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
       }
     } else {
       // PQ: flat start at 1.0∠0°
@@ -140,13 +144,13 @@ function applyCorrections(V, corrections, buses) {
     if (i === slackIndex) continue
 
     if (correctionIndex < corrections.length) {
-      const dTheta = corrections[correctionIndex]
-      const currentMag = Math.hypot(V[i].re, V[i].im)
-      const currentAng = Math.atan2(V[i].im, V[i].re)
-      const newAng = currentAng + dTheta
+      const dTheta = parseFloat(corrections[correctionIndex].toFixed(6))
+      const currentMag = parseFloat(Math.hypot(V[i].re, V[i].im).toFixed(6))
+      const currentAng = parseFloat(Math.atan2(V[i].im, V[i].re).toFixed(6))
+      const newAng = parseFloat((currentAng + dTheta).toFixed(6))
 
-      newV[i].re = currentMag * Math.cos(newAng)
-      newV[i].im = currentMag * Math.sin(newAng)
+      newV[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))
+      newV[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))
       correctionIndex++
     }
   }
@@ -154,13 +158,17 @@ function applyCorrections(V, corrections, buses) {
   // Apply magnitude corrections (only PQ buses)
   pq.forEach(i => {
     if (correctionIndex < corrections.length) {
-      const dV = corrections[correctionIndex]
-      const currentMag = Math.hypot(newV[i].re, newV[i].im)
-      const currentAng = Math.atan2(newV[i].im, newV[i].re)
-      const newMag = currentMag + dV // No clamping
+      const dV = parseFloat(corrections[correctionIndex].toFixed(6))
+      const currentMag = parseFloat(
+        Math.hypot(newV[i].re, newV[i].im).toFixed(6)
+      )
+      const currentAng = parseFloat(
+        Math.atan2(newV[i].im, newV[i].re).toFixed(6)
+      )
+      const newMag = parseFloat((currentMag + dV).toFixed(6)) // No clamping
 
-      newV[i].re = newMag * Math.cos(currentAng)
-      newV[i].im = newMag * Math.sin(currentAng)
+      newV[i].re = parseFloat((newMag * Math.cos(currentAng)).toFixed(6))
+      newV[i].im = parseFloat((newMag * Math.sin(currentAng)).toFixed(6))
       correctionIndex++
     }
   })

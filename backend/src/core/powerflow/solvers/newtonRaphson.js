@@ -335,12 +335,12 @@ class NewtonRaphsonSolver {
       const V_to = voltages[to]
 
       const V_from_complex = this.polarToComplex(
-        V_from.magnitude || 1.0,
-        V_from.angle || 0.0
+        parseFloat((V_from.magnitude || 1.0).toFixed(6)),
+        parseFloat((V_from.angle || 0.0).toFixed(6))
       )
       const V_to_complex = this.polarToComplex(
-        V_to.magnitude || 1.0,
-        V_to.angle || 0.0
+        parseFloat((V_to.magnitude || 1.0).toFixed(6)),
+        parseFloat((V_to.angle || 0.0).toFixed(6))
       )
 
       const y = ybus[from][to] || { real: 0.01, imag: 0.03 }
@@ -359,7 +359,8 @@ class NewtonRaphsonSolver {
         to: branch.to,
         power: powerShare,
         reactive: S.imag || 0.1,
-        current: Math.sqrt(I.real ** 2 + I.imag ** 2) || 1.0,
+        current:
+          parseFloat(Math.sqrt(I.real ** 2 + I.imag ** 2).toFixed(6)) || 1.0,
         losses: this.calculateLosses(S, branch),
       })
     })
@@ -472,7 +473,7 @@ class NewtonRaphsonSolver {
 
   calculateLosses(power, _branch) {
     // Simplified loss calculation
-    return Math.abs(power.real) * 0.02 // 2% loss assumption
+    return parseFloat((Math.abs(power.real) * 0.02).toFixed(6)) // 2% loss assumption
   }
 }
 

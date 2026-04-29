@@ -15,6 +15,7 @@ const { solveNR, solveFDLF } = require('@/core/powerflow/solvers')
 async function runPowerFlow(system, options = {}) {
   const { method = 'FDLF', tolerance = 1e-6, maxIterations = 20 } = options
 
+  // eslint-disable-next-line no-console
   console.log('⚡ PowerFlow: Running ' + method + ' analysis...')
 
   let result
@@ -29,6 +30,7 @@ async function runPowerFlow(system, options = {}) {
       throw new Error('Unknown power flow method: ' + method)
   }
 
+  // eslint-disable-next-line no-console
   console.log(
     '⚡ PowerFlow: ' +
       (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +

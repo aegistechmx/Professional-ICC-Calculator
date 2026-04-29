@@ -42,10 +42,10 @@ async function runOPF(system, options = {}) {
   // eslint-disable-next-line no-console
   console.log(
     '⚡ OPF: ' +
-    (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +
-    ' in ' +
-    result.iterations +
-    ' iterations'
+      (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +
+      ' in ' +
+      result.iterations +
+      ' iterations'
   )
   // eslint-disable-next-line no-console
   console.log('⚡ OPF: Final cost: $' + result.cost.toFixed(2))

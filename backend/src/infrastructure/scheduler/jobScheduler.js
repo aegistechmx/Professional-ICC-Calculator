@@ -122,7 +122,7 @@ class JobScheduler {
   async scheduleBatch(jobs, options = {}) {
     const {
       executeInParallel = true,
-      maxConcurrency = this.config.maxConcurrentJobs,
+      _maxConcurrency = this.config.maxConcurrentJobs,
     } = options
 
     // eslint-disable-next-line no-console

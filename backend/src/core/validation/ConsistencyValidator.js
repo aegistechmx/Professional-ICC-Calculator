@@ -393,9 +393,9 @@ class ConsistencyValidator {
     // current (A)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = Math.abs(currentsA[i] - currentsB[i])
+      const diff = parseFloat(Math.abs(currentsA[i] - currentsB[i]).toFixed(6))
       // current (A)
-      maxDiff = Math.max(maxDiff, diff)
+      maxDiff = parseFloat(Math.max(maxDiff, diff).toFixed(6))
     }
 
     return maxDiff
@@ -415,9 +415,9 @@ class ConsistencyValidator {
     // voltage (V)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = Math.abs(voltagesA[i] - voltagesB[i])
+      const diff = parseFloat(Math.abs(voltagesA[i] - voltagesB[i]).toFixed(6))
       // voltage (V)
-      maxDiff = Math.max(maxDiff, diff)
+      maxDiff = parseFloat(Math.max(maxDiff, diff).toFixed(6))
     }
 
     return maxDiff

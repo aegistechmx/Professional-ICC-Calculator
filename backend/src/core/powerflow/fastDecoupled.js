@@ -87,19 +87,24 @@ function solveFDLF(system, options = {}) {
   })
 
   const slackIndex = slack.length > 0 ? slack[0] : -1
-  const pvBuses = pv
+  const _pvBuses = pv
   const pqBuses = pq
 
   // Build decoupled matrices
-  const { Bp, indices: angleIndices } = buildBprime(B, slackIndex)
-  const { Bpp, indices: voltageIndices } = buildBdoubleprime(B, pqBuses)
+  const { Bp, indices: _angleIndices } = buildBprime(B, slackIndex)
+  const { Bpp, indices: _voltageIndices } = buildBdoubleprime(B, pqBuses)
 
   // Initialize voltages
   const V = system.buses.map(bus => {
     if (bus.type === 'Slack') {
-      const mag = bus.voltage?.magnitude || 1.0
-      const ang = ((bus.voltage?.angle || 0) * Math.PI) / 180
-      return { re: mag * Math.cos(ang), im: mag * Math.sin(ang) }
+      const mag = parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))
+      const ang = parseFloat(
+        (((bus.voltage?.angle || 0) * Math.PI) / 180).toFixed(6)
+      )
+      return {
+        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
+        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
+      }
     } else {
       return { re: 1.0, im: 0.0 }
     }
@@ -175,12 +180,12 @@ function solveFDLF(system, options = {}) {
     for (let i = 0; i < system.buses.length; i++) {
       if (i !== slackIndex && correctionIndex < deltaTheta.length) {
         const dTheta_i = deltaTheta[correctionIndex] * acceleration
-        const currentMag = getV(i)
-        const currentAng = getTheta(i)
-        const newAng = currentAng + dTheta_i
+        const currentMag = parseFloat(getV(i).toFixed(6))
+        const currentAng = parseFloat(getTheta(i).toFixed(6))
+        const newAng = parseFloat((currentAng + dTheta_i).toFixed(6))
 
-        V[i].re = currentMag * Math.cos(newAng)
-        V[i].im = currentMag * Math.sin(newAng)
+        V[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))
+        V[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))
         correctionIndex++
       }
     }
@@ -191,12 +196,12 @@ function solveFDLF(system, options = {}) {
       if (correctionIndex < deltaV.length) {
         const busIdx = pqBuses[i]
         const dV_i = deltaV[correctionIndex] * acceleration
-        const currentMag = getV(busIdx)
-        const currentAng = getTheta(busIdx)
-        const newMag = currentMag + dV_i
+        const currentMag = parseFloat(getV(busIdx).toFixed(6))
+        const currentAng = parseFloat(getTheta(busIdx).toFixed(6))
+        const newMag = parseFloat((currentMag + dV_i).toFixed(6))
 
-        V[busIdx].re = newMag * Math.cos(currentAng)
-        V[busIdx].im = newMag * Math.sin(currentAng)
+        V[busIdx].re = parseFloat((newMag * Math.cos(currentAng)).toFixed(6))
+        V[busIdx].im = parseFloat((newMag * Math.sin(currentAng)).toFixed(6))
         correctionIndex++
       }
     }

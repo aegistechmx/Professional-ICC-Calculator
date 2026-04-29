@@ -379,16 +379,20 @@ class CrossEngineValidator {
       const valA =
         typeof voltagesA[i] === 'object'
           ? // voltage (V)
-            Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2)
-          : voltagesA[i]
+            parseFloat(
+              Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2).toFixed(6)
+            )
+          : parseFloat(voltagesA[i].toFixed(6))
       const valB =
         typeof voltagesB[i] === 'object'
           ? // voltage (V)
-            Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2)
-          : voltagesB[i]
+            parseFloat(
+              Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2).toFixed(6)
+            )
+          : parseFloat(voltagesB[i].toFixed(6))
 
-      const diff = Math.abs(valA - valB)
-      maxDiff = Math.max(maxDiff, diff)
+      const diff = parseFloat(Math.abs(valA - valB).toFixed(6))
+      maxDiff = parseFloat(Math.max(maxDiff, diff).toFixed(6))
     }
 
     return maxDiff

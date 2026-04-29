@@ -77,10 +77,13 @@ class Logger {
     )
 
     if (level === LogLevel.ERROR) {
+      // eslint-disable-next-line no-console
       console.error(`${color}${formatted}${reset}`)
     } else if (level === LogLevel.WARN) {
+      // eslint-disable-next-line no-console
       console.warn(`${color}${formatted}${reset}`)
     } else {
+      // eslint-disable-next-line no-console
       console.log(`${color}${formatted}${reset}`)
     }
 

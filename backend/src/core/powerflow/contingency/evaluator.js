@@ -23,7 +23,7 @@ function calculateFlows(result, model) {
     const VtoMag = Math.sqrt(Vto.re * Vto.im + Vto.im * Vto.im)
     const thetaFrom = Math.atan2(Vfrom.im, Vfrom.re)
     const thetaTo = Math.atan2(Vto.im, Vto.re)
-    const theta = thetaFrom - thetaTo
+    const _theta = thetaFrom - thetaTo
 
     // Simplified flow calculation (I = (Vfrom - Vto) / Z)
     const Z = Math.sqrt(branch.R * branch.R + branch.X * branch.X)

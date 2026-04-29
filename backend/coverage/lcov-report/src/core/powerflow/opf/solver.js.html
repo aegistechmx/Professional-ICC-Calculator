@@ -365,7 +365,10 @@
 <a name='L300'></a><a href='#L300'>300</a>
 <a name='L301'></a><a href='#L301'>301</a>
 <a name='L302'></a><a href='#L302'>302</a>
-<a name='L303'></a><a href='#L303'>303</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -581,6 +584,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -644,7 +648,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -677,9 +683,9 @@
 &nbsp;
 const { solve } = <span class="cstat-no" title="statement not covered" >require('../solver')</span>
 const { solveFDLF } = <span class="cstat-no" title="statement not covered" >require('../fastDecoupled')</span>
-const { totalCost, costGradient, costHessian } = <span class="cstat-no" title="statement not covered" >require('./objective')</span>
+const { totalCost, costGradient, _costHessian } = <span class="cstat-no" title="statement not covered" >require('./objective')</span>
 const {
-  enforcePowerBalance,
+  _enforcePowerBalance,
   checkAllConstraints,
   checkGenerationLimits,
 } = <span class="cstat-no" title="statement not covered" >require('./constraints')</span>
@@ -731,7 +737,7 @@ class NewtonOPFSolver {
     const { powerFlowMethod, tolerance, maxIterations } = <span class="cstat-no" title="statement not covered" >this.options</span>
 &nbsp;
     // Update model with current generation
-<span class="cstat-no" title="statement not covered" >    this.generators.forEach(<span class="fstat-no" title="function not covered" >(g</span>en, i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    this.generators.forEach(<span class="fstat-no" title="function not covered" >(g</span>en, _i) =&gt; {</span>
       const bus = <span class="cstat-no" title="statement not covered" >this.model.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === gen.bus)</span></span>
 <span class="cstat-no" title="statement not covered" >      if (bus) {</span>
 <span class="cstat-no" title="statement not covered" >        bus.P = gen.P</span>
@@ -791,7 +797,7 @@ class NewtonOPFSolver {
    * @param {Object} pfResult - Power flow results
    * @returns {Array} Gradient vector
    */
-<span class="fstat-no" title="function not covered" >  bu</span>ildGradient(pfResult) {
+<span class="fstat-no" title="function not covered" >  bu</span>ildGradient(_pfResult) {
     const n = <span class="cstat-no" title="statement not covered" >this.generators.length</span>
     const gradient = <span class="cstat-no" title="statement not covered" >Array(n).fill(0)</span>
 &nbsp;
@@ -802,7 +808,7 @@ class NewtonOPFSolver {
     const Pgen = <span class="cstat-no" title="statement not covered" >this.generators.map(<span class="fstat-no" title="function not covered" >g </span>=&gt; <span class="cstat-no" title="statement not covered" >g.P)</span></span>
     const loads = <span class="cstat-no" title="statement not covered" >this.model.buses.filter(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.type === 'PQ')</span>.map(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.P)</span></span>
     const totalLoad = <span class="cstat-no" title="statement not covered" >loads.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, P) =&gt; <span class="cstat-no" title="statement not covered" >sum + P,</span> 0)</span>
-    const powerMismatch = <span class="cstat-no" title="statement not covered" >Pgen.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, P) =&gt; <span class="cstat-no" title="statement not covered" >sum + P,</span> 0) - totalLoad</span>
+    const _powerMismatch = <span class="cstat-no" title="statement not covered" >Pgen.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, P) =&gt; <span class="cstat-no" title="statement not covered" >sum + P,</span> 0) - totalLoad</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; n; i++) {</span>
 <span class="cstat-no" title="statement not covered" >      gradient[i] = costGrad[i] + this.lambda * 1 </span>// Power balance
@@ -883,6 +889,7 @@ class NewtonOPFSolver {
       violations: [],
     }
 &nbsp;
+    // eslint-disable-next-line no-console
 <span class="cstat-no" title="statement not covered" >    console.log('Starting Newton-OPF optimization...')</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let iter = <span class="cstat-no" title="statement not covered" >0;</span> iter &lt; this.options.maxIterations; iter++) {</span>
@@ -946,9 +953,11 @@ class NewtonOPFSolver {
       this.options
     )
 &nbsp;
+    // eslint-disable-next-line no-console
 <span class="cstat-no" title="statement not covered" >    console.log(</span>
       `Newton-OPF ${results.converged ? 'converged' : 'did not converge'} in ${results.iterations} iterations`
     )
+    // eslint-disable-next-line no-console
 <span class="cstat-no" title="statement not covered" >    console.log(`Final cost: $${results.cost.toFixed(2)}`)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return results</span>
@@ -976,7 +985,7 @@ class NewtonOPFSolver {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T07:48:07.940Z
+                at 2026-04-29T08:24:13.946Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

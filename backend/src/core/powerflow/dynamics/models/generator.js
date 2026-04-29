@@ -87,21 +87,21 @@ class Generator {
     // RK4 coefficients
     const k1 = this.derivatives(V, theta, Eq)
 
-    const temp1 = {
+    const _temp1 = {
       delta: this.delta + (k1.dDelta * dt) / 2,
       omega: this.omega + (k1.dOmega * dt) / 2,
     }
 
     const k2 = this.derivatives(V, theta, Eq)
 
-    const temp2 = {
+    const _temp2 = {
       delta: this.delta + (k2.dDelta * dt) / 2,
       omega: this.omega + (k2.dOmega * dt) / 2,
     }
 
     const k3 = this.derivatives(V, theta, Eq)
 
-    const temp3 = {
+    const _temp3 = {
       delta: this.delta + k3.dDelta * dt,
       omega: this.omega + k3.dOmega * dt,
     }

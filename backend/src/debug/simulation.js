@@ -120,6 +120,7 @@ class SimulationLogger {
         ? `\n${JSON.stringify(logEntry.data, null, 2)}`
         : ''
 
+    // eslint-disable-next-line no-console
     console.log(`${color}${message}${reset}${dataStr}`)
   }
 

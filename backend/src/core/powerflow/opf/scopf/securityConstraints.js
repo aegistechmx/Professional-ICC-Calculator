@@ -162,7 +162,7 @@ function applyContingency(system, contingency) {
  * @param {Object} solution - OPF solution
  */
 function updateSystemGeneration(system, solution) {
-  solution.generation.forEach((gen, i) => {
+  solution.generation.forEach((gen, _i) => {
     const systemGen = system.generators.find(g => g.id === gen.id)
     if (systemGen) {
       systemGen.P = gen.P
@@ -224,7 +224,7 @@ function checkLineFlowViolations(system, pfResult, limitFactor) {
     pfResult.flows = calculateLineFlows(system, pfResult.voltages)
   }
 
-  pfResult.flows.forEach((flow, i) => {
+  pfResult.flows.forEach((flow, _i) => {
     const branch = system.branches.find(b => b.id === flow.id)
     if (branch && branch.limit) {
       const loading = Math.abs(flow.power) / branch.limit
@@ -258,7 +258,7 @@ function checkLineFlowViolations(system, pfResult, limitFactor) {
 function checkGenerationViolations(system, solution) {
   const violations = []
 
-  solution.generation.forEach((gen, i) => {
+  solution.generation.forEach((gen, _i) => {
     if (gen.P < gen.Pmin) {
       violations.push({
         type: 'generation_below_min',
@@ -301,7 +301,7 @@ function calculateLineFlows(system, voltages) {
       const VtoMag = Math.sqrt(Vto.re * Vto.re + Vto.im * Vto.im)
       const thetaFrom = Math.atan2(Vfrom.im, Vfrom.re)
       const thetaTo = Math.atan2(Vto.im, Vto.re)
-      const theta = thetaFrom - thetaTo
+      const _theta = thetaFrom - thetaTo
 
       // Simplified power flow calculation
       const Z = Math.sqrt(branch.R * branch.R + branch.X * branch.X)

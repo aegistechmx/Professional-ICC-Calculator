@@ -126,7 +126,7 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
         J[row][angleIndex.length + jIdx] = sum + 2 * Vi * G[i][i]
       } else {
         // Off-diagonal
-        const Vj = getV(j)
+        const _Vj = getV(j)
 
         J[row][angleIndex.length + jIdx] =
           Vi * (G[i][j] * Math.cos(theta) + B[i][j] * Math.sin(theta))
