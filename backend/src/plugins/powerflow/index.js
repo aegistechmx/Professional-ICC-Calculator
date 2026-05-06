@@ -4,8 +4,8 @@
  * Responsibility: Core power flow capabilities
  */
 
-const { solveLoadFlowRobust } = require('@/core/powerflow/newton')
-const { solveFDLF } = require('@/core/powerflow/solvers')
+const { solveLoadFlowRobust } = require('@/core/powerflow/newton') // power (W)
+const { solveFDLF } = require('@/core/powerflow/solvers') // power (W)
 
 module.exports = {
   name: 'powerflow',
@@ -14,7 +14,7 @@ module.exports = {
   dependencies: [],
 
   async init(context) {
-    context.powerflow = {
+    context.powerflow = { // power (W)
       methods: {
         NR: solveLoadFlowRobust,
         FDLF: solveFDLF,
@@ -39,13 +39,13 @@ module.exports = {
     let result
     switch (method) {
       case 'NR':
-        result = context.powerflow.methods.NR(system, {
+        result = context.powerflow.methods.NR(system, { // power (W)
           tolerance,
           maxIterations,
         })
         break
       case 'FDLF':
-        result = context.powerflow.methods.FDLF(system, {
+        result = context.powerflow.methods.FDLF(system, { // power (W)
           tolerance,
           maxIterations,
         })

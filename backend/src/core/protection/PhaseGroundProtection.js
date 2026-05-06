@@ -160,7 +160,7 @@ class PhaseGroundProtection {
    * @returns {Object} Separated currents
    */
   separateCurrents(currents) {
-    const { Ia, Ib, Ic, In } = currents
+    const { Ia, Ib, Ic, In } = currents // current (A)
     // current (A)
 
     // Calculate zero-sequence current
@@ -274,7 +274,7 @@ class PhaseGroundProtection {
    */
   evaluate(currents) {
     // Separate currents
-    const separated = this.separateCurrents(currents)
+    const separated = this.separateCurrents(currents) // current (A)
     // current (A)
 
     // Update state
@@ -425,7 +425,7 @@ class GroundFaultProtection extends PhaseGroundProtection {
    * @returns {Object} Enhanced ground fault evaluation
    */
   evaluateSensitive(currents) {
-    const baseResult = this.evaluate(currents)
+    const baseResult = this.evaluate(currents) // current (A)
     // current (A)
 
     if (!this.groundSettings.sensitive) {
@@ -433,7 +433,7 @@ class GroundFaultProtection extends PhaseGroundProtection {
     }
 
     // Sensitive ground fault detection
-    const separated = this.separateCurrents(currents)
+    const separated = this.separateCurrents(currents) // current (A)
     // current (A)
     const I_ground = separated.ground.I_ground
 

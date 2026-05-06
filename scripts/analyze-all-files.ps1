@@ -38,9 +38,11 @@ function Get-FilesExcludingNodeModules {
     $excludePattern = "node_modules"
     if ($Directory) {
         Get-ChildItem -Path $Path -Directory -Recurse | Where-Object { $_.FullName -notlike "*$excludePattern*" }
-    } elseif ($Include.Count -gt 0) {
+    }
+    elseif ($Include.Count -gt 0) {
         Get-ChildItem -Path $Path -Recurse -Include $Include | Where-Object { $_.FullName -notlike "*$excludePattern*" }
-    } else {
+    }
+    else {
         Get-ChildItem -Path $Path -Recurse -File | Where-Object { $_.FullName -notlike "*$excludePattern*" }
     }
 }
@@ -48,16 +50,16 @@ function Get-FilesExcludingNodeModules {
 # Iniciar captura de salida para el reporte
 $output = New-Object System.Collections.Generic.List[string]
 
-$output.Add("════════════════════════════════════════════════════════════")
+$output.Add("============================================================")
 $output.Add("DETAILED FILE ANALYSIS - ICC CALCULATOR")
-$output.Add("════════════════════════════════════════════════════════════")
+$output.Add("============================================================")
 $output.Add("Directory analyzed: $Path")
 $output.Add("Excluded: node_modules folders")
 $output.Add("")
 
-Write-Host "════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "DETAILED FILE ANALYSIS - ICC CALCULATOR" -ForegroundColor Cyan
-Write-Host "════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "Directory analyzed: $Path" -ForegroundColor Gray
 Write-Host "Excluded: node_modules folders" -ForegroundColor Gray
 Write-Host ""
@@ -66,10 +68,10 @@ Write-Host ""
 # 1. ESTRUCTURA DE CARPETAS
 # ============================================
 Write-Host "1. FOLDER STRUCTURE" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("1. FOLDER STRUCTURE")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $allDirs = Get-FilesExcludingNodeModules -Path $Path -Directory
 $allDirs | ForEach-Object {
@@ -86,10 +88,10 @@ $output.Add("")
 # 2. ANÁLISIS POR TIPO DE ARCHIVO
 # ============================================
 Write-Host "2. FILES BY TYPE" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("2. FILES BY TYPE")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $allFiles = Get-FilesExcludingNodeModules -Path $Path
 $extensions = $allFiles | Group-Object Extension | Sort-Object Count -Descending
@@ -105,10 +107,10 @@ $output.Add("")
 # 3. ANÁLISIS DETALLADO POR SUBDIRECTORIO
 # ============================================
 Write-Host "3. ANALYSIS BY SUBDIRECTORY" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("3. ANALYSIS BY SUBDIRECTORY")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $directories = Get-ChildItem -Path $Path -Directory | Where-Object { $_.Name -ne "node_modules" }
 foreach ($dir in $directories) {
@@ -149,10 +151,10 @@ $output.Add("")
 # 4. ANÁLISIS DE IMPORTACIONES
 # ============================================
 Write-Host "4. IMPORT ANALYSIS" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("4. IMPORT ANALYSIS")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $jsFiles = Get-FilesExcludingNodeModules -Path $Path -Include @("*.js", "*.jsx")
 $imports = Select-String -Path $jsFiles.FullName -Pattern "import.*from" -ErrorAction SilentlyContinue
@@ -168,10 +170,10 @@ $output.Add("")
 # 5. ARCHIVOS MÁS GRANDES
 # ============================================
 Write-Host "5. LARGEST FILES (>50KB)" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("5. LARGEST FILES (>50KB)")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $largeFiles = Get-FilesExcludingNodeModules -Path $Path | Where-Object { $_.Length -gt 50KB } | Sort-Object Length -Descending
 if ($largeFiles) {
@@ -182,7 +184,8 @@ if ($largeFiles) {
         Write-Host $line -ForegroundColor Red
         $output.Add($line)
     }
-} else {
+}
+else {
     $line = "   [OK] No files >50KB"
     Write-Host $line -ForegroundColor Green
     $output.Add($line)
@@ -194,24 +197,24 @@ $output.Add("")
 # 6. COMPONENTES POR CATEGORÍA
 # ============================================
 Write-Host "6. COMPONENTS BY CATEGORY" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("6. COMPONENTS BY CATEGORY")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $categories = @{
-    "Panels" = "panels"
-    "Layout" = "layout"
-    "Common" = "common"
+    "Panels"         = "panels"
+    "Layout"         = "layout"
+    "Common"         = "common"
     "Visualizations" = "visualizations"
-    "AI" = "ai"
-    "Reports" = "reports"
-    "Wizard" = "wizard"
-    "Templates" = "templates"
-    "Docs" = "docs"
-    "Feeders" = "feeders"
-    "Optimization" = "optimization"
-    "Validation" = "validation"
+    "AI"             = "ai"
+    "Reports"        = "reports"
+    "Wizard"         = "wizard"
+    "Templates"      = "templates"
+    "Docs"           = "docs"
+    "Feeders"        = "feeders"
+    "Optimization"   = "optimization"
+    "Validation"     = "validation"
 }
 
 foreach ($cat in $categories.Keys) {
@@ -230,10 +233,10 @@ $output.Add("")
 # 7. SERVICIOS Y UTILIDADES
 # ============================================
 Write-Host "7. SERVICES AND UTILITIES" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("7. SERVICES AND UTILITIES")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $services = Get-ChildItem -Path "$Path\services" -Filter "*.js" -ErrorAction SilentlyContinue
 $utils = Get-ChildItem -Path "$Path\utils" -Filter "*.js" -ErrorAction SilentlyContinue
@@ -272,10 +275,10 @@ $output.Add("")
 # 8. ARCHIVOS SIN REFERENCIA (POSIBLES HUÉRFANOS)
 # ============================================
 Write-Host "8. FILES WITHOUT REFERENCES (POSSIBLE ORPHANS)" -ForegroundColor Yellow
-Write-Host "────────────────────────────────────────────────────────" -ForegroundColor DarkGray
+Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 
 $output.Add("8. FILES WITHOUT REFERENCES (POSSIBLE ORPHANS)")
-$output.Add("────────────────────────────────────────────────────────")
+$output.Add("------------------------------------------------------------")
 
 $allFiles = Get-FilesExcludingNodeModules -Path $Path -Include @("*.js", "*.jsx") | Where-Object { $_.Name -notlike "index.*" }
 $jsFilesForSearch = Get-FilesExcludingNodeModules -Path $Path -Include @("*.js", "*.jsx")
@@ -284,7 +287,8 @@ $orphans = @()
 foreach ($file in $allFiles) {
     $fileName = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
     $references = Select-String -Path $jsFilesForSearch.FullName -Pattern "$fileName" -ErrorAction SilentlyContinue
-    if ($references.Count -eq 1) {  # Solo la propia definición
+    if ($references.Count -eq 1) {
+        # Solo la propia definición
         $orphans += $file.FullName.Replace("$PWD\", "")
     }
 }
@@ -295,7 +299,8 @@ if ($orphans) {
         Write-Host $line -ForegroundColor Yellow
         $output.Add($line)
     }
-} else {
+}
+else {
     $line = "   [OK] No orphan files detected"
     Write-Host $line -ForegroundColor Green
     $output.Add($line)
@@ -307,10 +312,10 @@ $output.Add("")
 # 9. RESUMEN FINAL
 # ============================================
 Write-Host "FINAL SUMMARY" -ForegroundColor Cyan
-Write-Host "════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan
 
 $output.Add("FINAL SUMMARY")
-$output.Add("════════════════════════════════════════════════════════════")
+$output.Add("============================================================")
 
 $totalFiles = (Get-FilesExcludingNodeModules -Path $Path).Count
 $totalJS = (Get-FilesExcludingNodeModules -Path $Path -Include @("*.js", "*.jsx")).Count
@@ -332,14 +337,14 @@ $output.Add("   [SUM] Total size: $totalSize MB")
 $output.Add("")
 
 # Generar archivo de reporte
-$output.Add("════════════════════════════════════════════════════════════")
+$output.Add("============================================================")
 $output.Add("[OK] ANALYSIS COMPLETED")
 $output.Add("Report generated: $ReportFile")
-$output.Add("════════════════════════════════════════════════════════════")
+$output.Add("============================================================")
 
 $output | Out-File -FilePath $ReportFile -Encoding UTF8
 
-Write-Host "════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "[OK] ANALYSIS COMPLETED" -ForegroundColor Green
 Write-Host "[INFO] Report saved to: $ReportFile" -ForegroundColor Cyan
-Write-Host "════════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan

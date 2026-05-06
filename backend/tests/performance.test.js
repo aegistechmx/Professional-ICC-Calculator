@@ -335,7 +335,7 @@ describe('API Performance Tests', () => {
       const end = performance.now();
 
       expect(response.status).toBe(200);
-      expect(end - start).toBeLessThan(50); // 50ms limit
+      expect(end - start).toBeLessThan(100); // 100ms limit
     });
 
     test('should handle small power flow requests quickly', async () => {

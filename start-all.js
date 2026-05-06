@@ -34,7 +34,6 @@ function logSection(title) {
 // Verificar que existan los directorios
 const frontendDir = path.join(__dirname, 'frontend');
 const backendDir = path.join(__dirname, 'backend');
-const cortocircuitoDir = path.join(__dirname, 'cortocircuito');
 
 if (!fs.existsSync(frontendDir)) {
     log('❌ Directorio frontend no encontrado', 'red');
@@ -46,16 +45,11 @@ if (!fs.existsSync(backendDir)) {
     process.exit(1);
 }
 
-if (!fs.existsSync(cortocircuitoDir)) {
-    log('❌ Directorio cortocircuito no encontrado', 'red');
-    process.exit(1);
-}
-
 // Función para iniciar proceso
 function startProcess(name, cwd, command, args = [], port = null) {
     return new Promise((resolve, reject) => {
         log(`🚀 Iniciando ${name}...`, 'yellow');
-        
+
         const process = spawn(command, args, {
             cwd: cwd,
             stdio: 'pipe',
@@ -107,14 +101,14 @@ function checkPort(port) {
     return new Promise((resolve) => {
         const net = require('net');
         const server = net.createServer();
-        
+
         server.listen(port, () => {
             server.once('close', () => {
                 resolve(true); // Puerto disponible
             });
             server.close();
         });
-        
+
         server.on('error', () => {
             resolve(false); // Puerto en uso
         });
@@ -127,27 +121,21 @@ async function main() {
     log('🎯 Iniciando sistema completo:', 'bright');
     log('   • Frontend (React/Vite)', 'green');
     log('   • Backend (Node.js/Express)', 'green');
-    log('   • Cortocircuito (HTML/JavaScript)', 'green');
     log('\n⏱️  Esperando a que los servicios inicien...\n');
 
     try {
         // Verificar puertos
         const frontendPort = 5173;
         const backendPort = 3001;
-        const cortocircuitoPort = 3002;
 
         const frontendAvailable = await checkPort(frontendPort);
         const backendAvailable = await checkPort(backendPort);
-        const cortocircuitoAvailable = await checkPort(cortocircuitoPort);
 
         if (!frontendAvailable) {
             log(`⚠️  Puerto ${frontendPort} ya está en uso (frontend)`, 'yellow');
         }
         if (!backendAvailable) {
             log(`⚠️  Puerto ${backendPort} ya está en uso (backend)`, 'yellow');
-        }
-        if (!cortocircuitoAvailable) {
-            log(`⚠️  Puerto ${cortocircuitoPort} ya está en uso (cortocircuito)`, 'yellow');
         }
 
         // Iniciar procesos
@@ -181,39 +169,20 @@ async function main() {
             log('❌ No se pudo iniciar el frontend', 'red');
         }
 
-        // 3. Cortocircuito (servidor estático)
-        try {
-            const cortocircuito = await startProcess(
-                'CORTOCIRCUITO',
-                cortocircuitoDir,
-                'npx',
-                ['serve', '-l', '3000'],
-                cortocircuitoPort
-            );
-            processes.push(cortocircuito);
-        } catch (error) {
-            log('❌ No se pudo iniciar el servidor de cortocircuito', 'red');
-        }
-
         // Esperar un momento para que todo inicie
         await new Promise(resolve => setTimeout(resolve, 5000));
 
         // Mostrar URLs de acceso
         logSection('SERVICIOS INICIADOS');
-        
+
         if (frontendAvailable) {
             log('🌐 Frontend:', 'green');
             log(`   http://localhost:${frontendPort}`, 'bright');
         }
-        
+
         if (backendAvailable) {
             log('⚙️  Backend API:', 'green');
             log(`   http://localhost:${backendPort}`, 'bright');
-        }
-        
-        if (cortocircuitoAvailable) {
-            log('⚡ Cortocircuito:', 'green');
-            log(`   http://localhost:${cortocircuitoPort}`, 'bright');
         }
 
         log('\n📋 Instrucciones:', 'yellow');
@@ -224,14 +193,14 @@ async function main() {
         // Manejar cierre limpio
         process.on('SIGINT', () => {
             log('\n\n🛑 Deteniendo todos los servicios...', 'yellow');
-            
+
             processes.forEach(({ process }, index) => {
                 if (process && !process.killed) {
                     log(`   Deteniendo proceso ${index + 1}...`, 'cyan');
                     process.kill('SIGTERM');
                 }
             });
-            
+
             setTimeout(() => {
                 log('✅ Todos los servicios detenidos', 'green');
                 process.exit(0);

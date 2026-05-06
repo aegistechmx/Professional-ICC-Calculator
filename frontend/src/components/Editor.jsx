@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useMemo } from 'react'
 import ReactFlow, {
   addEdge,
   Controls,
@@ -17,6 +17,7 @@ import LoadNode from './nodes/LoadNode'
 import MotorNode from './nodes/MotorNode'
 import GeneratorNode from './nodes/GeneratorNode'
 import ATSNode from './nodes/ATSNode'
+import CapBankNode from './nodes/CapacitorBankNode'
 import PropertiesPanel from './PropertiesPanel'
 import GridBackground from './GridBackground'
 import { useStore } from '../store/useStore'
@@ -24,21 +25,8 @@ import { snap } from '../utils/snap'
 import { validateConnection } from '../utils/validation'
 import CableEdge from './edges/CableEdge'
 
-const nodeTypes = {
-  breaker: BreakerNode,
-  transformer: TransformerNode,
-  panel: PanelNode,
-  load: LoadNode,
-  motor: MotorNode,
-  generator: GeneratorNode,
-  ats: ATSNode,
-}
 
-const edgeTypes = {
-  cable: CableEdge,
-}
-
-function Editor() {
+const Editor = React.memo(function Editor() {
   const reactFlowWrapper = useRef(null)
   const {
     getNodes,
@@ -52,6 +40,22 @@ function Editor() {
   const setSelectedEdge = useStore(state => state.setSelectedEdge)
   const storeNodes = useStore(state => state.nodes)
   const storeEdges = useStore(state => state.edges)
+
+  // Memoize node and edge types to prevent recreation
+  const memoizedNodeTypes = useMemo(() => ({
+    breaker: BreakerNode,
+    transformer: TransformerNode,
+    panel: PanelNode,
+    load: LoadNode,
+    motor: MotorNode,
+    generator: GeneratorNode,
+    ats: ATSNode,
+    capacitor: CapBankNode,
+  }), [])
+
+  const memoizedEdgeTypes = useMemo(() => ({
+    cable: CableEdge,
+  }), [])
 
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
@@ -177,7 +181,7 @@ function Editor() {
         if (!validateConnection(sourceNode.type, targetNode.type)) {
           // Show user-friendly error message
           alert(
-            `Conexión inválida: No se puede conectar ${sourceNode.type} → ${targetNode.type}\n\nConexiones permitidas:\n• Transformador/Generador → Panel/Breaker\n• Panel → Panel/Breaker/Carga/Motor\n• Breaker → Panel/Carga/Motor`
+            `Conexión inválida: No se puede conectar ${sourceNode.type} - ${targetNode.type}\n\nConexiones permitidas:\n. Transformador/Generador - Panel/Breaker/ATS\n. Panel - Panel/Breaker/Carga/Motor\n. Breaker - Panel/Carga/Motor\n. ATS - Panel/Breaker`
           )
           return
         }
@@ -315,6 +319,36 @@ function Editor() {
     event.dataTransfer.dropEffect = 'move'
   }, [])
 
+  // Helper function to get default parameters for node types
+  function getDefaultParameters(type) {
+    switch (type) {
+      case 'breaker': {
+        return { In: 100, Icu: 25000, tipo: 'molded_case' }
+      }
+      case 'transformer': {
+        return { kVA: 500, primario: 13800, secundario: 480, Z: 5.75 }
+      }
+      case 'panel': {
+        return { tension: 480, fases: 3 }
+      }
+      case 'load': {
+        return { potencia_kW: 50, potencia_kVAR: 25, fp: 0.85, voltaje: 480 }
+      }
+      case 'motor': {
+        return { hp: 75, voltaje: 480, eficiencia: 0.92, fp: 0.85 }
+      }
+      case 'generator': {
+        return { kVA: 100, voltaje: 480, fp: 0.8, Xd: 0.15 }
+      }
+      case 'ats': {
+        return { mode: 'normal', transferTime: 10 }
+      }
+      default: {
+        return {}
+      }
+    }
+  }
+
   return (
     <div className="flex w-full h-full">
       <div className="flex-1" ref={reactFlowWrapper}>
@@ -329,8 +363,8 @@ function Editor() {
           onNodeClick={onNodeClick}
           onEdgeClick={onEdgeClick}
           onPaneClick={onPaneClick}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
+          nodeTypes={memoizedNodeTypes}
+          edgeTypes={memoizedEdgeTypes}
           fitView
         >
           <MiniMap
@@ -376,40 +410,7 @@ function Editor() {
       </div>
     </div>
   )
-}
-
-function getDefaultParameters(type) {
-  switch (type) {
-    case 'breaker': {
-      return { In: 100, Icu: 25000, tipo: 'molded_case' }
-    }
-    case 'transformer': {
-      return { kVA: 500, primario: 13800, secundario: 480, Z: 5.75 }
-    }
-    case 'panel': {
-      return { tension: 480, fases: 3 }
-    }
-    case 'load': {
-      return { potencia_kW: 50, potencia_kVAR: 25, fp: 0.85, voltaje: 480 }
-    }
-    case 'motor': {
-      return { hp: 75, voltaje: 480, eficiencia: 0.92, fp: 0.85 }
-    }
-    case 'generator': {
-      return { kVA: 100, voltaje: 480, fp: 0.8, Xd: 0.15 }
-    }
-    case 'ats': {
-      return { mode: 'normal', transferTime: 10 }
-    }
-    default: {
-      return {}
-    }
-  }
-}
-
-Editor.propTypes = {
-  // No props - uses Zustand store
-}
+})
 
 export default function EditorWithProvider() {
   return (

@@ -27,7 +27,7 @@ class Generator {
     // State variables
     this.delta = 0 // Rotor angle (radians)
     this.omega = 1 // Angular velocity (pu, 1.0 = synchronous)
-    this.Pe = 0 // Electrical power output
+    this.Pe = 0; // power (W) output
   }
 
   /**

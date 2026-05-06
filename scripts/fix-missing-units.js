@@ -47,7 +47,7 @@ const UNIT_PATTERNS = [
   },
   {
     pattern: /(\w+):\s*([\d.]+)\s*(?:\/\/.*?corriente|\/\/.*?current)/i,
-    unit: 'A', 
+    unit: 'A',
     type: 'current'
   },
   {
@@ -66,24 +66,27 @@ function fixMissingUnits(content, filePath) {
   let modified = false;
   let lines = content.split('\n');
   let fixesApplied = 0;
-  
+
   lines = lines.map((line, index) => {
     let newLine = line;
-    
+
     UNIT_PATTERNS.forEach(({ pattern, unit, type }) => {
       const match = newLine.match(pattern);
       if (match) {
         modified = true;
         fixesApplied++;
-        
-        // Replace with unit declaration
-        newLine = newLine.replace(pattern, `${match[1]} = ${match[2]}; // ${type} (${unit})`);
+
+        // Replace with unit declaration - preserve original structure
+        const assignmentMatch = newLine.match(/(\w+(?:\.\w+)?)\s*=\s*([^;]+)/);
+        if (assignmentMatch) {
+          newLine = `${match[1]} = ${match[2]}; // ${type} (${unit})`;
+        }
       }
     });
-    
+
     // Fix electrical calculations without any comments
     if (!newLine.includes('//') && (
-      newLine.includes('voltage') || newLine.includes('current') || 
+      newLine.includes('voltage') || newLine.includes('current') ||
       newLine.includes('power') || newLine.includes('impedance') ||
       newLine.includes('frecuencia') || newLine.includes('voltaje') ||
       newLine.includes('corriente') || newLine.includes('potencia') ||
@@ -92,7 +95,7 @@ function fixMissingUnits(content, filePath) {
       // Try to infer unit from context
       let inferredUnit = '';
       let inferredType = '';
-      
+
       if (newLine.includes('voltage') || newLine.includes('voltaje') || newLine.includes('tensión')) {
         inferredUnit = 'V';
         inferredType = 'voltage';
@@ -109,17 +112,17 @@ function fixMissingUnits(content, filePath) {
         inferredUnit = 'Hz';
         inferredType = 'frequency';
       }
-      
+
       if (inferredUnit && newLine.includes('=')) {
         modified = true;
         fixesApplied++;
         newLine += ` // ${inferredType} (${inferredUnit})`;
       }
     }
-    
+
     return newLine;
   });
-  
+
   return {
     content: lines.join('\n'),
     modified,
@@ -131,16 +134,16 @@ function processFile(filePath) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     const result = fixMissingUnits(content, filePath);
-    
+
     if (result.modified) {
       fs.writeFileSync(filePath, result.content, 'utf8');
-      return { 
-        modified: true, 
-        path: filePath, 
-        fixesApplied: result.fixesApplied 
+      return {
+        modified: true,
+        path: filePath,
+        fixesApplied: result.fixesApplied
       };
     }
-    
+
     return { modified: false, path: filePath };
   } catch (error) {
     console.error(`Error processing ${filePath}:`, error.message);
@@ -157,29 +160,29 @@ function scanAndFixMissingUnits() {
     errors: 0,
     files: []
   };
-  
+
   function scanDirectory(dir) {
     if (!fs.existsSync(dir)) return;
-    
+
     const files = fs.readdirSync(dir);
-    
+
     for (const file of files) {
       const fullPath = path.join(dir, file);
       const stat = fs.statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         scanDirectory(fullPath);
       } else if (file.endsWith('.js')) {
         results.scanned++;
         const result = processFile(fullPath);
         results.files.push(result);
-        
+
         if (result.modified) {
           results.modified++;
           results.totalFixes += result.fixesApplied || 0;
           console.log(`✅ Fixed: ${path.relative(__dirname, fullPath)} (${result.fixesApplied} units)`);
         }
-        
+
         if (result.error) {
           results.errors++;
           console.log(`❌ Error: ${path.relative(__dirname, fullPath)} - ${result.error}`);
@@ -187,7 +190,7 @@ function scanAndFixMissingUnits() {
       }
     }
   }
-  
+
   scanDirectory(backendDir);
   return results;
 }
@@ -198,7 +201,7 @@ function generateReport(results) {
   console.log(`✅ Files modified: ${results.modified}`);
   console.log(`🔧 Total unit fixes: ${results.totalFixes}`);
   console.log(`❌ Errors: ${results.errors}\n`);
-  
+
   if (results.modified > 0) {
     console.log('🔧 Modified files:');
     results.files
@@ -209,7 +212,7 @@ function generateReport(results) {
       });
     console.log();
   }
-  
+
   if (results.errors > 0) {
     console.log('❌ Files with errors:');
     results.files
@@ -217,33 +220,33 @@ function generateReport(results) {
       .forEach(f => console.log(`   ${path.relative(__dirname, f.path)} - ${f.error}`));
     console.log();
   }
-  
+
   console.log('💡 Summary:');
   console.log(`   • Added explicit unit declarations to ${results.totalFixes} calculations`);
   console.log(`   • Fixed ${results.modified} files`);
   console.log(`   • Improved IEEE/IEC compliance`);
-  
+
   return results;
 }
 
 function main() {
   console.log('🔧 Fixing Missing Unit Declarations\n');
   console.log('🔍 Scanning electrical files for missing units...\n');
-  
+
   const results = scanAndFixMissingUnits();
   const report = generateReport(results);
-  
+
   // Save report
   const reportDir = path.join(__dirname, '../reports');
   if (!fs.existsSync(reportDir)) {
     fs.mkdirSync(reportDir, { recursive: true });
   }
-  
+
   const reportFile = path.join(reportDir, `missing-units-fixes-${new Date().toISOString().split('T')[0]}.json`);
   fs.writeFileSync(reportFile, JSON.stringify(report, null, 2));
-  
+
   console.log(`\n📄 Report saved to: ${reportFile}`);
-  
+
   if (results.modified > 0) {
     console.log('\n✅ Missing unit declarations fixed successfully');
     console.log('💡 Run enhanced-electrical-validation.js to verify fixes');

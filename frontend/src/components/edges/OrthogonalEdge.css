@@ -1,0 +1,174 @@
+/**
+ * OrthogonalEdge.css - Estilos para cables ortogonales
+ * Diseño tipo diagrama unifilar profesional
+ */
+
+.orthogonal-edge {
+  transition: all 0.2s ease;
+}
+
+/* Estados del cable */
+.edge-animated {
+  animation: dashFlow 1s linear infinite;
+  stroke-dasharray: 8, 4;
+}
+
+@keyframes dashFlow {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+.edge-fault {
+  animation: faultPulse 0.3s ease-in-out infinite;
+  stroke: #dc2626;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.5));
+}
+
+@keyframes faultPulse {
+  0%, 100% { 
+    stroke-opacity: 1;
+    stroke-width: 3;
+  }
+  50% { 
+    stroke-opacity: 0.5;
+    stroke-width: 4;
+  }
+}
+
+.edge-tripped {
+  stroke: #f59e0b;
+  stroke-dasharray: 5, 5;
+  animation: tripPulse 1s ease-in-out infinite;
+}
+
+@keyframes tripPulse {
+  0%, 100% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.3; }
+}
+
+.edge-overload {
+  stroke: #f59e0b;
+  stroke-width: 3;
+  animation: overloadPulse 0.5s ease-in-out infinite;
+}
+
+@keyframes overloadPulse {
+  0%, 100% { stroke-width: 2; }
+  50% { stroke-width: 4; }
+}
+
+/* Label del cable */
+.edge-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: all 0.2s ease;
+}
+
+.edge-label:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.label-length {
+  color: #6b7280;
+  font-size: 9px;
+}
+
+.label-impedance {
+  color: #3b82f6;
+  font-weight: 500;
+  font-size: 9px;
+}
+
+.label-current {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 9px;
+}
+
+.label-fault {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 9px;
+  animation: blink 0.5s ease-in-out infinite;
+}
+
+.label-tripped {
+  color: #f59e0b;
+  font-weight: 600;
+  font-size: 9px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Indicadores de flujo */
+.flow-indicators {
+  pointer-events: none;
+}
+
+.flow-particle {
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+}
+
+@keyframes flowMove {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* Cable seleccionado */
+.orthogonal-edge.selected {
+  stroke: #3b82f6;
+  filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.5));
+}
+
+/* Marcadores de flecha */
+marker {
+  transition: all 0.2s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .edge-label {
+    font-size: 8px;
+    padding: 2px 4px !important;
+  }
+  
+  .label-length,
+  .label-impedance,
+  .label-current,
+  .label-fault,
+  .label-tripped {
+    font-size: 8px;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .edge-label {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #e5e7eb;
+  }
+  
+  .label-length {
+    color: #9ca3af;
+  }
+}

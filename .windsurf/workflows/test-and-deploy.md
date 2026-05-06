@@ -6,6 +6,7 @@ tags: [testing, deployment, ci-cd]
 # Test and Deploy Workflow
 
 ## Prerequisites
+
 - All dependencies installed
 - Environment variables configured
 - Build tools available
@@ -13,11 +14,13 @@ tags: [testing, deployment, ci-cd]
 ## Steps
 
 ### 1. Run Full Test Suite
+
 ```bash
 npm run test
 ```
 
 ### 2. Check Test Coverage
+
 ```bash
 # Frontend coverage
 cd frontend && npm run test:coverage
@@ -29,6 +32,7 @@ cd backend && npm run test:coverage
 ```
 
 ### 3. Security & Quality Checks
+
 ```bash
 # Security audit
 npm audit
@@ -42,6 +46,7 @@ npm run lint:check
 ```
 
 ### 4. Build for Production
+
 ```bash
 # Frontend build
 cd frontend && npm run build
@@ -51,6 +56,7 @@ ls -la frontend/dist/
 ```
 
 ### 5. Integration Tests
+
 ```bash
 # Run E2E tests if available
 npm run test:e2e
@@ -60,6 +66,7 @@ cd backend && npm run test:integration
 ```
 
 ### 6. Environment Validation
+
 ```bash
 # Check required environment variables
 node scripts/validate-env.js
@@ -69,6 +76,7 @@ cd backend && npm run db:migrate
 ```
 
 ### 7. Performance Checks
+
 ```bash
 # Bundle size analysis
 cd frontend && npm run analyze
@@ -78,6 +86,7 @@ npm run audit:lighthouse
 ```
 
 ### 8. Deployment Preparation
+
 ```bash
 # Create deployment artifact
 tar -czf deployment-$(date +%Y%m%d).tar.gz frontend/dist/
@@ -87,6 +96,7 @@ sha256sum deployment-*.tar.gz > checksum.txt
 ```
 
 ## Exit Criteria
+
 - ✅ All tests pass
 - ✅ Coverage meets minimum requirements
 - ✅ No security vulnerabilities
@@ -95,7 +105,9 @@ sha256sum deployment-*.tar.gz > checksum.txt
 - ✅ Performance within acceptable limits
 
 ## Deployment Gates
+
 Do NOT deploy if ANY of these fail:
+
 - Test failures
 - Coverage below threshold
 - Security issues

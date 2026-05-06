@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-04-29T12:21:25.608Z",
+  "overall": 100,
+  "metrics": {
+    "fcp": {
+      "target": 1.5,
+      "actual": 1.2,
+      "status": "good"
+    },
+    "lcp": {
+      "target": 2.5,
+      "actual": 2.1,
+      "status": "good"
+    },
+    "cls": {
+      "target": 0.1,
+      "actual": 0.05,
+      "status": "good"
+    },
+    "fid": {
+      "target": 0.1,
+      "actual": 0.08,
+      "status": "good"
+    },
+    "ttfb": {
+      "target": 0.8,
+      "actual": 0.3,
+      "status": "good"
+    }
+  },
+  "recommendations": []
+}

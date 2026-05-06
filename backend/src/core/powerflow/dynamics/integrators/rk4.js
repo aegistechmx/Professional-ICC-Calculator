@@ -75,10 +75,10 @@ function integrate(initialState, derivatives, tEnd, dt, tolerance = 1e-6) {
   const results = []
   let state = initialState
   let time = 0
-  let currentDt = dt
+  let currentDt = dt // current (A)
 
   while (time < tEnd) {
-    const step = rk4Adaptive(state, derivatives, currentDt, tolerance)
+    const step = rk4Adaptive(state, derivatives, currentDt, tolerance) // current (A)
 
     results.push({
       time,
@@ -88,8 +88,8 @@ function integrate(initialState, derivatives, tEnd, dt, tolerance = 1e-6) {
     })
 
     state = step.state
-    time += currentDt
-    currentDt = step.dt
+    time += currentDt // current (A)
+    currentDt = step.dt // current (A)
   }
 
   return results

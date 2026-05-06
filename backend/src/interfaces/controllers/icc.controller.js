@@ -4,7 +4,13 @@
  * Responsibility: Handle ICC calculation requests with professional pipeline
  */
 
-const { runICC } = require('../../application/icc.service')
+// Global dependency handling for Node.js
+const conductoresData = require('../../../../icc-core/cortocircuito/js/core/data/conductores.nom');
+global.CONDUCTORES_NOM = conductoresData.CONDUCTORES_NOM;
+global.factorTemperatura = conductoresData.factorTemperatura;
+global.factorAgrupamiento = conductoresData.factorAgrupamiento;
+global.MotorAmpacidadNOM = require('../../../../icc-core/cortocircuito/js/core/MotorAmpacidadNOM');
+const MotorElectrico = require('../../../../icc-core/cortocircuito/js/core/MotorElectrico');
 
 /**
  * Calculate ICC using professional pipeline
@@ -15,27 +21,27 @@ async function calculateICC(req, res) {
   try {
     const input = req.body
 
-    // Validate input
-    if (!input || typeof input.V !== 'number' || typeof input.Z !== 'number') {
+    // Validate input for MotorElectrico
+    if (!input || typeof input.I_carga !== 'number') {
       return res.status(400).json({
         success: false,
-        error: 'Invalid input. V (voltage) and Z (impedance) are required numbers.'
+        error: 'Invalid input. I_carga (load current) is required as number.'
       })
     }
 
-    if (input.Z <= 0) {
+    if (input.I_carga <= 0) {
       return res.status(400).json({
         success: false,
-        error: 'Impedance must be greater than zero.'
+        error: 'Load current must be greater than zero.'
       })
     }
 
-    // Run professional ICC calculation
-    const result = runICC(input)
+    // Run MotorElectrico complete system
+    const resultado = MotorElectrico.ejecutarMotorElectrico(input);
 
     res.json({
       success: true,
-      data: result
+      data: resultado
     })
 
   } catch (error) {
@@ -57,18 +63,30 @@ function getICCInfo(req, res) {
     data: {
       endpoint: '/api/icc',
       method: 'POST',
-      description: 'Professional Short Circuit Current calculation',
-      standards: ['IEEE 1584', 'IEC 60909'],
+      description: 'Professional ICC Calculator - Complete Electrical System',
+      standards: ['IEEE 1584', 'IEC 60909', 'NOM-001-SEDE-2012'],
       input: {
-        V: 'Voltage in volts (V)',
-        Z: 'Impedance in ohms (Z)',
-        system: 'Optional power system model'
+        I_carga: 'Load current in amperes (A)',
+        material: 'Conductor material (cobre, aluminio)',
+        tempAislamiento: 'Insulation temperature (60, 75, 90)',
+        tempAmbiente: 'Ambient temperature (°C)',
+        nConductores: 'Number of grouped conductors',
+        paralelos: 'Number of parallel conductors',
+        tempTerminal: 'Terminal temperature (60, 75, 90)',
+        voltaje: 'System voltage (V)',
+        FP: 'Power factor (0.8-1.0)',
+        longitud: 'Conductor length (m)',
+        tipoSistema: 'System type (1F, 3F)'
       },
       output: {
-        Icc: 'Short circuit current in amperes',
-        method: 'Calculation method used',
-        precision: 'IEEE standard precision',
-        formula: 'Applied formula'
+        sistema: 'Normalized system data',
+        ampacidad: 'Ampacity calculation with NOM factors',
+        conductor: 'Selected conductor specifications',
+        caida: 'Voltage drop calculation',
+        falla: 'Short circuit calculation',
+        proteccion: 'Protection device selection',
+        coordinacion: 'Protection coordination results',
+        validacion: 'NOM validation results'
       }
     }
   })

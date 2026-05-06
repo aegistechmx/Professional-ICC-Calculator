@@ -20,7 +20,6 @@ echo -e "${GREEN}  Iniciando sistema completo...${NC}"
 echo
 echo -e "   ${YELLOW}•${NC} Frontend (React/Vite)"
 echo -e "   ${YELLOW}•${NC} Backend (Node.js/Express)"
-echo -e "   ${YELLOW}•${NC} Cortocircuito (HTML/JavaScript)"
 echo
 echo -e "${BLUE}Espere mientras los servicios inician...${NC}"
 echo
@@ -36,10 +35,6 @@ if [ ! -d "backend" ]; then
     exit 1
 fi
 
-if [ ! -d "cortocircuito" ]; then
-    echo -e "${RED}❌ Directorio cortocircuito no encontrado${NC}"
-    exit 1
-fi
 
 # Función para verificar si un puerto está en uso
 check_port() {
@@ -53,7 +48,6 @@ check_port() {
 # Verificar puertos
 FRONTEND_PORT=5173
 BACKEND_PORT=3001
-CORTO_PORT=3002
 
 if ! check_port $FRONTEND_PORT; then
     echo -e "${YELLOW}⚠️  Puerto $FRONTEND_PORT ya está en uso (frontend)${NC}"
@@ -61,10 +55,6 @@ fi
 
 if ! check_port $BACKEND_PORT; then
     echo -e "${YELLOW}⚠️  Puerto $BACKEND_PORT ya está en uso (backend)${NC}"
-fi
-
-if ! check_port $CORTO_PORT; then
-    echo -e "${YELLOW}⚠️  Puerto $CORTO_PORT ya está en uso (cortocircuito)${NC}"
 fi
 
 # Iniciar servicios en background
@@ -85,15 +75,6 @@ cd frontend && npm run dev &
 FRONTEND_PID=$!
 cd ..
 
-# Esperar 3 segundos
-sleep 3
-
-# Cortocircuito
-echo -e "${BLUE}Iniciando Cortocircuito...${NC}"
-cd cortocircuito && npx serve -l 3002 &
-CORTO_PID=$!
-cd ..
-
 # Esperar 5 segundos para que todo inicie
 sleep 5
 
@@ -104,7 +85,6 @@ echo -e "${CYAN}====================================================${NC}"
 echo
 echo -e "${GREEN}🌐 Frontend:${NC}    http://localhost:$FRONTEND_PORT"
 echo -e "${GREEN}⚙️  Backend:${NC}     http://localhost:$BACKEND_PORT"
-echo -e "${GREEN}⚡ Cortocircuito:${NC} http://localhost:$CORTO_PORT"
 echo
 echo -e "${YELLOW}📋 Instrucciones:${NC}"
 echo -e "   • Presiona Ctrl+C para detener todos los servicios"
@@ -118,13 +98,11 @@ if command -v xdg-open > /dev/null; then
     echo -e "${BLUE}Abriendo navegador...${NC}"
     xdg-open http://localhost:$FRONTEND_PORT &
     xdg-open http://localhost:$BACKEND_PORT &
-    xdg-open http://localhost:$CORTO_PORT &
 elif command -v open > /dev/null; then
     # macOS
     echo -e "${BLUE}Abriendo navegador...${NC}"
     open http://localhost:$FRONTEND_PORT &
     open http://localhost:$BACKEND_PORT &
-    open http://localhost:$CORTO_PORT &
 fi
 
 # Función para limpieza
@@ -139,11 +117,6 @@ cleanup() {
     if [ ! -z "$FRONTEND_PID" ]; then
         echo -e "${CYAN}   Deteniendo Frontend (PID: $FRONTEND_PID)...${NC}"
         kill $FRONTEND_PID 2>/dev/null
-    fi
-    
-    if [ ! -z "$CORTO_PID" ]; then
-        echo -e "${CYAN}   Deteniendo Cortocircuito (PID: $CORTO_PID)...${NC}"
-        kill $CORTO_PID 2>/dev/null
     fi
     
     echo -e "${GREEN}✅ Todos los servicios detenidos${NC}"

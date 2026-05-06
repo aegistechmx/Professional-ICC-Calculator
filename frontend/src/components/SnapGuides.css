@@ -1,0 +1,141 @@
+/**
+ * SnapGuides.css - Estilos para las guías de alineación
+ * Líneas guía visuales tipo AutoCAD
+ */
+
+.snap-guides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.snap-guide {
+  position: absolute;
+  background: #3b82f6;
+  opacity: 0.6;
+  animation: guidePulse 1s ease-in-out infinite;
+}
+
+.snap-guide.vertical {
+  width: 1px;
+  height: 100%;
+  top: 0;
+}
+
+.snap-guide.horizontal {
+  height: 1px;
+  width: 100%;
+  left: 0;
+}
+
+.snap-guide::before,
+.snap-guide::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+}
+
+/* Marcas en los extremos de las líneas verticales */
+.snap-guide.vertical::before,
+.snap-guide.vertical::after {
+  width: 9px;
+  height: 1px;
+  left: -4px;
+}
+
+.snap-guide.vertical::before {
+  top: 0;
+}
+
+.snap-guide.vertical::after {
+  bottom: 0;
+}
+
+/* Marcas en los extremos de las líneas horizontales */
+.snap-guide.horizontal::before,
+.snap-guide.horizontal::after {
+  width: 1px;
+  height: 9px;
+  top: -4px;
+}
+
+.snap-guide.horizontal::before {
+  left: 0;
+}
+
+.snap-guide.horizontal::after {
+  right: 0;
+}
+
+/* Etiqueta del tipo de guía */
+.guide-label {
+  position: absolute;
+  background: #3b82f6;
+  color: white;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.snap-guide:hover .guide-label {
+  opacity: 1;
+}
+
+.snap-guide.vertical .guide-label {
+  top: 10px;
+  left: 5px;
+}
+
+.snap-guide.horizontal .guide-label {
+  left: 10px;
+  top: 5px;
+}
+
+@keyframes guidePulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Variantes por tipo de guía */
+.snap-guide[data-type="left"] {
+  background: #ef4444; /* Rojo para izquierda */
+}
+
+.snap-guide[data-type="right"] {
+  background: #f59e0b; /* Amarillo para derecha */
+}
+
+.snap-guide[data-type="center"] {
+  background: #10b981; /* Verde para centro */
+}
+
+.snap-guide[data-type="top"] {
+  background: #3b82f6; /* Azul para arriba */
+}
+
+.snap-guide[data-type="bottom"] {
+  background: #8b5cf6; /* Púrpura para abajo */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .snap-guide {
+    opacity: 0.4;
+  }
+  
+  .guide-label {
+    display: none;
+  }
+}

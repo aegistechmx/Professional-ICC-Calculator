@@ -1,0 +1,289 @@
+/**
+ * TCCPanel.css - Estilos para panel de curvas TCC
+ * Diseño profesional para coordinación de protecciones
+ */
+
+.tcc-panel {
+  position: fixed;
+  right: 20px;
+  top: 80px;
+  width: 450px;
+  max-height: calc(100vh - 100px);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  z-index: 1000;
+}
+
+.tcc-panel.empty {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Header */
+.tcc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tcc-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+/* Warning */
+.tcc-warning {
+  margin: 0;
+  padding: 12px 20px;
+  background: #fef2f2;
+  border-left: 4px solid #dc2626;
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Chart container */
+.tcc-chart-container {
+  padding: 20px;
+  background: white;
+}
+
+.tcc-chart {
+  width: 100%;
+  height: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.chart-grid line {
+  stroke: #e5e7eb;
+  stroke-width: 0.5;
+}
+
+.chart-axes line {
+  stroke: #374151;
+  stroke-width: 1;
+}
+
+.chart-axes text {
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+/* Conflict animation */
+.conflict {
+  animation: conflictPulse 1s ease-in-out infinite;
+  stroke-width: 3;
+}
+
+@keyframes conflictPulse {
+  0%, 100% {
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-opacity: 0.5;
+  }
+}
+
+/* Legend */
+.tcc-legend {
+  padding: 16px 20px;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tcc-legend h4 {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Info section */
+.tcc-info {
+  padding: 16px 20px;
+}
+
+.tcc-info h4 {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 12px;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item span:first-child {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.info-item span:last-child {
+  color: #1f2937;
+  font-weight: 600;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tcc-panel {
+    right: 10px;
+    left: 10px;
+    width: auto;
+    top: 70px;
+    max-height: calc(100vh - 80px);
+  }
+  
+  .tcc-header h3 {
+    font-size: 12px;
+  }
+  
+  .tcc-chart {
+    height: 250px;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .tcc-panel {
+    background: #1f2937;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .tcc-header {
+    background: #374151;
+    border-bottom-color: #4b5563;
+  }
+  
+  .tcc-header h3 {
+    color: #e5e7eb;
+  }
+  
+  .close-btn {
+    color: #9ca3af;
+  }
+  
+  .close-btn:hover {
+    background: #4b5563;
+    color: #e5e7eb;
+  }
+  
+  .tcc-warning {
+    background: #450a0a;
+    border-left-color: #dc2626;
+    color: #fca5a5;
+  }
+  
+  .tcc-chart {
+    background: #111827;
+    border-color: #374151;
+  }
+  
+  .chart-grid line {
+    stroke: #374151;
+  }
+  
+  .chart-axes line {
+    stroke: #9ca3af;
+  }
+  
+  .chart-axes text {
+    fill: #9ca3af;
+  }
+  
+  .tcc-legend {
+    border-top-color: #4b5563;
+    border-bottom-color: #4b5563;
+  }
+  
+  .tcc-legend h4 {
+    color: #9ca3af;
+  }
+  
+  .legend-item {
+    color: #e5e7eb;
+  }
+  
+  .tcc-info h4 {
+    color: #9ca3af;
+  }
+  
+  .info-item {
+    border-bottom-color: #374151;
+  }
+  
+  .info-item span:first-child {
+    color: #9ca3af;
+  }
+  
+  .info-item span:last-child {
+    color: #e5e7eb;
+  }
+}

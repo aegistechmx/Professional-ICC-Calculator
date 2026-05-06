@@ -1,0 +1,96 @@
+{
+  "exactDuplicates": [],
+  "sameName": [
+    {
+      "name": "index.js",
+      "files": [
+        "C:\\Professional ICC Calculator\\backend\\src\\application\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\contingency\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\dynamics\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\opf\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\opf\\scopf\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\powerflow\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\stability\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\stability\\models\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\protection\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\validation\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\infrastructure\\database\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\infrastructure\\infra\\config\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\infrastructure\\workers\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\plugins\\contingency\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\plugins\\opf\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\plugins\\powerflow\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\plugins\\stability\\index.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\shared\\index.js"
+      ]
+    },
+    {
+      "name": "Complex.js",
+      "files": [
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\math\\Complex.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\shared\\math\\Complex.js"
+      ]
+    },
+    {
+      "name": "generator.js",
+      "files": [
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\contingency\\generator.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\dynamics\\models\\generator.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\opf\\generator.js"
+      ]
+    },
+    {
+      "name": "solver.js",
+      "files": [
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\opf\\solver.js",
+        "C:\\Professional ICC Calculator\\backend\\src\\core\\powerflow\\solver.js"
+      ]
+    }
+  ],
+  "similarNames": [
+    {
+      "name1": "simulation.service.controller.js",
+      "name2": "simulation.service.routes.js",
+      "similarity": 0.78125
+    },
+    {
+      "name1": "powerflow.routes.js",
+      "name2": "powerflow.worker.js",
+      "similarity": 0.7894736842105263
+    },
+    {
+      "name1": "simulation.routes.js",
+      "name2": "simulation.worker.js",
+      "similarity": 0.8
+    },
+    {
+      "name1": "runSCOPF.js",
+      "name2": "runOPF.js",
+      "similarity": 0.8181818181818181
+    },
+    {
+      "name1": "index.js",
+      "name2": "index.ts",
+      "similarity": 0.875
+    },
+    {
+      "name1": "runPowerFlow.js",
+      "name2": "powerflow.js",
+      "similarity": 0.8
+    },
+    {
+      "name1": "scopfSolver.js",
+      "name2": "tsScopfSolver.js",
+      "similarity": 0.875
+    },
+    {
+      "name1": "solver.js",
+      "name2": "server.js",
+      "similarity": 0.7777777777777778
+    }
+  ],
+  "sameSize": [],
+  "timestamp": "2026-04-29T04:49:51.312Z"
+}

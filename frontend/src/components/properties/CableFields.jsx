@@ -95,48 +95,112 @@ export default function CableFields({ edge, updateEdge, cableRes }) {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Longitud (m)
         </label>
-        <input
-          type="number"
+        <select
           value={localEdge.longitud ?? 10}
           onChange={e => handleEdgeChange('longitud', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        >
+          <option value="">Seleccionar longitud...</option>
+          <option value="1">1 m</option>
+          <option value="2">2 m</option>
+          <option value="3">3 m</option>
+          <option value="5">5 m</option>
+          <option value="10">10 m</option>
+          <option value="15">15 m</option>
+          <option value="20">20 m</option>
+          <option value="25">25 m</option>
+          <option value="30">30 m</option>
+          <option value="40">40 m</option>
+          <option value="50">50 m</option>
+          <option value="75">75 m</option>
+          <option value="100">100 m</option>
+          <option value="125">125 m</option>
+          <option value="150">150 m</option>
+          <option value="200">200 m</option>
+          <option value="250">250 m</option>
+          <option value="300">300 m</option>
+          <option value="400">400 m</option>
+          <option value="500">500 m</option>
+          <option value="750">750 m</option>
+          <option value="1000">1000 m</option>
+        </select>
       </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Paralelo
         </label>
-        <input
-          type="number"
+        <select
           value={localEdge.paralelo ?? 1}
           onChange={e => handleEdgeChange('paralelo', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        >
+          <option value="">Seleccionar paralelo...</option>
+          <option value="1">1 (Simple)</option>
+          <option value="2">2 (Doble)</option>
+          <option value="3">3 (Triple)</option>
+          <option value="4">4 (Cuádruple)</option>
+          <option value="5">5 (Quíntuple)</option>
+          <option value="6">6 (Sextuple)</option>
+          <option value="8">8 (Óctuple)</option>
+          <option value="10">10 (Décuple)</option>
+        </select>
       </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Temperatura (°C)
         </label>
-        <input
-          type="number"
+        <select
           value={localEdge.temp ?? 30}
           onChange={e => handleEdgeChange('temp', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        >
+          <option value="">Seleccionar temperatura...</option>
+          <option value="10">10°C (Muy Frío)</option>
+          <option value="15">15°C (Frío)</option>
+          <option value="20">20°C (Frío Moderado)</option>
+          <option value="25">25°C (Normal)</option>
+          <option value="30">30°C (Ambiente)</option>
+          <option value="35">35°C (Cálido)</option>
+          <option value="40">40°C (Caliente)</option>
+          <option value="45">45°C (Muy Caliente)</option>
+          <option value="50">50°C (Extremo)</option>
+          <option value="55">55°C (Muy Extremo)</option>
+          <option value="60">60°C (Crítico)</option>
+          <option value="70">70°C (Muy Crítico)</option>
+          <option value="75">75°C (Peligroso)</option>
+          <option value="80">80°C (Muy Peligroso)</option>
+          <option value="90">90°C (Crítico Máximo)</option>
+        </select>
       </div>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           # Conductores (agrupamiento)
         </label>
-        <input
-          type="number"
+        <select
           value={localEdge.numConductores ?? 3}
           onChange={e => handleEdgeChange('numConductores', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        >
+          <option value="">Seleccionar conductores...</option>
+          <option value="1">1 (Monofásico)</option>
+          <option value="2">2 (Bifásico)</option>
+          <option value="3">3 (Trifásico)</option>
+          <option value="4">4 (3F + Neutro)</option>
+          <option value="5">5 (3F + N + T)</option>
+          <option value="6">6 (3F + 2N + T)</option>
+          <option value="7">7 (3F + 3N + T)</option>
+          <option value="8">8 (3F + 4N + T)</option>
+          <option value="9">9 (3F + 5N + T)</option>
+          <option value="10">10 (3F + 6N + T)</option>
+          <option value="12">12 (3F + 8N + T)</option>
+          <option value="15">15 (3F + 11N + T)</option>
+          <option value="20">20 (3F + 16N + T)</option>
+          <option value="25">25 (3F + 21N + T)</option>
+          <option value="30">30 (3F + 26N + T)</option>
+        </select>
       </div>
 
       {(errMsg || cableRes?.resultados) && (

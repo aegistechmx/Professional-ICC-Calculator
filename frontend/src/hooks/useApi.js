@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
 /**
  * Custom hook for API calls with loading and error states

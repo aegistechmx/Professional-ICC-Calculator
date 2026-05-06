@@ -49,7 +49,7 @@ class NewtonOPFSolver {
     })
 
     // Initialize Lagrangian multipliers
-    this.lambda = 0 // Power balance multiplier
+    this.lambda = 0; // power (W) balance multiplier
     this.mu = [] // Generation limit multipliers
     this.nu = [] // Voltage limit multipliers
   }
@@ -59,7 +59,7 @@ class NewtonOPFSolver {
    * @returns {Object} Power flow results
    */
   solvePowerFlow() {
-    const { powerFlowMethod, tolerance, maxIterations } = this.options
+    const { powerFlowMethod, tolerance, maxIterations } = this.options // power (W)
 
     // Update model with current generation
     this.generators.forEach((gen, _i) => {
@@ -69,7 +69,7 @@ class NewtonOPFSolver {
       }
     })
 
-    if (powerFlowMethod === 'FDLF') {
+    if (powerFlowMethod === 'FDLF') { // power (W)
       return solveFDLF(this.model, { tolerance, maxIterations })
     } else {
       return solve(this.model, { tolerance, maxIterations })
@@ -93,7 +93,7 @@ class NewtonOPFSolver {
         .map(() => Array(n).fill(0)),
       dP_dNu: Array(n)
         .fill()
-        .map(() => Array(pfResult.voltages.length).fill(0)),
+        .map(() => Array(pfResult.voltages.length).fill(0)), // voltage (V)
     }
 
     // Power balance derivatives
@@ -133,7 +133,7 @@ class NewtonOPFSolver {
     const Pgen = this.generators.map(g => g.P)
     const loads = this.model.buses.filter(b => b.type === 'PQ').map(b => b.P)
     const totalLoad = loads.reduce((sum, P) => sum + P, 0)
-    const _powerMismatch = Pgen.reduce((sum, P) => sum + P, 0) - totalLoad
+    const _powerMismatch = Pgen.reduce((sum, P) => sum + P, 0) - totalLoad // power (W)
 
     for (let i = 0; i < n; i++) {
       gradient[i] = costGrad[i] + this.lambda * 1 // Power balance

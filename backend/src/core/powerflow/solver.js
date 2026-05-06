@@ -88,7 +88,7 @@ function solveLinearSystem(J, b) {
 function initializeVoltages(buses) {
   return buses.map(bus => {
     if (bus.type === 'Slack') {
-      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0)
+      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0) // voltage (V)
       // voltage (V)
       const ang = toElectricalPrecision(
         ((bus.voltage?.angle || 0) * Math.PI) / 180
@@ -99,7 +99,7 @@ function initializeVoltages(buses) {
         im: toElectricalPrecision(mag * Math.sin(ang)),
       }
     } else if (bus.type === 'PV') {
-      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0)
+      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0) // voltage (V)
       // voltage (V)
       const ang = toElectricalPrecision(
         ((bus.voltage?.angle || 0) * Math.PI) / 180
@@ -146,12 +146,12 @@ function applyCorrections(V, corrections, buses) {
 
     if (correctionIndex < corrections.length) {
       const dTheta = toElectricalPrecision(corrections[correctionIndex])
-      const currentMag = toElectricalPrecision(Math.hypot(V[i].re, V[i].im))
-      const currentAng = toElectricalPrecision(Math.atan2(V[i].im, V[i].re))
-      const newAng = toElectricalPrecision(currentAng + dTheta)
+      const currentMag = toElectricalPrecision(Math.hypot(V[i].re, V[i].im)) // current (A)
+      const currentAng = toElectricalPrecision(Math.atan2(V[i].im, V[i].re)) // current (A)
+      const newAng = toElectricalPrecision(currentAng + dTheta) // current (A)
 
-      newV[i].re = toElectricalPrecision(currentMag * Math.cos(newAng))
-      newV[i].im = toElectricalPrecision(currentMag * Math.sin(newAng))
+      newV[i].re = toElectricalPrecision(currentMag * Math.cos(newAng)) // current (A)
+      newV[i].im = toElectricalPrecision(currentMag * Math.sin(newAng)) // current (A)
       correctionIndex++
     }
   }
@@ -160,16 +160,16 @@ function applyCorrections(V, corrections, buses) {
   pq.forEach(i => {
     if (correctionIndex < corrections.length) {
       const dV = toElectricalPrecision(corrections[correctionIndex])
-      const currentMag = toElectricalPrecision(
+      const currentMag = toElectricalPrecision( // current (A)
         Math.hypot(newV[i].re, newV[i].im)
       )
-      const currentAng = toElectricalPrecision(
+      const currentAng = toElectricalPrecision( // current (A)
         Math.atan2(newV[i].im, newV[i].re)
       )
       const newMag = toElectricalPrecision(currentMag + dV) // No clamping
 
-      newV[i].re = toElectricalPrecision(newMag * Math.cos(currentAng))
-      newV[i].im = toElectricalPrecision(newMag * Math.sin(currentAng))
+      newV[i].re = toElectricalPrecision(newMag * Math.cos(currentAng)) // current (A)
+      newV[i].im = toElectricalPrecision(newMag * Math.sin(currentAng)) // current (A)
       correctionIndex++
     }
   })

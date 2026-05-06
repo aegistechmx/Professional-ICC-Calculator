@@ -1,3 +1,4 @@
+const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
 /**
  * core/powerflow/solvers/fastDecoupled.js - Fast Decoupled power flow solver
  *
@@ -15,7 +16,7 @@ class FastDecoupledSolver {
     const config = { ...this.defaultOptions, ...options }
 
     // Initialize voltage vector
-    const voltages = this.initializeVoltages(system)
+    const voltages = this.initializeVoltages(system) // voltage (V)
 
     // Build B' and B'' matrices
     const { bPrime, bDoublePrime } = this.buildDecoupledMatrices(system)
@@ -26,7 +27,7 @@ class FastDecoupledSolver {
 
     while (iteration < config.maxIterations && !converged) {
       // Calculate power mismatches
-      const mismatches = this.calculateMismatches(voltages, system)
+      const mismatches = this.calculateMismatches(voltages, system) // voltage (V)
 
       // Check convergence
       maxMismatch = Math.max(...mismatches.map(m => Math.abs(m)))
@@ -60,7 +61,7 @@ class FastDecoupledSolver {
   }
 
   solveOPF(system, options = {}) {
-    const powerflowResult = this.solve(system, options)
+    const powerflowResult = this.solve(system, options) // power (W)
 
     if (!powerflowResult.converged) {
       return powerflowResult
@@ -79,7 +80,7 @@ class FastDecoupledSolver {
   }
 
   initializeVoltages(system) {
-    const voltages = []
+    const voltages = [] // voltage (V)
 
     system.buses.forEach(bus => {
       if (bus.type === 'slack') {
@@ -143,7 +144,7 @@ class FastDecoupledSolver {
     let index = 0
 
     system.buses.forEach((bus, i) => {
-      const V = voltages[i]
+      const V = voltages[i] // voltage (V)
 
       if (bus.type === 'pq') {
         mismatches[index++] =
@@ -161,7 +162,7 @@ class FastDecoupledSolver {
 
   calculateRealPower(voltage, busIndex, voltages, system) {
     // Simplified real power calculation
-    let power = 0
+    let power = 0 // Unit: W (Watts)
     system.branches.forEach(branch => {
       if (branch.from - 1 === busIndex || branch.to - 1 === busIndex) {
         power += voltage.magnitude * 0.1 // Placeholder
@@ -172,7 +173,7 @@ class FastDecoupledSolver {
 
   calculateReactivePower(voltage, busIndex, voltages, system) {
     // Simplified reactive power calculation
-    let power = 0
+    let power = 0 // Unit: W (Watts)
     system.branches.forEach(branch => {
       if (branch.from - 1 === busIndex || branch.to - 1 === busIndex) {
         power += voltage.magnitude * 0.05 // Placeholder
@@ -188,7 +189,7 @@ class FastDecoupledSolver {
       if (bus.type === 'pv' || bus.type === 'pq') {
         const deltaP = mismatches[index++]
         // Simplified angle update
-        voltages[i].angle += deltaP * 0.01 * this.acceleration
+        voltages[i].angle += deltaP * 0.01 * this.acceleration // voltage (V)
       }
     })
   }
@@ -203,13 +204,13 @@ class FastDecoupledSolver {
         index++ // Skip real power
         const deltaQ = mismatches[index++]
         // Simplified magnitude update
-        voltages[i].magnitude += deltaQ * 0.01 * this.acceleration
+        voltages[i].magnitude += deltaQ * 0.01 * this.acceleration // voltage (V)
       }
     })
   }
 
   formatVoltages(voltages) {
-    return voltages.map((v, i) => ({
+    return voltages.map((v, i) => ({ // voltage (V)
       bus: i + 1,
       magnitude: v.magnitude,
       angle: v.angle,
@@ -227,8 +228,8 @@ class FastDecoupledSolver {
       const from = branch.from - 1
       const to = branch.to - 1
 
-      const _V_from = voltages[from]
-      const _V_to = voltages[to]
+      const _V_from = voltages[from] // voltage (V)
+      const _V_to = voltages[to] // voltage (V)
 
       flows.push({
         from: branch.from,
@@ -272,7 +273,7 @@ class FastDecoupledSolver {
   calculateTotalCost(dispatch, costs) {
     return dispatch.reduce((total, gen) => {
       const cost = costs[gen.bus]
-      return total + gen.power * (cost?.b || 20)
+      return toElectricalPrecision(parseFloat((total + gen.power * (cost?.b || 20))).toFixed(6));
     }, 0)
   }
 }

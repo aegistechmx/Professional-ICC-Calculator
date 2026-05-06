@@ -58,7 +58,7 @@ class DynamicPowerFlowSolver {
       if (bus) {
         // Update voltage magnitude and angle from generator state
         const state = gen.getState()
-        bus.voltage = {
+        bus.voltage = { // voltage (V)
           magnitude: bus.voltage?.magnitude || 1.0, // Keep V magnitude
           angle: (state.delta * 180) / Math.PI, // Convert to degrees
         }
@@ -105,7 +105,7 @@ class DynamicPowerFlowSolver {
         const bus = model.buses.find(b => b.id === i)
 
         if (bus && pf.voltages[i]) {
-          const V = pf.voltages[i]
+          const V = pf.voltages[i] // voltage (V)
           const Vmag = Math.sqrt(V.re * V.re + V.im * V.im)
           const Vang = Math.atan2(V.im, V.re)
 
@@ -242,7 +242,7 @@ class DynamicPowerFlowSolver {
     if (fault.type === 'three_phase') {
       const bus = this.model.buses.find(b => b.id === fault.bus)
       if (bus) {
-        bus.voltage.magnitude = 1.0 // Restore normal voltage
+        bus.voltage.magnitude = 1.0; // voltage (V)
       }
     }
   }

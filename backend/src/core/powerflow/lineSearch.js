@@ -1,5 +1,6 @@
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils');
 /**
- * lineSearch.js - Line search with backtracking for NR stability
+ * core/powerflow/lineSearch.js - Line search with backtracking for NR stability
  *
  * Responsibility: Reduce step size if mismatch increases
  * NO Express, NO axios, NO UI logic
@@ -45,13 +46,13 @@ function applyUpdate(V, delta, alpha) {
   // Apply angle corrections
   for (let i = 0; i < V.length; i++) {
     if (correctionIndex < delta.length) {
-      const dTheta = parseFloat((delta[correctionIndex] * alpha).toFixed(6))
-      const currentMag = parseFloat(Math.hypot(V[i].re, V[i].im).toFixed(6))
-      const currentAng = parseFloat(Math.atan2(V[i].im, V[i].re).toFixed(6))
-      const newAng = parseFloat((currentAng + dTheta).toFixed(6))
+      const dTheta = toElectricalPrecision(delta[correctionIndex] * alpha)
+      const currentMag = toElectricalPrecision(Math.hypot(V[i].re, V[i].im)) // current (A)
+      const currentAng = toElectricalPrecision(Math.atan2(V[i].im, V[i].re)) // current (A)
+      const newAng = toElectricalPrecision(currentAng + dTheta) // current (A)
 
-      newV[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))
-      newV[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))
+      newV[i].re = toElectricalPrecision(currentMag * Math.cos(newAng)) // current (A)
+      newV[i].im = toElectricalPrecision(currentMag * Math.sin(newAng)) // current (A)
       correctionIndex++
     }
   }

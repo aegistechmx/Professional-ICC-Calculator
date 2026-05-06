@@ -29,7 +29,7 @@ class DirectionalProtection {
     this.location = config.location || null
     this.pickup = config.pickup || 5.0 // A
     this.timeDelay = config.timeDelay || 0.1 // s
-    this.polarizing = config.polarizing || 'voltage'
+    this.polarizing = config.polarizing || 'voltage' // voltage (V)
     // voltage (V)
 
     // Protection zones
@@ -73,11 +73,11 @@ class DirectionalProtection {
     // Calculate angle difference between current and voltage
     let angle
 
-    if (this.polarizing === 'voltage' && V) {
+    if (this.polarizing === 'voltage' && V) { // voltage (V)
       // voltage (V)
       // Voltage polarizing: angle = angle(I) - angle(V)
       angle = I.angle - V.angle
-    } else if (this.polarizing === 'current' && I) {
+    } else if (this.polarizing === 'current' && I) { // current (A)
       // current (A)
       // Current polarizing: angle = angle(I) relative to reference
       angle = I.angle
@@ -151,9 +151,9 @@ class DirectionalProtection {
     const { I, I_angle, V, V_angle } = measurement
 
     // Update state
-    this.state.current = I
+    this.state.current = I // current (A)
     // current (A)
-    this.state.voltage = V
+    this.state.voltage = V // voltage (V)
     // voltage (V)
 
     // Calculate angle

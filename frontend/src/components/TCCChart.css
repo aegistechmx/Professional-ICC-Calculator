@@ -1,0 +1,272 @@
+/**
+ * TCCChart.css - Estilos para gráfica de curvas TCC
+ */
+
+.tcc-chart-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.chart-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+}
+
+.tcc-chart {
+  display: block;
+  margin: 0 auto;
+  background: white;
+  border-radius: 4px;
+}
+
+/* Curvas TCC */
+.tcc-curve path {
+  transition: stroke-width 0.2s ease;
+}
+
+.tcc-curve path:hover {
+  stroke-width: 4;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+/* Línea de falla */
+.fault-line line {
+  animation: faultPulse 1s ease-in-out infinite;
+}
+
+@keyframes faultPulse {
+  0%, 100% {
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-opacity: 0.5;
+  }
+}
+
+/* Punto de operación */
+.operating-point circle {
+  animation: pointPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pointPulse {
+  0%, 100% {
+    r: 6;
+  }
+  50% {
+    r: 8;
+  }
+}
+
+/* Leyenda */
+.chart-legend {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.chart-legend h4 {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.legend-item:hover,
+.legend-item.selected {
+  background: #f0f9ff;
+}
+
+.legend-color {
+  width: 20px;
+  height: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.legend-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.legend-type {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+/* Información de coordinación */
+.coordination-info {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+
+.coordination-info.success {
+  background: #f0fdf4;
+  border-left-color: #10b981;
+}
+
+.coordination-info.error {
+  background: #fef2f2;
+  border-left-color: #dc2626;
+}
+
+.coordination-info h5 {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.coordination-info.success h5 {
+  color: #047857;
+}
+
+.coordination-info.error h5 {
+  color: #991b1b;
+}
+
+.coord-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.coord-stats .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.coord-stats .stat label {
+  font-size: 9px;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.coord-stats .stat value {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Monaco', 'Consolas', monospace;
+  color: #374151;
+}
+
+.coord-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.coordination-info.success .coord-status {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.coordination-info.error .coord-status {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tcc-chart-container {
+    padding: 12px;
+  }
+  
+  .chart-title {
+    font-size: 14px;
+  }
+  
+  .coord-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .legend-item {
+    padding: 6px;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .tcc-chart-container {
+    background: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .chart-title {
+    color: #e5e7eb;
+  }
+  
+  .chart-legend {
+    border-top-color: #374151;
+  }
+  
+  .chart-legend h4 {
+    color: #9ca3af;
+  }
+  
+  .legend-name {
+    color: #e5e7eb;
+  }
+  
+  .legend-type {
+    color: #9ca3af;
+  }
+  
+  .legend-item:hover,
+  .legend-item.selected {
+    background: #1e3a5f;
+  }
+  
+  .coordination-info.success {
+    background: #064e3b;
+  }
+  
+  .coordination-info.success h5 {
+    color: #6ee7b7;
+  }
+  
+  .coordination-info.error {
+    background: #450a0a;
+  }
+  
+  .coordination-info.error h5 {
+    color: #fca5a5;
+  }
+  
+  .coord-stats .stat label {
+    color: #9ca3af;
+  }
+  
+  .coord-stats .stat value {
+    color: #e5e7eb;
+  }
+}

@@ -125,10 +125,10 @@ function checkEqualAreaCriterion(trajectory, options = {}) {
     if (nextPoint) {
       const delta = point.delta
       const nextDelta = nextPoint.delta
-      const power = point.Pe || point.power
+      const power = point.Pe || point.power // power (W)
 
       // Trapezoidal integration
-      acceleratingArea += ((delta + nextDelta) * power) / 2
+      acceleratingArea += ((delta + nextDelta) * power) / 2 // power (W)
     }
   }
 
@@ -140,9 +140,9 @@ function checkEqualAreaCriterion(trajectory, options = {}) {
     if (nextPoint) {
       const delta = point.delta
       const nextDelta = nextPoint.delta
-      const power = point.Pe || point.power
+      const power = point.Pe || point.power // power (W)
 
-      deceleratingArea += ((delta + nextDelta) * power) / 2
+      deceleratingArea += ((delta + nextDelta) * power) / 2 // power (W)
     }
   }
 

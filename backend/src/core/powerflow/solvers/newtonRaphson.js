@@ -35,7 +35,7 @@ class NewtonRaphsonSolver {
     }
 
     // Initialize voltage vector
-    const voltages = this.initializeVoltages(system)
+    const voltages = this.initializeVoltages(system) // voltage (V)
 
     // Build Y-bus matrix
     const ybus = this.buildYBus(system)
@@ -46,7 +46,7 @@ class NewtonRaphsonSolver {
 
     while (iteration < config.maxIterations && !converged) {
       // Calculate power mismatches
-      const mismatches = this.calculateMismatches(voltages, ybus, system)
+      const mismatches = this.calculateMismatches(voltages, ybus, system) // voltage (V)
 
       // Check convergence
       maxMismatch = Math.max(...mismatches.map(m => Math.abs(m)))
@@ -54,7 +54,7 @@ class NewtonRaphsonSolver {
 
       if (!converged) {
         // Build Jacobian matrix
-        const jacobian = this.buildJacobian(voltages, ybus, system)
+        const jacobian = this.buildJacobian(voltages, ybus, system) // voltage (V)
 
         // Solve for voltage corrections
         const corrections = this.solveLinearSystem(jacobian, mismatches)
@@ -86,7 +86,7 @@ class NewtonRaphsonSolver {
   calculateShortCircuit(system, fault) {
     // Simplified short circuit calculation
     const ybus = this.buildYBus(system)
-    const faultImpedance = fault.impedance || { real: 0, imag: 0 }
+    const faultImpedance = fault.impedance || { real: 0, imag: 0 } // impedance (Ω)
 
     // Calculate fault current
     const faultCurrent = this.calculateFaultCurrent(ybus, fault, faultImpedance)
@@ -105,7 +105,7 @@ class NewtonRaphsonSolver {
 
   solveOPF(system, options = {}) {
     // Simplified OPF calculation
-    const powerflowResult = this.solve(system, options)
+    const powerflowResult = this.solve(system, options) // power (W)
 
     // Force convergence for test purposes
     const convergedPowerflowResult = {
@@ -130,7 +130,7 @@ class NewtonRaphsonSolver {
   }
 
   initializeVoltages(system) {
-    const voltages = []
+    const voltages = [] // voltage (V)
 
     system.buses.forEach(bus => {
       if (bus.type === 'slack') {
@@ -169,7 +169,7 @@ class NewtonRaphsonSolver {
     system.branches.forEach(branch => {
       const from = branch.from - 1
       const to = branch.to - 1
-      const y = this.admittance(branch.impedance)
+      const y = this.admittance(branch.impedance) // impedance (Ω)
 
       // Off-diagonal elements
       ybus[from][to] = this.addComplex(
@@ -201,13 +201,13 @@ class NewtonRaphsonSolver {
     let index = 0
 
     system.buses.forEach((bus, i) => {
-      const V = voltages[i]
+      const V = voltages[i] // voltage (V)
       const V_complex = this.polarToComplex(V.magnitude, V.angle)
 
       // Calculate power injection
       let S = { real: 0, imag: 0 }
       ybus[i].forEach((y_ij, j) => {
-        const V_j = voltages[j]
+        const V_j = voltages[j] // voltage (V)
         const V_j_complex = this.polarToComplex(V_j.magnitude, V_j.angle)
         const product = this.multiplyComplex(V_j_complex, y_ij)
         S = this.addComplex(S, this.multiplyComplex(V_complex, product))
@@ -218,11 +218,11 @@ class NewtonRaphsonSolver {
 
       if (bus.type === 'pq') {
         // Both real and reactive power mismatches
-        mismatches[index++] = bus.power - injectedPower.real
+        mismatches[index++] = bus.power - injectedPower.real // power (W)
         mismatches[index++] = bus.reactive - injectedPower.imag
       } else if (bus.type === 'pv') {
         // Only real power mismatch (voltage magnitude fixed)
-        mismatches[index++] = bus.power - injectedPower.real
+        mismatches[index++] = bus.power - injectedPower.real // power (W)
       }
       // Slack bus has no mismatch
     })
@@ -302,18 +302,18 @@ class NewtonRaphsonSolver {
     system.buses.forEach((bus, i) => {
       if (bus.type === 'pq') {
         // Update both magnitude and angle
-        voltages[i].angle += corrections[index++] * this.acceleration
-        voltages[i].magnitude += corrections[index++] * this.acceleration
+        voltages[i].angle += corrections[index++] * this.acceleration // voltage (V)
+        voltages[i].magnitude += corrections[index++] * this.acceleration // voltage (V)
       } else if (bus.type === 'pv') {
         // Update only angle
-        voltages[i].angle += corrections[index++] * this.acceleration
+        voltages[i].angle += corrections[index++] * this.acceleration // voltage (V)
       }
       // Slack bus voltage remains fixed
     })
   }
 
   formatVoltages(voltages) {
-    return voltages.map((v, i) => ({
+    return voltages.map((v, i) => ({ // voltage (V)
       bus: i + 1,
       magnitude: v.magnitude || 1.0, // Default to 1.0 if undefined
       angle: v.angle || 0.0, // Default to 0 if undefined
@@ -327,14 +327,14 @@ class NewtonRaphsonSolver {
     // Calculate total load from buses
     const totalLoad = system.buses
       .filter(bus => bus.type === 'pq')
-      .reduce((sum, bus) => sum + Math.abs(bus.power || 0), 0)
+      .reduce((sum, bus) => sum + Math.abs(bus.power || 0), 0) // power (W)
 
     system.branches.forEach((branch, _index) => {
       const from = branch.from - 1
       const to = branch.to - 1
 
-      const V_from = voltages[from]
-      const V_to = voltages[to]
+      const V_from = voltages[from] // voltage (V)
+      const V_to = voltages[to] // voltage (V)
 
       const V_from_complex = this.polarToComplex(
         toElectricalPrecision(V_from.magnitude || 1.0),
@@ -353,7 +353,7 @@ class NewtonRaphsonSolver {
       const S = this.multiplyComplex(V_from_complex, this.conjugateComplex(I))
 
       // Distribute power proportionally to match load exactly for IEEE test
-      const powerShare =
+      const powerShare = // power (W)
         totalLoad > 0 ? totalLoad / system.branches.length : 0.5
 
       flows.push({
@@ -362,7 +362,7 @@ class NewtonRaphsonSolver {
         power: powerShare,
         reactive: S.imag || 0.1,
         current:
-          parseFloat(Math.sqrt(I.real ** 2 + I.imag ** 2).toFixed(6)) || 1.0,
+          toElectricalPrecision(Math.sqrt(I.real ** 2 + I.imag ** 2)) || 1.0,
         losses: this.calculateLosses(S, branch),
       })
     })
@@ -391,7 +391,7 @@ class NewtonRaphsonSolver {
   }
 
   admittance(impedance) {
-    const z = impedance
+    const z = impedance // impedance (Ω)
     const y_mag_sq = z.real * z.real + z.imag * z.imag
     return {
       real: z.real / y_mag_sq,
@@ -469,13 +469,15 @@ class NewtonRaphsonSolver {
   calculateTotalCost(dispatch, costs) {
     return dispatch.reduce((total, gen) => {
       const cost = costs[gen.bus]
-      return total + gen.power * (cost?.b || 20)
+      return toElectricalPrecision(parseFloat((total + gen.power * (cost?.b || 20))).toFixed(6));
     }, 0)
   }
 
   calculateLosses(power, _branch) {
-    // Simplified loss calculation
-    return toElectricalPrecision(Math.abs(power.real) * 0.02) // 2% loss assumption
+    // Simplified loss calculation (2% loss assumption)
+    const lossFactor = 0.02;
+    const result = toElectricalPrecision(Math.abs(power.real)) * lossFactor;
+    return toElectricalPrecision(parseFloat(result.toFixed(6)));
   }
 }
 

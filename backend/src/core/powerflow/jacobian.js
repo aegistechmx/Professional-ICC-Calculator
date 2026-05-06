@@ -61,9 +61,9 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
   }
 
   // Indices for voltage variables (only PQ buses)
-  const voltageIndex = pqBuses
+  const voltageIndex = pqBuses // voltage (V)
 
-  const size = angleIndex.length + voltageIndex.length
+  const size = angleIndex.length + voltageIndex.length // voltage (V)
   const J = Array.from({ length: size }, () => Array(size).fill(0))
 
   let row = 0
@@ -108,8 +108,8 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
     // =========================
     // J12 = dP/dV
     // =========================
-    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) {
-      const j = voltageIndex[jIdx]
+    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) { // voltage (V)
+      const j = voltageIndex[jIdx] // voltage (V)
 
       const Vi = getV(i)
       const theta = getTheta(i) - getTheta(j)
@@ -139,8 +139,8 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
   // =========================
   // J21 = dQ/dθ
   // =========================
-  for (let iIdx = 0; iIdx < voltageIndex.length; iIdx++) {
-    const i = voltageIndex[iIdx]
+  for (let iIdx = 0; iIdx < voltageIndex.length; iIdx++) { // voltage (V)
+    const i = voltageIndex[iIdx] // voltage (V)
     let col = 0
 
     for (let jIdx = 0; jIdx < angleIndex.length; jIdx++) {
@@ -176,8 +176,8 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
     // =========================
     // J22 = dQ/dV
     // =========================
-    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) {
-      const j = voltageIndex[jIdx]
+    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) { // voltage (V)
+      const j = voltageIndex[jIdx] // voltage (V)
 
       const Vi = getV(i)
       const theta = getTheta(i) - getTheta(j)

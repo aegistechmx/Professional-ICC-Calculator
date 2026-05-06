@@ -6,7 +6,7 @@
  */
 
 const { parentPort, _workerData } = require('worker_threads')
-const { _PowerFlowSolver } = require('../../core/powerflow/solvers')
+const { _PowerFlowSolver } = require('../../core/powerflow/solvers') // power (W)
 
 /**
  * Handle worker message

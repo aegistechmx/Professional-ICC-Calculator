@@ -36,7 +36,7 @@ class Generator {
 
     // Current operating point
     this.P = Pmin // Start at minimum
-    this.Q = 0 // Reactive power
+    this.Q = 0; // power (W)
   }
 
   /**

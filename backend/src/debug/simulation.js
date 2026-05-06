@@ -324,7 +324,7 @@ class PowerFlowDebugger extends SimulationLogger {
    * @param {number} iteration - Current iteration
    */
   logVoltageProfile(voltages, iteration) {
-    const profile = voltages.map((v, i) => ({
+    const profile = voltages.map((v, i) => ({ // voltage (V)
       bus: i + 1,
       magnitude: v.magnitude,
       angle: v.angle,

@@ -9,20 +9,32 @@ export default function Sidebar() {
   const components = [
     {
       type: 'transformer',
-      icon: '🔌',
+      icon: '',
       label: 'Transformador',
       color: 'bg-blue-500',
     },
     {
       type: 'generator',
-      icon: '⚙️',
+      icon: '',
       label: 'Generador',
       color: 'bg-orange-500',
     },
-    { type: 'breaker', icon: '⚡', label: 'Breaker', color: 'bg-red-500' },
-    { type: 'panel', icon: '📦', label: 'Tablero', color: 'bg-green-500' },
-    { type: 'motor', icon: '🏭', label: 'Motor', color: 'bg-purple-500' },
-    { type: 'load', icon: '💡', label: 'Carga', color: 'bg-yellow-500' },
+    { type: 'breaker', icon: '', label: 'Breaker', color: 'bg-red-500' },
+    { type: 'panel', icon: '', label: 'Tablero', color: 'bg-green-500' },
+    { type: 'motor', icon: '', label: 'Motor', color: 'bg-purple-500' },
+    { type: 'load', icon: '', label: 'Carga', color: 'bg-yellow-500' },
+    {
+      type: 'capacitor',
+      icon: '||',
+      label: 'Banco de Capacitores',
+      color: 'bg-teal-500'
+    },
+    {
+      type: 'generator_ats',
+      icon: 'ATS',
+      label: 'Transferencia Automática',
+      color: 'bg-indigo-500'
+    },
   ]
 
   return (

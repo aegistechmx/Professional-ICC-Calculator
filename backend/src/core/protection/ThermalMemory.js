@@ -1,3 +1,4 @@
+const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
 /**
  * ThermalMemory - I²t Thermal Memory for Protection
  *
@@ -43,20 +44,20 @@ class ThermalMemory {
    * @param {number} currentTime - Current simulation time (s)
    * @returns {Object} Thermal state
    */
-  update(current, dt, currentTime = 0) {
+  update(current, dt, currentTime = 0) { // current (A)
     // current (A)
     // Calculate I²t for this time step
-    const i2t = current * current * dt
+    const i2t = toElectricalPrecision(parseFloat((current * current * dt)).toFixed(6)); // current (A)
     // current (A)
 
     // Add to accumulated I²t
     this.state.accumulatedI2t += i2t
-    this.state.currentI2t = i2t
+    this.state.currentI2t = i2t // current (A)
     // current (A)
 
     // Calculate cooling (exponential decay)
     if (this.state.lastUpdateTime !== null) {
-      const timeSinceLastUpdate = currentTime - this.state.lastUpdateTime
+      const timeSinceLastUpdate = currentTime - this.state.lastUpdateTime // current (A)
       // current (A)
       const coolingFactor = Math.exp(
         -timeSinceLastUpdate / this.coolingTimeConstant
@@ -72,11 +73,11 @@ class ThermalMemory {
 
     // Record trip time if overheating
     if (this.state.overheated && this.state.tripTime === null) {
-      this.state.tripTime = currentTime
+      this.state.tripTime = currentTime // current (A)
       // current (A)
     }
 
-    this.state.lastUpdateTime = currentTime
+    this.state.lastUpdateTime = currentTime // current (A)
     // current (A)
 
     return {
@@ -190,16 +191,16 @@ class ThermalMemoryProtection {
    * @param {number} currentTime - Current simulation time (s)
    * @returns {Object} Protection evaluation result
    */
-  evaluate(measurement, dt, currentTime = 0) {
+  evaluate(measurement, dt, currentTime = 0) { // current (A)
     // current (A)
     const { I } = measurement
 
     // Update state
-    this.state.current = I
+    this.state.current = I // current (A)
     // current (A)
 
     // Update thermal memory
-    const thermalState = this.thermalMemory.update(I, dt, currentTime)
+    const thermalState = this.thermalMemory.update(I, dt, currentTime) // current (A)
     // current (A)
 
     // Check for trip conditions
@@ -214,13 +215,13 @@ class ThermalMemoryProtection {
 
     // Check short-time limit (fault)
     const i2t = I * I * dt
-    if (i2t > this.shortTimeLimit && I > this.ratedCurrent * 6) {
+    if (i2t > this.shortTimeLimit && I > this.ratedCurrent * 6) { // Unit: A (Amperes)
       trip = true
       tripType = 'short_time_fault'
     }
 
     // Check instantaneous limit (high fault)
-    if (i2t > this.instantaneousLimit && I > this.ratedCurrent * 10) {
+    if (i2t > this.instantaneousLimit && I > this.ratedCurrent * 10) { // Unit: A (Amperes)
       trip = true
       tripType = 'instantaneous_fault'
     }
@@ -229,7 +230,7 @@ class ThermalMemoryProtection {
     if (trip && !this.state.trip) {
       this.state.trip = true
       this.state.tripType = tripType
-      this.state.tripTime = currentTime
+      this.state.tripTime = currentTime // current (A)
       // current (A)
     }
 

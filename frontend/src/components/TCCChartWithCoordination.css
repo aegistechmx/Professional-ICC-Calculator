@@ -1,0 +1,299 @@
+/**
+ * TCCChartWithCoordination.css
+ * Estilos para chart TCC con visualización de coordinación
+ */
+
+.tcc-with-coordination {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Banner de coordinación */
+.coordination-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 3px solid var(--coord-color, #6b7280);
+  background: linear-gradient(135deg, var(--coord-color, #6b7280) 0%, transparent 100%);
+  background-size: 200% 100%;
+  background-position: right;
+}
+
+.coordination-banner.success {
+  background: linear-gradient(135deg, #d1fae5 0%, #f0fdf4 100%);
+  border-bottom-color: #10b981;
+}
+
+.coordination-banner.warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  border-bottom-color: #f59e0b;
+}
+
+.coordination-banner.error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+  border-bottom-color: #ef4444;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  background: white;
+}
+
+.coordination-banner.success .status-icon {
+  color: #10b981;
+  border: 2px solid #10b981;
+}
+
+.coordination-banner.warning .status-icon {
+  color: #f59e0b;
+  border: 2px solid #f59e0b;
+}
+
+.status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.status-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.quality-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #374151;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.conflict-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ef4444;
+  padding: 4px 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 4px;
+}
+
+/* Contenedor del chart */
+.chart-container {
+  position: relative;
+  padding: 20px;
+}
+
+/* Overlay de cruces */
+.crossings-overlay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.crossing-marker {
+  animation: markerPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes markerPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Lista de conflictos */
+.crossings-list {
+  margin: 0 20px 20px;
+  padding: 16px;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 6px;
+}
+
+.crossings-list h4 {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #991b1b;
+}
+
+.crossing-item {
+  padding: 10px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border-left: 3px solid #ef4444;
+}
+
+.crossing-item:last-child {
+  margin-bottom: 0;
+}
+
+.crossing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.crossing-pair {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.crossing-severity {
+  font-size: 10px;
+  font-weight: 600;
+  color: #ef4444;
+  padding: 2px 6px;
+  background: #fee2e2;
+  border-radius: 3px;
+}
+
+.crossing-details {
+  display: flex;
+  gap: 16px;
+  font-size: 10px;
+  color: #6b7280;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+/* Mensaje de éxito */
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #f0fdf4;
+  border-top: 1px solid #d1fae5;
+}
+
+.success-icon {
+  font-size: 24px;
+}
+
+.success-message p {
+  margin: 0;
+  font-size: 12px;
+  color: #065f46;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tcc-with-coordination {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .coordination-banner {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .banner-content {
+    width: 100%;
+  }
+  
+  .chart-container {
+    padding: 10px;
+  }
+  
+  .crossings-list {
+    margin: 0 10px 10px;
+    padding: 12px;
+  }
+  
+  .crossing-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .tcc-with-coordination {
+    background: #1f2937;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .coordination-banner.success {
+    background: linear-gradient(135deg, #064e3b 0%, #1f2937 100%);
+    border-bottom-color: #10b981;
+  }
+  
+  .coordination-banner.success .status-icon {
+    color: #10b981;
+    border-color: #10b981;
+  }
+  
+  .coordination-banner.warning {
+    background: linear-gradient(135deg, #451a03 0%, #1f2937 100%);
+    border-bottom-color: #f59e0b;
+  }
+  
+  .coordination-banner.warning .status-icon {
+    color: #f59e0b;
+    border-color: #f59e0b;
+  }
+  
+  .status-label {
+    color: #e5e7eb;
+  }
+  
+  .quality-badge {
+    background: rgba(31, 41, 55, 0.8);
+    color: #e5e7eb;
+  }
+  
+  .crossings-list {
+    background: #450a0a;
+    border-color: #7f1d1d;
+  }
+  
+  .crossings-list h4 {
+    color: #fca5a5;
+  }
+  
+  .crossing-item {
+    background: #374151;
+  }
+  
+  .crossing-pair {
+    color: #e5e7eb;
+  }
+  
+  .success-message {
+    background: #064e3b;
+    border-top-color: #059669;
+  }
+  
+  .success-message p {
+    color: #6ee7b7;
+  }
+}

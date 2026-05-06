@@ -4,7 +4,7 @@
  * Responsibility: Economic dispatch optimization
  */
 
-const NewtonOPFSolver = require('@/core/powerflow/opf/solver')
+const NewtonOPFSolver = require('@/core/powerflow/opf/solver') // power (W)
 
 module.exports = {
   name: 'opf',
@@ -34,7 +34,7 @@ module.exports = {
       tolerance = 1e-6,
       maxIterations = 30,
       alpha = 0.5,
-      powerFlowMethod = 'FDLF',
+      powerFlowMethod = 'FDLF', // power (W)
       penalty = 1000,
     } = options
 
@@ -42,7 +42,7 @@ module.exports = {
     console.log(`⚡ OPF: Running economic dispatch optimization...`)
 
     // Get power flow result first
-    const pfResult = await context.engine.run('powerflow', 'run', {
+    const pfResult = await context.engine.run('powerflow', 'run', { // power (W)
       system,
       options: { method: powerFlowMethod },
     })

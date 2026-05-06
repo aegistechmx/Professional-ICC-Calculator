@@ -4,6 +4,7 @@
  * Responsibility: Run the professional Express API with ICC endpoints
  */
 
+/* eslint-disable no-console */
 const app = require('./app')
 const PORT = process.env.PORT || 3002
 

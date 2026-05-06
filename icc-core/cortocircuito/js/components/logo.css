@@ -1,0 +1,44 @@
+.logo-container {
+    width: 120px;
+    margin: auto;
+}
+
+.ring {
+    fill: none;
+    stroke: #1e90ff;
+    stroke-width: 4;
+    animation: rotate 6s linear infinite;
+}
+
+.bolt {
+    fill: #ffcc00;
+    animation: pulse 1.5s infinite;
+}
+
+.circuit {
+    stroke: #00bfff;
+    stroke-width: 2;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* ⚡ modo falla */
+.logo-container.active .bolt {
+    animation: shock 0.2s infinite;
+}
+
+@keyframes shock {
+    50% {
+        transform: translateX(2px);
+    }
+}

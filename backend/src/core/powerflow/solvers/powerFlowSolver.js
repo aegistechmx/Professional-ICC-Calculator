@@ -1,3 +1,4 @@
+const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
 /**
  * core/powerflow/solvers/powerFlowSolver.js - Base power flow solver
  *
@@ -18,7 +19,7 @@ class PowerFlowSolver {
     this.validateSystem(system)
 
     // Initialize voltages
-    const voltages = this.initializeVoltages(system)
+    const voltages = this.initializeVoltages(system) // voltage (V)
 
     // Simple iterative solver for demonstration
     let iteration = 0
@@ -27,7 +28,7 @@ class PowerFlowSolver {
 
     while (iteration < config.maxIterations && !converged) {
       // Calculate mismatches
-      const mismatches = this.calculateMismatches(voltages, system)
+      const mismatches = this.calculateMismatches(voltages, system) // voltage (V)
 
       // Check convergence
       maxMismatch = Math.max(...mismatches.map(m => Math.abs(m)))
@@ -59,7 +60,7 @@ class PowerFlowSolver {
   }
 
   solveOPF(system, options = {}) {
-    const powerflowResult = this.solve(system, options)
+    const powerflowResult = this.solve(system, options) // power (W)
 
     if (!powerflowResult.converged) {
       return powerflowResult
@@ -101,7 +102,7 @@ class PowerFlowSolver {
   }
 
   initializeVoltages(system) {
-    const voltages = []
+    const voltages = [] // voltage (V)
 
     system.buses.forEach(bus => {
       if (bus.type === 'slack') {
@@ -130,14 +131,14 @@ class PowerFlowSolver {
     let index = 0
 
     system.buses.forEach((bus, i) => {
-      const V = voltages[i]
+      const V = voltages[i] // voltage (V)
 
       if (bus.type === 'pq') {
-        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system)
+        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system) // power (W)
         mismatches[index++] =
           bus.reactive - this.calculateReactivePower(V, i, system)
       } else if (bus.type === 'pv') {
-        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system)
+        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system) // power (W)
       }
     })
 
@@ -146,7 +147,7 @@ class PowerFlowSolver {
 
   calculateRealPower(voltage, busIndex, system) {
     // Simplified real power calculation
-    let power = 0
+    let power = 0 // Unit: W (Watts)
     system.branches.forEach(branch => {
       if (branch.from - 1 === busIndex || branch.to - 1 === busIndex) {
         power += voltage.magnitude * 0.1 // Placeholder
@@ -157,7 +158,7 @@ class PowerFlowSolver {
 
   calculateReactivePower(voltage, busIndex, system) {
     // Simplified reactive power calculation
-    let power = 0
+    let power = 0 // Unit: W (Watts)
     system.branches.forEach(branch => {
       if (branch.from - 1 === busIndex || branch.to - 1 === busIndex) {
         power += voltage.magnitude * 0.05 // Placeholder
@@ -171,16 +172,16 @@ class PowerFlowSolver {
 
     system.buses.forEach((bus, i) => {
       if (bus.type === 'pq') {
-        voltages[i].angle += mismatches[index++] * 0.01
-        voltages[i].magnitude += mismatches[index++] * 0.01
+        voltages[i].angle += mismatches[index++] * 0.01 // voltage (V)
+        voltages[i].magnitude += mismatches[index++] * 0.01 // voltage (V)
       } else if (bus.type === 'pv') {
-        voltages[i].angle += mismatches[index++] * 0.01
+        voltages[i].angle += mismatches[index++] * 0.01 // voltage (V)
       }
     })
   }
 
   formatVoltages(voltages) {
-    return voltages.map((v, i) => ({
+    return voltages.map((v, i) => ({ // voltage (V)
       bus: i + 1,
       magnitude: v.magnitude,
       angle: v.angle,
@@ -237,7 +238,7 @@ class PowerFlowSolver {
   calculateTotalCost(dispatch, costs) {
     return dispatch.reduce((total, gen) => {
       const cost = costs[gen.bus]
-      return total + gen.power * (cost?.b || 20)
+      return toElectricalPrecision(parseFloat((total + gen.power * (cost?.b || 20))).toFixed(6));
     }, 0)
   }
 }

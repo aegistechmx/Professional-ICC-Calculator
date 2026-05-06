@@ -4,7 +4,7 @@
  * Responsibility: Dynamic simulation and stability analysis
  */
 
-const DynamicSimulator = require('@/core/powerflow/stability/dynamicSimulator')
+const DynamicSimulator = require('@/core/powerflow/stability/dynamicSimulator') // power (W)
 
 module.exports = {
   name: 'stability',

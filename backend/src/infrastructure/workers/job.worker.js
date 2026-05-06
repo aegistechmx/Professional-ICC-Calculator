@@ -1,3 +1,4 @@
+const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
 /**
  * infrastructure/workers/job.worker.js - Professional distributed job worker
  *
@@ -5,16 +6,16 @@
  */
 
 const { parentPort } = require('worker_threads')
-const { solveNR } = require('../../../core/powerflow/solvers')
-const { solveFDLF } = require('../../../core/powerflow/solvers')
+const { solveNR } = require('../../../core/powerflow/solvers') // power (W)
+const { solveFDLF } = require('../../../core/powerflow/solvers') // power (W)
 const { solveOPF } = require('../../../core/opf/algorithms')
 const { simulateDynamics } = require('../../../core/stability/solvers')
 const {
   generateN1Contingencies,
-} = require('../../../core/powerflow/contingency')
+} = require('../../../core/powerflow/contingency') // power (W)
 const {
   evaluateSecurityConstraints,
-} = require('../../../core/powerflow/contingency')
+} = require('../../../core/powerflow/contingency') // power (W)
 
 /**
  * Apply contingency to system
@@ -58,9 +59,9 @@ function calculateScenarioMetrics(system, pfResult) {
   )
 
   // Voltage violations
-  let voltageViolations = 0
+  let voltageViolations = 0 // voltage (V)
   system.buses.forEach(bus => {
-    const voltage = pfResult.voltages[bus.id]
+    const voltage = pfResult.voltages[bus.id] // voltage (V)
     if (voltage) {
       const magnitude = Math.sqrt(
         voltage.re * voltage.re + voltage.im * voltage.im
@@ -82,18 +83,18 @@ function calculateScenarioMetrics(system, pfResult) {
 
   const minVoltage = Math.min(
     ...system.buses.map(b => {
-      const voltage = pfResult.voltages[b.id]
+      const voltage = pfResult.voltages[b.id] // voltage (V)
       return voltage
-        ? parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im).toFixed(6))
+        ? toElectricalPrecision(parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)).toFixed(6))
         : Infinity
     })
   )
 
   const maxVoltage = Math.max(
     ...system.buses.map(b => {
-      const voltage = pfResult.voltages[b.id]
+      const voltage = pfResult.voltages[b.id] // voltage (V)
       return voltage
-        ? parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im).toFixed(6))
+        ? toElectricalPrecision(parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)).toFixed(6))
         : 0
     })
   )
@@ -300,11 +301,11 @@ function calculateMonteCarloStats(results) {
   const meanImbalance =
     loadGenImbalances.reduce((sum, val) => sum + val, 0) /
     loadGenImbalances.length
-  const voltageViolations = results.map(r =>
+  const voltageViolations = results.map(r => // voltage (V)
     r.metrics ? r.metrics.voltageViolations : 0
   )
   const meanVoltageViolations =
-    voltageViolations.reduce((sum, val) => sum + val, 0) /
+    voltageViolations.reduce((sum, val) => sum + val, 0) / // voltage (V)
     voltageViolations.length
 
   return {
@@ -315,14 +316,14 @@ function calculateMonteCarloStats(results) {
     statistics: {
       loadGenerationImbalance: {
         mean: meanImbalance,
-        min: parseFloat(Math.min(...loadGenImbalances).toFixed(6)),
-        max: parseFloat(Math.max(...loadGenImbalances).toFixed(6)),
+        min: toElectricalPrecision(parseFloat(Math.min(...loadGenImbalances)).toFixed(6)),
+        max: toElectricalPrecision(parseFloat(Math.max(...loadGenImbalances)).toFixed(6)),
         std: calculateStandardDeviation(loadGenImbalances, meanImbalance),
       },
       voltageViolations: {
         mean: meanVoltageViolations,
-        min: parseFloat(Math.min(...voltageViolations).toFixed(6)),
-        max: parseFloat(Math.max(...voltageViolations).toFixed(6)),
+        min: toElectricalPrecision(parseFloat(Math.min(...voltageViolations)).toFixed(6)),
+        max: toElectricalPrecision(parseFloat(Math.max(...voltageViolations)).toFixed(6)),
         std: calculateStandardDeviation(
           voltageViolations,
           meanVoltageViolations

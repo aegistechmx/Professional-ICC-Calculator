@@ -21,6 +21,8 @@ digraph G {
     "C:\Professional ICC Calculator\backend\src\app.js" [label="app.js\n(unused)"];
     "C:\Professional ICC Calculator\backend\src\core\index.js" [label="index.js\n(unused)"];
     "C:\Professional ICC Calculator\backend\src\core\powerflow\powerflow\index.js" [label="index.js\n(unused)"];
+    "C:\Professional ICC Calculator\backend\src\debug\index.js" [label="index.js\n(unused)"];
+    "C:\Professional ICC Calculator\backend\src\debug\panel.js" [label="panel.js\n(unused)"];
     "C:\Professional ICC Calculator\backend\src\infrastructure\database\index.js" [label="index.js\n(unused)"];
     "C:\Professional ICC Calculator\backend\src\infrastructure\workers\index.js" [label="index.js\n(unused)"];
     "C:\Professional ICC Calculator\backend\src\infrastructure\workers\job.worker.js" [label="job.worker.js\n(unused)"];
@@ -88,6 +90,9 @@ digraph G {
     "C:\Professional ICC Calculator\backend\src\core\validation\index.js" [label="index.js\n(used by 0)"];
     "C:\Professional ICC Calculator\backend\src\core\validation\StressTest.js" [label="StressTest.js\n(used by 1)"];
     "C:\Professional ICC Calculator\backend\src\core\validation\SystemValidator.js" [label="SystemValidator.js\n(used by 1)"];
+    "C:\Professional ICC Calculator\backend\src\debug\logger.js" [label="logger.js\n(used by 2)"];
+    "C:\Professional ICC Calculator\backend\src\debug\simulation.js" [label="simulation.js\n(used by 0)"];
+    "C:\Professional ICC Calculator\backend\src\debug\tracer.js" [label="tracer.js\n(used by 0)"];
     "C:\Professional ICC Calculator\backend\src\engine\Engine.js" [label="Engine.js\n(used by 0)"];
     "C:\Professional ICC Calculator\backend\src\engine\PluginManager.js" [label="PluginManager.js\n(used by 1)"];
     "C:\Professional ICC Calculator\backend\src\infrastructure\infra\config\index.js" [label="index.js\n(used by 0)"];
@@ -166,6 +171,8 @@ digraph G {
     "C:\Professional ICC Calculator\backend\src\core\validation\index.js" -> "C:\Professional ICC Calculator\backend\src\core\validation\EdgeCasesTest.js";
     "C:\Professional ICC Calculator\backend\src\core\validation\index.js" -> "C:\Professional ICC Calculator\backend\src\core\validation\CascadeTest.js";
     "C:\Professional ICC Calculator\backend\src\core\validation\index.js" -> "C:\Professional ICC Calculator\backend\src\core\validation\ExternalValidation.js";
+    "C:\Professional ICC Calculator\backend\src\debug\simulation.js" -> "C:\Professional ICC Calculator\backend\src\debug\logger.js";
+    "C:\Professional ICC Calculator\backend\src\debug\tracer.js" -> "C:\Professional ICC Calculator\backend\src\debug\logger.js";
     "C:\Professional ICC Calculator\backend\src\engine\Engine.js" -> "C:\Professional ICC Calculator\backend\src\engine\PluginManager.js";
     "C:\Professional ICC Calculator\backend\src\infrastructure\infra\config\index.js" -> "C:\Professional ICC Calculator\backend\src\infrastructure\infra\config\ToleranceConfig.js";
     "C:\Professional ICC Calculator\backend\src\infrastructure\scheduler\jobScheduler.js" -> "C:\Professional ICC Calculator\backend\src\infrastructure\queue\queue.js";

@@ -8,7 +8,7 @@ const path = require('path');
  * Automatically adds toElectricalPrecision() calls and unit declarations
  */
 
-const { toElectricalPrecision, formatElectricalValue } = require('../backend/src/utils/electricalUtils');
+const { toElectricalPrecision, formatElectricalValue } = require('../backend/src/shared/utils/electricalUtils');
 
 // Patterns to identify electrical calculations needing precision
 const ELECTRICAL_PATTERNS = [
@@ -74,22 +74,20 @@ function applyPrecisionFixes(content, filePath) {
     });
     
     // Fix math operations
-    newLine = newLine.replace(/(\w+\.\w+)\s*=\s*(?:Math\.\w+\(|)([\d.]+)\s*[+\-*/]\s*([\d.]+)/, (match, prop, val1, val2) => {
+    newLine = newLine.replace(/(\w+\.\w+)\s*=\s*(?:Math\.\w+\(|)([\d.]+)\s*([+\-*/])\s*([\d.]+)/, (match, prop, val1, operator, val2) => {
       modified = true;
-      return `${prop} = toElectricalPrecision(${val1} ${match.includes('+') ? '+' : match.includes('-') ? '-' : match.includes('*') ? '*' : '/'} ${val2})`;
+      return `${prop} = toElectricalPrecision(${val1} ${operator} ${val2})`;
     });
     
     // Fix return statements
-    newLine = newLine.replace(/return\s+([\d.]+)\s*[+\-*/]\s*([\d.]+)/, (match, val1, val2) => {
+    newLine = newLine.replace(/return\s+([\d.]+)\s*([+\-*/])\s*([\d.]+)/, (match, val1, operator, val2) => {
       modified = true;
-      const operator = match.includes('+') ? '+' : match.includes('-') ? '-' : match.includes('*') ? '*' : '/';
       return `return toElectricalPrecision(${val1} ${operator} ${val2})`;
     });
     
     // Fix object properties
-    newLine = newLine.replace(/(\w+):\s*([\d.]+)\s*[+\-*/]\s*([\d.]+)/, (match, prop, val1, val2) => {
+    newLine = newLine.replace(/(\w+):\s*([\d.]+)\s*([+\-*/])\s*([\d.]+)/, (match, prop, val1, operator, val2) => {
       modified = true;
-      const operator = match.includes('+') ? '+' : match.includes('-') ? '-' : match.includes('*') ? '*' : '/';
       return `${prop}: toElectricalPrecision(${val1} ${operator} ${val2})`;
     });
     

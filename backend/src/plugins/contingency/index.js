@@ -6,10 +6,10 @@
 
 const {
   generateN1Contingencies,
-} = require('@/core/powerflow/contingency/generator')
+} = require('@/core/powerflow/contingency/generator') // power (W)
 const {
   evaluateSecurityConstraints,
-} = require('@/core/powerflow/contingency/evaluator')
+} = require('@/core/powerflow/contingency/evaluator') // power (W)
 
 module.exports = {
   name: 'contingency',

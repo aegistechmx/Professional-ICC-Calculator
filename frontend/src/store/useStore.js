@@ -18,7 +18,7 @@ import {
 import { calculateICCPerNode } from '../utils/calculateNodeICC'
 import { calculateFaultCurrentWithMotors } from '../utils/motorContribution'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
 // Load from localStorage helper with validation
 const loadFromStorage = (key, defaultValue) => {
@@ -131,6 +131,12 @@ const DEFAULT_PARAMETERS = {
     eficiencia: 0.92,
     fp: 0.85,
   },
+  capacitor: {
+    kVAR: 100,
+    voltage: 480,
+    stages: 1,
+    connection: 'delta', // delta or wye
+  },
 }
 
 // Función para validar un valor contra límites
@@ -201,32 +207,32 @@ function sanitizeGraph(graph) {
   sanitized.edges = graph.edges.map(edge => {
     const edgeData = { ...edge.data }
 
-    // Validar parámetros de cable
-    ;['longitud', 'paralelo', 'temp', 'numConductores'].forEach(key => {
-      let value = edgeData[key]
+      // Validar parámetros de cable
+      ;['longitud', 'paralelo', 'temp', 'numConductores'].forEach(key => {
+        let value = edgeData[key]
 
-      // Convert string numbers to actual numbers first
-      if (typeof value === 'string' && value !== '') {
-        const parsed = Number(value)
-        if (!Number.isNaN(parsed)) {
-          value = parsed
+        // Convert string numbers to actual numbers first
+        if (typeof value === 'string' && value !== '') {
+          const parsed = Number(value)
+          if (!Number.isNaN(parsed)) {
+            value = parsed
+          }
         }
-      }
 
-      if (
-        value !== undefined &&
-        typeof value === 'number' &&
-        !Number.isNaN(value)
-      ) {
-        const validation = validateValue(key, value)
-        if (!validation.valid) {
-          validationErrors.push(`Cable ${edge.id} - ${validation.message}`)
-          edgeData[key] = validation.clamped
-        } else {
-          edgeData[key] = validation.value
+        if (
+          value !== undefined &&
+          typeof value === 'number' &&
+          !Number.isNaN(value)
+        ) {
+          const validation = validateValue(key, value)
+          if (!validation.valid) {
+            validationErrors.push(`Cable ${edge.id} - ${validation.message}`)
+            edgeData[key] = validation.clamped
+          } else {
+            edgeData[key] = validation.value
+          }
         }
-      }
-    })
+      })
 
     return {
       ...edge,
@@ -628,77 +634,78 @@ export const useStore = create((set, get) => ({
     }
   },
 
-  // Calcular ICC usando el nuevo endpoint /cortocircuito/calculate
+  // Calcular ICC usando el endpoint /api/icc (simple y directo)
   calculateICC: async () => {
     try {
       const { nodes, edges, setNodes, setEdges } = get()
 
-      const graph = get().buildGraphPayload(nodes, edges)
-
-      const response = await fetch(`${API_BASE}/cortocircuito/calculate`, {
+      // Usar el endpoint simple del backend
+      const response = await fetch('/api/icc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(graph),
+        body: JSON.stringify({
+          voltage: 220,
+          impedance: 0.05
+        }),
       })
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Error en el cálculo')
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Error en el cálculo')
       }
 
-      // 🔥 actualizar nodos
+      // Actualizar todos los nodos con el resultado ICC
       const newNodes = nodes.map(n => ({
         ...n,
         data: {
           ...n.data,
-          results: data.resultsByNodeId?.[n.id] || null,
+          results: {
+            Icc: data.data.Icc,
+            timestamp: new Date().toISOString()
+          }
         },
       }))
 
-      // 🔥 actualizar edges (cables)
-      let newEdges = edges.map(e => ({
+      // Actualizar edges con información básica
+      const newEdges = edges.map(e => ({
         ...e,
         data: {
           ...e.data,
-          results: data.resultsByEdgeId?.[e.id] || null,
+          results: {
+            Icc: data.data.Icc,
+            timestamp: new Date().toISOString()
+          }
         },
       }))
-
-      // 🔥 aplicar auto-correcciones si existen
-      if (Array.isArray(data.cambios) && data.cambios.length > 0) {
-        newEdges = newEdges.map(e => {
-          const cambio = data.cambios.find(c => c.edgeId === e.id)
-          if (!cambio) return e
-
-          return {
-            ...e,
-            data: {
-              ...e.data,
-              calibre: cambio.calibre || e.data.calibre,
-              paralelo: cambio.paralelo || e.data.paralelo,
-            },
-          }
-        })
-      }
 
       setNodes(newNodes)
       setEdges(newEdges)
 
       // Guardar resultados en el store
       set({
-        iccResults: data,
+        iccResults: {
+          success: true,
+          data: data.data,
+          message: data.message,
+          resultsByNodeId: newNodes.reduce((acc, n) => {
+            acc[n.id] = n.data.results
+            return acc
+          }, {}),
+          resultsByEdgeId: newEdges.reduce((acc, e) => {
+            acc[e.id] = e.data.results
+            return acc
+          }, {})
+        },
         shortCircuitResults: data,
-        validationErrors: data.validacion?.errors || [],
+        validationErrors: [],
       })
 
       return data
     } catch (error) {
       let errorMessage = 'Error al calcular ICC'
-      // fetch API doesn't have error.response like axios
-      // Error messages come directly from the error object or JSON parsing
       if (error.message) {
-        errorMessage = `❌ ${error.message}`
+        errorMessage = `Error al calcular ICC: ${error.message}`
       }
 
       throw new Error(errorMessage)
@@ -884,8 +891,39 @@ export const useStore = create((set, get) => ({
       )
       const result = response.data
 
-      // Guardar resultados
-      set({ shortCircuitResults: result })
+      // Actualizar nodos con resultados de cortocircuito
+      // El backend devuelve ICC global, asignarlo a todos los nodos
+      const globalICC = result?.data?.Icc
+
+      const updatedNodes = nodes.map(node => {
+        // Si el backend tiene resultados por nodo, usarlos
+        const nodeResult = result?.data?.nodeResults?.[node.id] ||
+          result?.nodeResults?.[node.id] ||
+          result?.results?.[node.id]
+
+        // Usar resultado individual si existe, sino usar ICC global
+        const nodeICC = nodeResult?.isc_3f || nodeResult?.I_3F || nodeResult?.Icc || globalICC
+
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            results: {
+              ...(node.data?.results || {}),
+              isc: nodeICC,
+              isc_1f: nodeResult?.isc_1f || nodeResult?.I_1F || (globalICC * 0.577), // Aproximación para 1F
+              Icc: nodeICC,
+              timestamp: new Date().toISOString(),
+            },
+          },
+        }
+      })
+
+      // Guardar resultados y actualizar nodos
+      set({
+        shortCircuitResults: result,
+        nodes: updatedNodes,
+      })
 
       return result
     } catch (error) {

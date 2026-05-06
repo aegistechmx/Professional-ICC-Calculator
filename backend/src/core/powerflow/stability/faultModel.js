@@ -19,7 +19,7 @@ function createThreePhaseFault(system, fault) {
     const faultedBus = modified.buses.find(b => b.id === fault.bus)
     if (faultedBus) {
       // Set bus voltage to zero for fault
-      faultedBus.voltage = { magnitude: 0, angle: 0 }
+      faultedBus.voltage = { magnitude: 0, angle: 0 } // voltage (V)
       faultedBus.faulted = true
     }
 
@@ -49,7 +49,7 @@ function clearFault(system, fault) {
   // Restore bus voltage
   const faultedBus = modified.buses.find(b => b.id === fault.bus)
   if (faultedBus) {
-    faultedBus.voltage = { magnitude: 1.0, angle: 0 }
+    faultedBus.voltage = { magnitude: 1.0, angle: 0 } // voltage (V)
     delete faultedBus.faulted
   }
 

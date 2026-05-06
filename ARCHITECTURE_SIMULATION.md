@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ICC Calculator has been transformed from a calculator into an industrial-grade power system simulator. This document describes the new unified electrical simulation engine.
+The ICC Calculator is an industrial-grade power system simulator with a ReactFlow-based visual editor frontend and Express backend for electrical calculations.
 
 ## Architecture Diagram
 
@@ -14,41 +14,29 @@ The ICC Calculator has been transformed from a calculator into an industrial-gra
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              ReactFlowConverter                              │
-│         (Editor → ElectricalSystem Mapping)                  │
+│              Frontend Store (useStore.js)                    │
+│  - Sanitize graph data (validate limits)                     │
+│  - Build API payloads                                        │
+│  - Apply simulation results to visual elements              │
 └─────────────────────────┬───────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              ElectricalSystem (Unified Model)                │
-│  ┌─────────┬─────────┬─────────┬─────────┬─────────────┐   │
-│  │  Buses  │  Lines  │Transf.  │  Loads  │  Motors/Gen │   │
-│  └─────────┴─────────┴─────────┴─────────┴─────────────┘   │
-└─────────────────────────┬───────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Solver Engine                                │
+│              Backend API Controllers                         │
 │  ┌─────────────┬──────────────┬──────────────────────┐     │
-│  │ Load Flow  │ Fault Analysis│ Topology Validator  │     │
-│  │ (Newton-   │ (Symmetrical  │ (Graph Analysis)    │     │
-│  │  Raphson)  │  Components) │                      │     │
+│  │ /powerflow  │ /cortocircuito│ /motor-integration   │     │
+│  │ /validate   │ /proyectos    │ /simulacion/branches│     │
 │  └─────────────┴──────────────┴──────────────────────┘     │
 └─────────────────────────┬───────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Protection Engine                               │
+│              Core Engine                                     │
 │  ┌─────────────┬──────────────┬──────────────────────┐     │
-│  │  TCC Curves │ Coordination │  Selectivity Matrix  │     │
-│  │ (IEC/ANSI)  │  Analysis    │                      │     │
+│  │ Power Flow │ Short Circuit │ System Validation     │     │
+│  │ (Newton-   │ Analysis      │ (SystemValidator.js)  │     │
+│  │  Raphson)  │               │                       │     │
 │  └─────────────┴──────────────┴──────────────────────┘     │
-└─────────────────────────┬───────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Scenario System                                 │
-│  (Multi-condition Analysis: Load variations, N-1, Faults)   │
 └─────────────────────────┬───────────────────────────────────┘
                           │
                           ▼
@@ -62,249 +50,250 @@ The ICC Calculator has been transformed from a calculator into an industrial-gra
 
 ## Module Structure
 
-### Phase 1: Unified Electrical Model
-**Location:** `backend/src/core/electrical/`
+### Core Power Flow Engine
+**Location:** `backend/src/core/`
 
-- `ElectricalSystem.js` - Core system model with Bus, Line, Transformer, Load, Motor, Generator classes
-- `ReactFlowConverter.js` - Converts ReactFlow nodes/edges to ElectricalSystem
-- `YbusBuilder.js` - Builds admittance matrix (Ybus) for power flow analysis
-- `NewtonRaphsonSolver.js` - Load flow solver using Newton-Raphson method
+- `index.js` - Centralized exports for powerflow, OPF, stability, shortcircuit
+- `powerflow/solvers/newtonRaphson.js` - Newton-Raphson solver implementation
+- `powerflow/solvers/fastDecoupled.js` - Fast Decoupled Load Flow
+- `powerflow/jacobian.js` - Jacobian matrix calculations
+- `validation/SystemValidator.js` - Electrical system validation
 
-### Phase 2: Fault Analysis & Topology
-**Location:** `backend/src/core/electrical/`
+### API Layer
+**Location:** `backend/src/api/`
 
-- `SymmetricalComponents.js` - Fault analysis using symmetrical components (3F, LG, LL, LLG)
-- `TopologyValidator.js` - Validates electrical topology (loops, isolated buses, etc.)
+- `controllers/` - Request handlers (distributed, motor, proteccion, powerflow)
+- `routes/` - API route definitions
+- `middlewares/errorHandler.js` - Error handling middleware
 
-### Phase 3: Protection & Scenarios
-**Location:** `backend/src/core/protections/` and `backend/src/core/scenarios/`
+### Frontend
+**Location:** `frontend/src/`
 
-- `TCCCurves.js` - Time-Current Characteristic curves (IEC 60255, ANSI C37.112)
-- `ProtectionCoordination.js` - Protection coordination analysis and auto-adjustment
-- `ScenarioSystem.js` - Multi-scenario simulation system
+- `store/useStore.js` - Zustand store with simulation methods
+- `components/Editor.jsx` - ReactFlow visual editor
+- `utils/` - Calculation utilities and result application
 
 ## Key Features
 
-### 1. Unified Electrical Model
-- Object-oriented representation of power system components
-- Per-unit system support
-- Proper voltage level handling
-- Component status tracking
+### 1. Visual Circuit Editor
+- ReactFlow-based drag-and-drop interface
+- Components: transformers, generators, motors, breakers, panels, loads
+- Real-time validation and sanitization
 
-### 2. Load Flow Analysis
+### 2. Power Flow Analysis
 - Newton-Raphson iterative solver
 - Jacobian matrix calculation
-- Convergence tracking
-- Voltage and angle results
-- Power loss calculation
+- Convergence tracking with configurable tolerance
+- Per-unit system support
 
-### 3. Fault Analysis
-- Symmetrical components method
-- All fault types: 3F, LG, LL, LLG
-- Sequence networks (positive, negative, zero)
-- Fault current calculation
-- X/R ratio analysis
-- Peak current with DC offset
+### 3. Short Circuit Analysis
+- Branch-based impedance accumulation
+- Fault current calculation per node
+- Motor contribution modeling
 
-### 4. Topology Validation
+### 4. System Validation
 - Isolated bus detection
 - Loop detection
-- Direct source-to-load connection warning
-- Transformer ratio validation
-- Grounding configuration check
+- Voltage base consistency checking
+- Transformer configuration validation
 
-### 5. TCC Curves
-- IEC 60255 curves: Standard, Very, Extremely, Long Time, Short Time
-- ANSI C37.112 curves: Moderately, Very, Extremely Inverse
-- Operating time calculation
-- Curve generation for visualization
-- Trip evaluation
-
-### 6. Protection Coordination
+### 5. Protection Coordination
 - Time-current coordination analysis
-- Cascade coordination (multi-level)
-- Selectivity matrix
-- Auto-adjustment of TMS settings
-- LSIG coordination
+- Auto-tuning of relay settings
+- Cascade simulation
 
-### 7. Scenario System
-- Multiple operating conditions
-- Load variations (max, min, normal)
-- Generation states (N-1, N-2)
-- Topology changes (line outages)
-- Fault scenarios
-- Scenario comparison
+### 6. Data Persistence
+- LocalStorage for session recovery
+- Backend project save/load
+- JSON import/export
 
 ## Integration with Existing System
 
 ### Backend Integration
 
-Create a new controller to expose the simulation engine:
+The backend exposes separate endpoints for different analysis types:
 
 ```javascript
-// backend/src/controllers/simulation.controller.js
-const core = require('../core');
-const { convertToElectricalSystem, solveLoadFlow, calculateFault } = core;
-
-exports.runSimulation = asyncHandler(async (req, res) => {
-  const { nodes, edges, analysisType } = req.body;
-  
-  // Convert ReactFlow to ElectricalSystem
-  const system = convertToElectricalSystem(nodes, edges);
-  
-  // Validate topology
-  const validation = core.validateTopology(system);
-  if (!validation.valid) {
-    return res.status(400).json({ error: 'Invalid topology', details: validation.errors });
+// backend/src/core/index.js - Actual exports
+module.exports = {
+  powerflow: {
+    solveNR,      // Newton-Raphson solver
+    solveFDLF     // Fast Decoupled Load Flow
+  },
+  opf: {
+    solveOPF      // Optimal Power Flow
+  },
+  stability: {
+    simulateDynamics
+  },
+  shortcircuit: {
+    analyzeShortCircuit
   }
-  
-  // Run analysis based on type
-  let result;
-  switch (analysisType) {
-    case 'loadflow':
-      result = solveLoadFlow(system);
-      break;
-    case 'fault':
-      result = calculateFault(system, req.body.faultData);
-      break;
-    default:
-      throw new Error('Unknown analysis type');
-  }
-  
-  success(res, result);
-});
+};
 ```
+
+**Available API Endpoints:**
+- `POST /powerflow/run` - Execute power flow analysis
+- `POST /powerflow/validate` - Validate system topology
+- `POST /cortocircuito/calculate` - Calculate short circuit currents
+- `POST /simulacion/branches` - Branch-based calculations
+- `GET/POST/PUT/DELETE /projects` - Project management
 
 ### Frontend Integration
 
-Update the frontend store to use the new simulation engine:
+The frontend store provides simulation methods:
 
 ```javascript
 // frontend/src/store/useStore.js
-import axios from 'axios';
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
 
-export const useStore = create((set) => ({
-  runSimulation: async (nodes, edges, analysisType, options) => {
-    try {
-      const response = await axios.post(`${API_BASE}/simulation/run`, {
-        nodes,
-        edges,
-        analysisType,
-        ...options
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Simulation error:', error);
-      throw error;
-    }
+export const useStore = create((set, get) => ({
+  // Calculate power flow
+  calculatePowerFlow: async (options = {}) => {
+    const { nodes, edges } = get();
+    const response = await axios.post(`${API_BASE}/powerflow/run`, {
+      nodes,
+      edges,
+      options: {
+        Sbase_MVA: options.Sbase_MVA || 100,
+        maxIter: options.maxIter || 20,
+        tol: options.tol || 1e-6,
+        returnActualUnits: true,
+      },
+    });
+    return response.data;
+  },
+
+  // Calculate short circuit
+  calculateShortCircuitFromGraph: async () => {
+    const { nodes, edges, systemMode } = get();
+    const cleanGraph = sanitizeGraph({ nodes, edges, systemMode });
+    const response = await axios.post(
+      `${API_BASE}/cortocircuito/calculate`,
+      cleanGraph
+    );
+    return response.data;
   }
 }));
 ```
 
 ## Usage Examples
 
-### Load Flow Analysis
+### Power Flow Analysis
 
 ```javascript
-const core = require('../core');
+const { powerflow } = require('../core');
+const SystemValidator = require('../validation/SystemValidator');
 
-// Convert ReactFlow editor to electrical system
-const system = core.convertToElectricalSystem(nodes, edges, {
+// Build system from ReactFlow data
+const system = {
   baseMVA: 100,
-  baseKV: 13.8
+  baseKV: 13.8,
+  buses: [
+    { id: 1, type: 'slack', V: 1.0, theta: 0 },
+    { id: 2, type: 'pq', P: 0.5, Q: 0.2 },
+  ],
+  branches: [
+    { from: 1, to: 2, R: 0.01, X: 0.05 },
+  ],
+};
+
+// Validate first
+const validation = SystemValidator.validateSystem({
+  buses: system.buses,
+  lines: system.branches,
+  trafos: [],
+  loads: [],
+  generators: [],
 });
 
-// Run load flow
-const loadFlow = core.solveLoadFlow(system, {
-  maxIterations: 30,
-  tolerance: 1e-6
+if (!validation.valid) {
+  console.error('Validation errors:', validation.errors);
+  return;
+}
+
+// Run Newton-Raphson
+const result = powerflow.solveNR(system, {
+  maxIterations: 20,
+  tolerance: 1e-6,
 });
 
-console.log('Converged:', loadFlow.converged);
-console.log('Iterations:', loadFlow.iterations);
-console.log('P loss:', loadFlow.P_loss);
-console.log('Voltages:', loadFlow.voltages);
+console.log('Converged:', result.converged);
+console.log('Iterations:', result.iterations);
+console.log('Voltages:', result.voltages);
 ```
 
-### Fault Analysis
+### Short Circuit Analysis
 
 ```javascript
-// Calculate 3-phase fault at bus
-const faultResult = core.calculateFault(system, {
-  faultBusId: 'BUS_2',
-  faultType: '3F',
-  faultImpedance: { Zf: 0, Zg: 0 }
-});
+// Using the cortocircuito endpoint
+const response = await axios.post(
+  `${API_BASE}/cortocircuito/calculate`,
+  {
+    nodes: graphNodes,
+    edges: graphEdges,
+    systemMode: 'normal'
+  }
+);
 
-console.log('Fault current:', faultResult.faultCurrent.magnitude_kA, 'kA');
-console.log('Peak current:', faultResult.faultCurrent.peak_kA, 'kA');
-console.log('X/R ratio:', faultResult.XRRatio);
+const result = response.data;
+console.log('Results by node:', result.resultsByNodeId);
+console.log('Validation:', result.validacion);
 ```
 
 ### Protection Coordination
 
 ```javascript
-const { ProtectionDevice, analyzeCoordination } = core;
+// From useStore.js - frontend coordination
+const { protections } = get();
 
-// Create protection devices
-const upstream = new ProtectionDevice({
-  id: 'brk1',
-  name: 'Main Breaker',
-  pickup: 400,
-  tms: 0.3,
-  curveType: 'standard',
-  level: 2
-});
+// Auto-tune relays for coordination
+const tunedRelays = autoTuneRelays(protections, flows, 10, 0.3);
 
-const downstream = new ProtectionDevice({
-  id: 'brk2',
-  name: 'Feeder Breaker',
-  pickup: 100,
-  tms: 0.1,
-  curveType: 'standard',
-  level: 1
-});
+// Apply relay state to nodes
+const newNodes = applyRelayState(nodes, tunedRelays, flows);
 
-// Analyze coordination
-const coordination = analyzeCoordination(upstream, downstream, {
-  faultCurrents: [1000, 5000, 10000],
-  coordinationMargin: 0.2
-});
-
-console.log('Coordinated:', coordination.coordinated);
-console.log('Min margin:', (coordination.minMargin * 100).toFixed(1) + '%');
+console.log('Tuned relays:', tunedRelays);
 ```
 
-### Scenario Analysis
+### System Validation
 
 ```javascript
-const { ScenarioManager } = core;
+const SystemValidator = require('../validation/SystemValidator');
 
-const manager = new ScenarioManager();
-manager.setBaseSystem(system);
+const system = {
+  buses: [...],
+  lines: [...],
+  trafos: [...],
+  loads: [...],
+  generators: [...]
+};
 
-// Create standard scenarios
-manager.createStandardScenarios();
+const validation = SystemValidator.validateSystem(system);
 
-// Run all scenarios
-const results = manager.runAllScenarios();
-
-// Compare scenarios
-const comparison = manager.compareScenarios();
-
-// Find worst case
-const worstCase = manager.findWorstCase('P_loss');
+console.log('Valid:', validation.valid);
+console.log('Errors:', validation.errors);
+console.log('Warnings:', validation.warnings);
+console.log('Summary:', validation.summary);
 ```
 
-## Next Steps (Phase 4)
+## Known Limitations & TODOs
 
-The following features are pending implementation:
+1. **Jacobian Calculation** - Currently uses simplified placeholder implementation in `newtonRaphson.js`. Full partial derivative calculation needed for production use.
 
-1. **Dynamic Motor Models** - Differential equations for motor dynamics (dω/dt)
-2. **Advanced Visualization** - Real-time voltage coloring, animated flow
-3. **Professional PDF Reports** - Engineering-grade reports with tables and plots
+2. **Newton-Raphson Convergence** - May report fake convergence in some edge cases. See solver implementation for details.
+
+3. **Dynamic Motor Models** - Planned: Differential equations for motor dynamics (dω/dt)
+
+4. **Advanced Visualization** - Planned: Real-time voltage coloring, animated flow
+
+5. **Professional PDF Reports** - Implemented via `/reporte/pdf` endpoint
+
+## Development Guidelines
+
+- Run linting: `npm run lint` in backend/ and frontend/ directories
+- Tests: `npm test` in both directories
+- Electrical validation: `node scripts/validate-electrical-inputs.js`
 
 ## Performance Considerations
 

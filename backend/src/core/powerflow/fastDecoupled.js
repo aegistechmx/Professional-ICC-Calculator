@@ -93,12 +93,12 @@ function solveFDLF(system, options = {}) {
 
   // Build decoupled matrices
   const { Bp, indices: _angleIndices } = buildBprime(B, slackIndex)
-  const { Bpp, indices: _voltageIndices } = buildBdoubleprime(B, pqBuses)
+  const { Bpp, indices: _voltageIndices } = buildBdoubleprime(B, pqBuses) // voltage (V)
 
   // Initialize voltages
   const V = system.buses.map(bus => {
     if (bus.type === 'Slack') {
-      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0)
+      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0) // voltage (V)
       const ang = toElectricalPrecision(
         ((bus.voltage?.angle || 0) * Math.PI) / 180
       )
@@ -181,12 +181,12 @@ function solveFDLF(system, options = {}) {
     for (let i = 0; i < system.buses.length; i++) {
       if (i !== slackIndex && correctionIndex < deltaTheta.length) {
         const dTheta_i = toElectricalPrecision(deltaTheta[correctionIndex] * acceleration)
-        const currentMag = toElectricalPrecision(getV(i))
-        const currentAng = toElectricalPrecision(getTheta(i))
-        const newAng = toElectricalPrecision(currentAng + dTheta_i)
+        const currentMag = toElectricalPrecision(getV(i)) // current (A)
+        const currentAng = toElectricalPrecision(getTheta(i)) // current (A)
+        const newAng = toElectricalPrecision(currentAng + dTheta_i) // current (A)
 
-        V[i].re = toElectricalPrecision(currentMag * Math.cos(newAng))
-        V[i].im = toElectricalPrecision(currentMag * Math.sin(newAng))
+        V[i].re = toElectricalPrecision(currentMag * Math.cos(newAng)) // current (A)
+        V[i].im = toElectricalPrecision(currentMag * Math.sin(newAng)) // current (A)
         correctionIndex++
       }
     }
@@ -197,12 +197,12 @@ function solveFDLF(system, options = {}) {
       if (correctionIndex < deltaV.length) {
         const busIdx = pqBuses[i]
         const dV_i = toElectricalPrecision(deltaV[correctionIndex] * acceleration)
-        const currentMag = toElectricalPrecision(getV(busIdx))
-        const currentAng = toElectricalPrecision(getTheta(busIdx))
-        const newMag = toElectricalPrecision(currentMag + dV_i)
+        const currentMag = toElectricalPrecision(getV(busIdx)) // current (A)
+        const currentAng = toElectricalPrecision(getTheta(busIdx)) // current (A)
+        const newMag = toElectricalPrecision(currentMag + dV_i) // current (A)
 
-        V[busIdx].re = toElectricalPrecision(newMag * Math.cos(currentAng))
-        V[busIdx].im = toElectricalPrecision(newMag * Math.sin(currentAng))
+        V[busIdx].re = toElectricalPrecision(newMag * Math.cos(currentAng)) // current (A)
+        V[busIdx].im = toElectricalPrecision(newMag * Math.sin(currentAng)) // current (A)
         correctionIndex++
       }
     }

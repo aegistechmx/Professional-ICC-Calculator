@@ -8,12 +8,12 @@
     "frontend": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build",
     "preview": "cd frontend && npm run preview",
+    "analyze": "cd frontend && npm run analyze",
     "test": "cd frontend && npm run test:run && cd ../backend && npm test",
     "test:and:fix": "node scripts/run-tests-and-fix.js",
     "fix:ports": "node scripts/run-tests-and-fix.js --kill-ports-only",
-    
     "lint:check": "cd frontend && npm run lint && cd ../backend && npm run lint",
-    "test:coverage": "cd frontend && npm run test:coverage && cd ../backend && npm run test:coverage",
+    "test:coverage": "cd frontend && npm run test:run -- --coverage && cd ../backend && npm run test:coverage",
     "test:e2e": "cd frontend && npm run test:e2e",
     "test:integration": "cd backend && npm run test:integration",
     "test:security": "cd backend && npm run test:security",
@@ -32,11 +32,9 @@
     "test:electrical-integration": "npm run test:electrical-integration",
     "test:data-flow-accuracy": "npm run test:data-flow-accuracy",
     "test:report-accuracy": "npm run test:report-accuracy",
-    
     "security:sast": "npm run security:sast",
     "security:codeql": "npm run security:codeql",
     "security:export-report": "node scripts/generate-security-report.js",
-    
     "measure:performance": "node scripts/measure-performance.js",
     "audit:core-vitals": "node scripts/audit-core-vitals.js",
     "analyze:cache-performance": "npm run analyze:cache-performance",
@@ -45,12 +43,10 @@
     "analyze:memory": "npm run analyze:memory",
     "profile:memory": "npm run profile:memory",
     "optimize:memory": "npm run optimize:memory",
-    
     "db:slow-queries": "cd backend && npm run db:slow-queries",
     "db:index-analysis": "cd backend && npm run db:index-analysis",
     "db:profile": "cd backend && npm run db:profile",
     "db:migrate": "cd backend && npm run db:migrate",
-    
     "validate:ieee-1584": "cd backend && npm run validate:ieee-1584",
     "validate:iec-60909": "cd backend && npm run validate:iec-60909",
     "validate:nec-compliance": "cd backend && npm run validate:nec-compliance"

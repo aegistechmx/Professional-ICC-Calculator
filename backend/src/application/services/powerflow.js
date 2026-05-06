@@ -4,7 +4,7 @@
  * Responsibility: Business logic for power flow operations
  */
 
-const { solveNR, solveFDLF } = require('@/core/powerflow/solvers')
+const { solveNR, solveFDLF } = require('@/core/powerflow/solvers') // power (W)
 
 /**
  * Run power flow analysis

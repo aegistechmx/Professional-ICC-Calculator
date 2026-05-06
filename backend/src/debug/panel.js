@@ -188,11 +188,11 @@ class DebugPanel {
       if (!isDragging) return
 
       e.preventDefault()
-      currentX = e.clientX - initialX
-      currentY = e.clientY - initialY
+      currentX = e.clientX - initialX // current (A)
+      currentY = e.clientY - initialY // current (A)
 
-      this.panelElement.style.left = currentX + 'px'
-      this.panelElement.style.top = currentY + 'px'
+      this.panelElement.style.left = currentX + 'px' // current (A)
+      this.panelElement.style.top = currentY + 'px' // current (A)
     })
 
     document.addEventListener('mouseup', () => {

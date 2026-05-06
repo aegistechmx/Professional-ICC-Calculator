@@ -37,15 +37,28 @@ export default function ATSFields({ node, updateNode }) {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Tiempo de Transferencia (segundos)
         </label>
-        <input
-          type="number"
+        <select
           value={node.data?.parameters?.transferTime || 10}
           onChange={e => handleChange('transferTime', Number(e.target.value))}
-          min="0"
-          max="60"
-          step="1"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        >
+          <option value="">Seleccionar tiempo...</option>
+          <option value="0">0 segundos (Instantáneo)</option>
+          <option value="1">1 segundo</option>
+          <option value="2">2 segundos</option>
+          <option value="3">3 segundos</option>
+          <option value="5">5 segundos</option>
+          <option value="10">10 segundos (Típico)</option>
+          <option value="15">15 segundos</option>
+          <option value="20">20 segundos</option>
+          <option value="25">25 segundos</option>
+          <option value="30">30 segundos (Lento)</option>
+          <option value="35">35 segundos</option>
+          <option value="40">40 segundos</option>
+          <option value="45">45 segundos</option>
+          <option value="50">50 segundos</option>
+          <option value="60">60 segundos (Muy Lento)</option>
+        </select>
         <p className="text-xs text-gray-500 mt-1">
           Tiempo que tarda el ATS en cambiar de fuente
         </p>

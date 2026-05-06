@@ -72,17 +72,17 @@ class DynamicSimulator {
     }
 
     let t = 0
-    let currentSystem = JSON.parse(JSON.stringify(this.system))
+    let currentSystem = JSON.parse(JSON.stringify(this.system)) // current (A)
 
     // eslint-disable-next-line no-console
     console.log(`Starting dynamic simulation with fault: ${fault.description}`)
 
     while (t < this.options.tEnd) {
       // Apply fault at specified time
-      currentSystem = applyFaultAtTime(currentSystem, fault, t)
+      currentSystem = applyFaultAtTime(currentSystem, fault, t) // current (A)
 
       // Solve power flow for current system state
-      const pfResult = this.solvePowerFlow(currentSystem)
+      const pfResult = this.solvePowerFlow(currentSystem) // current (A)
 
       if (!pfResult.converged) {
         results.stable = false
@@ -106,7 +106,7 @@ class DynamicSimulator {
       results.time.push(t)
       results.angles.push(this.generators.map(g => g.delta))
       results.speeds.push(this.generators.map(g => g.omega))
-      results.powers.push(this.generators.map(g => g.Pe))
+      results.powers.push(this.generators.map(g => g.Pe)) // power (W)
       results.voltages.push(pfResult.voltages)
 
       t += this.options.dt
@@ -136,7 +136,7 @@ class DynamicSimulator {
     this.generators.forEach((gen, _i) => {
       const bus = system.buses.find(b => b.id === gen.bus)
       if (bus) {
-        bus.voltage = {
+        bus.voltage = { // voltage (V)
           magnitude: 1.0, // Assume constant voltage magnitude
           angle: gen.delta, // Use generator angle as bus angle
         }
@@ -156,7 +156,7 @@ class DynamicSimulator {
    */
   updateAllGenerators(voltages, dt) {
     this.generators.forEach((gen, _i) => {
-      const V = voltages[gen.bus]
+      const V = voltages[gen.bus] // voltage (V)
       if (V) {
         const Vmag = Math.sqrt(V.re * V.re + V.im * V.im)
         const Vang = Math.atan2(V.im, V.re)

@@ -24,13 +24,13 @@ function buildYbus(system) {
     const { from, to, R, X } = branch
 
     if (!isFinite(R) || !isFinite(X)) {
-      throw new Error(`Branch ${idx} invalid impedance: R=${R}, X=${X}`)
+      throw new Error(`Branch ${idx} invalid impedance: R=${R}, X=${X}`) // impedance (Ω)
       // impedance (Ω)
     }
 
     if (R === 0 && X === 0) {
       throw new Error(
-        `Branch ${idx} (${from}→${to}) has zero impedance: R=0, X=0`
+        `Branch ${idx} (${from}→${to}) has zero impedance: R=0, X=0` // impedance (Ω)
       )
       // impedance (Ω)
     }

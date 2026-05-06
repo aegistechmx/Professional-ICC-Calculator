@@ -1,0 +1,135 @@
+/**
+ * FlowEdge.css - Estilos para edge con animación de flujo
+ * Colores dinámicos por carga y animación de partículas
+ */
+
+.flow-edge {
+  transition: all 0.3s ease;
+}
+
+/* Estados del edge */
+.flow-edge.fault {
+  stroke: #dc2626;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6));
+  animation: faultPulse 0.3s ease-in-out infinite;
+}
+
+.flow-edge.tripped {
+  stroke: #f59e0b;
+  stroke-dasharray: 8, 4;
+  animation: tripPulse 1s ease-in-out infinite;
+}
+
+@keyframes faultPulse {
+  0%, 100% {
+    stroke-opacity: 1;
+    stroke-width: 3;
+  }
+  50% {
+    stroke-opacity: 0.5;
+    stroke-width: 4;
+  }
+}
+
+@keyframes tripPulse {
+  0%, 100% {
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-opacity: 0.3;
+  }
+}
+
+/* Partículas de flujo */
+.flow-particles {
+  pointer-events: none;
+}
+
+.flow-particle {
+  filter: drop-shadow(0 0 4px currentColor);
+  opacity: 0.8;
+}
+
+/* Label del flujo */
+.flow-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: all 0.2s ease;
+}
+
+.flow-label:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.current-value {
+  font-weight: 700;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.capacity-value {
+  color: #6b7280;
+  font-size: 9px;
+}
+
+.load-percent {
+  color: #9ca3af;
+  font-size: 8px;
+  font-weight: 500;
+}
+
+/* Colores de carga */
+.current-value[style*="#dc2626"] {
+  animation: overloadPulse 0.5s ease-in-out infinite;
+}
+
+.current-value[style*="#f97316"] {
+  animation: warningPulse 1s ease-in-out infinite;
+}
+
+@keyframes overloadPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes warningPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .flow-label {
+    font-size: 9px;
+    padding: 2px 4px !important;
+  }
+  
+  .current-value {
+    font-size: 10px;
+  }
+  
+  .capacity-value,
+  .load-percent {
+    font-size: 8px;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .flow-label {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #e5e7eb;
+  }
+  
+  .capacity-value {
+    color: #9ca3af;
+  }
+  
+  .load-percent {
+    color: #6b7280;
+  }
+}

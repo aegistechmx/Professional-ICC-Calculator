@@ -66,7 +66,7 @@ export default function useLiveSimulation(delay = 300) {
       isSimulatingRef.current = true
       try {
         const API_BASE =
-          import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'
+          import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
         // Strip simulation results before sending to API
         const cleanNodes = nodes.map(n => ({
@@ -109,6 +109,7 @@ export default function useLiveSimulation(delay = 300) {
 
         setNodes(updated)
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.warn('Live simulation error:', error)
       } finally {
         isSimulatingRef.current = false

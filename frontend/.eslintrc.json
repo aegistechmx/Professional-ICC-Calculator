@@ -1,9 +1,18 @@
 {
   "env": {
     "browser": true,
-    "es2021": true
+    "es2021": true,
+    "jest": true
   },
-  "ignorePatterns": ["dist/**", "node_modules/**"],
+  "ignorePatterns": [
+    "dist/**",
+    "node_modules/**",
+    "**/*.test.js",
+    "**/*.test.jsx",
+    "**/*.spec.js",
+    "**/*.spec.jsx",
+    "**/examples/**"
+  ],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -31,7 +40,8 @@
     "quotes": "off",
     "indent": "off",
     "no-extra-semi": "off",
-    "no-mixed-spaces-and-tabs": "off"
+    "no-mixed-spaces-and-tabs": "off",
+    "no-case-declarations": "off"
   },
   "settings": {
     "react": {

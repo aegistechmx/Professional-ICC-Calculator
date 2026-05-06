@@ -5,7 +5,7 @@
  */
 
 const { solveOPF } = require('@/core/opf/algorithms')
-const { runPowerFlow } = require('./powerflow')
+const { runPowerFlow } = require('./powerflow') // power (W)
 
 /**
  * Run optimal power flow analysis
@@ -18,14 +18,14 @@ async function runOPF(system, options = {}) {
     tolerance = 1e-6,
     maxIterations = 30,
     alpha = 0.5,
-    powerFlowMethod = 'FDLF',
+    powerFlowMethod = 'FDLF', // power (W)
   } = options
 
   // eslint-disable-next-line no-console
   console.log('⚡ OPF: Running economic dispatch optimization...')
 
   // Get base power flow solution
-  const pfResult = await runPowerFlow(system, { method: powerFlowMethod })
+  const pfResult = await runPowerFlow(system, { method: powerFlowMethod }) // power (W)
 
   if (!pfResult.converged) {
     throw new Error('Base power flow did not converge')

@@ -5,7 +5,7 @@
  */
 
 // Power flow solvers
-const { solveNR, solveFDLF } = require('./powerflow/solvers')
+const { solveNR, solveFDLF } = require('./powerflow/solvers') // power (W)
 
 // OPF algorithms
 const { solveOPF } = require('./opf/algorithms')

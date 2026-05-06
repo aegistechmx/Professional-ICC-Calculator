@@ -13,3 +13,23 @@
 - Frontend: run `npm run lint` from frontend/ directory
 - Always fix lint errors before completing tasks
 </linting_strategy>
+
+<environment_configuration>
+- Commands Auto Execution: SAFE (prevents loops and uncontrolled executions)
+- Model: Claude (for complex electrical logic)
+- Web Search: Disabled (faster responses)
+- Terminal Completion: Enabled (for npm/node/scripts)
+- Autocomplete Speed: FAST
+- Browser Previews: Disabled
+- Auto-open Edited Files: Disabled
+- Configuration file: `.windsurf/settings.json`
+</environment_configuration>
+
+<icc_development_rules>
+- Backend First: All heavy calculations in Node.js backend
+- Frontend Role: Visualization only, no heavy logic
+- Calculation Trigger: Manual "Calculate" button or debounced inputs
+- Debug Logging: Use clear console.log() for ICC INPUT and RESULT
+- Example: `console.log("ICC INPUT:", data)` and `console.log("ICC RESULT:", result)`
+- Avoid: Auto-recalculation on every input, aggressive watchers
+</icc_development_rules>

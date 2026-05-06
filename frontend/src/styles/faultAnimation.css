@@ -1,0 +1,413 @@
+/**
+ * faultAnimation.css - Estilos para animación de fallas
+ * Efectos visuales tipo ETAP
+ */
+
+/* Animación de pulso para fallas */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+/* Animación de flujo eléctrico */
+@keyframes flowPulse {
+  0% {
+    stroke-dashoffset: 20;
+    opacity: 0.8;
+  }
+  50% {
+    stroke-dashoffset: 10;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.8;
+  }
+}
+
+/* Animación de onda */
+@keyframes wave {
+  0% {
+    stroke-dasharray: 5, 5;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dasharray: 5, 5;
+    stroke-dashoffset: -20;
+  }
+}
+
+/* Nodo en falla */
+.node-fault {
+  animation: pulse 0.5s ease-in-out infinite;
+  background: #fee2e2 !important;
+  border: 3px solid #ef4444 !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.3);
+}
+
+/* Halo de falla */
+.node-fault::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+  animation: pulse 1s ease-in-out infinite;
+  z-index: -1;
+}
+
+/* Edge con flujo de falla */
+.edge-fault-flow {
+  stroke: #ef4444 !important;
+  stroke-width: 3px !important;
+  animation: flowPulse 0.3s ease-in-out infinite;
+  stroke-dasharray: 10, 5;
+}
+
+/* Edge con onda */
+.edge-fault-wave {
+  stroke: #ef4444 !important;
+  stroke-width: 3px !important;
+  animation: wave 0.5s linear infinite;
+}
+
+/* Breaker disparado */
+.node-tripped {
+  background: #fef3c7 !important;
+  border: 3px solid #f59e0b !important;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+  transition: all 0.3s ease;
+}
+
+/* Etiqueta de estado */
+.status-label {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.status-label.fault {
+  background: #ef4444;
+  color: white;
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+.status-label.tripped {
+  background: #f59e0b;
+  color: white;
+}
+
+.status-label.flow {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Indicador de magnitud */
+.magnitude-indicator {
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: 600;
+  color: #ef4444;
+  font-family: 'Monaco', 'Consolas', monospace;
+}
+
+/* Partículas de flujo */
+.flow-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: particleMove 0.5s linear infinite;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+}
+
+@keyframes particleMove {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Flecha de dirección */
+.direction-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 12px solid #ef4444;
+  animation: arrowPulse 0.3s ease-in-out infinite;
+}
+
+@keyframes arrowPulse {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-3px);
+    opacity: 0.7;
+  }
+}
+
+/* Panel de control de simulación */
+.simulation-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  z-index: 1000;
+}
+
+.simulation-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: statusPulse 1s ease-in-out infinite;
+}
+
+.status-dot.idle {
+  background: #6b7280;
+  animation: none;
+}
+
+.status-dot.fault {
+  background: #ef4444;
+}
+
+.status-dot.flow {
+  background: #3b82f6;
+}
+
+.status-dot.tripped {
+  background: #f59e0b;
+}
+
+.status-dot.complete {
+  background: #10b981;
+  animation: none;
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Botones de control */
+.sim-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sim-btn-start {
+  background: #ef4444;
+  color: white;
+}
+
+.sim-btn-start:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.sim-btn-stop {
+  background: #6b7280;
+  color: white;
+}
+
+.sim-btn-stop:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.sim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Información de simulación */
+.sim-info {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.sim-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sim-info-label {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sim-info-value {
+  font-family: 'Monaco', 'Consolas', monospace;
+  color: #374151;
+}
+
+/* Timeline de eventos */
+.event-timeline {
+  position: fixed;
+  right: 20px;
+  bottom: 80px;
+  width: 300px;
+  max-height: 200px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  padding: 12px;
+  z-index: 1000;
+}
+
+.event-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.event-item.fault {
+  background: #fee2e2;
+  border-left: 3px solid #ef4444;
+}
+
+.event-item.flow {
+  background: #dbeafe;
+  border-left: 3px solid #3b82f6;
+}
+
+.event-item.trip {
+  background: #fef3c7;
+  border-left: 3px solid #f59e0b;
+}
+
+.event-time {
+  font-family: 'Monaco', 'Consolas', monospace;
+  color: #6b7280;
+  min-width: 50px;
+}
+
+.event-description {
+  color: #374151;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .simulation-controls {
+    left: 10px;
+    right: 10px;
+    transform: none;
+    flex-wrap: wrap;
+  }
+
+  .event-timeline {
+    right: 10px;
+    left: 10px;
+    bottom: 120px;
+    width: auto;
+  }
+
+  .sim-info {
+    flex-wrap: wrap;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .simulation-controls {
+    background: #1f2937;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .simulation-status {
+    color: #e5e7eb;
+  }
+
+  .sim-info {
+    color: #9ca3af;
+  }
+
+  .sim-info-value {
+    color: #e5e7eb;
+  }
+
+  .event-timeline {
+    background: #1f2937;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .event-item.fault {
+    background: #450a0a;
+  }
+
+  .event-item.flow {
+    background: #1e3a5f;
+  }
+
+  .event-item.trip {
+    background: #451a03;
+  }
+
+  .event-description {
+    color: #e5e7eb;
+  }
+
+  .sim-btn-stop {
+    background: #4b5563;
+    color: #e5e7eb;
+  }
+}

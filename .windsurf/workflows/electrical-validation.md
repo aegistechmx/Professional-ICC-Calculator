@@ -6,6 +6,7 @@ tags: [electrical, validation, engineering, calculations]
 # Electrical Calculation Validation Workflow
 
 ## Prerequisites
+
 - Reference calculation data available
 - Industry-standard calculation tools
 - Test cases with known results
@@ -14,6 +15,7 @@ tags: [electrical, validation, engineering, calculations]
 ## Steps
 
 ### 1. Input Validation
+
 ```bash
 # Validate electrical parameters
 node scripts/validate-electrical-inputs.js
@@ -26,6 +28,7 @@ node scripts/validate-parameter-ranges.js
 ```
 
 ### 2. Calculation Accuracy Tests
+
 ```bash
 # Run standard test cases
 npm run test:electrical-standards
@@ -38,6 +41,7 @@ npm run test:short-circuit-accuracy
 ```
 
 ### 3. Standards Compliance
+
 ```bash
 # Check IEEE 1584 compliance
 npm run validate:ieee-1584
@@ -50,6 +54,7 @@ npm run validate:nec-compliance
 ```
 
 ### 4. Mathematical Precision
+
 ```bash
 # Test floating-point precision
 npm run test:mathematical-precision
@@ -62,6 +67,7 @@ npm run test:matrix-calculations
 ```
 
 ### 5. Edge Case Testing
+
 ```bash
 # Test zero impedance cases
 npm run test:zero-impedance
@@ -74,6 +80,7 @@ npm run test:boundary-conditions
 ```
 
 ### 6. Performance Validation
+
 ```bash
 # Measure calculation performance
 npm run measure:calculation-performance
@@ -86,6 +93,7 @@ npm run test:convergence-criteria
 ```
 
 ### 7. Integration Testing
+
 ```bash
 # Test frontend-backend integration
 npm run test:electrical-integration
@@ -98,6 +106,7 @@ npm run test:report-accuracy
 ```
 
 ### 8. Generate Validation Report
+
 ```bash
 # Create comprehensive validation report
 node scripts/electrical-validation-report.js
@@ -110,6 +119,7 @@ node scripts/discrepancy-report.js
 ```
 
 ## Validation Criteria
+
 - **Calculation Accuracy**: ±0.1% for standard cases
 - **Standards Compliance**: 100% IEEE/IEC compliance
 - **Mathematical Precision**: 6+ decimal places
@@ -117,6 +127,7 @@ node scripts/discrepancy-report.js
 - **Edge Cases**: No crashes or infinite loops
 
 ## Test Cases
+
 - **3-Phase Systems**: Balanced and unbalanced
 - **Short Circuits**: 3-phase, phase-to-phase, phase-to-ground
 - **Load Flow**: Various load types and conditions
@@ -124,6 +135,7 @@ node scripts/discrepancy-report.js
 - **Protection**: Coordination and selectivity
 
 ## Validation Checklist
+
 - [ ] All standard test cases pass
 - [ ] IEEE/IEC standards compliance verified
 - [ ] Mathematical precision confirmed
@@ -134,6 +146,7 @@ node scripts/discrepancy-report.js
 - [ ] No numerical instabilities
 
 ## Exit Criteria
+
 - ✅ All validation tests pass
 - ✅ Standards compliance confirmed
 - ✅ Accuracy requirements met
@@ -142,6 +155,7 @@ node scripts/discrepancy-report.js
 - ✅ No critical discrepancies found
 
 ## Reference Materials
+
 - IEEE 1584 - Guide for Performing Arc-Flash Calculations
 - IEC 60909 - Short-Circuit Currents in Three-Phase AC Systems
 - NEC 2023 - National Electrical Code

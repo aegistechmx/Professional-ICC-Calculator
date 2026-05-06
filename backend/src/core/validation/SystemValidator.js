@@ -209,7 +209,7 @@ class SystemValidator {
       inconsistentBases.push({
         type: 'missing_base',
         buses: busesWithoutBase.map(b => b.id),
-        message: `Buses without voltage base: ${busesWithoutBase.map(b => b.id).join(', ')}`,
+        message: `Buses without voltage base: ${busesWithoutBase.map(b => b.id).join(', ')}`, // voltage (V)
         // voltage (V)
       })
     }
@@ -324,7 +324,7 @@ class SystemValidator {
     if (ungroundedBuses.length > 0) {
       return {
         valid: true, // Not necessarily invalid, but should be noted
-        warning: `High voltage buses without grounding: ${ungroundedBuses.map(b => b.id).join(', ')}. Consider grounding for proper fault analysis.`,
+        warning: `High voltage buses without grounding: ${ungroundedBuses.map(b => b.id).join(', ')}. Consider grounding for proper fault analysis.`, // voltage (V)
         // voltage (V)
       }
     }

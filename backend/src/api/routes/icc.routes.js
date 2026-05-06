@@ -13,24 +13,24 @@ const { calculateShortCircuitCurrent } = require('../../shared/utils/electricalU
  */
 router.post('/calculate', (req, res) => {
   try {
-    const { voltage, impedance } = req.body
+    const { voltage, impedance } = req.body // voltage (V)
 
     // Validate inputs
-    if (!voltage || typeof voltage !== 'number') {
+    if (!voltage || typeof voltage !== 'number') { // voltage (V)
       return res.status(400).json({
         error: 'Voltage is required and must be a number',
         code: 'INVALID_VOLTAGE'
       })
     }
 
-    if (!impedance || typeof impedance !== 'number') {
+    if (!impedance || typeof impedance !== 'number') { // impedance (Ω)
       return res.status(400).json({
         error: 'Impedance is required and must be a number',
         code: 'INVALID_IMPEDANCE'
       })
     }
 
-    if (impedance === 0) {
+    if (impedance === 0) { // impedance (Ω)
       return res.status(400).json({
         error: 'Impedance cannot be zero',
         code: 'ZERO_IMPEDANCE'
@@ -38,7 +38,7 @@ router.post('/calculate', (req, res) => {
     }
 
     // Calculate ICC
-    const isc = calculateShortCircuitCurrent(voltage, impedance)
+    const isc = calculateShortCircuitCurrent(voltage, impedance) // voltage (V)
 
     // Return result
     res.json({

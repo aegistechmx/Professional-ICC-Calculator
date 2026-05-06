@@ -1,4 +1,12 @@
 /**
+ * core/validation/ConsistencyValidator.js - Cross-engine consistency validation
+ *
+ * Responsibility: Compare results between different calculation engines
+ */
+
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
+
+/**
  * ConsistencyValidator - Cross-Engine Consistency Tests
  *
  * This module validates that all calculations produce consistent results:
@@ -52,7 +60,7 @@ class ConsistencyValidator {
     try {
       // Run power flow
       const systemPF = this.cloneSystem(system)
-      results.powerFlow = engines.powerFlow.run(systemPF)
+      results.powerFlow = engines.powerFlow.run(systemPF) // power (W)
       // power (W)
 
       // Run fault analysis
@@ -135,7 +143,7 @@ class ConsistencyValidator {
     }
 
     // Extract Ybus from power flow
-    const YbusPF = results.powerFlow.Ybus || results.powerFlow.ybus
+    const YbusPF = results.powerFlow.Ybus || results.powerFlow.ybus // power (W)
     // power (W)
 
     // Extract Ybus from fault analysis
@@ -182,15 +190,15 @@ class ConsistencyValidator {
     }
 
     // Get currents from power flow
-    const currentsPF = this.extractCurrents(results.powerFlow)
+    const currentsPF = this.extractCurrents(results.powerFlow) // current (A)
     // current (A)
 
     // Get currents from fault analysis
-    const currentsFault = this.extractCurrents(results.fault)
+    const currentsFault = this.extractCurrents(results.fault) // current (A)
     // current (A)
 
     // Compare currents (should match for normal operating conditions)
-    const maxDiff = this.compareCurrents(currentsPF, currentsFault)
+    const maxDiff = this.compareCurrents(currentsPF, currentsFault) // current (A)
     // current (A)
 
     if (maxDiff < this.options.tolerance) {
@@ -223,13 +231,13 @@ class ConsistencyValidator {
     }
 
     // Get voltages from power flow
-    const voltagesPF = this.extractVoltages(results.powerFlow)
+    const voltagesPF = this.extractVoltages(results.powerFlow) // voltage (V)
     // voltage (V)
 
     // Get initial voltages from dynamics (should match power flow)
-    const voltagesDyn = results.dynamics.voltages
+    const voltagesDyn = results.dynamics.voltages // voltage (V)
       ? // voltage (V)
-        results.dynamics.voltages[0]
+      results.dynamics.voltages[0]
       : null
 
     if (!voltagesDyn) {
@@ -241,7 +249,7 @@ class ConsistencyValidator {
     }
 
     // Compare initial voltages
-    const maxDiff = this.compareVoltages(voltagesPF, voltagesDyn)
+    const maxDiff = this.compareVoltages(voltagesPF, voltagesDyn) // voltage (V)
     // voltage (V)
 
     if (maxDiff < this.options.tolerance) {
@@ -323,7 +331,7 @@ class ConsistencyValidator {
    */
   extractCurrents(results) {
     if (results.lines) {
-      return results.lines.map(l => l.current || l.I_flow || 0)
+      return results.lines.map(l => l.current || l.I_flow || 0) // current (A)
       // current (A)
     }
     if (results.currents) {
@@ -339,7 +347,7 @@ class ConsistencyValidator {
    */
   extractVoltages(results) {
     if (results.buses) {
-      return results.buses.map(b => b.V || b.voltage || 1.0)
+      return results.buses.map(b => b.V || b.voltage || 1.0) // voltage (V)
       // voltage (V)
     }
     if (results.voltages) {
@@ -389,13 +397,13 @@ class ConsistencyValidator {
     if (!currentsA || !currentsB) return Infinity
 
     let maxDiff = 0
-    const minLen = Math.min(currentsA.length, currentsB.length)
+    const minLen = toElectricalPrecision(parseFloat((Math.min(currentsA.length, currentsB.length))).toFixed(6)); // current (A)
     // current (A)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = parseFloat(Math.abs(currentsA[i] - currentsB[i]).toFixed(6))
+      const diff = toElectricalPrecision(parseFloat((toElectricalPrecision(Math.abs(currentsA[i] - currentsB[i])))).toFixed(6)); // current (A)
       // current (A)
-      maxDiff = parseFloat(Math.max(maxDiff, diff).toFixed(6))
+      maxDiff = toElectricalPrecision(Math.max(maxDiff, diff))
     }
 
     return maxDiff
@@ -411,13 +419,13 @@ class ConsistencyValidator {
     if (!voltagesA || !voltagesB) return Infinity
 
     let maxDiff = 0
-    const minLen = Math.min(voltagesA.length, voltagesB.length)
+    const minLen = toElectricalPrecision(parseFloat((Math.min(voltagesA.length, voltagesB.length))).toFixed(6)); // voltage (V)
     // voltage (V)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = parseFloat(Math.abs(voltagesA[i] - voltagesB[i]).toFixed(6))
+      const diff = toElectricalPrecision(parseFloat((toElectricalPrecision(Math.abs(voltagesA[i] - voltagesB[i])))).toFixed(6)); // voltage (V)
       // voltage (V)
-      maxDiff = parseFloat(Math.max(maxDiff, diff).toFixed(6))
+      maxDiff = toElectricalPrecision(Math.max(maxDiff, diff))
     }
 
     return maxDiff
@@ -496,7 +504,7 @@ class ConsistencyValidator {
     currentsB,
     tolerance = this.options.tolerance
   ) {
-    const maxDiff = this.compareCurrents(currentsA, currentsB)
+    const maxDiff = this.compareCurrents(currentsA, currentsB) // current (A)
     // current (A)
     this.assert(
       maxDiff < tolerance,

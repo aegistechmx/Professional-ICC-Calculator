@@ -1,0 +1,553 @@
+﻿============================================================
+DETAILED FILE ANALYSIS - ICC CALCULATOR
+============================================================
+Directory analyzed: C:\Professional ICC Calculator
+Excluded: node_modules folders
+
+1. FOLDER STRUCTURE
+------------------------------------------------------------
+  [DIR] .github (3 files)
+  [DIR] .netlify (4 files)
+  [DIR] .vscode (3 files)
+  [DIR] .windsurf (21 files)
+  [DIR] backend (399 files)
+  [DIR] docs (3 files)
+  [DIR] examples (9 files)
+  [DIR] frontend (462 files)
+  [DIR] icc-core (256 files)
+  [DIR] netlify (3 files)
+  [DIR] reports (22 files)
+  [DIR] scripts (33 files)
+  [DIR] tests (1 files)
+    [DIR] workflows (3 files)
+    [DIR] functions (2 files)
+    [DIR] functions-internal (0 files)
+    [DIR] v1 (0 files)
+      [DIR] functions (0 files)
+    [DIR] rules (12 files)
+    [DIR] workflows (8 files)
+    [DIR] coverage (197 files)
+    [DIR] data (3 files)
+    [DIR] prisma (2 files)
+    [DIR] public (3 files)
+    [DIR] src (149 files)
+    [DIR] tests (15 files)
+      [DIR] lcov-report (98 files)
+      [DIR] src (90 files)
+        [DIR] src (90 files)
+          [DIR] api (6 files)
+          [DIR] application (3 files)
+          [DIR] core (55 files)
+          [DIR] debug (5 files)
+          [DIR] engine (3 files)
+          [DIR] infrastructure (11 files)
+          [DIR] shared (5 files)
+            [DIR] controllers (2 files)
+            [DIR] middlewares (2 files)
+            [DIR] routes (2 files)
+            [DIR] services (3 files)
+            [DIR] powerflow (41 files)
+            [DIR] protection (8 files)
+            [DIR] validation (4 files)
+            [DIR] ybus (2 files)
+              [DIR] contingency (4 files)
+              [DIR] dynamics (6 files)
+              [DIR] opf (9 files)
+              [DIR] solvers (4 files)
+              [DIR] stability (10 files)
+                [DIR] integrators (2 files)
+                [DIR] models (2 files)
+                [DIR] solver (2 files)
+                [DIR] scopf (4 files)
+                [DIR] models (5 files)
+            [DIR] infra (2 files)
+            [DIR] queue (2 files)
+            [DIR] scheduler (2 files)
+            [DIR] workers (5 files)
+              [DIR] config (2 files)
+            [DIR] math (2 files)
+            [DIR] utils (3 files)
+        [DIR] api (6 files)
+        [DIR] application (3 files)
+        [DIR] core (55 files)
+        [DIR] debug (5 files)
+        [DIR] engine (3 files)
+        [DIR] infrastructure (11 files)
+        [DIR] shared (5 files)
+          [DIR] controllers (2 files)
+          [DIR] middlewares (2 files)
+          [DIR] routes (2 files)
+          [DIR] services (3 files)
+          [DIR] powerflow (41 files)
+          [DIR] protection (8 files)
+          [DIR] validation (4 files)
+          [DIR] ybus (2 files)
+            [DIR] contingency (4 files)
+            [DIR] dynamics (6 files)
+            [DIR] opf (9 files)
+            [DIR] solvers (4 files)
+            [DIR] stability (10 files)
+              [DIR] integrators (2 files)
+              [DIR] models (2 files)
+              [DIR] solver (2 files)
+              [DIR] scopf (4 files)
+              [DIR] models (5 files)
+          [DIR] infra (2 files)
+          [DIR] queue (2 files)
+          [DIR] scheduler (2 files)
+          [DIR] workers (5 files)
+            [DIR] config (2 files)
+          [DIR] math (2 files)
+          [DIR] utils (3 files)
+      [DIR] sqd_curvas (3 files)
+      [DIR] cortocircuito (3 files)
+        [DIR] app (0 files)
+        [DIR] cortocircuito (0 files)
+        [DIR] css (0 files)
+        [DIR] js (0 files)
+        [DIR] plantillas (0 files)
+      [DIR] api (10 files)
+      [DIR] application (5 files)
+      [DIR] config (0 files)
+      [DIR] controllers (2 files)
+      [DIR] core (57 files)
+      [DIR] data (0 files)
+      [DIR] debug (5 files)
+      [DIR] domain (8 files)
+      [DIR] engine (13 files)
+      [DIR] infrastructure (18 files)
+      [DIR] interfaces (6 files)
+      [DIR] monitoring (1 files)
+      [DIR] plugins (4 files)
+      [DIR] routes (1 files)
+      [DIR] services (2 files)
+      [DIR] shared (8 files)
+      [DIR] types (1 files)
+      [DIR] utils (2 files)
+      [DIR] validation (2 files)
+      [DIR] validators (0 files)
+        [DIR] controllers (7 files)
+        [DIR] middlewares (1 files)
+        [DIR] routes (2 files)
+        [DIR] contingency (0 files)
+        [DIR] opf (0 files)
+        [DIR] powerflow (0 files)
+        [DIR] services (3 files)
+        [DIR] simulation (0 files)
+        [DIR] useCases (0 files)
+        [DIR] adapters (1 files)
+        [DIR] events (0 files)
+        [DIR] math (0 files)
+        [DIR] powerflow (40 files)
+        [DIR] protection (8 files)
+        [DIR] protections (0 files)
+        [DIR] shortcircuit (0 files)
+        [DIR] stability (0 files)
+        [DIR] system (0 files)
+        [DIR] validation (4 files)
+        [DIR] ybus (1 files)
+          [DIR] contingency (4 files)
+          [DIR] dynamics (4 files)
+          [DIR] opf (9 files)
+          [DIR] powerflow (1 files)
+          [DIR] solvers (4 files)
+          [DIR] stability (10 files)
+            [DIR] integrators (1 files)
+            [DIR] models (1 files)
+            [DIR] solver (1 files)
+            [DIR] scopf (4 files)
+            [DIR] models (5 files)
+        [DIR] services (8 files)
+        [DIR] adapters (1 files)
+        [DIR] database (1 files)
+        [DIR] external (0 files)
+        [DIR] http (0 files)
+        [DIR] infra (2 files)
+        [DIR] logger (0 files)
+        [DIR] middleware (1 files)
+        [DIR] persistence (0 files)
+        [DIR] queue (1 files)
+        [DIR] queues (1 files)
+        [DIR] repositories (1 files)
+        [DIR] scheduler (1 files)
+        [DIR] services (3 files)
+        [DIR] workers (6 files)
+          [DIR] config (2 files)
+          [DIR] logger (0 files)
+        [DIR] controllers (3 files)
+        [DIR] routes (3 files)
+        [DIR] contingency (1 files)
+        [DIR] core (0 files)
+        [DIR] opf (1 files)
+        [DIR] powerflow (1 files)
+        [DIR] stability (1 files)
+        [DIR] constants (0 files)
+        [DIR] logger (0 files)
+        [DIR] math (1 files)
+        [DIR] types (0 files)
+        [DIR] utils (6 files)
+      [DIR] electrical (2 files)
+    [DIR] dist (5 files)
+    [DIR] public (256 files)
+    [DIR] src (190 files)
+      [DIR] assets (4 files)
+      [DIR] cortocircuito (256 files)
+        [DIR] app (5 files)
+        [DIR] cortocircuito (122 files)
+        [DIR] css (1 files)
+        [DIR] js (123 files)
+        [DIR] plantillas (2 files)
+          [DIR] calculo (1 files)
+          [DIR] core (1 files)
+          [DIR] datos (1 files)
+          [DIR] debug (1 files)
+          [DIR] ui (1 files)
+          [DIR] css (1 files)
+          [DIR] js (118 files)
+          [DIR] plantillas (2 files)
+            [DIR] app (1 files)
+            [DIR] calculo (49 files)
+            [DIR] core (24 files)
+            [DIR] datos (9 files)
+            [DIR] debug (6 files)
+            [DIR] modules (2 files)
+            [DIR] selectors (2 files)
+            [DIR] ui (19 files)
+            [DIR] verification (1 files)
+              [DIR] data (6 files)
+              [DIR] domain (5 files)
+              [DIR] dominio (4 files)
+              [DIR] electrical (2 files)
+              [DIR] models (1 files)
+              [DIR] protection (1 files)
+              [DIR] services (1 files)
+              [DIR] utils (1 files)
+          [DIR] app (1 files)
+          [DIR] calculo (49 files)
+          [DIR] core (29 files)
+          [DIR] datos (9 files)
+          [DIR] debug (6 files)
+          [DIR] modules (2 files)
+          [DIR] selectors (2 files)
+          [DIR] ui (19 files)
+          [DIR] verification (1 files)
+            [DIR] data (6 files)
+            [DIR] domain (5 files)
+            [DIR] dominio (4 files)
+            [DIR] electrical (2 files)
+            [DIR] models (1 files)
+            [DIR] protection (1 files)
+            [DIR] services (1 files)
+            [DIR] utils (1 files)
+      [DIR] catalogs (1 files)
+      [DIR] components (109 files)
+      [DIR] hooks (19 files)
+      [DIR] modules (5 files)
+      [DIR] store (5 files)
+      [DIR] styles (1 files)
+      [DIR] test (1 files)
+      [DIR] utils (43 files)
+      [DIR] workers (1 files)
+        [DIR] edges (5 files)
+        [DIR] nodes (16 files)
+        [DIR] particles (18 files)
+        [DIR] properties (6 files)
+        [DIR] shared (5 files)
+        [DIR] symbols (6 files)
+          [DIR] electrical (6 files)
+          [DIR] __tests__ (7 files)
+        [DIR] __tests__ (1 files)
+        [DIR] cortocircuito (5 files)
+          [DIR] components (2 files)
+          [DIR] hooks (1 files)
+          [DIR] services (1 files)
+        [DIR] slices (0 files)
+    [DIR] cortocircuito (256 files)
+      [DIR] app (5 files)
+      [DIR] cortocircuito (122 files)
+      [DIR] css (1 files)
+      [DIR] js (123 files)
+      [DIR] plantillas (2 files)
+        [DIR] calculo (1 files)
+        [DIR] core (1 files)
+        [DIR] datos (1 files)
+        [DIR] debug (1 files)
+        [DIR] ui (1 files)
+        [DIR] css (1 files)
+        [DIR] js (118 files)
+        [DIR] plantillas (2 files)
+          [DIR] app (1 files)
+          [DIR] calculo (49 files)
+          [DIR] core (24 files)
+          [DIR] datos (9 files)
+          [DIR] debug (6 files)
+          [DIR] modules (2 files)
+          [DIR] selectors (2 files)
+          [DIR] ui (19 files)
+          [DIR] verification (1 files)
+            [DIR] data (6 files)
+            [DIR] domain (5 files)
+            [DIR] dominio (4 files)
+            [DIR] electrical (2 files)
+            [DIR] models (1 files)
+            [DIR] protection (1 files)
+            [DIR] services (1 files)
+            [DIR] utils (1 files)
+        [DIR] app (1 files)
+        [DIR] calculo (49 files)
+        [DIR] core (29 files)
+        [DIR] datos (9 files)
+        [DIR] debug (6 files)
+        [DIR] modules (2 files)
+        [DIR] selectors (2 files)
+        [DIR] ui (19 files)
+        [DIR] verification (1 files)
+          [DIR] data (6 files)
+          [DIR] domain (5 files)
+          [DIR] dominio (4 files)
+          [DIR] electrical (2 files)
+          [DIR] models (1 files)
+          [DIR] protection (1 files)
+          [DIR] services (1 files)
+          [DIR] utils (1 files)
+    [DIR] functions (3 files)
+    [DIR] compliance (2 files)
+
+2. FILES BY TYPE
+------------------------------------------------------------
+   .js : 808 files
+   .html : 190 files
+   .jsx : 79 files
+   .md : 58 files
+   .json : 43 files
+   .css : 25 files
+   .bak : 4 files
+   .yml : 4 files
+   .xlsx : 4 files
+   .png : 4 files
+   .ts : 4 files
+   .ps1 : 2 files
+   .csv : 2 files
+   .zip : 2 files
+   .dot : 2 files
+   .txt : 2 files
+   .example : 2 files
+   .sh : 2 files
+   .toml : 2 files
+   .info : 2 files
+   .codeiumignore : 1 files
+   .lnk : 1 files
+   .production : 1 files
+   .env : 1 files
+   .bat : 1 files
+   .gitignore : 1 files
+   .prisma : 1 files
+   .db : 1 files
+    : 1 files
+
+3. ANALYSIS BY SUBDIRECTORY
+------------------------------------------------------------
+
+[DIR] .github/
+   |-- Total files: 3
+   |-- JS/TS/JSX: 0
+   |-- CSS: 0
+   |-- JSON: 0
+   |-- Files:
+
+[DIR] .netlify/
+   |-- Total files: 4
+   |-- JS/TS/JSX: 0
+   |-- CSS: 0
+   |-- JSON: 2
+   |-- Files:
+
+[DIR] .vscode/
+   |-- Total files: 3
+   |-- JS/TS/JSX: 0
+   |-- CSS: 0
+   |-- JSON: 3
+   |-- Files:
+
+[DIR] .windsurf/
+   |-- Total files: 21
+   |-- JS/TS/JSX: 0
+   |-- CSS: 0
+   |-- JSON: 1
+   |-- Files:
+
+[DIR] backend/
+   |-- Total files: 399
+   |-- JS/TS/JSX: 187
+   |-- CSS: 4
+   |-- JSON: 6
+
+[DIR] docs/
+   |-- Total files: 3
+   |-- JS/TS/JSX: 0
+   |-- CSS: 0
+   |-- JSON: 0
+   |-- Files:
+
+[DIR] examples/
+   |-- Total files: 9
+   |-- JS/TS/JSX: 0
+   |-- CSS: 0
+   |-- JSON: 8
+   |-- Files:
+
+[DIR] frontend/
+   |-- Total files: 462
+   |-- JS/TS/JSX: 424
+   |-- CSS: 19
+   |-- JSON: 5
+
+[DIR] icc-core/
+   |-- Total files: 256
+   |-- JS/TS/JSX: 246
+   |-- CSS: 2
+   |-- JSON: 1
+
+[DIR] netlify/
+   |-- Total files: 3
+   |-- JS/TS/JSX: 1
+   |-- CSS: 0
+   |-- JSON: 2
+   |-- Files:
+       [FILE] api.js (0.6 KB)
+
+[DIR] reports/
+   |-- Total files: 22
+   |-- JS/TS/JSX: 0
+   |-- CSS: 0
+   |-- JSON: 8
+   |-- Files:
+
+[DIR] scripts/
+   |-- Total files: 33
+   |-- JS/TS/JSX: 30
+   |-- CSS: 0
+   |-- JSON: 0
+
+[DIR] tests/
+   |-- Total files: 1
+   |-- JS/TS/JSX: 1
+   |-- CSS: 0
+   |-- JSON: 0
+   |-- Files:
+       [FILE] test-nodos.js (8.83 KB)
+
+4. IMPORT ANALYSIS
+------------------------------------------------------------
+   Total unique imports: 350
+
+5. LARGEST FILES (>50KB)
+------------------------------------------------------------
+   [FILE] C:\Professional ICC Calculator\.netlify\functions\api.zip - 3728.56 KB (3.64 MB)
+   [FILE] C:\Professional ICC Calculator\backend\package-lock.json - 373.05 KB (0.36 MB)
+   [FILE] C:\Professional ICC Calculator\frontend\dist\assets\ui-DgltLOWy.js - 280.91 KB (0.27 MB)
+   [FILE] C:\Professional ICC Calculator\frontend\package-lock.json - 266.22 KB (0.26 MB)
+   [FILE] C:\Professional ICC Calculator\frontend\dist\assets\index-VRCpjQjm.js - 121.42 KB (0.12 MB)
+   [FILE] C:\Professional ICC Calculator\backend\coverage\lcov.info - 114.33 KB (0.11 MB)
+   [FILE] C:\Professional ICC Calculator\reports\enhanced-electrical-validation-2026-04-29.json - 99.73 KB (0.1 MB)
+   [FILE] C:\Professional ICC Calculator\frontend\public\cortocircuito\js\calculo\motor.js - 95.2 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\icc-core\cortocircuito\js\calculo\motor.js - 95.2 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\icc-core\cortocircuito\cortocircuito\js\calculo\motor.js - 95.02 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\frontend\public\cortocircuito\cortocircuito\js\calculo\motor.js - 95.02 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\backend\coverage\src\core\protection\LSIGBreaker.js.html - 94.04 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\backend\coverage\lcov-report\src\core\protection\LSIGBreaker.js.html - 94.04 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\netlify\functions\package-lock.json - 89.61 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\backend\src\core\core.zip - 88.6 KB (0.09 MB)
+   [FILE] C:\Professional ICC Calculator\backend\coverage\src\core\validation\SystemValidator.js.html - 77.86 KB (0.08 MB)
+   [FILE] C:\Professional ICC Calculator\backend\coverage\lcov-report\src\core\validation\SystemValidator.js.html - 77.86 KB (0.08 MB)
+   [FILE] C:\Professional ICC Calculator\frontend\public\cortocircuito\js\app.js - 73.08 KB (0.07 MB)
+   [FILE] C:\Professional ICC Calculator\icc-core\cortocircuito\js\app.js - 73.08 KB (0.07 MB)
+   [FILE] C:\Professional ICC Calculator\frontend\public\cortocircuito\cortocircuito\js\app.js - 73.08 KB (0.07 MB)
+
+6. COMPONENTS BY CATEGORY
+------------------------------------------------------------
+
+7. SERVICES AND UTILITIES
+------------------------------------------------------------
+   [SRV] Services: 0
+   [UTL] Utilities: 0
+   [HKS] Hooks: 0
+
+8. FILES WITHOUT REFERENCES (POSSIBLE ORPHANS)
+------------------------------------------------------------
+   [WARN] src\api\controllers\breakerSelector.controller.js
+   [WARN] src\api\controllers\coordination.controller.js
+   [WARN] src\api\controllers\graphSystem.controller.js
+   [WARN] src\api\controllers\realtime.controller.js
+   [WARN] src\api\controllers\tcc.controller.js
+   [WARN] src\domain\services\breakerFamilies.domain.js
+   [WARN] src\domain\services\faultAnimation.domain.js
+   [WARN] src\domain\services\tccBandEngine.domain.js
+   [WARN] src\infrastructure\middleware\security.middleware.js
+   [WARN] src\infrastructure\workers\simulation.worker.js
+   [WARN] src\interfaces\routes\professional.routes.js
+   [WARN] src\shared\utils\electricalUtilsMissing.js
+   [WARN] src\validation\electrical.standards.validator.js
+   [WARN] src\express-server.js
+   [WARN] tests\Complex.test.js
+   [WARN] tests\electricalUtils.test.js
+   [WARN] tests\icc.service.fixed.test.js
+   [WARN] tests\jest.config.js
+   [WARN] tests\powerflow.test.js
+   [WARN] tests\precision.improvements.test.js
+   [WARN] tests\tcc-digitalizer.test.js
+   [WARN] jest.config.js
+   [WARN] start-server.js
+   [WARN] test-advanced-features.js
+   [WARN] test-advanced-generator-models.js
+   [WARN] test-all-endpoints.js
+   [WARN] test-batch.js
+   [WARN] test-contingency.js
+   [WARN] test-dynamic.js
+   [WARN] test-icc-fixed.js
+   [WARN] test-opf.js
+   [WARN] test-scopf.js
+   [WARN] test-ts-scopf.js
+   [WARN] test-worker.js
+   [WARN] C:\Professional ICC Calculator\frontend\dist\assets\ui-DgltLOWy.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\components\nodes\CapacitorBankNode.jsx
+   [WARN] C:\Professional ICC Calculator\frontend\src\components\particles\__tests__\memory.leaks.test.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\components\particles\__tests__\particle.calculations.test.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\hooks\__tests__\useFaultParticleAnimation.integration.test.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\hooks\useAutoSave.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\hooks\useLiveSimulation.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\utils\applyResults.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\utils\diagramExport.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\utils\manhattanRouter.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\utils\parametricTCCEngine.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\utils\projectStorage.js
+   [WARN] C:\Professional ICC Calculator\frontend\src\utils\timelinePlayback.js
+   [WARN] C:\Professional ICC Calculator\scripts\check-unit-consistency.js
+   [WARN] C:\Professional ICC Calculator\scripts\clean-duplicates-safe.js
+   [WARN] C:\Professional ICC Calculator\scripts\cleanup-final.js
+   [WARN] C:\Professional ICC Calculator\scripts\cleanup-remaining.js
+   [WARN] C:\Professional ICC Calculator\scripts\cleanup-truly-unused.js
+   [WARN] C:\Professional ICC Calculator\scripts\cleanup-unused-safe.js
+   [WARN] C:\Professional ICC Calculator\scripts\find-duplicates.js
+   [WARN] C:\Professional ICC Calculator\scripts\fix-imports.js
+   [WARN] C:\Professional ICC Calculator\scripts\generate-visualization-suite.js
+   [WARN] C:\Professional ICC Calculator\scripts\merge-similar-files.js
+   [WARN] C:\Professional ICC Calculator\scripts\refactor-phase-final.js
+   [WARN] C:\Professional ICC Calculator\scripts\refactor-phase1.js
+   [WARN] C:\Professional ICC Calculator\scripts\update-memories.js
+   [WARN] C:\Professional ICC Calculator\scripts\validate-electrical-inputs.js
+   [WARN] C:\Professional ICC Calculator\tests\test-nodos.js
+   [WARN] C:\Professional ICC Calculator\start-all.js
+
+FINAL SUMMARY
+============================================================
+
+   [SUM] Total files: 1252
+   [SUM] JS/JSX files: 889
+   [SUM] CSS files: 25
+   [SUM] Total size: 19.32 MB
+
+============================================================
+[OK] ANALYSIS COMPLETED
+Report generated: C:\Professional ICC Calculator\analysis_report_20260429_151459.txt
+============================================================

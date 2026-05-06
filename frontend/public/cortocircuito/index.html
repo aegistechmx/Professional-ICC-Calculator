@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 11px;
+                line-height: 1.3;
+            }
+
+            /* Ocultar UI innecesaria */
+            button,
+            .no-print,
+            header,
+            footer,
+            .toast-container,
+            #toast-container,
+            .modal,
+            .fixed {
+                display: none !important;
+            }
+
+            /* Mostrar contenido principal */
+            main,
+            .print-content {
+                display: block !important;
+                visibility: visible !important;
+            }
+
+            /* Cada módulo = página */
+            .print-module {
+                display: block !important;
+                page-break-after: always;
+                break-after: page;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                position: relative;
+                min-height: 260mm;
+                padding: 10mm;
+                box-sizing: border-box;
+                background: white !important;
+                border: 1px solid #ccc;
+                margin-bottom: 10mm;
+            }
+
+            /* Último módulo sin salto */
+            .print-module:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+
+            /* Evitar cortes críticos */
+            table,
+            .card,
+            .section,
+            .p-3,
+            .rounded-lg {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Layout limpio (Tailwind grid fix) */
+            .grid,
+            .grid-cols-1,
+            .grid-cols-2,
+            .grid-cols-3,
+            .grid-cols-4 {
+                display: block !important;
+            }
+
+            .grid>div {
+                display: block !important;
+                margin-bottom: 10px;
+                page-break-inside: avoid;
+            }
+
+            /* Flexbox fix */
+            .flex,
+            .flex-row,
+            .flex-col {
+                display: block !important;
+            }
+
+            .flex>div {
+                display: block !important;
+                margin-bottom: 5px;
+            }
+
+            /* Asegurar visibilidad de canvas (gráficas) */
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+                page-break-inside: avoid;
+            }
+
+            /* Tablas */
+            table {
+                width: 100% !important;
+                border-collapse: collapse;
+                margin: 10px 0;
+            }
+
+            table th,
+            table td {
+                border: 1px solid #ddd;
+                padding: 5px;
+                text-align: left;
+            }
+
+            table th {
+                background: #f5f5f5;
+                font-weight: bold;
+            }
+
+            /* Texto y colores */
+            * {
+                color: black !important;
+                background: white !important;
+            }
+
+            .text-[--cyan],
+            .text-[--green],
+            .text-[--red],
+            .text-[--yellow] {
+                color: black !important;
+                font-weight: bold;
+            }
+
+            /* Header */
+            .print-header::before {
+                content: "Memoria de Cálculo de Cortocircuito";
+                display: block;
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 5px;
+            }
+
+            .print-header::after {
+                content: "Sistema eléctrico – Análisis conforme a NOM-001-SEDE-2012";
+                display: block;
+                font-size: 10px;
+                margin-bottom: 10px;
+            }
+
+            /* Footer automático */
+            .print-module::after {
+                content: "Documento técnico | Generado automáticamente";
+                position: absolute;
+                bottom: 5mm;
+                left: 10mm;
+                font-size: 9px;
+            }
+
+            /* Fechas dinámicas */
+            .fecha-print {
+                display: block !important;
+                font-size: 10px;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+    <title>Calculadora de Cortocircuito — NOM-001-SEDE-2012</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['DM Sans', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } }
+        }
+    </script>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <!-- Toast -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <!-- Modal de Proyectos -->
+    <div id="modal-proyectos" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="UIProyectos.cerrarModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg">
+            <div class="card border-[--amber]/20 shadow-2xl shadow-black/40">
+                <div class="card-title"><i class="fas fa-folder-open"></i> Gestion de Proyectos</div>
+                <div id="proyectos-lista" class="space-y-2 max-h-60 overflow-y-auto mb-4"></div>
+                <div class="flex gap-2">
+                    <button class="btn-sm flex-1" onclick="UIProyectos.guardar()"><i class="fas fa-save mr-1"></i>
+                        Guardar actual</button>
+                    <button class="btn-sm flex-1" onclick="UIProyectos.exportarJSON()"><i
+                            class="fas fa-download mr-1"></i> Exportar JSON</button>
+                    <button class="btn-sm flex-1" onclick="UIProyectos.cerrarModal()"><i class="fas fa-times mr-1"></i>
+                        Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="border-b border-[--border] bg-[--surface]/80 backdrop-blur-sm sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-lg bg-[--amber-dim] flex items-center justify-center border border-[--amber]/20">
+                    <i class="fas fa-bolt text-[--amber]"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-tight">Calculadora de Cortocircuito</h1>
+                    <p class="text-[0.65rem] text-[--text-muted] tracking-wide">NOM-001-SEDE-2012</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="UIProyectos.abrirModal()" class="btn-sm" title="Proyectos">
+                    <i class="fas fa-folder text-[0.65rem]"></i> <span class="hidden sm:inline">Proyectos</span>
+                </button>
+                <label class="btn-sm cursor-pointer" title="Importar JSON">
+                    <i class="fas fa-upload text-[0.65rem]"></i> <span class="hidden sm:inline">Importar</span>
+                    <input type="file" id="import-json-input" name="import-json-input" accept=".json" class="hidden"
+                        onchange="UIProyectos.importarJSON(event)">
+                </label>
+                <button onclick="UIExportar.resumenEjecutivo()" class="btn-sm" title="Resumen Ejecutivo">
+                    <i class="fas fa-file-alt text-[0.65rem]"></i>
+                </button>
+                <button onclick="UIExportar.csv()" class="btn-sm" title="Exportar CSV">
+                    <i class="fas fa-file-csv text-[0.65rem]"></i>
+                </button>
+                <button onclick="App.saveProfile()" class="btn-sm" title="Guardar como perfil por defecto">
+                    <i class="fas fa-user-cog text-[0.65rem]"></i> <span class="hidden sm:inline">Guardar Perfil</span>
+                </button>
+                <button onclick="App.resetProfile()" class="btn-sm" title="Restablecer perfil a valores por defecto">
+                    <i class="fas fa-undo text-[0.65rem]"></i> <span class="hidden sm:inline">Reset Perfil</span>
+                </button>
+                <button onclick="App.imprimirModulos()" class="btn-sm" title="PDF de interfaz completa">
+                    <i class="fas fa-file-pdf text-[0.65rem]"></i> <span class="hidden sm:inline">PDF</span>
+                </button>
+                <!-- Botón de sincronización con React -->
+                <button id="sync-btn-html" onclick="syncManualFromHTML()"
+                    class="btn-sm bg-cyan-600 hover:bg-cyan-700 text-white border-cyan-500"
+                    title="Sincronizar con App React">
+                    <i class="fas fa-sync-alt text-[0.65rem]"></i>
+                    <span id="sync-filename-html" class="hidden sm:inline ml-1">Sincronizar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Script de sincronización - debe cargar antes de que el botón sea clickeado -->
+        <script>
+            // Variable global para nombre de archivo
+            window.currentSyncFilename = 'Sin sincronizar';
+
+            // Función global para sincronización manual
+            window.syncManualFromHTML = function () {
+                console.log('SYNC DEBUG: Sincronización manual iniciada desde HTML');
+
+                var projectName = 'Proyecto HTML';
+                if (window.UIProyectos && window.UIProyectos.proyectoActual) {
+                    projectName = window.UIProyectos.proyectoActual.nombre || 'Proyecto HTML';
+                }
+
+                var currentData = {};
+                if (window.MotorICC && window.MotorICC.obtenerDatosActuales) {
+                    currentData = window.MotorICC.obtenerDatosActuales();
+                }
+
+                try {
+                    localStorage.setItem('icc-sync-nodes', JSON.stringify(currentData.nodes || []));
+                    localStorage.setItem('icc-sync-edges', JSON.stringify(currentData.edges || []));
+                    localStorage.setItem('icc-sync-filename', projectName);
+                    localStorage.setItem('icc-sync-timestamp', new Date().toISOString());
+
+                    window.currentSyncFilename = projectName;
+
+                    // Actualizar display
+                    var filenameElement = document.getElementById('sync-filename-html');
+                    if (filenameElement) {
+                        var displayName = projectName;
+                        if (displayName.length > 20) {
+                            displayName = displayName.substring(0, 17) + '...';
+                        }
+                        filenameElement.textContent = displayName;
+                    }
+
+                    // Notificar éxito (con fallback si UIToast no tiene el método)
+                    if (window.UIToast && typeof window.UIToast.success === 'function') {
+                        window.UIToast.success('Sincronizado con React: ' + projectName);
+                    } else if (window.UIToast && typeof window.UIToast.show === 'function') {
+                        window.UIToast.show('Sincronizado con React: ' + projectName, 'success');
+                    } else {
+                        console.log('SYNC: Sincronizado con React: ' + projectName);
+                    }
+
+                    console.log('SYNC DEBUG: Sincronización manual completada:', projectName);
+                } catch (error) {
+                    console.error('SYNC ERROR: Error en sincronización manual:', error);
+                    // Notificar error (con fallback si UIToast no tiene el método)
+                    if (window.UIToast && typeof window.UIToast.error === 'function') {
+                        window.UIToast.error('Error al sincronizar');
+                    } else if (window.UIToast && typeof window.UIToast.show === 'function') {
+                        window.UIToast.show('Error al sincronizar', 'error');
+                    } else {
+                        alert('Error al sincronizar: ' + error.message);
+                    }
+                }
+            };
+
+            // Escuchar cambios desde React
+            window.addEventListener('storage', function (e) {
+                if (e.key === 'icc-sync-filename' && e.newValue) {
+                    window.currentSyncFilename = e.newValue;
+                    var filenameElement = document.getElementById('sync-filename-html');
+                    if (filenameElement) {
+                        var displayName = e.newValue;
+                        if (displayName.length > 20) {
+                            displayName = displayName.substring(0, 17) + '...';
+                        }
+                        filenameElement.textContent = displayName;
+                    }
+                } else if (e.key === 'icc-sync-nodes' && e.newValue) {
+                    window.currentSyncFilename = 'Proyecto React';
+                    var filenameElement = document.getElementById('sync-filename-html');
+                    if (filenameElement) {
+                        filenameElement.textContent = 'Proyecto React';
+                    }
+                }
+            });
+        </script>
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-7xl mx-auto px-4 py-6" id="app">
+        <div class="print-module">
+            <div class="print-header"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+                <!-- ===================== COLUMNA IZQUIERDA ===================== -->
+                <div class="lg:col-span-7 space-y-4">
+
+                    <!-- Configuración del Sistema -->
+                    <section class="card">
+                        <div class="card-title"><i class="fas fa-sliders-h"></i> Configuracion del Sistema</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="field-label" for="modo-calculo">Modo de calculo</label>
+                                <div class="flex gap-2">
+                                    <button class="mode-btn active" id="btn-conocido"
+                                        onclick="App.setMode('conocido')">Isc conocido</button>
+                                    <button class="mode-btn" id="btn-completo" onclick="App.setMode('completo')">Calculo
+                                        completo</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="field-label" for="tipo-sistema">Tipo de sistema</label>
+                                <div class="flex gap-2">
+                                    <button class="mode-btn active" id="btn-3f" onclick="App.setTipo('3f')">Trifasico
+                                        3F-4H</button>
+                                    <button class="mode-btn" id="btn-1f" onclick="App.setTipo('1f')">Monofasico
+                                        1F-3H</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="field-label" for="input-tension">Tension del sistema (V)</label>
+                            <div class="flex gap-2 mb-2 flex-wrap">
+                                <button class="voltage-btn" onclick="App.setVoltage(480,this)">480</button>
+                                <button class="voltage-btn" onclick="App.setVoltage(440,this)">440</button>
+                                <button class="voltage-btn active" onclick="App.setVoltage(220,this)">220</button>
+                                <button class="voltage-btn" onclick="App.setVoltage(208,this)">208</button>
+                                <button class="voltage-btn" onclick="App.setVoltage(127,this)">127</button>
+                            </div>
+                            <input type="number" id="input-tension" name="input-tension" value="220" min="1" step="1"
+                                oninput="App.clearResults()">
+                        </div>
+                    </section>
+
+                    <!-- Datos de Fuente -->
+                    <section class="card">
+                        <div class="card-title"><i class="fas fa-plug"></i> Datos de Fuente</div>
+                        <div id="modo-conocido">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="field-label" for="input-isc-conocido">Isc disponible en el punto
+                                        (kA)</label>
+                                    <input type="number" id="input-isc-conocido" name="input-isc-conocido" value="10"
+                                        min="0.01" step="0.01" oninput="App.clearResults()">
+                                </div>
+                                <div class="flex items-end">
+                                    <p class="text-xs text-[--text-muted] leading-relaxed">Corriente de cortocircuito
+                                        simetrica proporcionada por CFE o medida en el punto de conexion.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="modo-completo" class="hidden">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="field-label" for="input-zona-electrica">Zona Eléctrica</label>
+                                    <select id="input-zona-electrica" name="input-zona-electrica"
+                                        onchange="App.actualizarIscPorZona()" class="relative">
+                                        <option value="">Seleccionar zona...</option>
+                                    </select>
+                                    <p class="text-xs text-[--text-muted] mt-1">Zona geográfica para cálculo automático
+                                        de Isc</p>
+                                </div>
+                                <div>
+                                    <label class="field-label" for="input-isc-fuente">Isc en media tensión (lado
+                                        primario)</label>
+                                    <input type="number" id="input-isc-fuente" name="input-isc-fuente" value="25"
+                                        min="0.01" step="0.01" oninput="App.clearResults()" placeholder="Auto por zona"
+                                        title="Valores típicos de cortocircuito en media tensión. Confirmar con CFE para diseño definitivo.">
+                                    <p class="text-xs text-[--text-muted] mt-1">Isc de red en MT (se transformará a BT
+                                        automáticamente)</p>
+                                    <p id="isc-equivalente-bt" class="text-xs text-[--cyan] mt-1 hidden">Isc equivalente
+                                        en BT: <span id="isc-bt-valor">--</span> kA</p>
+                                    <div id="fault-types-display" class="mt-2 p-2 bg-[--bg-secondary] rounded hidden">
+                                        <p class="text-xs font-semibold text-[--text-muted] mb-1">Análisis de Fallas
+                                            (IEEE Std 399):</p>
+                                        <p class="text-xs text-[--text]">3F: <span id="fault-3f">--</span> kA | L-G:
+                                            <span id="fault-lg">--</span> kA
+                                        </p>
+                                        <p class="text-xs text-[--text]">L-L: <span id="fault-ll">--</span> kA | L-L-G:
+                                            <span id="fault-llg">--</span> kA
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="field-label" for="input-xr-fuente">X/R de la fuente</label>
+                                    <input type="number" id="input-xr-fuente" name="input-xr-fuente" value="15"
+                                        min="0.5" step="0.5" oninput="App.clearResults()">
+                                    <p class="text-xs text-[--text-muted] mt-1">Relación reactancia/resistencia</p>
+                                </div>
+                            </div>
+                            <div class="separator"></div>
+                            <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">
+                                Transformador</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div><label class="field-label" for="input-trafo-kva">Capacidad (kVA)</label><select
+                                        id="input-trafo-kva" name="input-trafo-kva"
+                                        onchange="App.clearResults(); Motor.actualizarRetornoTierra()"
+                                        class="relative"></select></div>
+                                <div><label class="field-label" for="input-trafo-z">% Impedancia</label><input
+                                        type="number" id="input-trafo-z" name="input-trafo-z" value="5.75" min="0.1"
+                                        step="0.01" max="15"
+                                        oninput="App.clearResults(); Motor.actualizarRetornoTierra()"></div>
+                                <div><label class="field-label" for="input-trafo-vp">V primario (V)</label><select
+                                        id="input-trafo-vp" name="input-trafo-vp"
+                                        onchange="App.clearResults(); App.actualizarIscPorZona()" class="relative">
+                                        <option value="13200">13,200 V (Zona Rural/Turística)</option>
+                                        <option value="23000">23,000 V (Zonas Urbanas)</option>
+                                        <option value="13800">13,800 V (Personalizado)</option>
+                                        <option value="34500">34,500 V</option>
+                                        <option value="66000">66,000 V</option>
+                                        <option value="115000">115,000 V</option>
+                                        <option value="230000">230,000 V</option>
+                                        <option value="custom">Personalizado...</option>
+                                    </select></div>
+                                <div>
+                                    <label class="field-label" for="input-trafo-vs">V secundario (V)</label>
+                                    <select id="input-trafo-vs" name="input-trafo-vs"
+                                        onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
+                                        <option value="480">480 V (3F)</option>
+                                        <option value="220">220 V (3F)</option>
+                                        <option value="208">208 V (3F)</option>
+                                        <option value="127">127 V (1F)</option>
+                                        <option value="240">240 V (1F)</option>
+                                        <option value="120">120 V (1F)</option>
+                                        <option value="277">277 V (3F)</option>
+                                        <option value="custom">Personalizado...</option>
+                                    </select>
+                                    <!-- Campo oculto para valores personalizados -->
+                                    <input type="number" id="input-trafo-vs-custom" name="input-trafo-vs-custom"
+                                        value="" min="1" step="1" oninput="App.clearResults()"
+                                        style="display:none; margin-top:8px;" placeholder="Ingrese valor personalizado">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label class="field-label" for="input-x0-config">Configuración X0 (secuencia
+                                        cero)</label>
+                                    <select id="input-x0-config" name="input-x0-config"
+                                        onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
+                                        <option value="plano_acero">Cables en plano (acero)</option>
+                                        <option value="plano_al">Cables en plano (aluminio)</option>
+                                        <option value="triangular_acero">Cables en triángulo (acero)</option>
+                                        <option value="triangular_al">Cables en triángulo (aluminio)</option>
+                                    </select>
+                                    <p class="text-xs text-[--text-muted] mt-1">Configuración geométrica de cables para
+                                        cálculo de impedancia de secuencia cero</p>
+                                </div>
+                                <div>
+                                    <label class="field-label" for="input-trafo-aterr">Tipo de aterrizaje del
+                                        transformador</label>
+                                    <select id="input-trafo-aterr" name="input-trafo-aterr"
+                                        onchange="App.clearResults(); Motor.actualizarRetornoTierra()" class="relative">
+                                        <option value="yg_solido">Yg sólidamente aterrizado</option>
+                                        <option value="yg_resistivo">Yg aterrizado por resistencia</option>
+                                        <option value="delta">Delta (no aterrizado)</option>
+                                    </select>
+                                    <p class="text-xs text-[--text-muted] mt-1">Conexión del neutro del transformador
+                                        para falla fase-tierra</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label class="field-label" for="input-retorno-tierra">Resistencia de retorno a
+                                        tierra (mΩ)</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" id="input-retorno-tierra" name="input-retorno-tierra"
+                                            value="" min="0" step="0.1" placeholder="Auto-calculado"
+                                            oninput="App.clearResults()"
+                                            title="Valor calculado automáticamente según configuración del sistema">
+                                        <button class="btn-sm" onclick="Motor.actualizarRetornoTierra()"
+                                            title="Calcular automáticamente"><i
+                                                class="fas fa-calculator text-[0.65rem]"></i></button>
+                                    </div>
+                                    <p class="text-xs text-[--text-muted] mt-1">Resistencia del camino de retorno a
+                                        tierra (opcional) - Calcular valor automáticamente</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-[--text-muted] mt-4">Para cálculos avanzados de falla
+                                        fase-tierra</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Equipo P0 -->
+                    <section class="card">
+                        <div class="card-title"><i class="fas fa-shield-alt"></i> Equipo en Punto de Conexion (P0)</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="field-label" for="equip-p0-tipo">Tipo de equipo</label>
+                                <select id="equip-p0-tipo" name="equip-p0-tipo" onchange="UIEquipos.onTipoChange('p0')">
+                                    <option value="">Sin equipo</option>
+                                </select>
+                                <div id="equip-p0-detalles" class="mt-1 text-xs text-gray-500"></div>
+                            </div>
+                            <div>
+                                <label class="field-label" for="equip-p0-modelo">I.P / Modelo</label>
+                                <select id="equip-p0-modelo" name="equip-p0-modelo"
+                                    onchange="UIEquipos.onModeloChange('p0')">
+                                    <option value="">-- Seleccionar modelo --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="field-label" for="equip-p0-cap">Capacidad interruptiva (kA)</label>
+                                <input type="number" id="equip-p0-cap" name="equip-p0-cap" value="" min="0" step="0.1"
+                                    placeholder="kA" oninput="App.clearResults()">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="field-label" for="equip-p0-amp">Amperaje (A)</label>
+                                <input type="number" id="equip-p0-amp" name="equip-p0-amp" value="" min="0" step="1"
+                                    placeholder="A" oninput="App.clearResults()">
+                            </div>
+                        </div>
+                        <div id="equip-p0-info" class="mt-4"></div>
+                    </section>
+
+                    <!-- Alimentadores y Equipos -->
+                    <section class="card">
+                        <div class="card-title flex justify-between">
+                            <span class="flex items-center gap-2"><i class="fas fa-route"></i> Alimentadores y
+                                Equipos</span>
+                            <button class="btn-sm" onclick="App.addFeeder()"><i class="fas fa-plus text-[0.6rem]"></i>
+                                Agregar</button>
+                        </div>
+                        <div id="feeders-container"></div>
+                        <p class="text-xs text-[--text-muted] mt-2">
+                            <i class="fas fa-info-circle text-[--cyan]"></i>
+                            Cada tramo incluye el conductor, datos de carga y el equipo en el punto destino.
+                        </p>
+                    </section>
+
+                    <!-- C.D.T. (Capacidad de Diseño Térmico) — Parámetros -->
+                    <section class="card" id="section-cdt">
+                        <button class="w-full text-left flex items-center justify-between"
+                            onclick="App.toggleCollapse('cdt-content',this)">
+                            <div class="card-title mb-0"><i class="fas fa-thermometer-half"></i> C.D.T. (Capacidad de
+                                Diseño Térmico) <span
+                                    class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Parámetros</span></div>
+                            <i
+                                class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                        </button>
+                        <div id="cdt-content" class="collapsible-content">
+                            <div class="mt-4">
+                                <p class="text-xs text-[--text-muted] mb-3">Parámetros para cálculo de ampacidad
+                                    corregida según NOM-001-SEDE-2012.</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                    <div><label class="field-label" for="cdt-fcc-input">Fcc (Factor carga
+                                            continua)</label><input type="number" id="cdt-fcc-input"
+                                            name="cdt-fcc-input" value="1.25" min="0" max="2" step="0.01"
+                                            placeholder="Default 1.25" onchange="App.calculate()"></div>
+                                    <div><label class="field-label" for="cdt-temp-input">Temp. Ambiente
+                                            (°C)</label><input type="number" id="cdt-temp-input" name="cdt-temp-input"
+                                            value="31" min="0" max="100" step="1" placeholder="Default 31°C"
+                                            onchange="App.calculate()"></div>
+                                    <div><label class="field-label" for="cdt-conductores-input">N°
+                                            Conductores</label><input type="number" id="cdt-conductores-input"
+                                            name="cdt-conductores-input" value="3" min="1" max="50" step="1"
+                                            placeholder="Default 3"
+                                            onchange="App.actualizarAgrupamientoAuto(); App.calculate()"></div>
+                                    <div><label class="field-label" for="cdt-agrupamiento-input">F_agrupamiento
+                                            (Auto)</label><input type="number" id="cdt-agrupamiento-input"
+                                            name="cdt-agrupamiento-input" value="1.0" min="0" max="1" step="0.05"
+                                            placeholder="Auto por NOM-001" readonly onchange="App.calculate()"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Motores (aporte en falla) — Sección 4 -->
+                    <section class="card" id="section-motores">
+                        <button class="w-full text-left flex items-center justify-between"
+                            onclick="App.toggleCollapse('motores-content',this)">
+                            <div class="card-title mb-0"><i class="fas fa-cogs"></i> Aporte de Motores en Falla <span
+                                    class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional</span></div>
+                            <i
+                                class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                        </button>
+                        <div id="motores-content" class="collapsible-content">
+                            <div class="mt-4" id="motores-container">
+                                <p class="text-xs text-[--text-muted] mb-3">Agregue grupos de motores que aportan
+                                    corriente de falla. Vacio = sin aporte.</p>
+                                <div id="motores-lista"></div>
+                                <button class="btn-sm mt-2" onclick="UIMotores.agregar()"><i
+                                        class="fas fa-plus text-[0.6rem] mr-1"></i> Agregar grupo de motores</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Capacitores — Sección 8 -->
+                    <section class="card" id="section-capacitores">
+                        <button class="w-full text-left flex items-center justify-between"
+                            onclick="App.toggleCollapse('capacitores-content',this)">
+                            <div class="card-title mb-0"><i class="fas fa-bolt"></i> Banco de Capacitores <span
+                                    class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional</span></div>
+                            <i
+                                class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                        </button>
+                        <div id="capacitores-content" class="collapsible-content">
+                            <div class="mt-4">
+                                <p class="text-xs text-[--text-muted] mb-3">Banco de capacitores en paralelo que
+                                    descarga durante la falla.</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div><label class="field-label" for="input-cap-kvar">Potencia reactiva
+                                            (kVAr)</label><input type="number" id="input-cap-kvar" name="input-cap-kvar"
+                                            value="" min="0" step="1" placeholder="0 = sin banco"
+                                            oninput="App.clearResults()"></div>
+                                    <div><label class="field-label" for="input-cap-tension">Tension del banco
+                                            (V)</label><input type="number" id="input-cap-tension"
+                                            name="input-cap-tension" value="" min="0" step="1"
+                                            placeholder="Tension nominal" oninput="App.clearResults()"></div>
+                                    <div><label class="field-label" for="input-cap-distancia">Distancia al punto
+                                            (m)</label><input type="number" id="input-cap-distancia"
+                                            name="input-cap-distancia" value="" min="0" step="1"
+                                            placeholder="0 = en el punto" oninput="App.clearResults()"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Contexto de Carga (Cuadros) -->
+                    <section class="card" id="section-load-context">
+                        <button class="w-full text-left flex items-center justify-between"
+                            onclick="App.toggleCollapse('load-context-content',this)">
+                            <div class="card-title mb-0"><i class="fas fa-balance-scale"></i> Contexto de Carga Real
+                                <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional - Desde
+                                    Cuadros</span>
+                            </div>
+                            <i
+                                class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                        </button>
+                        <div id="load-context-content" class="collapsible-content">
+                            <div class="mt-4">
+                                <p class="text-xs text-[--text-muted] mb-3">Ingrese datos de operación reales del
+                                    sistema. Sin datos = condición ideal balanceada.</p>
+
+                                <div class="separator"></div>
+                                <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">
+                                    Corrientes de Fase (A)</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <div><label class="field-label" for="ctx-ia">Ia (A)</label><input type="number"
+                                            id="ctx-ia" name="ctx-ia" value="" min="0" step="1"
+                                            placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                    <div><label class="field-label" for="ctx-ib">Ib (A)</label><input type="number"
+                                            id="ctx-ib" name="ctx-ib" value="" min="0" step="1"
+                                            placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                    <div><label class="field-label" for="ctx-ic">Ic (A)</label><input type="number"
+                                            id="ctx-ic" name="ctx-ic" value="" min="0" step="1"
+                                            placeholder="0 = balanceado" oninput="App.clearResults()"></div>
+                                    <div><label class="field-label" for="ctx-in">In (A)</label><input type="number"
+                                            id="ctx-in" name="ctx-in" value="" min="0" step="1"
+                                            placeholder="Neutro fundamental" oninput="App.clearResults()"></div>
+                                </div>
+
+                                <div class="separator"></div>
+                                <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">
+                                    Armónicos</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div><label class="field-label" for="ctx-in-harm">In armónicos (A)</label><input
+                                            type="number" id="ctx-in-harm" name="ctx-in-harm" value="" min="0" step="1"
+                                            placeholder="0 = sin armónicos" oninput="App.clearResults()"></div>
+                                    <div><label class="field-label" for="ctx-thdi">THDi (0-1)</label><input
+                                            type="number" id="ctx-thdi" name="ctx-thdi" value="" min="0" max="1"
+                                            step="0.01" placeholder="Opcional" oninput="App.clearResults()"></div>
+                                </div>
+
+                                <div class="separator"></div>
+                                <p class="text-xs font-semibold text-[--text-muted] mb-3 uppercase tracking-wider">
+                                    Configuración del Sistema</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div><label class="field-label" for="ctx-unbalance">Desbalance (0-1)</label><input
+                                            type="number" id="ctx-unbalance" name="ctx-unbalance" value="" min="0"
+                                            max="1" step="0.01" placeholder="0 = balanceado"
+                                            oninput="App.clearResults()"></div>
+                                    <div><label class="field-label" for="ctx-fcc">Fcc (Factor de carga
+                                            continua)</label><input type="number" id="ctx-fcc" name="ctx-fcc" value=""
+                                            min="0" max="1" step="0.01" placeholder="Opcional"
+                                            oninput="App.clearResults()"></div>
+                                    <div class="flex items-end">
+                                        <label class="flex items-center gap-2 cursor-pointer" for="ctx-single-phase">
+                                            <input type="checkbox" id="ctx-single-phase" name="ctx-single-phase"
+                                                onchange="App.clearResults()">
+                                            <span class="text-xs text-[--text]">Tiene cargas monofásicas</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 p-3 bg-[--surface] rounded-lg border border-[--border]">
+                                    <div id="load-context-status" class="flex items-center gap-2">
+                                        <span class="text-xs text-[--text-muted]">Sin contexto: modo ideal
+                                            balanceado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Calcular -->
+                    <div class="flex justify-center gap-3 pt-2 pb-4">
+                        <button class="btn-primary pulse-glow" onclick="App.calculate()">
+                            <i class="fas fa-calculator mr-2"></i> Calcular Cortocircuito
+                        </button>
+                        <button class="btn-secondary" onclick="App.autoCorregir()">
+                            <i class="fas fa-magic mr-2"></i> Auto-Corregir
+                        </button>
+                        <button class="btn-secondary" onclick="App.autoCorregirTotal()">
+                            <i class="fas fa-robot mr-2"></i> Auto-Corregir Total
+                        </button>
+                        <button class="btn-secondary" id="btn-autocorregir" onclick="App.toggleAutocorreccion()">
+                            <i class="fas fa-sync-alt mr-2"></i> Autocorregir: OFF
+                        </button>
+                        <button class="btn-secondary" onclick="App.autoCorregirInteligente()">
+                            <i class="fas fa-brain mr-2"></i> Auto-Corregir (Modo Ingeniero)
+                        </button>
+                        <button class="btn-secondary" onclick="TestEngine.run()">
+                            <i class="fas fa-flask mr-2"></i> Ejecutar Pruebas
+                        </button>
+                        <button class="btn-secondary"
+                            onclick="DebugVisualPro.toggleDebug(); if(DebugVisualPro.isDebugMode()) App.calculate(); else DebugVisualPro.ocultarDebug();">
+                            <i class="fas fa-bug mr-2"></i> Debug Pro
+                        </button>
+                        <button class="btn-secondary" onclick="App.exportarExcel()">
+                            <i class="fas fa-file-excel mr-2"></i> Exportar Excel
+                        </button>
+                    </div>
+
+                    <!-- Test Results -->
+                    <div id="test-results" class="mt-4"></div>
+
+                    <!-- TCC Chart -->
+                    <div id="tcc-chart-section" class="mt-4 hidden">
+                        <div class="card">
+                            <div class="card-title mb-3"><i class="fas fa-chart-line mr-2"></i>Gráfica TCC (Time-Current
+                                Curve)</div>
+                            <canvas id="tccChart" width="600" height="400" class="w-full"></canvas>
+                            <div id="tcc-cruces" class="mt-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- TCC Digitalizer -->
+                    <section class="card mt-4">
+                        <button class="w-full text-left flex items-center justify-between"
+                            onclick="App.toggleCollapse('tcc-calibracion-content',this)">
+                            <div class="card-title mb-0"><i class="fas fa-crosshairs"></i> Digitalización de Curvas TCC
+                            </div>
+                            <i
+                                class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                        </button>
+                        <div id="tcc-calibracion-content" class="collapsible-content">
+                            <div id="tcc-calibracion-container" class="mt-4"></div>
+                        </div>
+                    </section>
+
+                    <!-- Metodología -->
+                    <section class="card">
+                        <button class="w-full text-left flex items-center justify-between"
+                            onclick="App.toggleCollapse('metodo-content',this)">
+                            <div class="card-title mb-0"><i class="fas fa-book"></i> Metodologia y Normatividad</div>
+                            <i
+                                class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                        </button>
+                        <div id="metodo-content" class="collapsible-content">
+                            <div class="mt-4 text-xs text-[--text-muted] leading-relaxed space-y-3">
+                                <p><strong class="text-[--text]">Metodo de impedancias</strong> — Se calcula la
+                                    impedancia equivalente del sistema desde la fuente hasta cada punto de interes.</p>
+                                <div
+                                    class="bg-[--surface] rounded-lg p-3 font-mono text-[0.7rem] space-y-1 text-[--cyan]">
+                                    <p>Z_fuente = V / (sqrt(3) x Isc) [trifasico]</p>
+                                    <p>Z_trafo = (%Z/100) x V^2_sec / S_trafo</p>
+                                    <p>Z_alim = sqrt(R^2 + X^2) x L / 1000</p>
+                                    <p>Isc = V / (sqrt(3) x Z_total)</p>
+                                    <p>I_pico = Isc x sqrt(2) x (1 + e^(-pi*R/X))</p>
+                                </div>
+                                <p><strong class="text-[--text]">Art. 110.9:</strong> "Los equipos de interrupcion
+                                    deberan tener una capacidad interruptiva no menor a la corriente de cortocircuito
+                                    disponible en sus terminales de linea."</p>
+                                <p><strong class="text-[--text]">Art. 110.10:</strong> "Se debera marcar en los equipos
+                                    la capacidad de cortocircuito disponible en el punto de instalacion."</p>
+                                <p><strong class="text-[--text]">Art. 240.83:</strong> La capacidad interruptiva de
+                                    interruptores termomagneticos debe ser igual o mayor a la corriente de cortocircuito
+                                    disponible.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagrama Unifilar (Separate print module) -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card">
+                <div class="card-title"><i class="fas fa-project-diagram"></i> Diagrama Unifilar</div>
+                <div id="diagram-container"><canvas id="diagram"></canvas></div>
+            </section>
+        </div>
+
+        <!-- Resultados Principales (Separate print module) -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="results-section">
+                <div class="card-title"><i class="fas fa-table"></i> Resultados y Verificacion de Equipos</div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <script>
+                        tailwind.config = {
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        primary: '#3b82f6',
+                                        secondary: '#64748b',
+                                        success: '#22c55e',
+                                        warning: '#f59e0b',
+                                        danger: '#ef4444',
+                                        info: '#3b82f6',
+                                        surface: '#1e293b',
+                                        border: '#334155',
+                                        background: '#0f172a',
+                                        text: '#f1f5f9',
+                                        muted: '#94a3b8'
+                                    }
+                                }
+                            }
+                        }
+                    </script>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Punto / Equipo</th>
+                                <th>Isc (kA)</th>
+                                <th>Ipico (kA)</th>
+                                <th>X/R</th>
+                                <th>Cap. Equipo</th>
+                                <th>Cap. Min</th>
+                                <th>Verif.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Contexto de Carga -->
+            <div id="load-context-results" class="mt-4"></div>
+
+            <!-- Panel de Diagnóstico Global (Semáforo) -->
+            <section class="card hidden mt-4" id="diagnostico-section">
+                <div class="card-title"><i class="fas fa-traffic-light"></i> Diagnóstico Global</div>
+                <div id="diagnostico-panel"></div>
+            </section>
+
+            <!-- C.D.T. (Capacidad de Diseño Térmico) -->
+            <section class="card hidden" id="ampacidad-real-section">
+                <div class="card-title"><i class="fas fa-thermometer-half"></i> C.D.T. (Capacidad de Diseño Térmico)
+                </div>
+                <div id="ampacidad-real-content"></div>
+            </section>
+        </div>
+
+        <!-- Caida de Tensión -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="caida-section">
+                <div class="card-title"><i class="fas fa-arrow-down"></i> Caida de Tension por Alimentador</div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Alim.</th>
+                                <th>I carga (A)</th>
+                                <th>FP</th>
+                                <th>Caida (V)</th>
+                                <th>Caida (%)</th>
+                                <th>Limite</th>
+                            </tr>
+                        </thead>
+                        <tbody id="caida-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Falla Mínima -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="falla-min-section">
+                <div class="card-title"><i class="fas fa-low-vision"></i> Falla Minima (Sensibilidad)</div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Punto</th>
+                                <th>Isc max (kA)</th>
+                                <th>Isc min (kA)</th>
+                                <th>I disparo (A)</th>
+                                <th>Sensib.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="falla-min-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Falla Fase-Tierra -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="fase-tierra-section">
+                <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Falla Fase-Tierra (Secuencia Cero)
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-[--border]">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Punto</th>
+                                <th>I 3F (kA)</th>
+                                <th>I F-T (kA)</th>
+                                <th>Ratio %</th>
+                                <th>Z0 (mOhm)</th>
+                                <th>Z1 (mOhm)</th>
+                                <th>I disparo (A)</th>
+                                <th>Sensibilidad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fase-tierra-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Coordonograma -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="coordonograma-section">
+                <div class="card-title"><i class="fas fa-chart-line"></i> Coordinacion de Protecciones</div>
+                <div id="coordonograma-container"
+                    class="bg-[--surface] rounded-lg border border-[--border] overflow-hidden">
+                    <canvas id="coordonograma"></canvas>
+                </div>
+                <p class="text-[0.65rem] text-[--text-muted] mt-2">Curvas tiempo-corriente de los equipos seleccionados.
+                    Eje vertical: tiempo (s), eje horizontal: corriente (A). Escala logaritmica.</p>
+            </section>
+        </div>
+
+        <!-- Diagnóstico -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="recomendaciones-section">
+                <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Diagnostico y Recomendaciones</div>
+                <div id="recomendaciones-content" class="text-sm text-[--text-muted] space-y-2"></div>
+            </section>
+        </div>
+
+        <!-- Impedancias -->
+        <div class="print-module">
+            <div class="print-header"></div>
+            <section class="card hidden" id="impedancias-section">
+                <button class="w-full text-left flex items-center justify-between"
+                    onclick="App.toggleCollapse('impedancias-content',this)">
+                    <div class="card-title mb-0"><i class="fas fa-microscope"></i> Detalle de Impedancias</div>
+                    <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
+                </button>
+                <div id="impedancias-content" class="collapsible-content">
+                    <div class="overflow-x-auto mt-4 rounded-lg border border-[--border]">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Punto</th>
+                                    <th>R (mOhm)</th>
+                                    <th>X (mOhm)</th>
+                                    <th>Z (mOhm)</th>
+                                    <th>V fase (V)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="impedancias-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="border-t border-[--border] mt-12 py-6 no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-[--text-muted]">
+            <p>Herramienta orientativa para ingenieria electrica. Verifique con un profesional certificado.</p>
+            <p class="mt-1">NOM-001-SEDE-2012 — Instalaciones Electricas (Utilizacion). DOF 28/11/2012.</p>
+        </div>
+    </footer>
+
+    <!-- ========== SCRIPTS: Orden estricto de dependencias ========== -->
+    <!-- Datos -->
+    <script src="js/datos/constantes.js?v=26"></script>
+    <script src="js/datos/conductores.js"></script>
+    <script src="js/datos/equipos.js"></script>
+    <script src="js/datos/ampacidad.js?v=2"></script>
+    <script src="js/datos/curvas_equipo.js?v=2"></script>
+    <script src="js/datos/catalogo_schneider.js"></script>
+    <!-- Core Architecture (NOM-001-SEDE-2012) -->
+    <script src="js/core/data/tabla_ampacidad_310_15.js"></script>
+    <script src="js/core/data/factores_temperatura.js"></script>
+    <script src="js/core/data/factores_agrupamiento.js"></script>
+    <script src="js/core/data/conductores.nom.js"></script>
+    <script src="js/core/data/resistencias.js"></script>
+    <script src="js/core/data/catalog.adapter.js"></script>
+    <script src="js/core/MotorAmpacidadNOM.js"></script>
+    <script src="js/core/models/nodo.model.js"></script>
+    <script src="js/core/domain/ampacity.engine.js"></script>
+    <script src="js/core/domain/shortcircuit.engine.js"></script>
+    <script src="js/core/domain/protection.engine.js"></script>
+    <script src="js/core/domain/coordination.engine.js"></script>
+    <script src="js/core/domain/voltageDrop.engine.js"></script>
+    <script src="js/core/services/conductor.selector.js"></script>
+    <script src="js/core/utils/nom.validator.js"></script>
+    <script src="js/app/orchestrator.js"></script>
+    <!-- Clean Architecture (Pipeline Único) -->
+    <script src="js/core/engine.js"></script>
+    <script src="js/modules/validator.js"></script>
+    <script src="js/modules/calculo.js"></script>
+    <script src="js/selectors/conductor.selector.js"></script>
+    <script src="js/selectors/breaker.selector.js"></script>
+    <script src="js/verification/nom.verifier.js"></script>
+    <!-- Calculo -->
+    <script src="js/calculo/secuencia.js?v=3"></script>
+    <script src="js/calculo/fault_analysis.js"></script>
+    <script src="js/calculo/impedancias.js"></script>
+    <script src="js/calculo/agrupamiento_nom.js"></script>
+    <script src="js/calculo/ampacidad_real.js?v=3"></script>
+    <script src="js/calculo/breaker_selector.js?v=1"></script>
+    <script src="js/calculo/coordinacion_automatica.js?v=1"></script>
+    <script src="js/calculo/tcc_curvas_reales.js?v=1"></script>
+    <script src="js/calculo/tcc_digitalizer_pro.js"></script>
+    <script src="js/calculo/tcc_pdf_importer.js"></script>
+    <!-- NOTA: tcc_pdf_importer.js requiere pdfjs-dist cargado antes para funcionar -->
+    <script src="js/ui/tcc_viewer_pro.js?v=1"></script>
+    <script src="js/calculo/validador_sistema.js?v=1"></script>
+    <script src="js/calculo/motor_falla_tierra.js?v=1"></script>
+    <script src="js/calculo/motor_validacion_inteligente.js"></script>
+    <script src="js/calculo/motor_autocorreccion.js"></script>
+    <script src="js/calculo/motor_consistencia.js"></script>
+    <script src="js/calculo/motor_diagnostico.js?v=2"></script>
+    <script src="js/calculo/motor_protecciones.js"></script>
+    <script src="js/calculo/debug_visual_pro.js?v=2"></script>
+    <script src="js/calculo/tcc_chart_real.js"></script>
+    <script src="js/calculo/motor_rediseño.js"></script>
+    <script src="js/calculo/motor_arc_flash.js"></script>
+    <script src="js/calculo/ieee_1584_arcflash.js"></script>
+    <script src="js/calculo/motor_optimizacion_global.js"></script>
+    <script src="js/calculo/motor_optimizacion_ga.js"></script>
+    <script src="js/calculo/motor_ia_aprendizaje.js"></script>
+    <script src="js/calculo/motor_ajuste_lsig.js"></script>
+    <script src="js/calculo/motor_coordinacion_fase_tierra.js"></script>
+    <script src="js/calculo/motor_autocorreccion_total.js?v=1"></script>
+    <script src="js/calculo/semaforo.js?v=2"></script>
+    <script src="js/calculo/motor_inteligente_ccc.js"></script>
+    <script src="js/calculo/motor_diseno_automatico.js?v=4"></script>
+    <script src="js/datos/catalogo_equipos_real.js?v=2"></script>
+    <script src="js/datos/catalogo_breakers_pro.js"></script>
+    <script src="js/datos/catalogo_conductores_nom.js"></script>
+    <script src="js/calculo/motor_coordinacion_real.js?v=2"></script>
+    <!-- Test script deshabilitado en producción -->
+    <!-- <script src="js/calculo/test_coordinacion_real.js"></script> -->
+    <script src="js/calculo/solver_electrico.js"></script>
+    <script src="js/calculo/tcc_digitalizer.js"></script>
+    <script src="js/calculo/excel_export_pro.js"></script>
+    <script src="js/calculo/caida_tension.js"></script>
+    <script src="js/calculo/caida_tension_pro.js"></script>
+    <script src="js/calculo/capacitores.js"></script>
+    <script src="js/calculo/motores.js"></script>
+    <script src="js/calculo/nom_validacion.js"></script>
+    <script src="js/calculo/optimizador_conductores.js"></script>
+    <script src="js/calculo/tcc_coordinacion.js"></script>
+    <script src="js/calculo/curvas.js"></script>
+    <script src="js/calculo/curvas_tcc_pro.js"></script>
+    <script src="js/calculo/motor_impedancias.js"></script>
+    <script src="js/calculo/coordinacion_total_pro.js"></script>
+    <script src="js/calculo/loadContext.js"></script>
+    <script src="js/calculo/motor.js?v=44"></script>
+    <!-- Utilidades -->
+    <script src="js/units.js"></script>
+    <script src="js/profile.js"></script>
+    <!-- UI -->
+    <script src="js/ui/toast.js?v=2"></script>
+    <script src="js/ui/configuracion.js"></script>
+    <script src="js/ui/alimentadores.js?v=15"></script>
+    <script src="js/ui/equipos.js?v=16"></script>
+    <script src="js/ui/diagrama.js?v=3"></script>
+    <script src="js/ui/exportar.js?v=16"></script>
+    <script src="js/ui/resultados.js?v=22"></script>
+    <script src="js/ui/proyectos.js?v=15"></script>
+    <script src="js/ui/coordonograma.js?v=6"></script>
+    <script src="js/ui/tcc_viewer.js?v=2"></script>
+    <script src="js/ui/tcc_viewer_interactivo.js"></script>
+    <script src="js/ui/simulacion_fallas.js?v=3"></script>
+    <script src="js/ui/reporte_pdf.js?v=15"></script>
+    <script src="js/ui/reporte_visual.js"></script>
+    <script src="js/ui/motores_ui.js?v=5"></script>
+    <script src="js/ui/tcc_calibracion_ui.js"></script>
+    <!-- API Client -->
+    <script src="js/api.js"></script>
+    <!-- App (siempre ultimo) -->
+    <script src="js/app.js"></script>
+    <!-- Verificación de módulos -->
+    <script>
+        window.addEventListener('load', function () {
+            var modulosRequeridos = [
+                'CONSTANTES', 'CONDUCTORES', 'EQUIPOS', 'AMPACIDAD', 'CURVAS_EQUIPO',
+                'Secuencia', 'FaultAnalysis', 'Impedancias', 'Motor', 'CaidaTension',
+                'CalculoCapacitores', 'CalculoMotores', 'NOMValidacion', 'OptimizadorConductores', 'TCCCoordinacion', 'Curvas',
+                'Units', 'Profile',
+                'UIToast', 'UIConfiguracion', 'UIAlimentadores', 'UIEquipos', 'UIDiagrama', 'UIResultados', 'UIProyectos', 'UICoordonograma', 'UIReportePDF', 'UIExportar', 'UIMotores',
+                'App'
+            ];
+            var modulosOpcionales = [
+                'ValidadorSistema',
+                'MotorValidacionInteligente',
+                'MotorAutocorreccionTotal',
+                'DebugVisualPro',
+                'TCCChartReal',
+                'ExcelExportPro'
+            ];
+            var errores = [];
+            modulosRequeridos.forEach(function (mod) {
+                if (typeof window[mod] === 'undefined') {
+                    errores.push(mod);
+                }
+            });
+            if (errores.length > 0) {
+                console.error('Módulos no cargados:', errores);
+                var errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 16px 24px; border-radius: 8px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
+                errorDiv.textContent = 'Error: No se cargaron los módulos: ' + errores.join(', ');
+                document.body.appendChild(errorDiv);
+                setTimeout(function () { errorDiv.remove(); }, 5000);
+            }
+            var opcionalesFaltantes = [];
+            modulosOpcionales.forEach(function (mod) {
+                if (typeof window[mod] === 'undefined') {
+                    opcionalesFaltantes.push(mod);
+                }
+            });
+            if (opcionalesFaltantes.length > 0) {
+                console.warn('Módulos opcionales no cargados:', opcionalesFaltantes);
+            }
+        });
+    </script>
+    <!-- Módulos tipo ETAP/SKM -->
+    <script src="js/core/ConductorSelectorNOM.js?v=1"></script>
+    <script src="js/core/BreakerSelectorNOM.js?v=1"></script>
+    }
+    });
+    if (opcionalesFaltantes.length > 0) {
+    console.warn('Módulos opcionales no cargados:', opcionalesFaltantes);
+    }
+    });
+    </script>
+    <!-- Módulos tipo ETAP/SKM -->
+    <script src="js/core/ConductorSelectorNOM.js?v=1"></script>
+    <script src="js/core/BreakerSelectorNOM.js?v=1"></script>
+    <script src="js/core/AutocorreccionETAP.js?v=1"></script>
+    <script src="js/core/RamasDetector.js?v=1"></script>
+    <script src="js/core/MotorICCCompleto.js?v=1"></script>
+    <script src="js/testEngine.js?v=1"></script>
+
+    <!-- JavaScript para manejar listas desplegables personalizadas -->
+    <script>
+        // Manejar opciones personalizadas en listas desplegables
+        document.addEventListener('DOMContentLoaded', function () {
+            // Manejar tensión primaria personalizada
+            const vpSelect = document.getElementById('input-trafo-vp');
+            if (vpSelect) {
+                vpSelect.addEventListener('change', function () {
+                    if (this.value === 'custom') {
+                        // Crear campo de entrada personalizado si no existe
+                        if (!document.getElementById('input-trafo-vp-custom')) {
+                            const customInput = document.createElement('input');
+                            customInput.type = 'number';
+                            customInput.id = 'input-trafo-vp-custom';
+                            customInput.name = 'input-trafo-vp-custom';
+                            customInput.min = '1';
+                            customInput.step = '1';
+                            customInput.placeholder = 'Ingrese valor personalizado';
+                            customInput.style.marginTop = '8px';
+                            customInput.style.width = '100%';
+                            customInput.oninput = function () {
+                                App.clearResults();
+                            };
+                            this.parentNode.appendChild(customInput);
+                        }
+                        document.getElementById('input-trafo-vp-custom').style.display = 'block';
+                        document.getElementById('input-trafo-vp-custom').focus();
+                    } else {
+                        // Ocultar campo personalizado si existe
+                        const customInput = document.getElementById('input-trafo-vp-custom');
+                        if (customInput) {
+                            customInput.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            // Manejar tensión secundaria personalizada
+            const vsSelect = document.getElementById('input-trafo-vs');
+            if (vsSelect) {
+                vsSelect.addEventListener('change', function () {
+                    const customInput = document.getElementById('input-trafo-vs-custom');
+                    if (customInput) {
+                        customInput.style.display = this.value === 'custom' ? 'block' : 'none';
+                        if (this.value === 'custom') {
+                            customInput.focus();
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Implementación de funciones para API postMessage -->
+    <script>
+        (function () {
+            'use strict';
+
+            // Almacenar resultados actuales
+            window.ultimosResultados = null;
+
+            // Cargar modelo del sistema desde React
+            window.loadSystemModel = function (model) {
+                console.log('ICC Module: Loading system model', model);
+
+                // Guardar en almacenamiento local
+                if (model) {
+                    console.log('ICC Module: Model is valid, saving to localStorage...');
+                    localStorage.setItem('icore_system_model', JSON.stringify(model));
+
+                    // Si hay función de UI para cargar, llamarla
+                    if (window.UIAlimentadores && window.UIAlimentadores.cargarDesdeModelo) {
+                        console.log('ICC Module: Loading model via UIAlimentadores...');
+                        window.UIAlimentadores.cargarDesdeModelo(model);
+                    } else {
+                        console.log('ICC Module: UIAlimentadores not available');
+                    }
+
+                    // Calcular ICC automáticamente
+                    console.log('ICC Module: Scheduling ICC calculation in 2 seconds...');
+                    setTimeout(function () {
+                        console.log('ICC Module: Starting ICC calculation...');
+                        console.log('ICC Module: window.App:', window.App);
+                        console.log('ICC Module: typeof window.App:', typeof window.App);
+                        console.log('ICC Module: window.App.calculate:', window.App?.calculate);
+                        console.log('ICC Module: typeof window.App.calculate:', typeof window.App?.calculate);
+
+                        if (typeof window.App !== 'undefined' && window.App.calculate) {
+                            console.log('ICC Module: App.calculate found, executing...');
+                            window.App.calculate();
+                            console.log('ICC Module: Calculation completed');
+
+                            // Obtener resultados y enviar a React
+                            console.log('ICC Module: Checking for results in window.estado...');
+                            console.log('ICC Module: window.estado:', window.estado);
+                            if (window.estado && window.estado.resultados) {
+                                console.log('ICC Module: Results found in window.estado:', window.estado.resultados);
+                                window.parent.postMessage({
+                                    type: 'ICC_RESULTS',
+                                    data: window.estado.resultados
+                                }, '*');
+                                console.log('ICC Module: Results sent to React', window.estado.resultados);
+                            } else {
+                                console.log('ICC Module: No results found in window.estado');
+                                console.log('ICC Module: window.estado:', window.estado);
+                            }
+                        } else {
+                            console.log('ICC Module: App.calculate not found');
+                            console.log('ICC Module: window.App:', window.App);
+
+                            // Intentar con Motor directo
+                            console.log('ICC Module: Trying with Motor.ejecutar...');
+                            if (window.Motor && window.Motor.ejecutar) {
+                                console.log('ICC Module: Motor.ejecutar found, executing...');
+                                var resultado = window.Motor.ejecutar();
+                                console.log('ICC Module: Motor.ejecutar completed:', resultado);
+                                if (resultado && resultado.puntos) {
+                                    window.parent.postMessage({
+                                        type: 'ICC_RESULTS',
+                                        data: resultado.puntos
+                                    }, '*');
+                                    console.log('ICC Module: Motor results sent to React', resultado.puntos);
+                                }
+                            } else {
+                                console.log('ICC Module: Motor.ejecutar not found either');
+                            }
+                        }
+                    }, 2000);
+
+                    // Notificar éxito
+                    window.parent.postMessage({
+                        type: 'MODEL_LOADED',
+                        data: { success: true, buses: model.buses?.length || 0 }
+                    }, '*');
+                }
+            };
+
+            // Ejecutar cálculo ICC
+            window.calcularICC = function (params) {
+                console.log('ICC Module: Calculating', params);
+
+                var results = null;
+
+                // Usar el motor existente si está disponible
+                if (window.Motor && window.Motor.ejecutar) {
+                    try {
+                        // Llamar a la función principal de cálculo del módulo
+                        if (typeof window.App !== 'undefined' && window.App.calculate) {
+                            window.App.calculate(); // Esto ejecuta el cálculo completo
+                            // Obtener resultados del estado
+                            if (window.estado && window.estado.resultados) {
+                                results = window.estado.resultados;
+                            }
+                        } else {
+                            // Fallback directo a Motor.ejecutar
+                            var resultado = window.Motor.ejecutar();
+                            if (resultado && resultado.puntos) {
+                                results = resultado.puntos;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error en cálculo ICC:', error);
+                        results = { error: error.message, points: [] };
+                    }
+                } else if (window.FaultAnalysis && window.FaultAnalysis.calcularCorrientesCortocircuito) {
+                    // Fallback a FaultAnalysis
+                    var datos = {
+                        tension: params.voltage || params.V || 480,
+                        impedancia: params.impedancia || params.Z || 0.05,
+                        factorCrecimiento: params.factorC || 1.25
+                    };
+                    results = window.FaultAnalysis.calcularCorrientesCortocircuito(datos);
+                } else {
+                    // Cálculo básico fallback
+                    var V = params.voltage || params.V || 480;
+                    var Z = params.impedancia || params.Z || 0.05;
+                    var c = V / (Math.sqrt(3) * Z);
+                    results = [{
+                        V: V,
+                        Z: Z,
+                        I3F: parseFloat(c.toFixed(2)),
+                        metodo: 'IccClasica'
+                    }];
+                }
+
+                window.ultimosResultados = results;
+
+                // Enviar resultados a React
+                if (window.sendICCResults) {
+                    window.sendICCResults(results);
+                }
+
+                // También actualizar UI si existe
+                if (window.UIResultados && window.UIResultados.mostrar) {
+                    window.UIResultados.mostrar(results);
+                }
+
+                return results;
+            };
+
+            // Establecer ubicación de falla
+            window.setFaultLocation = function (busId) {
+                console.log('ICC Module: Setting fault location', busId);
+
+                if (window.SimulacionFallas && window.SimulacionFallas.seleccionarBarra) {
+                    window.SimulacionFallas.seleccionarBarra(busId);
+                }
+
+                window.parent.postMessage({
+                    type: 'FAULT_SET',
+                    data: { busId: busId }
+                }, '*');
+            };
+
+            // Optimizar coordinación
+            window.optimizeCoordination = function (params) {
+                console.log('ICC Module: Optimizing coordination', params);
+
+                var result = null;
+
+                if (window.CoordinacionTotalPro && window.CoordinacionTotalPro.optimizar) {
+                    result = window.CoordinacionTotalPro.optimizar(params);
+                } else if (window.MotorCoordinacionReal && window.MotorCoordinacionReal.optimizar) {
+                    result = window.MotorCoordinacionReal.optimizar(params);
+                }
+
+                window.parent.postMessage({
+                    type: 'OPTIMIZATION_COMPLETE',
+                    data: result
+                }, '*');
+
+                return result;
+            };
+
+            // Controlar logo animado
+            window.setLogoState = function (state) {
+                console.log('ICC Module: Setting logo state', state);
+
+                // Buscar el contenedor del logo
+                var logoContainer = document.getElementById('logo-container') ||
+                    document.querySelector('.logo-container');
+
+                if (logoContainer) {
+                    if (state.active) {
+                        logoContainer.classList.add('active');
+                    } else {
+                        logoContainer.classList.remove('active');
+                    }
+
+                    if (state.fault) {
+                        logoContainer.classList.add('fault');
+                        // Auto-remove fault after 3 seconds
+                        setTimeout(function () {
+                            logoContainer.classList.remove('fault');
+                        }, 3000);
+                    }
+                }
+
+                // Si existe la función renderIcoreLogo, usarla
+                if (window.renderIcoreLogo && state.containerId) {
+                    window.renderIcoreLogo(state.containerId, state.active);
+                }
+
+                window.parent.postMessage({
+                    type: 'LOGO_STATE_CHANGED',
+                    data: state
+                }, '*');
+            };
+
+            // Función helper para enviar resultados
+            function sendResults(results) {
+                window.parent.postMessage({
+                    type: 'RESULTS',
+                    data: results
+                }, '*');
+            }
+
+            // Notificar a React que el módulo está listo
+            function notifyReady() {
+                window.parent.postMessage({
+                    type: 'ICC_READY',
+                    data: {
+                        version: '1.0.0',
+                        timestamp: new Date().toISOString(),
+                        hasMotor: !!window.Motor,
+                        hasFaultAnalysis: !!window.FaultAnalysis
+                    }
+                }, '*');
+            }
+
+            // Escuchar mensajes desde React
+            window.addEventListener('message', function (event) {
+                // Ignorar mensajes sin datos o de origen desconocido
+                if (!event.data) return;
+
+                var message = event.data;
+
+                // Ignorar mensajes que no son objetos o no tienen tipo
+                if (typeof message !== 'object' || !message.type) return;
+
+                // Ignorar mensajes propios del iframe (ICC_READY, etc. son enviados, no recibidos)
+                var ignoredTypes = ['ICC_READY', 'RESULTS', 'EXPORT_REQUEST', 'LOGO_STATE_CHANGED', 'MODULE_REFRESHED', 'NAVIGATION_ATTEMPT'];
+                if (ignoredTypes.includes(message.type)) return;
+
+                // Ignorar mensajes de extensiones del navegador o sistemas externos
+                if (message.type.startsWith('Pass') || message.type === 'webpackOk' || message.type === 'webpackHotUpdate') return;
+
+                console.log('ICC Module: Mensaje recibido de React:', message.type);
+
+                switch (message.type) {
+                    case 'LOAD_MODEL':
+                        // Cargar modelo del sistema desde React
+                        if (message.data && window.loadSystemModel) {
+                            window.loadSystemModel(message.data);
+                        }
+                        break;
+
+                    case 'CALCULATE':
+                        // Ejecutar cálculo ICC
+                        if (window.calcularICC) {
+                            window.calcularICC(message.data);
+                        }
+                        break;
+
+                    case 'GET_RESULTS':
+                        // Enviar resultados actuales
+                        var results = window.ultimosResultados || null;
+                        sendResults(results);
+                        break;
+
+                    case 'SET_FAULT':
+                        // Establecer punto de falla
+                        if (window.setFaultLocation && message.data) {
+                            window.setFaultLocation(message.data.busId);
+                        }
+                        break;
+
+                    case 'OPTIMIZE':
+                        // Ejecutar optimización de coordinación
+                        if (window.optimizeCoordination && message.data) {
+                            window.optimizeCoordination(message.data);
+                        }
+                        break;
+
+                    case 'SET_LOGO_STATE':
+                        // Controlar estado del logo animado
+                        if (window.setLogoState && message.data) {
+                            window.setLogoState(message.data);
+                        }
+                        break;
+
+                    default:
+                        console.log('Mensaje no reconocido:', message.type);
+                }
+            });
+
+            // Función para manejar exportación sin salir del iframe
+            window.handleExport = function (data, format) {
+                console.log('ICC Module: Exporting data', format, data);
+
+                // Enviar datos a React para que maneje la exportación
+                window.parent.postMessage({
+                    type: 'EXPORT_REQUEST',
+                    data: {
+                        format: format,
+                        data: data,
+                        timestamp: new Date().toISOString()
+                    }
+                }, '*');
+
+                // También intentar exportación directa si es posible
+                if (format === 'json' && data) {
+                    try {
+                        var jsonString = JSON.stringify(data, null, 2);
+                        var blob = new Blob([jsonString], { type: 'application/json' });
+                        var url = URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'icc_results_' + new Date().getTime() + '.json';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    } catch (error) {
+                        console.error('Error en exportación directa:', error);
+                    }
+                }
+            };
+
+            // Función para refrescar el módulo sin salir del iframe
+            window.refreshModule = function () {
+                console.log('ICC Module: Refresh requested');
+
+                // Limpiar resultados
+                if (window.estado) {
+                    window.estado.resultados = null;
+                }
+                window.ultimosResultados = null;
+
+                // Limpiar UI
+                if (window.UIResultados && window.UIResultados.limpiar) {
+                    window.UIResultados.limpiar();
+                }
+
+                // Resetear formularios
+                var forms = document.querySelectorAll('form');
+                forms.forEach(function (form) {
+                    form.reset();
+                });
+
+                // Notificar a React
+                window.parent.postMessage({
+                    type: 'MODULE_REFRESHED',
+                    data: { timestamp: new Date().toISOString() }
+                }, '*');
+            };
+
+            // Interceptar navegación para manejarla dentro del iframe
+            window.addEventListener('beforeunload', function (e) {
+                // Prevenir navegación accidental fuera del iframe
+                e.preventDefault();
+                e.returnValue = '';
+
+                // Enviar mensaje a React para manejar la navegación
+                window.parent.postMessage({
+                    type: 'NAVIGATION_ATTEMPT',
+                    data: { url: window.location.href }
+                }, '*');
+
+                return '';
+            });
+
+            // Poblar listas desplegables cuando el DOM esté listo
+            function populateDropdowns() {
+                try {
+                    // Poblar dropdown de capacidades de transformador
+                    if (typeof poblarDropdownCapacidadesTrafo === 'function') {
+                        poblarDropdownCapacidadesTrafo();
+                        console.log('Dropdown capacidades trafo poblado');
+                    }
+
+                    // Poblar dropdown de zonas eléctricas
+                    if (typeof poblarDropdownZonas === 'function') {
+                        poblarDropdownZonas();
+                        console.log('Dropdown zonas eléctricas poblado');
+                    }
+
+                    // Poblar otros dropdowns si existen
+                    if (typeof poblarDropdownBreakers === 'function') {
+                        poblarDropdownBreakers();
+                    }
+
+                } catch (error) {
+                    console.error('Error poblando dropdowns:', error);
+                }
+            }
+
+            // Notificar a React que estamos listos cuando el DOM esté cargado
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function () {
+                    populateDropdowns();
+                    notifyReady();
+                });
+            } else {
+                populateDropdowns();
+                notifyReady();
+            }
+
+            // Exponer funciones para uso externo
+            window.sendICCResults = sendResults;
+            window.refreshModule = refreshModule;
+            window.handleExport = handleExport;
+
+            console.log('ICC Module: postMessage API initialized');
+        })();
+    </script>
+</body>
+
+</html>

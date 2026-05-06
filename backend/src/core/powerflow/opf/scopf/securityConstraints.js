@@ -1,3 +1,4 @@
+const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
 /**
  * securityConstraints.js - Security constraints for SCOPF
  *
@@ -23,8 +24,8 @@ function evaluateSecurityConstraints(
   options = {}
 ) {
   const {
-    voltageMin = 0.9,
-    voltageMax = 1.1,
+    voltageMin = 0.9, // voltage (V)
+    voltageMax = 1.1, // voltage (V)
     lineLimitFactor = 1.0,
     tolerance = 1e-6,
     maxIterations = 30,
@@ -98,7 +99,7 @@ function evaluateContingency(baseSystem, solution, contingency, options) {
   }
 
   // Check voltage violations
-  const voltageViolations = checkVoltageViolations(pfResult.voltages, options)
+  const voltageViolations = checkVoltageViolations(pfResult.voltages, options) // voltage (V)
 
   // Check line flow violations
   const flowViolations = checkLineFlowViolations(
@@ -180,7 +181,7 @@ function updateSystemGeneration(system, solution) {
 function checkVoltageViolations(voltages, options) {
   const violations = []
 
-  voltages.forEach((V, i) => {
+  voltages.forEach((V, i) => { // voltage (V)
     const magnitude = Math.sqrt(V.re * V.re + V.im * V.im)
 
     if (magnitude < options.voltageMin) {
@@ -221,13 +222,13 @@ function checkLineFlowViolations(system, pfResult, limitFactor) {
 
   if (!pfResult.flows) {
     // Calculate flows if not provided
-    pfResult.flows = calculateLineFlows(system, pfResult.voltages)
+    pfResult.flows = calculateLineFlows(system, pfResult.voltages) // voltage (V)
   }
 
   pfResult.flows.forEach((flow, _i) => {
     const branch = system.branches.find(b => b.id === flow.id)
     if (branch && branch.limit) {
-      const loading = Math.abs(flow.power) / branch.limit
+      const loading = toElectricalPrecision(parseFloat((Math.abs(flow.power)) / branch.limit).toFixed(6)); // power (W)
       const limit = branch.limit * limitFactor
 
       if (Math.abs(flow.power) > limit) {
@@ -293,8 +294,8 @@ function calculateLineFlows(system, voltages) {
   const flows = []
 
   system.branches.forEach(branch => {
-    const Vfrom = voltages[branch.from]
-    const Vto = voltages[branch.to]
+    const Vfrom = voltages[branch.from] // voltage (V)
+    const Vto = voltages[branch.to] // voltage (V)
 
     if (Vfrom && Vto) {
       const VfromMag = Math.sqrt(Vfrom.re * Vfrom.re + Vfrom.im * Vfrom.im)

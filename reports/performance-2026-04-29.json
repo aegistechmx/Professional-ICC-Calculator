@@ -1,24 +1,36 @@
 {
-  "timestamp": "2026-04-29T02:35:55.737Z",
+  "timestamp": "2026-04-29T12:20:54.377Z",
   "bundle": {
-    "totalSize": 421406,
+    "totalSize": 445862,
     "files": [
       {
-        "path": "assets\\index-KzBBnIQb.js",
-        "size": 393523,
-        "sizeKB": 384.3,
-        "sizeMB": 0.38
+        "path": "assets\\ui-DgltLOWy.js",
+        "size": 287656,
+        "sizeKB": 280.91,
+        "sizeMB": 0.27
       },
       {
-        "path": "assets\\index-DWZdf4_q.css",
-        "size": 27456,
-        "sizeKB": 26.81,
+        "path": "assets\\index-VRCpjQjm.js",
+        "size": 124335,
+        "sizeKB": 121.42,
+        "sizeMB": 0.12
+      },
+      {
+        "path": "assets\\index-Co2eCvlS.css",
+        "size": 33370,
+        "sizeKB": 32.59,
         "sizeMB": 0.03
       },
       {
         "path": "index.html",
-        "size": 427,
-        "sizeKB": 0.42,
+        "size": 500,
+        "sizeKB": 0.49,
+        "sizeMB": 0
+      },
+      {
+        "path": "assets\\vendor-l0sNRNKZ.js",
+        "size": 1,
+        "sizeKB": 0,
         "sizeMB": 0
       }
     ],
@@ -41,9 +53,9 @@
       ]
     },
     "frontend": {
-      "total": 22,
+      "total": 23,
       "dependencies": 8,
-      "devDependencies": 14,
+      "devDependencies": 15,
       "largest": [
         "autoprefixer",
         "axios",

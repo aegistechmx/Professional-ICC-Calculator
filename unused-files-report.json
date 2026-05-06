@@ -1,0 +1,114 @@
+{
+  "timestamp": "2026-04-29T05:24:56.275Z",
+  "summary": {
+    "totalFiles": 82,
+    "usedFiles": 80,
+    "unusedFiles": 6,
+    "entryPoints": 27,
+    "unresolvedImports": 19
+  },
+  "categories": {
+    "controllers": [],
+    "routes": [],
+    "workers": [],
+    "services": [],
+    "utils": [],
+    "models": [],
+    "config": [],
+    "other": [
+      "C:\\Professional ICC Calculator\\backend\\src\\api\\middlewares\\errorHandler.js",
+      "C:\\Professional ICC Calculator\\backend\\src\\debug\\panel.js",
+      "C:\\Professional ICC Calculator\\backend\\src\\debug\\simulation.js",
+      "C:\\Professional ICC Calculator\\backend\\src\\debug\\tracer.js",
+      "C:\\Professional ICC Calculator\\backend\\src\\engine\\Engine.js",
+      "C:\\Professional ICC Calculator\\backend\\src\\infrastructure\\scheduler\\jobScheduler.js"
+    ]
+  },
+  "unusedFiles": [
+    "backend\\src\\api\\middlewares\\errorHandler.js",
+    "backend\\src\\debug\\panel.js",
+    "backend\\src\\debug\\simulation.js",
+    "backend\\src\\debug\\tracer.js",
+    "backend\\src\\engine\\Engine.js",
+    "backend\\src\\infrastructure\\scheduler\\jobScheduler.js"
+  ],
+  "dynamicCandidates": [],
+  "unresolvedImports": [
+    {
+      "from": "backend\\src\\api\\middlewares\\errorHandler.js",
+      "import": "@/shared/utils/formatting"
+    },
+    {
+      "from": "backend\\src\\application\\services\\opf.js",
+      "import": "@/core/opf/algorithms"
+    },
+    {
+      "from": "backend\\src\\application\\services\\powerflow.js",
+      "import": "@/core/powerflow/solvers"
+    },
+    {
+      "from": "backend\\src\\core\\index.js",
+      "import": "./powerflow/solvers"
+    },
+    {
+      "from": "backend\\src\\core\\index.js",
+      "import": "./opf/algorithms"
+    },
+    {
+      "from": "backend\\src\\core\\index.js",
+      "import": "./stability/solvers"
+    },
+    {
+      "from": "backend\\src\\core\\powerflow\\powerflow\\index.js",
+      "import": "./newton/solver"
+    },
+    {
+      "from": "backend\\src\\core\\validation\\CrossEngineValidator.js",
+      "import": "../config"
+    },
+    {
+      "from": "backend\\src\\infrastructure\\workers\\job.worker.js",
+      "import": "../../../core/powerflow/solvers"
+    },
+    {
+      "from": "backend\\src\\infrastructure\\workers\\job.worker.js",
+      "import": "../../../core/powerflow/solvers"
+    },
+    {
+      "from": "backend\\src\\infrastructure\\workers\\job.worker.js",
+      "import": "../../../core/opf/algorithms"
+    },
+    {
+      "from": "backend\\src\\infrastructure\\workers\\job.worker.js",
+      "import": "../../../core/stability/solvers"
+    },
+    {
+      "from": "backend\\src\\infrastructure\\workers\\job.worker.js",
+      "import": "../../../core/powerflow/contingency"
+    },
+    {
+      "from": "backend\\src\\infrastructure\\workers\\job.worker.js",
+      "import": "../../../core/powerflow/contingency"
+    },
+    {
+      "from": "backend\\src\\plugins\\powerflow\\index.js",
+      "import": "@/core/powerflow/newton"
+    },
+    {
+      "from": "backend\\src\\plugins\\powerflow\\index.js",
+      "import": "@/core/powerflow/solvers"
+    },
+    {
+      "from": "backend\\src\\shared\\index.js",
+      "import": "./models/electrical"
+    },
+    {
+      "from": "backend\\src\\shared\\index.js",
+      "import": "./utils/formatting"
+    },
+    {
+      "from": "backend\\src\\shared\\index.js",
+      "import": "./utils/logging"
+    }
+  ]
+}

@@ -1,0 +1,363 @@
+/**
+ * ElectricalSymbols.css - Estilos para símbolos eléctricos IEC
+ * Diseño profesional tipo diagrama unifilar
+ */
+
+/* ===== NODO BASE ===== */
+.electrical-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.electrical-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.electrical-node.selected {
+  box-shadow: 0 0 0 3px #3b82f6, 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Estados especiales */
+.electrical-node.tripped {
+  animation: tripPulse 0.5s ease-in-out infinite;
+}
+
+.electrical-node.overload {
+  animation: overloadPulse 1s ease-in-out infinite;
+}
+
+@keyframes tripPulse {
+  0%, 100% { box-shadow: 0 0 0 3px #dc2626; }
+  50% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.3); }
+}
+
+@keyframes overloadPulse {
+  0%, 100% { box-shadow: 0 0 0 2px #f59e0b; }
+  50% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.3); }
+}
+
+/* ===== CONTENEDOR DE SÍMBOLO ===== */
+.symbol-container {
+  position: relative;
+  padding: 8px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.symbol-container:hover {
+  border-color: #3b82f6;
+}
+
+/* Símbolo SVG */
+.iec-symbol {
+  display: block;
+}
+
+/* Badge de estado */
+.status-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.status-badge.calculated {
+  background: #10b981;
+}
+
+.status-badge.error {
+  background: #ef4444;
+}
+
+.status-badge.pending {
+  background: #f59e0b;
+}
+
+.status-badge.tripped {
+  background: #dc2626;
+  animation: blink 0.5s ease-in-out infinite;
+}
+
+.status-badge.overload {
+  background: #f59e0b;
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ===== INFORMACIÓN DEL NODO ===== */
+.node-info {
+  margin-top: 8px;
+  text-align: center;
+  min-width: 100%;
+}
+
+.node-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.node-values span {
+  white-space: nowrap;
+}
+
+.node-values .voltage {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.node-values .current {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.node-values .power {
+  color: #8b5cf6;
+  font-weight: 500;
+}
+
+.node-values .icu {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.node-values .length {
+  color: #6b7280;
+}
+
+.node-values .phases {
+  color: #f59e0b;
+}
+
+/* ===== INDICADORES ESPECIALES ===== */
+.trip-indicator,
+.overload-indicator {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #dc2626;
+  color: white;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  animation: warningPulse 1s ease-in-out infinite;
+}
+
+.overload-indicator {
+  background: #f59e0b;
+}
+
+@keyframes warningPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ===== ANIMACIÓN DE FLUJO ===== */
+.flow-animation {
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.flow-dot {
+  width: 4px;
+  height: 4px;
+  background: #3b82f6;
+  border-radius: 50%;
+  animation: flowMove 1s ease-in-out infinite;
+}
+
+@keyframes flowMove {
+  0% { opacity: 0; transform: translateX(-5px); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(5px); }
+}
+
+/* ===== HANDLES DE REACT FLOW ===== */
+.handle-left,
+.handle-right {
+  width: 8px !important;
+  height: 8px !important;
+  background: #3b82f6 !important;
+  border: 2px solid white !important;
+  border-radius: 50% !important;
+}
+
+.handle-left {
+  left: -4px !important;
+}
+
+.handle-right {
+  right: -4px !important;
+}
+
+/* ===== TIPOS ESPECÍFICOS ===== */
+/* Fuente */
+.electrical-node.source .symbol-container {
+  border-color: #f59e0b;
+}
+
+.electrical-node.source .symbol-container:hover {
+  border-color: #fbbf24;
+}
+
+/* Transformador */
+.electrical-node.transformer .symbol-container {
+  border-color: #8b5cf6;
+}
+
+.electrical-node.transformer .symbol-container:hover {
+  border-color: #a78bfa;
+}
+
+/* Breaker */
+.electrical-node.breaker .symbol-container {
+  border-color: #ef4444;
+}
+
+.electrical-node.breaker .symbol-container:hover {
+  border-color: #f87171;
+}
+
+/* Carga */
+.electrical-node.load .symbol-container {
+  border-color: #3b82f6;
+}
+
+.electrical-node.load .symbol-container:hover {
+  border-color: #60a5fa;
+}
+
+/* Panel */
+.electrical-node.panel .symbol-container {
+  border-color: #f59e0b;
+}
+
+.electrical-node.panel .symbol-container:hover {
+  border-color: #fbbf24;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .electrical-node {
+    min-width: 60px;
+    padding: 4px;
+  }
+  
+  .symbol-container {
+    padding: 4px;
+  }
+  
+  .iec-symbol {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .node-label {
+    font-size: 9px;
+  }
+  
+  .node-values {
+    font-size: 8px;
+  }
+}
+
+/* ===== TOOLTIP ELECTRICAL ===== */
+.electrical-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.electrical-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.electrical-node:hover .electrical-tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: calc(100% + 8px);
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  .electrical-node {
+    background: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .symbol-container {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .node-label {
+    color: #e5e7eb;
+  }
+  
+  .node-values {
+    color: #9ca3af;
+  }
+}

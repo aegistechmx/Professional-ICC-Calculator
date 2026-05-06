@@ -28,7 +28,7 @@ function enforcePowerBalance(model, generators, loads) {
   const Pgen = generators.map(g => g.P)
   const Pload = loads.map(l => l.P)
 
-  const mismatch = powerBalanceMismatch(model, Pgen, Pload)
+  const mismatch = powerBalanceMismatch(model, Pgen, Pload) // power (W)
 
   // Adjust slack generator (first generator)
   if (generators.length > 0) {
@@ -83,10 +83,10 @@ function checkGenerationLimits(generators) {
  * @param {number} Vmax - Maximum voltage (pu)
  * @returns {Object} Violation information
  */
-function checkVoltageLimits(voltages, Vmin = 0.95, Vmax = 1.05) {
+function checkVoltageLimits(voltages, Vmin = 0.95, Vmax = 1.05) { // voltage (V)
   const violations = []
 
-  voltages.forEach((V, i) => {
+  voltages.forEach((V, i) => { // voltage (V)
     const Vmag = Math.sqrt(V.re * V.re + V.im * V.im)
 
     if (Vmag < Vmin) {
@@ -169,14 +169,14 @@ function calculatePenalty(violations, penalty = 1000) {
  * @param {Object} options - Constraint options
  * @returns {Object} Overall constraint status
  */
-function checkAllConstraints(model, generators, voltages, options = {}) {
+function checkAllConstraints(model, generators, voltages, options = {}) { // voltage (V)
   const { Vmin = 0.95, Vmax = 1.05, penalty = 1000 } = options
 
   // Check generation limits
   const genConstraints = checkGenerationLimits(generators)
 
   // Check voltage limits
-  const voltConstraints = checkVoltageLimits(voltages, Vmin, Vmax)
+  const voltConstraints = checkVoltageLimits(voltages, Vmin, Vmax) // voltage (V)
 
   // Check line flow limits (if available)
   let flowConstraints = { violations: [], feasible: true }

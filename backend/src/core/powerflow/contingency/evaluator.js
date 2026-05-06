@@ -13,11 +13,11 @@
  */
 function calculateFlows(result, model) {
   const flows = []
-  const { voltages } = result
+  const { voltages } = result // voltage (V)
 
   model.branches.forEach(branch => {
-    const Vfrom = voltages[branch.from]
-    const Vto = voltages[branch.to]
+    const Vfrom = voltages[branch.from] // voltage (V)
+    const Vto = voltages[branch.to] // voltage (V)
 
     const VfromMag = Math.sqrt(Vfrom.re * Vfrom.re + Vfrom.im * Vfrom.im)
     const VtoMag = Math.sqrt(Vto.re * Vto.im + Vto.im * Vto.im)
@@ -65,7 +65,7 @@ function evaluateViolations(result, model, limits = {}) {
   }
 
   // Voltage violations
-  result.voltages.forEach((v, i) => {
+  result.voltages.forEach((v, i) => { // voltage (V)
     const magnitude = Math.sqrt(v.re * v.re + v.im * v.im)
 
     if (magnitude < Vmin * 0.9 || magnitude > Vmax * 1.1) {

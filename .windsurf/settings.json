@@ -1,0 +1,25 @@
+{
+  "cascade": {
+    "commandsAutoExecution": "SAFE",
+    "model": "claude",
+    "webSearchDisabled": true,
+    "enableTerminalCompletion": true,
+    "autocompleteSpeed": "FAST",
+    "disableCascadeBrowserPreviews": true,
+    "disableAutoOpenEditedFiles": true
+  },
+  "project": {
+    "type": "electrical-simulation",
+    "backendFirst": true,
+    "avoidFrontendHeavyCalculations": true,
+    "manualCalculationTrigger": true,
+    "debugLogging": true
+  },
+  "iccSpecific": {
+    "backendCalculations": true,
+    "frontendVisualizationOnly": true,
+    "useCalculateButton": true,
+    "debounceInputs": true,
+    "clearLogs": true
+  }
+}

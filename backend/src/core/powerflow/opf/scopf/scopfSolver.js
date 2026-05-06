@@ -167,7 +167,7 @@ class SCOPFSolver {
           adjustment: -0.1, // Reduce generation
           reason: `Line ${violation.line} overload contingency`,
         })
-      } else if (violation.type === 'undervoltage') {
+      } else if (violation.type === 'undervoltage') { // voltage (V)
         // Increase generation to support voltage
         constraints.push({
           type: 'generation_limit',
@@ -261,7 +261,7 @@ class SCOPFSolver {
    */
   countVoltageViolations(voltages) {
     let count = 0
-    voltages.forEach(V => {
+    voltages.forEach(V => { // voltage (V)
       const magnitude = Math.sqrt(V.re * V.re + V.im * V.im)
       if (
         magnitude < this.options.voltageMin ||
@@ -301,7 +301,7 @@ class SCOPFSolver {
    * @returns {string} Severity level
    */
   assessSeverity(pfResult) {
-    const voltageIssues = this.countVoltageViolations(pfResult.voltages)
+    const voltageIssues = this.countVoltageViolations(pfResult.voltages) // voltage (V)
     const overloads = this.countOverloads(this.model, pfResult)
 
     if (voltageIssues > 3 || overloads > 2) {

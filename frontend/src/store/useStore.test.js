@@ -25,7 +25,7 @@ describe('Store API Integration', () => {
 
       // Simulate the API call that would be made by calculatePowerFlow
       const result = await mockedAxios.post(
-        'http://localhost:3002/powerflow/run',
+        'http://localhost:3001/powerflow/run',
         {
           nodes: [],
           edges: [],
@@ -39,7 +39,7 @@ describe('Store API Integration', () => {
       )
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:3002/powerflow/run',
+        'http://localhost:3001/powerflow/run',
         expect.objectContaining({
           options: expect.objectContaining({
             Sbase_MVA: 100,

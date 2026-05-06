@@ -6,7 +6,7 @@
 
 const NewtonRaphsonSolver = require('./newtonRaphson')
 const FastDecoupledSolver = require('./fastDecoupled')
-const MainPowerFlowSolver = require('./powerFlowSolver')
+const MainPowerFlowSolver = require('./powerFlowSolver') // power (W)
 
 class PowerFlowSolver {
   constructor(options = {}) {
