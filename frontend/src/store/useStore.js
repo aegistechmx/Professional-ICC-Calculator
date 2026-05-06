@@ -891,18 +891,16 @@ export const useStore = create((set, get) => ({
       )
       const result = response.data
 
-      // Actualizar nodos con resultados de cortocircuito
-      // El backend devuelve ICC global, asignarlo a todos los nodos
-      const globalICC = result?.data?.Icc
+      // Actualizar nodos con resultados individuales del backend
+      const nodeResults = result?.data?.nodeResults || {}
 
       const updatedNodes = nodes.map(node => {
-        // Si el backend tiene resultados por nodo, usarlos
-        const nodeResult = result?.data?.nodeResults?.[node.id] ||
-          result?.nodeResults?.[node.id] ||
-          result?.results?.[node.id]
+        const nodeResult = nodeResults[node.id]
 
-        // Usar resultado individual si existe, sino usar ICC global
-        const nodeICC = nodeResult?.isc_3f || nodeResult?.I_3F || nodeResult?.Icc || globalICC
+        if (!nodeResult) {
+          // Si no hay resultado para este nodo, mantener valores existentes
+          return node
+        }
 
         return {
           ...node,
@@ -910,9 +908,9 @@ export const useStore = create((set, get) => ({
             ...node.data,
             results: {
               ...(node.data?.results || {}),
-              isc: nodeICC,
-              isc_1f: nodeResult?.isc_1f || nodeResult?.I_1F || (globalICC * 0.577), // Aproximación para 1F
-              Icc: nodeICC,
+              isc: nodeResult.isc_3f,
+              isc_1f: nodeResult.isc_1f,
+              Icc: nodeResult.isc_3f_ka * 1000, // Convertir kA a A
               timestamp: new Date().toISOString(),
             },
           },
