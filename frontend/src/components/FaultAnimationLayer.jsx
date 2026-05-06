@@ -12,11 +12,11 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const faultEffectsRef = useRef([]);
-  
-  const { 
-    nodes, 
-    edges, 
-    results, 
+
+  const {
+    nodes,
+    edges,
+    results,
     simulation,
     triggerFault,
     clearFault,
@@ -37,11 +37,11 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
   const getEdgePath = useCallback((edge) => {
     const sourceNode = nodes.find(n => n.id === edge.source);
     const targetNode = nodes.find(n => n.id === edge.target);
-    
+
     if (!sourceNode?.position || !targetNode?.position) {
       return [{ x: 0, y: 0 }, { x: 100, y: 100 }];
     }
-    
+
     return [sourceNode.position, targetNode.position];
   }, [nodes]);
 
@@ -49,7 +49,7 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
   const initFaultEffects = useCallback((faultNodeId) => {
     const effects = [];
     const faultNode = nodes.find(n => n.id === faultNodeId);
-    
+
     if (!faultNode?.position) return effects;
 
     // Crear efecto central en nodo de falla
@@ -68,7 +68,7 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
 
     // Crear efectos de propagación
     const propagation = simulateFaultPropagation(faultNodeId, nodes, edges, results);
-    
+
     propagation.forEach((prop, index) => {
       const sourceNode = nodes.find(n => n.id === prop.from);
       if (!sourceNode?.position) return;
@@ -112,7 +112,7 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
       // Dibujar efecto de onda expansiva
       ctx.beginPath();
       ctx.arc(effect.x, effect.y, currentRadius, 0, Math.PI * 2);
-      
+
       // Gradiente radial para efecto de glow
       const gradient = ctx.createRadialGradient(
         effect.x, effect.y, 0,
@@ -121,7 +121,7 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
       gradient.addColorStop(0, effect.color + '40');
       gradient.addColorStop(0.5, effect.color + '20');
       gradient.addColorStop(1, 'transparent');
-      
+
       ctx.fillStyle = gradient;
       ctx.globalAlpha = effect.opacity * (1 - progress);
       ctx.fill();
@@ -150,7 +150,7 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
   // === ACTUALIZAR EFECTOS ===
   const updateFaultEffects = useCallback(() => {
     const now = Date.now();
-    
+
     // Limpiar efectos completados
     faultEffectsRef.current = faultEffectsRef.current.filter(
       effect => (now - effect.startTime) < faultConfig.effectDuration
@@ -173,10 +173,10 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    
+
     updateFaultEffects();
     drawFaultEffects(ctx);
-    
+
     animationRef.current = requestAnimationFrame(animate);
   }, [updateFaultEffects, drawFaultEffects]);
 
@@ -220,17 +220,17 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
 
 // === COMPONENTE DE CONTROL DE FALLAS ===
 export const FaultControlPanel = () => {
-  const { 
-    nodes, 
-    simulation, 
-    triggerFault, 
+  const {
+    nodes,
+    simulation,
+    triggerFault,
     clearFault,
     tripBreaker
   } = useGraphStore();
 
   const handleTriggerFault = (nodeId) => {
     triggerFault(nodeId);
-    
+
     // Simular trips de breakers afectados
     const affectedBreakers = nodes
       .filter(node => node.type === 'breaker')
@@ -242,7 +242,7 @@ export const FaultControlPanel = () => {
     });
   };
 
-  const isUpstreamBreaker = (breakerId, nodeId) => {
+  const isUpstreamBreaker = useCallback((breakerId, nodeId) => {
     // Lógica simplificada para determinar si un breaker está upstream
     const visited = new Set();
     const queue = [nodeId];
@@ -260,7 +260,7 @@ export const FaultControlPanel = () => {
     }
 
     return false;
-  };
+  }, [edges]);
 
   const loadNodes = nodes.filter(node => node.type === 'load');
   const breakerNodes = nodes.filter(node => node.type === 'breaker');
@@ -268,18 +268,17 @@ export const FaultControlPanel = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Control de Fallas</h3>
-      
+
       {/* Estado actual */}
       <div className="mb-4 p-3 bg-gray-50 rounded">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">Estado:</span>
-          <span className={`text-sm font-medium ${
-            simulation.fault ? 'text-red-600' : 'text-green-600'
-          }`}>
+          <span className={`text-sm font-medium ${simulation.fault ? 'text-red-600' : 'text-green-600'
+            }`}>
             {simulation.fault ? 'Falla Activa' : 'Normal'}
           </span>
         </div>
-        
+
         {simulation.fault && (
           <div className="mt-2 text-sm text-gray-600">
             Falla en: {nodes.find(n => n.id === simulation.fault)?.data?.label || simulation.fault}
@@ -301,8 +300,8 @@ export const FaultControlPanel = () => {
                 disabled={simulation.fault === node.id}
                 className={`
                   px-3 py-2 rounded text-sm font-medium transition-colors
-                  ${simulation.fault === node.id 
-                    ? 'bg-red-500 text-white cursor-not-allowed' 
+                  ${simulation.fault === node.id
+                    ? 'bg-red-500 text-white cursor-not-allowed'
                     : 'bg-red-100 text-red-700 hover:bg-red-200'
                   }
                 `}
@@ -318,8 +317,8 @@ export const FaultControlPanel = () => {
           disabled={!simulation.fault}
           className={`
             w-full px-4 py-2 rounded font-medium transition-colors
-            ${!simulation.fault 
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+            ${!simulation.fault
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
               : 'bg-blue-500 text-white hover:bg-blue-600'
             }
           `}
@@ -359,8 +358,8 @@ export const FaultControlPanel = () => {
               const targetNode = nodes.find(n => n.id === prop.to);
               return (
                 <div key={index} className="text-xs text-red-600">
-                  {sourceNode?.data?.label || prop.from} 
-                  {' '} 
+                  {sourceNode?.data?.label || prop.from}
+                  {' '}
                   <span className="text-red-400">{'>'}</span>
                   {' '}
                   {targetNode?.data?.label || prop.to}
@@ -387,7 +386,7 @@ export const FaultControlPanel = () => {
 export const FaultIndicator = ({ nodeId }) => {
   const { simulation } = useGraphStore();
   const { nodes } = useGraphStore();
-  
+
   const node = nodes.find(n => n.id === nodeId);
   const isFaulted = simulation.fault === nodeId;
   const isAffected = simulation.propagation.some(p => p.to === nodeId);

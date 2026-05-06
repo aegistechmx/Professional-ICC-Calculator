@@ -1,217 +1,149 @@
 #!/usr/bin/env node
 
 /**
- * start-all.js — Script para ejecutar frontend y backend simultáneamente
- * Professional ICC Calculator - Sistema completo
+ * start-all.js — Script Unificado y Robusto
+ * icore-icc - Professional ICC Calculator
  */
 
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const net = require('net');
 
-// Colores para consola
 const colors = {
-    reset: '\x1b[0m',
-    bright: '\x1b[1m',
-    red: '\x1b[31m',
-    green: '\x1b[32m',
-    yellow: '\x1b[33m',
-    blue: '\x1b[34m',
-    magenta: '\x1b[35m',
-    cyan: '\x1b[36m'
+    reset: '\x1b[0m', bright: '\x1b[1m',
+    red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m',
+    blue: '\x1b[34m', magenta: '\x1b[35m', cyan: '\x1b[36m'
 };
 
-function log(message, color = 'reset') {
-    console.log(`${colors[color]}${message}${colors.reset}`);
+function log(msg, color = 'reset') {
+    console.log(`${colors[color]}${msg}${colors.reset}`);
 }
 
 function logSection(title) {
-    log(`\n${'='.repeat(60)}`, 'cyan');
+    log(`\n${'='.repeat(70)}`, 'cyan');
     log(`  ${title}`, 'bright');
-    log(`${'='.repeat(60)}\n`, 'cyan');
+    log(`${'='.repeat(70)}\n`, 'cyan');
 }
 
-// Verificar que existan los directorios
-const frontendDir = path.join(__dirname, 'frontend');
-const backendDir = path.join(__dirname, 'backend');
+// Rutas
+const rootDir = __dirname;
+const frontendDir = path.join(rootDir, 'frontend');
+const backendDir = path.join(rootDir, 'backend');
+const cortocircuitoDir = path.join(rootDir, 'icc-core', 'cortocircuito');
 
+const processes = [];
+
+// Verificar directorios
 if (!fs.existsSync(frontendDir)) {
-    log('❌ Directorio frontend no encontrado', 'red');
+    log('❌ Directorio "frontend" no encontrado', 'red');
     process.exit(1);
 }
-
 if (!fs.existsSync(backendDir)) {
-    log('❌ Directorio backend no encontrado', 'red');
+    log('❌ Directorio "backend" no encontrado', 'red');
     process.exit(1);
 }
 
-// Función para iniciar proceso
-function startProcess(name, cwd, command, args = [], port = null) {
-    return new Promise((resolve, reject) => {
-        log(`🚀 Iniciando ${name}...`, 'yellow');
-
-        const process = spawn(command, args, {
-            cwd: cwd,
-            stdio: 'pipe',
-            shell: true
-        });
-
-        process.stdout.on('data', (data) => {
-            const output = data.toString().trim();
-            if (output) {
-                log(`[${name}] ${output}`, 'blue');
-            }
-        });
-
-        process.stderr.on('data', (data) => {
-            const output = data.toString().trim();
-            if (output && !output.includes('WARN')) {
-                log(`[${name}] ${output}`, 'red');
-            } else if (output) {
-                log(`[${name}] ${output}`, 'yellow');
-            }
-        });
-
-        process.on('error', (error) => {
-            log(`❌ Error iniciando ${name}: ${error.message}`, 'red');
-            reject(error);
-        });
-
-        process.on('close', (code) => {
-            if (code !== 0) {
-                log(`❌ ${name} terminó con código ${code}`, 'red');
-            } else {
-                log(`✅ ${name} terminado correctamente`, 'green');
-            }
-        });
-
-        // Esperar un momento y verificar si el puerto está disponible
-        setTimeout(() => {
-            if (port) {
-                resolve({ process, port });
-            } else {
-                resolve({ process });
-            }
-        }, 3000);
-    });
-}
-
-// Función para verificar si un puerto está en uso
-function checkPort(port) {
-    return new Promise((resolve) => {
-        const net = require('net');
+function isPortAvailable(port) {
+    return new Promise(resolve => {
         const server = net.createServer();
-
-        server.listen(port, () => {
-            server.once('close', () => {
-                resolve(true); // Puerto disponible
-            });
+        server.once('error', () => resolve(false));
+        server.once('listening', () => {
             server.close();
+            resolve(true);
         });
-
-        server.on('error', () => {
-            resolve(false); // Puerto en uso
-        });
+        server.listen(port);
     });
 }
 
-// Función principal
+async function startProcess(name, cwd, command, args, expectedPort) {
+    log(`🚀 Iniciando ${name}...`, 'yellow');
+
+    const proc = spawn(command, args, {
+        cwd,
+        stdio: 'pipe',
+        shell: true
+    });
+
+    proc.stdout.on('data', data => {
+        const text = data.toString().trim();
+        if (text) log(`[${name}] ${text}`, 'blue');
+    });
+
+    proc.stderr.on('data', data => {
+        const text = data.toString().trim();
+        if (text) log(`[${name}] ${text}`, text.includes('error') ? 'red' : 'yellow');
+    });
+
+    proc.on('error', err => {
+        log(`❌ Error al iniciar ${name}: ${err.message}`, 'red');
+    });
+
+    if (expectedPort) {
+        setTimeout(async () => {
+            const available = await isPortAvailable(expectedPort);
+            if (!available) {
+                log(`✅ ${name} parece estar corriendo en http://localhost:${expectedPort}`, 'green');
+            }
+        }, 4000);
+    }
+
+    processes.push({ name, process: proc });
+    return proc;
+}
+
 async function main() {
-    logSection('PROFESSIONAL ICC CALCULATOR - INICIO COMPLETO');
-    log('🎯 Iniciando sistema completo:', 'bright');
-    log('   • Frontend (React/Vite)', 'green');
-    log('   • Backend (Node.js/Express)', 'green');
-    log('\n⏱️  Esperando a que los servicios inicien...\n');
+    logSection('ICORE-ICC - INICIO COMPLETO DEL SISTEMA');
+
+    // Verificar puertos
+    const ports = { frontend: 5173, backend: 3001, standalone: 3002 };
+    for (const [service, port] of Object.entries(ports)) {
+        const available = await isPortAvailable(port);
+        if (!available) {
+            log(`⚠️  Puerto ${port} (${service}) ya está en uso`, 'yellow');
+        }
+    }
 
     try {
-        // Verificar puertos
-        const frontendPort = 5173;
-        const backendPort = 3001;
+        // Backend primero
+        await startProcess('BACKEND', backendDir, 'npm', ['run', 'dev'], ports.backend);
 
-        const frontendAvailable = await checkPort(frontendPort);
-        const backendAvailable = await checkPort(backendPort);
+        // Espera breve para que el backend inicie
+        await new Promise(r => setTimeout(r, 3000));
 
-        if (!frontendAvailable) {
-            log(`⚠️  Puerto ${frontendPort} ya está en uso (frontend)`, 'yellow');
-        }
-        if (!backendAvailable) {
-            log(`⚠️  Puerto ${backendPort} ya está en uso (backend)`, 'yellow');
-        }
+        // Frontend
+        await startProcess('FRONTEND', frontendDir, 'npm', ['run', 'dev'], ports.frontend);
 
-        // Iniciar procesos
-        const processes = [];
-
-        // 1. Backend
-        try {
-            const backend = await startProcess(
-                'BACKEND',
-                backendDir,
-                'npm',
-                ['run', 'dev'],
-                backendPort
-            );
-            processes.push(backend);
-        } catch (error) {
-            log('❌ No se pudo iniciar el backend', 'red');
+        // Standalone Cortocircuito (opcional)
+        if (fs.existsSync(cortocircuitoDir)) {
+            await startProcess('STANDALONE', cortocircuitoDir, 'npm', ['run', 'dev'], ports.standalone);
         }
 
-        // 2. Frontend
-        try {
-            const frontend = await startProcess(
-                'FRONTEND',
-                frontendDir,
-                'npm',
-                ['run', 'dev'],
-                frontendPort
-            );
-            processes.push(frontend);
-        } catch (error) {
-            log('❌ No se pudo iniciar el frontend', 'red');
+        logSection('✅ SISTEMA INICIADO CORRECTAMENTE');
+
+        log('🌐 **Accesos rápidos:**', 'green');
+        log(`   Frontend (Editor)     → http://localhost:${ports.frontend}`, 'bright');
+        log(`   Backend API           → http://localhost:${ports.backend}`, 'bright');
+        if (fs.existsSync(cortocircuitoDir)) {
+            log(`   Calculadora Standalone → http://localhost:${ports.standalone}`, 'bright');
         }
 
-        // Esperar un momento para que todo inicie
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        log('\n📌 Presiona Ctrl+C para detener todos los servicios', 'yellow');
 
-        // Mostrar URLs de acceso
-        logSection('SERVICIOS INICIADOS');
-
-        if (frontendAvailable) {
-            log('🌐 Frontend:', 'green');
-            log(`   http://localhost:${frontendPort}`, 'bright');
-        }
-
-        if (backendAvailable) {
-            log('⚙️  Backend API:', 'green');
-            log(`   http://localhost:${backendPort}`, 'bright');
-        }
-
-        log('\n📋 Instrucciones:', 'yellow');
-        log('   • Presiona Ctrl+C para detener todos los servicios');
-        log('   • Los logs se mostrarán en esta consola');
-        log('   • Revisa las URLs arriba para acceder a cada interfaz\n');
-
-        // Manejar cierre limpio
+        // Manejo limpio de cierre
         process.on('SIGINT', () => {
-            log('\n\n🛑 Deteniendo todos los servicios...', 'yellow');
-
-            processes.forEach(({ process }, index) => {
+            log('\n🛑 Deteniendo todos los servicios...', 'yellow');
+            processes.forEach(({ name, process }) => {
                 if (process && !process.killed) {
-                    log(`   Deteniendo proceso ${index + 1}...`, 'cyan');
+                    log(`   Deteniendo ${name}...`, 'cyan');
                     process.kill('SIGTERM');
                 }
             });
-
-            setTimeout(() => {
-                log('✅ Todos los servicios detenidos', 'green');
-                process.exit(0);
-            }, 2000);
+            setTimeout(() => process.exit(0), 1500);
         });
 
-        // Mantener el script corriendo
-        log('🔄 Sistema en ejecución... (Ctrl+C para detener)\n', 'green');
-
-    } catch (error) {
-        log(`❌ Error general: ${error.message}`, 'red');
+    } catch (err) {
+        log(`❌ Error crítico: ${err.message}`, 'red');
         process.exit(1);
     }
 }

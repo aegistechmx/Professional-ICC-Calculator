@@ -55,6 +55,8 @@
     "@xyflow/react": "^12.10.2"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@playwright/test": "^1.59.1",
+    "concurrently": "^8.2.2",
+    "playwright": "^1.59.1"
   }
 }

@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useGraphStore } from '../store/graphStore.js';
 import { useTCCCurves } from './SimulationEngine.jsx';
-import { 
+import {
   calculateCoordinationMargin,
   adjustCurveForCoordination,
   curvesOverlap,
@@ -18,19 +18,20 @@ export const AutoCoordinationPanel = () => {
   const [coordinationResults, setCoordinationResults] = useState(null);
   const [selectedBreaker, setSelectedBreaker] = useState(null);
   const [autoMode, setAutoMode] = useState(false);
-  
-  const { 
-    nodes, 
-    results, 
-    simulation, 
+
+  const {
+    nodes,
+    edges,
+    results,
+    simulation,
     generateTCCCurves,
-    autoCoordinateBreakers 
+    autoCoordinateBreakers
   } = useGraphStore();
 
   const { curves } = useTCCCurves();
 
   // === BREAKERS DISPONIBLES ===
-  const breakerNodes = useMemo(() => 
+  const breakerNodes = useMemo(() =>
     nodes.filter(node => node.type === 'breaker')
       .map(breaker => ({
         ...breaker,
@@ -49,7 +50,7 @@ export const AutoCoordinationPanel = () => {
   // === ANÁLISIS DE COORDINACIÓN ===
   const analyzeCoordination = useCallback(() => {
     setIsAnalyzing(true);
-    
+
     setTimeout(() => {
       const results = {
         issues: [],
@@ -71,10 +72,10 @@ export const AutoCoordinationPanel = () => {
 
         // Calcular margen de coordinación
         const margin = calculateCoordinationMargin(upCurve.curve, downCurve.curve);
-        
+
         // Verificar cruces
         const hasOverlap = curvesOverlap(upCurve.curve, downCurve.curve);
-        
+
         // Análisis detallado
         const analysis = {
           downstream: downstream.id,
@@ -90,7 +91,7 @@ export const AutoCoordinationPanel = () => {
         testCurrents.forEach(current => {
           const downTime = interpolateTripTime(downCurve.curve, current);
           const upTime = interpolateTripTime(upCurve.curve, current);
-          
+
           analysis.testPoints.push({
             current,
             downstreamTime: downTime,
@@ -203,25 +204,25 @@ export const AutoCoordinationPanel = () => {
     }
 
     // Actualizar datos del breaker
-    const updatedNodes = nodes.map(node => 
-      node.id === breakerId 
-        ? { 
-            ...node, 
-            data: { 
-              ...node.data, 
-              pickup: breaker.pickup,
-              instantaneous: breaker.instantaneous 
-            } 
+    const updatedNodes = nodes.map(node =>
+      node.id === breakerId
+        ? {
+          ...node,
+          data: {
+            ...node.data,
+            pickup: breaker.pickup,
+            instantaneous: breaker.instantaneous
           }
+        }
         : node
     );
 
     // Actualizar store
     useGraphStore.getState().setGraph(updatedNodes, edges);
-    
+
     // Regenerar curvas
     generateTCCCurves();
-    
+
     // Re-analizar
     setTimeout(() => {
       analyzeCoordination();
@@ -238,10 +239,10 @@ export const AutoCoordinationPanel = () => {
   // === MODO AUTOMÁTICO ===
   useEffect(() => {
     if (autoMode && coordinationResults) {
-      const hasIssues = coordinationResults.issues.some(issue => 
+      const hasIssues = coordinationResults.issues.some(issue =>
         issue.severity === 'critical'
       );
-      
+
       if (hasIssues) {
         applyAutoCoordination();
       }
@@ -286,10 +287,9 @@ export const AutoCoordinationPanel = () => {
         <div className="mb-4 p-3 bg-gray-50 rounded">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">Score de Coordinación:</span>
-            <span className={`text-lg font-bold ${
-              coordinationResults.overallScore > 80 ? 'text-green-600' :
-              coordinationResults.overallScore > 60 ? 'text-yellow-600' : 'text-red-600'
-            }`}>
+            <span className={`text-lg font-bold ${coordinationResults.overallScore > 80 ? 'text-green-600' :
+                coordinationResults.overallScore > 60 ? 'text-yellow-600' : 'text-red-600'
+              }`}>
               {coordinationResults.overallScore.toFixed(1)}%
             </span>
           </div>
@@ -302,14 +302,12 @@ export const AutoCoordinationPanel = () => {
           <h4 className="text-sm font-medium text-gray-700 mb-2">Issues Detectados</h4>
           <div className="space-y-2">
             {coordinationResults.issues.map((issue, index) => (
-              <div key={index} className={`p-2 rounded border ${
-                issue.severity === 'critical' ? 'bg-red-50 border-red-200' :
-                'bg-yellow-50 border-yellow-200'
-              }`}>
+              <div key={index} className={`p-2 rounded border ${issue.severity === 'critical' ? 'bg-red-50 border-red-200' :
+                  'bg-yellow-50 border-yellow-200'
+                }`}>
                 <div className="flex items-center justify-between">
-                  <span className={`text-sm font-medium ${
-                    issue.severity === 'critical' ? 'text-red-700' : 'text-yellow-700'
-                  }`}>
+                  <span className={`text-sm font-medium ${issue.severity === 'critical' ? 'text-red-700' : 'text-yellow-700'
+                    }`}>
                     {issue.description}
                   </span>
                   <button
