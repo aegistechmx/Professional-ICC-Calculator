@@ -280,13 +280,13 @@ export function getSnapGuides(nodes, draggedNode, threshold = 10) {
 /**
  * Aplicar snap a posición basado en guías
  */
-export function applySnap(position, guides, threshold = 10) {
+export function applySnap(position, guides, _threshold = 10) {
   const nodeWidth = 150;
   const nodeHeight = 100;
-  const centerX = position.x + nodeWidth / 2;
-  const centerY = position.y + nodeHeight / 2;
-  const right = position.x + nodeWidth;
-  const bottom = position.y + nodeHeight;
+  // const centerX = position.x + nodeWidth / 2; // Unused variable removed
+  // const centerY = position.y + nodeHeight / 2; // Unused variable removed
+  // const right = position.x + nodeWidth; // Unused variable removed
+  // const bottom = position.y + nodeHeight; // Unused variable removed
 
   let newPosition = { ...position };
   let snapped = { x: false, y: false };

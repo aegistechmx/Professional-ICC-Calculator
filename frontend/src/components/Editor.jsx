@@ -17,6 +17,7 @@ import LoadNode from './nodes/LoadNode'
 import MotorNode from './nodes/MotorNode'
 import GeneratorNode from './nodes/GeneratorNode'
 import ATSNode from './nodes/ATSNode'
+import GeneratorATSNode from './nodes/GeneratorATSNode'
 import CapBankNode from './nodes/CapacitorBankNode'
 import PropertiesPanel from './PropertiesPanel'
 import GridBackground from './GridBackground'
@@ -49,8 +50,9 @@ const Editor = React.memo(function Editor() {
     load: LoadNode,
     motor: MotorNode,
     generator: GeneratorNode,
+    generator_ats: GeneratorATSNode,
     ats: ATSNode,
-    capacitor: CapBankNode,
+    capacitorBank: CapBankNode,
   }), [])
 
   const memoizedEdgeTypes = useMemo(() => ({
@@ -227,6 +229,13 @@ const Editor = React.memo(function Editor() {
 
   const onNodeClick = useCallback(
     (event, node) => {
+      // Prevent event propagation to improve performance
+      event?.stopPropagation?.()
+
+      // Early return if same node already selected
+      const currentSelected = useStore.getState().selectedNode
+      if (currentSelected?.id === node.id) return
+
       setSelectedNode(node)
       setSelectedEdge(null)
     },
@@ -235,6 +244,13 @@ const Editor = React.memo(function Editor() {
 
   const onEdgeClick = useCallback(
     (event, edge) => {
+      // Prevent event propagation to improve performance
+      event?.stopPropagation?.()
+
+      // Early return if same edge already selected
+      const currentSelected = useStore.getState().selectedEdge
+      if (currentSelected?.id === edge.id) return
+
       setSelectedEdge(edge)
       setSelectedNode(null)
     },

@@ -258,12 +258,12 @@ class GraphSystemController {
 
     if (node.type === 'source') {
       results.voltage = node.voltaje || 480; // voltage (V)
-      results.availablePower = toElectricalPrecision(parseFloat((results.voltage * (systemData.ampacidad?.I_final || 0)) / 1000; // kW).toFixed(6));
+      results.availablePower = toElectricalPrecision(parseFloat(((results.voltage * (systemData.ampacidad?.I_final || 0)) / 1000).toFixed(6)));
     }
 
     if (node.type === 'load') {
       results.current = node.I_carga || 150; // current (A)
-      results.power = toElectricalPrecision(parseFloat((results.current * (systemData.sistema?.voltaje || 480)) * 0.9 / 1000; // kW).toFixed(6));
+      results.power = toElectricalPrecision(parseFloat(((results.current * (systemData.sistema?.voltaje || 480)) * 0.9 / 1000).toFixed(6))); // kW
       results.voltageDrop = systemData.caida?.porcentaje || 0; // voltage (V)
     }
 

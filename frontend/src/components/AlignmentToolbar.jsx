@@ -38,7 +38,10 @@ export default function AlignmentToolbar() {
     const newNodes = alignFn(nodes);
     setGraph(newNodes, edges);
 
-    console.log(`[ALIGN] ${name}: ${selectedCount} nodos`);
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log(`[ALIGN] ${name}: ${selectedCount} nodos`);
+    }
   };
 
   const handleDistribute = (distributeFn, name) => {
@@ -50,7 +53,10 @@ export default function AlignmentToolbar() {
     const newNodes = distributeFn(nodes);
     setGraph(newNodes, edges);
 
-    console.log(`[DISTRIBUTE] ${name}: ${selectedCount} nodos`);
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log(`[DISTRIBUTE] ${name}: ${selectedCount} nodos`);
+    }
   };
 
   const boundingBox = hasSelection ? getBoundingBox(nodes) : null;
@@ -67,7 +73,7 @@ export default function AlignmentToolbar() {
             title="Alinear a la izquierda (Ctrl+Shift+←)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 3h2v18H3V3zm4 4h12v4H7V7zm0 6h8v4H7v-4z"/>
+              <path d="M3 3h2v18H3V3zm4 4h12v4H7V7zm0 6h8v4H7v-4z" />
             </svg>
             Izquierda
           </button>
@@ -79,7 +85,7 @@ export default function AlignmentToolbar() {
             title="Alinear al centro horizontal"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 3h4v18h-4V3zM7 7h10v4H7V7zm0 6h10v4H7v-4z"/>
+              <path d="M10 3h4v18h-4V3zM7 7h10v4H7V7zm0 6h10v4H7v-4z" />
             </svg>
             Centro H
           </button>
@@ -91,7 +97,7 @@ export default function AlignmentToolbar() {
             title="Alinear a la derecha (Ctrl+Shift+→)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 3h2v18h-2V3zm-4 4h-12v4h12V7zm0 6h-8v4h8v-4z"/>
+              <path d="M19 3h2v18h-2V3zm-4 4h-12v4h12V7zm0 6h-8v4h8v-4z" />
             </svg>
             Derecha
           </button>
@@ -105,7 +111,7 @@ export default function AlignmentToolbar() {
             title="Alinear arriba (Ctrl+Shift+↑)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 3h18v2H3V3zm4 4v12H5V7h2zm6 0v8h-2V7h2zm6 0v4h-2V7h2z"/>
+              <path d="M3 3h18v2H3V3zm4 4v12H5V7h2zm6 0v8h-2V7h2zm6 0v4h-2V7h2z" />
             </svg>
             Arriba
           </button>
@@ -117,7 +123,7 @@ export default function AlignmentToolbar() {
             title="Alinear al centro vertical"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 10h18v4H3v-4zM7 7v10H5V7h2zm6-2v14h-2V5h2zm6 2v10h-2V7h2z"/>
+              <path d="M3 10h18v4H3v-4zM7 7v10H5V7h2zm6-2v14h-2V5h2zm6 2v10h-2V7h2z" />
             </svg>
             Centro V
           </button>
@@ -129,7 +135,7 @@ export default function AlignmentToolbar() {
             title="Alinear abajo (Ctrl+Shift+↓)"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 19h18v2H3v-2zm4-4v-12H5v12h2zm6 0v-8h-2v8h2zm6 0v-4h-2v4h2z"/>
+              <path d="M3 19h18v2H3v-2zm4-4v-12H5v12h2zm6 0v-8h-2v8h2zm6 0v-4h-2v4h2z" />
             </svg>
             Abajo
           </button>
@@ -148,7 +154,7 @@ export default function AlignmentToolbar() {
             title="Distribuir horizontalmente"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2 12h2v-2H2v2zm4-4h12v4H6V8zm0 6h12v4H6v-4zm14-6h2v4h-2V8zm0 6h2v-2h-2v2z"/>
+              <path d="M2 12h2v-2H2v2zm4-4h12v4H6V8zm0 6h12v4H6v-4zm14-6h2v4h-2V8zm0 6h2v-2h-2v2z" />
             </svg>
             Horizontal
           </button>
@@ -160,7 +166,7 @@ export default function AlignmentToolbar() {
             title="Distribuir verticalmente"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2v2h-2V2h2zm-4 4v12H6V6h2zm6 0v8h-2V6h2zm6 0v4h-2V6h2z"/>
+              <path d="M12 2v2h-2V2h2zm-4 4v12H6V6h2zm6 0v8h-2V6h2zm6 0v4h-2V6h2z" />
             </svg>
             Vertical
           </button>
@@ -172,7 +178,7 @@ export default function AlignmentToolbar() {
             title="Distribuir en grid"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/>
+              <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z" />
             </svg>
             Grid
           </button>

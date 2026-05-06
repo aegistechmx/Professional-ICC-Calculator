@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { _toElectricalPrecision, _formatElectricalValue } = require('../../utils/electricalUtils');
 /**
  * backend/src/domain/services/breakerFamilies.domain.js
  * Modelos de Familias de Breakers Reales (Square D, Eaton, ABB)
@@ -164,7 +164,7 @@ class BreakerFamilies {
     const multipliers = [0.5, 0.8, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0];
 
     for (const m of multipliers) {
-      const I = toElectricalPrecision(parseFloat((baseCurrent * m;)).toFixed(6));
+      const I = toElectricalPrecision(parseFloat((baseCurrent * m).toFixed(6)));
       let t;
 
       if (m < 0.9) {
@@ -257,7 +257,7 @@ class BreakerFamilies {
     const multipliers = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0, 12.0, 15.0];
 
     for (const m of multipliers) {
-      const I = toElectricalPrecision(parseFloat((baseCurrent * m;)).toFixed(6));
+      const I = toElectricalPrecision(parseFloat((baseCurrent * m).toFixed(6)));
       let t;
       let zone;
 

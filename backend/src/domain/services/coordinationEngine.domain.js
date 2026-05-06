@@ -10,7 +10,7 @@ const TCCEngine = require('./tccEngine.domain');
 class CoordinationEngine {
   constructor(options = {}) {
     this.tccEngine = new TCCEngine();
-    
+
     // Configuración de optimización
     this.config = {
       margin: options.margin || 0.3,           // Margen mínimo (segundos)
@@ -64,7 +64,7 @@ class CoordinationEngine {
         if (crossings.length > 0) {
           // Hay conflicto - ajustar upstream
           const adjustment = this.adjustBreaker(upstream, downstream, crossings);
-          
+
           if (adjustment.changed) {
             coordinatedBreakers[i + 1] = adjustment.breaker;
             changed = true;
@@ -113,13 +113,13 @@ class CoordinationEngine {
     for (const p of curveDown) {
       // Encontrar punto correspondiente en upstream
       const match = this.findMatchingPoint(p.I, curveUp);
-      
+
       if (!match || match.t === Infinity || p.t === Infinity) continue;
 
       // Verificar condición de coordinación:
       // t_down + margin < t_up
       const requiredTime = p.t + margin;
-      
+
       if (requiredTime >= match.t) {
         crossings.push({
           I: p.I,
@@ -146,7 +146,7 @@ class CoordinationEngine {
     let minDiff = Infinity;
 
     for (const point of curve) {
-      const diff = toElectricalPrecision(parseFloat((Math.abs(point.I - current));).toFixed(6)); // current (A)
+      const diff = toElectricalPrecision(parseFloat((Math.abs(point.I - current)).toFixed(6))); // current (A)
       if (diff < minDiff && diff < current * 0.05) { // 5% tolerancia // Unit: A (Amperes)
         minDiff = diff;
         closest = point;
@@ -186,7 +186,7 @@ class CoordinationEngine {
         up.TMS * this.config.tmsIncrement,
         this.config.maxTMS
       );
-      
+
       up.TMS = toElectricalPrecision(parseFloat(newTMS.toFixed(3)));
       adjustmentType = 'TMS_INCREASE';
       adjustmentValues = {
@@ -202,7 +202,7 @@ class CoordinationEngine {
         down.pickup * 3,
         this.config.maxPickup
       );
-      
+
       up.pickup = toElectricalPrecision(parseFloat(newPickup.toFixed(1)));
       adjustmentType = 'PICKUP_INCREASE';
       adjustmentValues = {
@@ -250,11 +250,11 @@ class CoordinationEngine {
       const upCurve = this.tccEngine.generateTCCCurve(upstream);
 
       const crossings = this.detectCrossings(downCurve, upCurve, this.config.margin);
-      
+
       results.push({
         pair: `${downstream.id || i} → ${upstream.id || (i + 1)}`,
         crossings: crossings.length,
-        minTimeDiff: crossings.length > 0 
+        minTimeDiff: crossings.length > 0
           ? Math.min(...crossings.map(c => c.tUp - c.tDown))
           : Infinity,
         status: crossings.length === 0 ? 'OK' : 'CONFLICT'
@@ -281,9 +281,9 @@ class CoordinationEngine {
   calculateQualityScore(results) {
     const totalPairs = results.length;
     const okPairs = results.filter(r => r.status === 'OK').length;
-    
+
     if (totalPairs === 0) return 0;
-    
+
     return toElectricalPrecision(parseFloat(((okPairs / totalPairs)) * 100).toFixed(1));
   }
 
@@ -293,13 +293,13 @@ class CoordinationEngine {
   generateMessage(finalStatus, iterations) {
     if (finalStatus.isCoordinated) {
       return `Coordinación exitosa en ${iterations} iteraciones. ` +
-             `Score de calidad: ${finalStatus.quality}%`;
+        `Score de calidad: ${finalStatus.quality}%`;
     }
-    
+
     const remaining = finalStatus.totalCrossings;
     return `Coordinación parcial después de ${iterations} iteraciones. ` +
-           `${remaining} conflictos restantes. ` +
-           `Revisar manualmente protecciones upstream.`;
+      `${remaining} conflictos restantes. ` +
+      `Revisar manualmente protecciones upstream.`;
   }
 
   /**
@@ -320,7 +320,7 @@ class CoordinationEngine {
 
       if (crossings.length > 0) {
         const worst = crossings[0]; // Más severo
-        
+
         suggestions.push({
           pair: `${down.id || i} → ${up.id || (i + 1)}`,
           issue: `${crossings.length} puntos de conflicto`,
@@ -348,11 +348,11 @@ class CoordinationEngine {
 
     // Probar diferentes márgenes
     const margins = [0.2, 0.3, 0.4, 0.5];
-    
+
     for (const margin of margins) {
       this.config.margin = margin;
       const result = this.autoCoordinate(original);
-      
+
       results.push({
         margin,
         status: result.status,
@@ -365,7 +365,7 @@ class CoordinationEngine {
     this.config.margin = 0.3;
 
     return {
-      optimalMargin: results.reduce((best, curr) => 
+      optimalMargin: results.reduce((best, curr) =>
         curr.quality > best.quality ? curr : best
       ),
       allResults: results

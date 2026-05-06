@@ -1,0 +1,14 @@
+{
+  "nodes": [
+    {"id": "test-transformer", "type": "transformer"},
+    {"id": "test-generator", "type": "generator"},
+    {"id": "test-breaker", "type": "breaker"},
+    {"id": "test-panel", "type": "panel"}
+  ],
+  "edges": [
+    {"source": "test-generator", "target": "test-breaker"},
+    {"source": "test-breaker", "target": "test-transformer"},
+    {"source": "test-transformer", "target": "test-panel"}
+  ],
+  "systemMode": "normal"
+}

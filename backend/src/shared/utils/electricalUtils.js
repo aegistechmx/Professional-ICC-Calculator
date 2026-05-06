@@ -4,17 +4,22 @@
  * Responsibility: Common electrical engineering calculations
  */
 
+const {
+  toElectricalPrecision: toPrecision,
+  _toDisplayPrecision,
+  formatElectricalValue,
+  _getPrecisionForType,
+  _validatePrecision
+} = require('./precision');
+
 /**
- * Convert to electrical precision
+ * Convert to electrical precision (backward compatibility)
  * @param {number} value - Input value
- * @param {number} precision - Decimal places (default 6) // Unit: kW
+ * @param {number} precision - Decimal places (default 6)
  * @returns {number} Value with electrical precision
  */
 function toElectricalPrecision(value, precision = 6) {
-  if (typeof value !== 'number' || isNaN(value)) {
-    return value
-  }
-  return Number(value.toFixed(precision))
+  return toPrecision(value, precision);
 }
 
 /**
@@ -84,7 +89,7 @@ function calculateShortCircuitCurrent(voltage, impedance) {
     if (impedance === 0) { // impedance (Ω)
       throw new Error('Impedance cannot be zero for short circuit calculation')
     }
-    const isc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3)) * impedance)).toFixed(6)) // voltage (V)
+    const isc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3) * impedance))).toFixed(6)) // voltage (V)
     return toElectricalPrecision(isc)
   }
 
@@ -105,7 +110,7 @@ function calculateShortCircuitCurrent(voltage, impedance) {
     throw new Error('Impedance cannot be zero for short circuit calculation')
   }
 
-  const isc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3)) * z)).toFixed(6)) // voltage (V)
+  const isc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3) * z))).toFixed(6)) // voltage (V)
   return toElectricalPrecision(isc)
 }
 
@@ -295,19 +300,6 @@ function convertPerUnitToActual(puValue, baseValue) {
   return toElectricalPrecision(puValue * baseValue)
 }
 
-/**
- * Format electrical value for display
- * @param {number} value - Value to format
- * @param {string} unit - Unit string
- * @param {number} decimals - Decimal places
- * @returns {string} Formatted value with unit
- */
-function formatElectricalValue(value, unit = '', decimals = 2) {
-  if (typeof value !== 'number' || isNaN(value)) {
-    return `Invalid ${unit}`
-  }
-  return `${value.toFixed(decimals)} ${unit}`.trim()
-}
 
 /**
  * Convert voltage between units

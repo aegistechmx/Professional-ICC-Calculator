@@ -69,7 +69,10 @@ function runProfessionalICC(system, V, Z) {
   const faultCurrentPU = calculateFaultCurrent(faultedSystem, fault)
 
   // Step 5: Convert to actual amperes with IEEE precision
-  const baseCurrent = toElectricalPrecision(parseFloat((V / (Math.sqrt(3)) * Z)).toFixed(6))
+  if (!Z || Z <= 0) {
+    throw new Error('Impedance must be greater than zero for professional ICC calculation')
+  }
+  const baseCurrent = toElectricalPrecision(parseFloat((V / (Math.sqrt(3) * Z))).toFixed(6))
   const actualCurrent = toElectricalPrecision(parseFloat((faultCurrentPU * baseCurrent)).toFixed(6))
 
   return {

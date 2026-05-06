@@ -3,7 +3,7 @@
  * Muestra cómo React se comunica con el módulo HTML existente
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import ICCModule from '../components/ICCModule';
 
 export default function ICCIframeDemo() {
@@ -14,10 +14,10 @@ export default function ICCIframeDemo() {
 
   // Agregar log
   const addLog = useCallback((message, type = 'info') => {
-    setLogs(prev => [...prev, { 
-      message, 
-      type, 
-      timestamp: new Date().toLocaleTimeString() 
+    setLogs(prev => [...prev, {
+      message,
+      type,
+      timestamp: new Date().toLocaleTimeString()
     }].slice(-10));
   }, []);
 
@@ -34,17 +34,17 @@ export default function ICCIframeDemo() {
         { id: 'br2', from: 'bus2', to: 'bus3', size: 150, current: 100 }
       ],
       breakers: [
-        { 
-          id: 'cb1', 
-          model: 'MGA36500', 
+        {
+          id: 'cb1',
+          model: 'MGA36500',
           In: 500,
           pickup: 550,
           tms: 0.5,
           inst: 5000
         },
-        { 
-          id: 'cb2', 
-          model: 'MGA32500', 
+        {
+          id: 'cb2',
+          model: 'MGA32500',
           In: 250,
           pickup: 275,
           tms: 0.1,
@@ -52,7 +52,7 @@ export default function ICCIframeDemo() {
         }
       ]
     };
-    
+
     setSystemModel(model);
     addLog('Modelo de sistema cargado', 'success');
   };
@@ -82,9 +82,8 @@ export default function ICCIframeDemo() {
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Estado</h2>
             <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${
-                isModuleReady ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'
-              }`} />
+              <div className={`w-3 h-3 rounded-full ${isModuleReady ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'
+                }`} />
               <span className="text-gray-700">
                 {isModuleReady ? 'Módulo listo' : 'Esperando módulo...'}
               </span>
@@ -106,7 +105,7 @@ export default function ICCIframeDemo() {
               >
                 📦 Cargar Modelo de Ejemplo
               </button>
-              
+
               <button
                 onClick={() => {
                   setSystemModel(null);
@@ -131,9 +130,9 @@ export default function ICCIframeDemo() {
                   <div key={i} className="text-xs">
                     <span className="text-gray-500">[{log.timestamp}]</span>{' '}
                     <span className={
-                      log.type === 'error' ? 'text-red-400' : 
-                      log.type === 'success' ? 'text-green-400' : 
-                      'text-blue-400'
+                      log.type === 'error' ? 'text-red-400' :
+                        log.type === 'success' ? 'text-green-400' :
+                          'text-blue-400'
                     }>
                       {log.message}
                     </span>
@@ -179,7 +178,7 @@ export default function ICCIframeDemo() {
           <div>
             <h3 className="font-semibold mb-2">React → HTML (postMessage)</h3>
             <pre className="bg-gray-800 text-gray-100 p-3 rounded">
-{`iframe.contentWindow.postMessage({
+              {`iframe.contentWindow.postMessage({
   type: 'LOAD_MODEL',
   data: systemModel
 }, '*');`}
@@ -188,7 +187,7 @@ export default function ICCIframeDemo() {
           <div>
             <h3 className="font-semibold mb-2">HTML → React (postMessage)</h3>
             <pre className="bg-gray-800 text-gray-100 p-3 rounded">
-{`window.parent.postMessage({
+              {`window.parent.postMessage({
   type: 'RESULTS',
   data: results
 }, '*');`}

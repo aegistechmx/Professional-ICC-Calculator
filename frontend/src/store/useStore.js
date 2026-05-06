@@ -28,6 +28,13 @@ const loadFromStorage = (key, defaultValue) => {
 
     const parsed = JSON.parse(item)
 
+    // Validate JSON structure before using
+    if (!isValidLocalStorageData(parsed, key)) {
+      // Clear corrupted data
+      localStorage.removeItem(key)
+      return defaultValue
+    }
+
     // Basic validation for expected data types
     if (key.includes('nodes') || key.includes('edges')) {
       return Array.isArray(parsed) ? parsed : defaultValue
@@ -35,10 +42,49 @@ const loadFromStorage = (key, defaultValue) => {
 
     return parsed
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(`Error loading ${key} from localStorage:`, error)
+    // Clear corrupted data and return default
+    localStorage.removeItem(key)
     return defaultValue
   }
+}
+
+// Validate localStorage data structure
+const isValidLocalStorageData = (data, key) => {
+  // Check for null/undefined
+  if (data === null || data === undefined) return false
+
+  // Check for circular references that can't be JSON serialized
+  try {
+    JSON.stringify(data)
+  } catch {
+    return false
+  }
+
+  // Validate nodes structure
+  if (key.includes('nodes')) {
+    if (!Array.isArray(data)) return false
+    return data.every(node =>
+      node &&
+      typeof node === 'object' &&
+      typeof node.id === 'string' &&
+      typeof node.type === 'string'
+    )
+  }
+
+  // Validate edges structure
+  if (key.includes('edges')) {
+    if (!Array.isArray(data)) return false
+    return data.every(edge =>
+      edge &&
+      typeof edge === 'object' &&
+      typeof edge.id === 'string' &&
+      typeof edge.source === 'string' &&
+      typeof edge.target === 'string'
+    )
+  }
+
+  // For other keys, just ensure it's valid JSON
+  return true
 }
 
 // Save to localStorage helper
@@ -316,8 +362,17 @@ export const useStore = create((set, get) => ({
       clearInterval(playbackInterval)
     }
 
+    // Ensure only one interval can exist
+    get().cleanupPlayback()
+
     const interval = setInterval(() => {
-      const { currentTime, maxTime } = get()
+      const { currentTime, maxTime, playbackInterval: currentInterval } = get()
+
+      // Double-check interval is still valid
+      if (currentInterval !== interval) {
+        clearInterval(interval)
+        return
+      }
 
       if (currentTime >= maxTime) {
         clearInterval(interval)

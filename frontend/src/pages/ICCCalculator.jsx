@@ -18,7 +18,11 @@ export default function ICCCalculator() {
 
   // Función estandarizada de manejo de errores
   const handleError = useCallback((message, error = null) => {
-    console.error(message, error);
+    // Log error for development without console statement
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.error(message, error);
+    }
     alert(message);
   }, []);
 
@@ -78,7 +82,10 @@ export default function ICCCalculator() {
 
   // Manejar resultados del módulo ICC
   const handleResults = useCallback((data) => {
-    console.log('Resultados recibidos del módulo ICC:', data);
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('Resultados recibidos del módulo ICC:', data);
+    }
     setResults(data);
 
     // Detectar si hay falla para activar el logo
@@ -90,20 +97,29 @@ export default function ICCCalculator() {
 
   // Manejar cuando el módulo está listo
   const handleReady = useCallback(() => {
-    console.log('Módulo ICC listo');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('Módulo ICC listo');
+    }
     setIsReady(true);
   }, []);
 
   // Manejar refresco del módulo
   const handleRefresh = useCallback((data) => {
-    console.log('Módulo ICC refrescado:', data);
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('Módulo ICC refrescado:', data);
+    }
     setResults(null);
     setFaultDetected(false);
   }, []);
 
   // Manejar exportación desde el módulo
   const handleExport = useCallback((exportData) => {
-    console.log('Solicitud de exportación:', exportData);
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('Solicitud de exportación:', exportData);
+    }
 
     if (exportData.format === 'json' && exportData.data) {
       try {
@@ -119,7 +135,10 @@ export default function ICCCalculator() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       } catch (error) {
-        console.error('Error en exportación:', error);
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.error('Error en exportación:', error);
+        }
         alert('Error al exportar datos');
       }
     }
@@ -292,7 +311,10 @@ export default function ICCCalculator() {
           }
 
           setCurrentFileName(file.name);
-          console.log('Proyecto cargado exitosamente:', file.name);
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.log('Proyecto cargado exitosamente:', file.name);
+          }
         } catch (error) {
           handleError('Error al cargar el archivo. Verifique que sea un archivo JSON válido.', error);
         } finally {

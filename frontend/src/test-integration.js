@@ -24,22 +24,34 @@ const testSystem = {
 
 // Función para probar la comunicación
 export function testICCIntegration() {
-  console.log('=== Test de Integración ICC Module ===');
-  
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('=== Test de Integración ICC Module ===');
+  }
+
   // Verificar que el componente ICCModule esté disponible
   if (typeof window.ICCModule === 'undefined') {
-    console.error('ICCModule no encontrado');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.error('ICCModule no encontrado');
+    }
     return false;
   }
-  
+
   // Verificar que el logo esté disponible
   if (typeof window.IcoreLogo === 'undefined') {
-    console.error('IcoreLogo no encontrado');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.error('IcoreLogo no encontrado');
+    }
     return false;
   }
-  
+
   // Simular carga del módulo
-  console.log('1. Enviando modelo de prueba...');
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('⏱️ Enviando datos al motor de flujo de potencia...');
+  }
   const iframe = document.querySelector('iframe');
   if (iframe && iframe.contentWindow) {
     iframe.contentWindow.postMessage({
@@ -47,87 +59,134 @@ export function testICCIntegration() {
       data: testSystem
     }, '*');
   }
-  
+
   // Simular cálculo
   setTimeout(() => {
-    console.log('2. Enviando comando de cálculo...');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('⏱️ Enviando datos al módulo ICC...');
+    }
     if (iframe && iframe.contentWindow) {
       iframe.contentWindow.postMessage({
         type: 'CALCULATE'
       }, '*');
     }
   }, 1000);
-  
+
   // Escuchar respuestas
   const messageHandler = (event) => {
     const { type, data } = event.data;
-    
+
     switch (type) {
       case 'ICC_READY':
-        console.log('3. Módulo ICC listo:', data);
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log('✅ ICC Response:', data);
+        }
         break;
-        
+
       case 'MODEL_LOADED':
-        console.log('4. Modelo cargado:', data);
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log('✅ Power Flow Response:', data);
+        }
         break;
-        
+
       case 'RESULTS':
-        console.log('5. Resultados recibidos:', data);
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log('5. Resultados recibidos:', data);
+        }
         // Verificar que el logo reaccione a los resultados
         if (data && data.length > 0) {
-          console.log('6. Activando logo en modo falla...');
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.log('6. Activando logo en modo falla...');
+          }
           // El logo debería reaccionar automáticamente
         }
         break;
-        
+
       case 'ERROR':
-        console.error('Error del módulo:', data);
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.error('Error del módulo:', data);
+        }
         break;
     }
   };
-  
+
   window.addEventListener('message', messageHandler);
-  
+
   // Cleanup después de 10 segundos
   setTimeout(() => {
     window.removeEventListener('message', messageHandler);
-    console.log('=== Test completado ===');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('=== Test Integration ===');
+      }
+    }
   }, 10000);
-  
+
   return true;
 }
 
 // Función para probar el motor compartido
 export function testSharedEngine() {
-  console.log('=== Test Motor Compartido ===');
-  
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('=== Test Motor Compartido ===');
+    }
+  }
+
   // Importar funciones del motor compartido
   import('../shared/engine/index.js').then(engine => {
-    console.log('1. Motor compartido cargado:', Object.keys(engine));
-    
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('1. Motor compartido cargado:', Object.keys(engine));
+      }
+    }
+
     // Probar cálculo básico
     const result = engine.calcICC({
       V: 220,
       Z: 0.05,
       factorC: 1.25
     });
-    
-    console.log('2. Cálculo ICC básico:', result);
-    
+
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('2. Cálculo ICC básico:', result);
+    }
+
     // Probar ampacidad
     const ampacity = engine.calcAmpacity({
       material: 'Cu',
       size: '4/0',
       ambientC: 30
     });
-    
-    console.log('3. Cálculo ampacidad:', ampacity);
-    
+
+    if (import.meta.env.DEV) {
+      console.log('2. Cálculo ampacidad:', ampacity);
+    }
+
     // Probar motor completo
     return import('../shared/engine/icc.js');
   }).then(iccEngine => {
-    console.log('4. Motor ICC completo cargado:', Object.keys(iccEngine));
-    
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('4. Motor ICC completo cargado:', Object.keys(iccEngine));
+      }
+    }
+
     // Probar cálculo completo
     const sistema = iccEngine.calcularSistemaCompleto({
       tension: 220,
@@ -143,42 +202,75 @@ export function testSharedEngine() {
         }
       }]
     });
-    
-    console.log('5. Cálculo sistema completo:', sistema);
-    console.log('=== Test motor completado ===');
+
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('5. Cálculo sistema completo:', sistema);
+      }
+    }
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('=== Test motor completado ===');
+      }
+    }
   }).catch(error => {
-    console.error('Error en test motor:', error);
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.error('Error en test motor:', error.message);
+    }
   });
 }
 
 // Función para probar el logo animado
 export function testLogoAnimation() {
-  console.log('=== Test Logo Animado ===');
-  
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('=== Test Logo Animado ===');
+  }
+
   // Verificar que el logo esté en el DOM
   const logoContainer = document.querySelector('.logo-container');
   if (!logoContainer) {
-    console.error('Logo container no encontrado');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.error('Logo container no encontrado');
+    }
     return false;
   }
-  
+
   // Activar logo
-  console.log('1. Activando logo...');
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('1. Activando logo...');
+  }
   logoContainer.classList.add('active');
-  
+
   // Simular falla
   setTimeout(() => {
-    console.log('2. Activando modo falla...');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log('2. Activando modo falla...');
+    }
     logoContainer.classList.add('fault');
-    
+
     // Quitar modo falla después de 3 segundos
     setTimeout(() => {
-      console.log('3. Quitando modo falla...');
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.log('3. Quitando modo falla...');
+      }
       logoContainer.classList.remove('fault');
     }, 3000);
   }, 1000);
-  
-  console.log('=== Test logo completado ===');
+
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('=== Test logo completado ===');
+  }
   return true;
 }
 
@@ -191,8 +283,11 @@ export const tests = {
 
 // Auto-ejecutar si estamos en modo desarrollo
 if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-  console.log('Modo desarrollo detectado, ejecutando tests...');
-  
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('Modo desarrollo detectado, ejecutando tests...');
+  }
+
   // Esperar a que el DOM esté listo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

@@ -16,7 +16,7 @@ export const ProfessionalBreakerLibrary = {
     type: "Thermal-Magnetic",
     manufacturer: "Square D",
     description: "Miniature Circuit Breaker - Residential",
-    
+
     // Ratings estándar
     getRatings: (In) => ({
       In,                    // Corriente nominal
@@ -26,7 +26,7 @@ export const ProfessionalBreakerLibrary = {
       tsd: 0.2,              // Short-time delay (200ms)
       Ii: 10                 // Instantaneous pickup (10x In)
     }),
-    
+
     // Características técnicas
     characteristics: {
       breakingCapacity: "10kA RMS",
@@ -35,7 +35,7 @@ export const ProfessionalBreakerLibrary = {
       tripUnit: "Thermal-Magnetic Fixed",
       standards: ["UL 489", "CSA C22.2"]
     },
-    
+
     // Modelos disponibles
     models: [15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 110, 125, 150, 200, 225]
   },
@@ -48,7 +48,7 @@ export const ProfessionalBreakerLibrary = {
     type: "Thermal-Magnetic",
     manufacturer: "Square D",
     description: "QO Industrial - Heavy Duty",
-    
+
     getRatings: (In) => ({
       In,
       Ir: 1.0,
@@ -57,7 +57,7 @@ export const ProfessionalBreakerLibrary = {
       tsd: 0.25,             // 250ms para mayor robustez
       Ii: 10
     }),
-    
+
     characteristics: {
       breakingCapacity: "10kA RMS",
       voltage: "240V AC",
@@ -65,7 +65,7 @@ export const ProfessionalBreakerLibrary = {
       tripUnit: "Thermal-Magnetic Fixed",
       standards: ["UL 489", "NEMA AB1"]
     },
-    
+
     models: [70, 100, 125, 150, 200, 225]
   },
 
@@ -77,7 +77,7 @@ export const ProfessionalBreakerLibrary = {
     type: "MCCB",
     manufacturer: "Square D",
     description: "Energy Breaker - Commercial",
-    
+
     getRatings: (In) => ({
       In,
       Ir: 1.0,              // Adjustable 0.7-1.0x In
@@ -86,7 +86,7 @@ export const ProfessionalBreakerLibrary = {
       tsd: 0.3,              // 300ms
       Ii: 10                 // Adjustable 8-12x In
     }),
-    
+
     characteristics: {
       breakingCapacity: "25kA RMS",
       voltage: "480V AC",
@@ -94,7 +94,7 @@ export const ProfessionalBreakerLibrary = {
       tripUnit: "Thermal-Magnetic Adjustable",
       standards: ["UL 489", "IEC 60947-2"]
     },
-    
+
     models: [100, 125, 150, 200, 250, 300, 400, 500, 600, 800]
   },
 
@@ -106,7 +106,7 @@ export const ProfessionalBreakerLibrary = {
     type: "Electronic",
     manufacturer: "Schneider Electric",
     description: "I-Line MGL - Electronic Trip Unit (LSIG)",
-    
+
     getRatings: (In) => ({
       In,
       Ir: 1.0,              // Long-time adjustable 0.4-1.0x In
@@ -117,7 +117,7 @@ export const ProfessionalBreakerLibrary = {
       Igr: 0.2,             // Ground pickup 0.2x In
       tgr: 0.5              // Ground delay 500ms
     }),
-    
+
     characteristics: {
       breakingCapacity: "42kA RMS",
       voltage: "600V AC",
@@ -126,7 +126,7 @@ export const ProfessionalBreakerLibrary = {
       communication: "Modbus",
       standards: ["UL 489", "IEC 60947-2", "ANSI/IEEE C37.13"]
     },
-    
+
     models: [800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000]
   },
 
@@ -138,7 +138,7 @@ export const ProfessionalBreakerLibrary = {
     type: "Electronic",
     manufacturer: "Schneider Electric",
     description: "PowerPact H/J Frame - Industrial",
-    
+
     getRatings: (In) => ({
       In,
       Ir: 1.0,              // Adjustable 0.5-1.0x In
@@ -147,7 +147,7 @@ export const ProfessionalBreakerLibrary = {
       tsd: 0.25,             // 250ms adjustable 0.1-0.5s
       Ii: 8                  // Adjustable 4-10x In
     }),
-    
+
     characteristics: {
       breakingCapacity: "35kA RMS",
       voltage: "600V AC",
@@ -156,7 +156,7 @@ export const ProfessionalBreakerLibrary = {
       communication: "Modbus",
       standards: ["UL 489", "IEC 60947-2"]
     },
-    
+
     models: [400, 600, 800, 1000, 1200, 1600, 2000, 2500]
   },
 
@@ -168,7 +168,7 @@ export const ProfessionalBreakerLibrary = {
     type: "ACB",
     manufacturer: "Schneider Electric",
     description: "MasterPact NW/HW - Low Voltage Air Circuit Breaker",
-    
+
     getRatings: (In) => ({
       In,
       Ir: 1.0,              // Adjustable 0.4-1.0x In
@@ -179,7 +179,7 @@ export const ProfessionalBreakerLibrary = {
       Igr: 0.3,             // Ground pickup 0.3x In
       tgr: 0.6              // Ground delay 600ms
     }),
-    
+
     characteristics: {
       breakingCapacity: "65kA RMS",
       voltage: "690V AC",
@@ -188,7 +188,7 @@ export const ProfessionalBreakerLibrary = {
       communication: "Modbus TCP",
       standards: ["IEC 60947-2", "ANSI/IEEE C37.13"]
     },
-    
+
     models: [800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6300]
   },
 
@@ -200,7 +200,7 @@ export const ProfessionalBreakerLibrary = {
     type: "MCCB",
     manufacturer: "Schneider Electric",
     description: "Compact NS - European Style MCCB",
-    
+
     getRatings: (In) => ({
       In,
       Ir: 1.0,              // Adjustable 0.8-1.0x In
@@ -209,7 +209,7 @@ export const ProfessionalBreakerLibrary = {
       tsd: 0.2,              // 200ms
       Ii: 10                 // Adjustable 8-12x In
     }),
-    
+
     characteristics: {
       breakingCapacity: "36kA RMS",
       voltage: "415V AC",
@@ -217,7 +217,7 @@ export const ProfessionalBreakerLibrary = {
       tripUnit: "MicroLogic Trip Unit",
       standards: ["IEC 60947-2"]
     },
-    
+
     models: [100, 125, 160, 200, 250, 400, 630]
   }
 };
@@ -296,12 +296,15 @@ export function createBreaker(family, In, id = null) {
   if (!breakerDef) {
     throw new Error(`Familia de breaker no encontrada: ${family}`);
   }
-  
+
   // Validar que el In esté disponible para esta familia
   if (breakerDef.models && !breakerDef.models.includes(In)) {
-    console.warn(`In=${In}A no está disponible para ${family}, modelos disponibles: ${breakerDef.models.join(', ')}`);
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn(`In=${In}A no está disponible para ${family}, modelos disponibles: ${breakerDef.models.join(', ')}`);
+    }
   }
-  
+
   return {
     id: id || `${family}_${In}`,
     family,
@@ -319,7 +322,7 @@ export function getSystemConfiguration(configName) {
   if (!config) {
     throw new Error(`Configuración no encontrada: ${configName}`);
   }
-  
+
   return {
     ...config,
     breakers: config.breakers.map(b => createBreaker(b.family, b.In, b.id))
@@ -333,7 +336,7 @@ export function getAvailableFamilies() {
 export function getBreakerInfo(family) {
   const breakerDef = ProfessionalBreakerLibrary[family];
   if (!breakerDef) return null;
-  
+
   return {
     family: breakerDef.family,
     type: breakerDef.type,
@@ -346,11 +349,11 @@ export function getBreakerInfo(family) {
 
 export function validateSystemCompatibility(breakers) {
   const issues = [];
-  
+
   for (let i = 0; i < breakers.length - 1; i++) {
     const upstream = breakers[i];
     const downstream = breakers[i + 1];
-    
+
     // Verificar ratings decrecientes
     if (downstream.In > upstream.In) {
       issues.push({
@@ -360,11 +363,11 @@ export function validateSystemCompatibility(breakers) {
         message: `Downstream breaker (${downstream.In}A) no debe ser mayor que upstream (${upstream.In}A)`
       });
     }
-    
+
     // Verificar capacidad de interrupción
     const upCapacity = parseInt(upstream.characteristics.breakingCapacity);
     const downCapacity = parseInt(downstream.characteristics.breakingCapacity);
-    
+
     if (downCapacity > upCapacity) {
       issues.push({
         type: "breaking_capacity_violation",
@@ -373,11 +376,11 @@ export function validateSystemCompatibility(breakers) {
         message: `Downstream tiene mayor capacidad de interrupción (${downCapacity}kA) que upstream (${upCapacity}kA)`
       });
     }
-    
+
     // Verificar compatibilidad de voltaje
     const upVoltage = parseInt(upstream.characteristics.voltage);
     const downVoltage = parseInt(downstream.characteristics.voltage);
-    
+
     if (downVoltage > upVoltage) {
       issues.push({
         type: "voltage_mismatch",
@@ -387,7 +390,7 @@ export function validateSystemCompatibility(breakers) {
       });
     }
   }
-  
+
   return {
     compatible: issues.length === 0,
     issues,
@@ -397,19 +400,19 @@ export function validateSystemCompatibility(breakers) {
 
 export function generateSystemReport(breakers) {
   const validation = validateSystemCompatibility(breakers);
-  
+
   // Análisis de tipos
   const typeAnalysis = breakers.reduce((acc, b) => {
     acc[b.type] = (acc[b.type] || 0) + 1;
     return acc;
   }, {});
-  
+
   // Análisis de familias
   const familyAnalysis = breakers.reduce((acc, b) => {
     acc[b.family] = (acc[b.family] || 0) + 1;
     return acc;
   }, {});
-  
+
   // Análisis de capacidades
   const capacityAnalysis = breakers.map(b => ({
     id: b.id,
@@ -419,7 +422,7 @@ export function generateSystemReport(breakers) {
     breakingCapacity: b.characteristics.breakingCapacity,
     voltage: b.characteristics.voltage
   }));
-  
+
   return {
     summary: {
       totalBreakers: breakers.length,
@@ -434,7 +437,7 @@ export function generateSystemReport(breakers) {
 
 function generateRecommendations(breakers, validation) {
   const recommendations = [];
-  
+
   if (!validation.compatible) {
     recommendations.push({
       type: "compatibility",
@@ -442,11 +445,11 @@ function generateRecommendations(breakers, validation) {
       message: "El sistema tiene violaciones de compatibilidad que deben corregirse"
     });
   }
-  
+
   // Verificar si hay mezcla de tipos incompatibles
   const hasElectronic = breakers.some(b => b.type === "Electronic");
   const hasThermal = breakers.some(b => b.type === "Thermal-Magnetic");
-  
+
   if (hasElectronic && hasThermal) {
     recommendations.push({
       type: "mixing",
@@ -454,7 +457,7 @@ function generateRecommendations(breakers, validation) {
       message: "Mezcla de breakers térmicos y electrónicos puede afectar coordinación"
     });
   }
-  
+
   // Verificar si hay muchos breakers pequeños
   const smallBreakers = breakers.filter(b => b.In < 100).length;
   if (smallBreakers > breakers.length * 0.7) {
@@ -464,7 +467,7 @@ function generateRecommendations(breakers, validation) {
       message: "Considerar consolidar breakers pequeños para mejorar selectividad"
     });
   }
-  
+
   return recommendations;
 }
 

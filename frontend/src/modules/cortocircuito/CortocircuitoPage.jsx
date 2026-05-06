@@ -1,11 +1,10 @@
 import FormICC from './components/FormICC';
 import ResultsICC from './components/ResultsICC';
 import { useICC } from './hooks/useICC';
-import { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useStore } from '../../store/useStore';
 
 export default function CortocircuitoPage() {
-  console.log('SYNC DEBUG: CortocircuitoPage se está montando!')
 
   const { runICC, runOptimization, loading, result, error, optimization } = useICC();
 
@@ -15,64 +14,66 @@ export default function CortocircuitoPage() {
   const setNodes = useStore(state => state.setNodes);
   const setEdges = useStore(state => state.setEdges);
 
-  console.log('SYNC DEBUG: Store conectado - Nodes:', nodes.length, 'Edges:', edges.length)
 
   // Sincronización bidireccional
   useEffect(() => {
-    console.log('SYNC DEBUG: Iniciando sincronización en CortocircuitoPage')
-    console.log('SYNC DEBUG: Nodes actuales:', nodes.length)
-    console.log('SYNC DEBUG: Edges actuales:', edges.length)
 
     // Escuchar cambios desde la ventana principal
     const handleStorageChange = (e) => {
-      console.log('SYNC DEBUG: Cambio en storage detectado en módulo:', e.key, e.newValue)
       if (e.key === 'icc-sync-nodes' && e.newValue) {
         try {
           const newNodes = JSON.parse(e.newValue);
-          console.log('SYNC DEBUG: Nodes recibidos en módulo:', newNodes.length)
           setNodes(newNodes);
         } catch (error) {
-          console.error('SYNC ERROR: Error parsing nodes en módulo:', error)
+          // console.error('SYNC ERROR: Error parsing nodes en módulo:', error)
         }
       } else if (e.key === 'icc-sync-edges' && e.newValue) {
         try {
           const newEdges = JSON.parse(e.newValue);
-          console.log('SYNC DEBUG: Edges recibidos en módulo:', newEdges.length)
           setEdges(newEdges);
         } catch (error) {
-          console.error('SYNC ERROR: Error parsing edges en módulo:', error)
+          // console.error('SYNC ERROR: Error parsing edges en módulo:', error)
         }
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
 
-    // Sincronizar cambios locales a otras ventanas
-    const syncToOtherWindows = () => {
-      console.log('SYNC DEBUG: Sincronizando desde módulo')
-      try {
-        localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes));
-        localStorage.setItem('icc-sync-edges', JSON.stringify(edges));
-        console.log('SYNC DEBUG: Datos guardados en localStorage desde módulo')
-
-        // Disparar evento personalizado para notificación inmediata
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: 'icc-sync-nodes',
-          newValue: JSON.stringify(nodes)
-        }));
-      } catch (error) {
-        console.error('SYNC ERROR: Error guardando en localStorage desde módulo:', error)
-      }
-    };
-
-    // Sincronizar cuando cambian los nodes/edges
-    const interval = setInterval(syncToOtherWindows, 500);
-
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
     };
   }, [nodes, edges, setNodes, setEdges]);
+
+  // Sincronizar cambios locales a otras ventanas
+  const syncToOtherWindows = useCallback(() => {
+    try {
+      localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes));
+      localStorage.setItem('icc-sync-edges', JSON.stringify(edges));
+
+      // Disparar evento personalizado para notificación inmediata
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'icc-sync-nodes',
+        newValue: JSON.stringify(nodes)
+      }));
+    } catch (error) {
+      // console.error('SYNC ERROR: Error guardando en localStorage desde módulo:', error)
+    }
+  }, [nodes, edges]);
+
+  // Separar el efecto de sincronización para evitar múltiples intervalos
+  useEffect(() => {
+    let interval = null;
+
+    if (nodes.length > 0 || edges.length > 0) {
+      interval = setInterval(syncToOtherWindows, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [nodes.length, edges.length, syncToOtherWindows]);
 
   // Handler para optimización con breakers de ejemplo
   const handleOptimize = () => {

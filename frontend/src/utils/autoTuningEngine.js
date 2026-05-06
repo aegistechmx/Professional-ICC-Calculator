@@ -28,7 +28,7 @@ export function tripTime(I, brk) {
   if (brk.instEnabled && I >= brk.instPickup && !brk.instBlocked) {
     return brk.instDelay ?? 0.02;
   }
-  
+
   // Térmico según curva
   switch (brk.curve) {
     case 'IEC':
@@ -47,15 +47,15 @@ export function tripTime(I, brk) {
 export function buildChains(graph, faultNode) {
   const chains = [];
   const visited = new Set();
-  
+
   // DFS para encontrar todos los caminos desde la falla hacia la fuente
   function dfs(node, path) {
     if (visited.has(node)) return;
     visited.add(node);
-    
+
     // Encontrar edges upstream (hacia la fuente)
     const upstreamEdges = graph.edges.filter(e => e.target === node);
-    
+
     if (!upstreamEdges.length) {
       // Llegamos a la fuente - guardar cadena completa
       if (path.length > 0) {
@@ -63,13 +63,13 @@ export function buildChains(graph, faultNode) {
       }
       return;
     }
-    
+
     upstreamEdges.forEach(edge => {
       const prevNode = edge.source;
       dfs(prevNode, [...path, edge]);
     });
   }
-  
+
   dfs(faultNode, []);
   return chains; // cada chain es lista de edges desde fuente hasta falla
 }
@@ -78,77 +78,79 @@ export function buildChains(graph, faultNode) {
 
 export function adjustPair(down, up, Icc, margin = 0.3, limits = {}) {
   const {
-    TMS_min = 0.05,
     TMS_max = 2.0,
-    pickup_min_factor = 1.05,
     pickup_max_factor = 2.0,
     maxIterations = 50
   } = limits;
-  
+
   // Guardar valores originales
   const originalUp = { ...up };
-  const originalDown = { ...down };
-  
+
   // Tiempos actuales
   let tDown = tripTime(Icc, down);
   let tUp = tripTime(Icc, up);
-  
+
   // 1) Asegurar sensibilidad del downstream
   if (down.pickup >= Icc) {
     // Reducir pickup del downstream para que sea sensible
     down.pickup = Math.max(Icc * 0.6, down.pickup * 0.9);
     tDown = tripTime(Icc, down);
   }
-  
+
   // 2) Si upstream está muy rápido -> retrasarlo
   if (tUp < tDown + margin) {
     let adjusted = false;
-    
+
     // Estrategia: subir TMS primero (mejor que subir pickup)
     for (let i = 0; i < maxIterations; i++) {
       // Subir TMS gradualmente
       let newTMS = up.TMS + 0.05;
       newTMS = Math.min(newTMS, TMS_max);
       up.TMS = newTMS;
-      
+
       tUp = tripTime(Icc, up);
-      
+
       if (tUp >= tDown + margin) {
         adjusted = true;
         break;
       }
-      
+
       // Si TMS llegó al tope, subir pickup un poco
       if (newTMS >= TMS_max) {
         const maxPickup = originalUp.pickup * pickup_max_factor;
         up.pickup = Math.min(up.pickup * 1.05, maxPickup);
         tUp = tripTime(Icc, up);
-        
+
         if (tUp >= tDown + margin) {
           adjusted = true;
           break;
         }
       }
     }
-    
+
     // Si no se pudo ajustar, restaurar valores originales
     if (!adjusted) {
       Object.assign(up, originalUp);
-      console.warn(`No se pudo coordinar ${up.id} con ${down.id} para Icc=${Icc}A`);
+      if (import.meta.env.DEV) {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.log(`No se pudo coordinar ${up.id} con ${down.id} para Icc=${Icc}A`);
+        }
+      }
     }
   }
-  
+
   // 3) Bloqueo de instantáneo aguas arriba si interfiere
   if (up.instEnabled && Icc >= up.instPickup) {
     up.instBlocked = true;
     up.instBlockReason = 'upstream_instantaneous_block';
   }
-  
-  return { 
-    down, 
-    up, 
-    tDown, 
-    tUp, 
+
+  return {
+    down,
+    up,
+    tDown,
+    tUp,
     adjusted: tUp >= tDown + margin,
     margin: (tDown + margin) - tUp
   };
@@ -163,35 +165,43 @@ export function autoTuneProtection(graph, faultNode, IccMap, opts = {}) {
     tolerance = 0.01,
     limits = {}
   } = opts;
-  
+
   const chains = buildChains(graph, faultNode);
   let converged = false;
   let totalError = Infinity;
   const adjustments = [];
-  
-  console.log(`Iniciando auto-tuning para ${chains.length} cadenas...`);
-  
+
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('=== Auto-tuning started ===');
+  }
+
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log(`Iniciando auto-tuning para ${chains.length} cadenas...`);
+  }
+
   for (let iter = 0; iter < maxIterations; iter++) {
     let iterationError = 0;
     const iterationAdjustments = [];
-    
+
     // Procesar cada cadena
     chains.forEach((chain, chainIndex) => {
       // Ordenar: upstream (fuente) -> downstream (falla)
       const edges = [...chain].reverse(); // Reverse para downstream primero
-      
+
       for (let i = 0; i < edges.length - 1; i++) {
         const edgeDown = edges[i];     // Más cercano a falla
         const edgeUp = edges[i + 1];     // Más cercano a fuente
-        
+
         if (!edgeDown.breaker || !edgeUp.breaker) continue;
-        
+
         const Icc = IccMap[edgeDown.id] || edgeDown.current || 1000;
-        
+
         // Guardar estado antes del ajuste
         const beforeUp = { ...edgeUp.breaker };
         const beforeDown = { ...edgeDown.breaker };
-        
+
         // Ajustar par
         const result = adjustPair(
           edgeDown.breaker,
@@ -200,11 +210,11 @@ export function autoTuneProtection(graph, faultNode, IccMap, opts = {}) {
           margin,
           limits
         );
-        
+
         // Calcular error
         const err = Math.max(0, (result.tDown + margin) - result.tUp);
         iterationError += err;
-        
+
         // Guardar ajuste para reporte
         if (result.adjusted) {
           iterationAdjustments.push({
@@ -223,28 +233,31 @@ export function autoTuneProtection(graph, faultNode, IccMap, opts = {}) {
         }
       }
     });
-    
+
     // Verificar convergencia
     if (iterationError < tolerance) {
       converged = true;
       adjustments.push(...iterationAdjustments);
       break;
     }
-    
+
     // Si mejoró significativamente, guardar ajustes
     if (iterationError < totalError * 0.9) {
       adjustments.push(...iterationAdjustments);
     }
-    
+
     totalError = iterationError;
-    
-    console.log(`Iteración ${iter + 1}: Error = ${iterationError.toFixed(4)}, Ajustes = ${iterationAdjustments.length}`);
+
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.log(`Iteración ${iter + 1}: Error = ${iterationError.toFixed(4)}, Ajustes = ${iterationAdjustments.length}`);
+    }
   }
-  
-  return { 
-    converged, 
-    graph, 
-    totalError, 
+
+  return {
+    converged,
+    graph,
+    totalError,
     iterations: converged ? chains.findIndex(() => true) + 1 : maxIterations,
     adjustments,
     chainsProcessed: chains.length
@@ -255,19 +268,19 @@ export function autoTuneProtection(graph, faultNode, IccMap, opts = {}) {
 
 export function validateCoordination(chain, currents, margin = 0.3) {
   const violations = [];
-  
+
   for (let k = 0; k < currents.length; k++) {
     const I = currents[k];
-    
+
     for (let i = chain.length - 1; i > 0; i--) {
       const downstream = chain[i].breaker;
       const upstream = chain[i - 1].breaker;
-      
+
       if (!downstream || !upstream) continue;
-      
+
       const tDown = tripTime(I, downstream);
       const tUp = tripTime(I, upstream);
-      
+
       if (!(tUp >= tDown + margin)) {
         violations.push({
           current: I,
@@ -281,7 +294,7 @@ export function validateCoordination(chain, currents, margin = 0.3) {
       }
     }
   }
-  
+
   return {
     valid: violations.length === 0,
     violations,
@@ -293,7 +306,7 @@ export function validateCoordination(chain, currents, margin = 0.3) {
 
 export function analyzeSensitivity(breakers, faultCurrents) {
   const analysis = [];
-  
+
   breakers.forEach(breaker => {
     const sensitivities = faultCurrents.map(Icc => {
       const ratio = Icc / breaker.pickup;
@@ -304,10 +317,10 @@ export function analyzeSensitivity(breakers, faultCurrents) {
         tripTime: tripTime(Icc, breaker)
       };
     });
-    
+
     const sensitiveCount = sensitivities.filter(s => s.sensitive).length;
     const sensitivityScore = (sensitiveCount / faultCurrents.length) * 100;
-    
+
     analysis.push({
       breakerId: breaker.id,
       pickup: breaker.pickup,
@@ -317,7 +330,7 @@ export function analyzeSensitivity(breakers, faultCurrents) {
       isAdequate: sensitivityScore > 80
     });
   });
-  
+
   return analysis;
 }
 
@@ -336,7 +349,7 @@ export function generateTuningReport(result, validationResults) {
     validation: validationResults,
     recommendations: []
   };
-  
+
   // Generar recomendaciones
   if (!result.converged) {
     report.recommendations.push({
@@ -345,13 +358,13 @@ export function generateTuningReport(result, validationResults) {
       message: 'El auto-tuning no convergió. Considerar aumentar márgenes o revisar topología.'
     });
   }
-  
+
   // Analizar ajustes de pickup
-  const pickupAdjustments = result.adjustments.filter(adj => 
+  const pickupAdjustments = result.adjustments.filter(adj =>
     adj.afterDown.pickup !== adj.beforeDown.pickup ||
     adj.afterUp.pickup !== adj.beforeUp.pickup
   );
-  
+
   if (pickupAdjustments.length > result.adjustments.length * 0.3) {
     report.recommendations.push({
       type: 'pickup',
@@ -359,12 +372,12 @@ export function generateTuningReport(result, validationResults) {
       message: `${pickupAdjustments.length} breakers requirieron ajuste de pickup. Considerar revisar capacidades del sistema.`
     });
   }
-  
+
   // Analizar TMS adjustments
-  const tmsAdjustments = result.adjustments.filter(adj => 
+  const tmsAdjustments = result.adjustments.filter(adj =>
     adj.afterUp.TMS !== adj.beforeUp.TMS
   );
-  
+
   if (tmsAdjustments.length > 0) {
     report.recommendations.push({
       type: 'tms',
@@ -372,7 +385,7 @@ export function generateTuningReport(result, validationResults) {
       message: `${tmsAdjustments.length} breakers ajustaron TMS para mejorar coordinación.`
     });
   }
-  
+
   return report;
 }
 
@@ -383,19 +396,19 @@ export function integrateWithCoordinationEngine(coordinationEngine, autoTuningRe
   autoTuningResult.adjustments.forEach(adj => {
     const upstreamBreaker = coordinationEngine.getBreakerState(adj.upstream);
     const downstreamBreaker = coordinationEngine.getBreakerState(adj.downstream);
-    
+
     if (upstreamBreaker) {
       upstreamBreaker.TMS = adj.afterUp.TMS;
       upstreamBreaker.pickup = adj.afterUp.pickup;
       upstreamBreaker.instBlocked = upstreamBreaker.instBlocked || false;
     }
-    
+
     if (downstreamBreaker) {
       downstreamBreaker.TMS = adj.afterDown.TMS;
       downstreamBreaker.pickup = adj.afterDown.pickup;
     }
   });
-  
+
   return coordinationEngine;
 }
 

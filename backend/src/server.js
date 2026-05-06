@@ -11,14 +11,30 @@ const { optimizeBreakers } = require('./engine/optimizer')
 // Import cache and full analysis
 const { getCached, setCached } = require('./cache')
 const { runFullAnalysis } = require('./engine/fullAnalysis')
+const {
+  validateICCInput,
+  _validateFeederInput,
+  validateGraphInput,
+  validateOptimizerInput,
+  validateJSONBody
+} = require('./middleware/validation')
 const crypto = require('crypto')
+
+// Allowed origins from environment or defaults
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174']
 
 // Standardized ICC API Server
 const server = http.createServer((req, res) => {
-  // Enable CORS for all requests
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  // Enable CORS for specific origins only
+  const origin = req.headers.origin
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -111,7 +127,30 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
       try {
-        const data = JSON.parse(body)
+        // Basic sanitization - limit body size and remove dangerous patterns
+        if (body.length > 1000000) { // 1MB limit
+          return sendResponse(false, null, 'Request body too large')
+        }
+
+        // Remove potential prototype pollution patterns
+        const sanitizedBody = body.replace(/\b__proto__\b/g, '')
+          .replace(/\bconstructor\b/g, '')
+          .replace(/\bprototype\b/g, '')
+
+        const data = JSON.parse(sanitizedBody)
+
+        // Apply input validation
+        const mockReq = { body: data }
+        const mockRes = {
+          status: () => ({ json: (response) => response })
+        }
+        let validationResult = { error: null }
+        const next = (error) => { validationResult = error || { error: null } }
+
+        validateGraphInput(mockReq, mockRes, next)
+        if (validationResult.error) {
+          return sendResponse(false, null, validationResult.error)
+        }
         const nodes = data.nodes || []
         const edges = data.edges || []
         const systemMode = data.systemMode || 'normal'
@@ -226,6 +265,19 @@ const server = http.createServer((req, res) => {
       try {
         const params = JSON.parse(body)
 
+        // Apply input validation
+        const mockReq = { body: params }
+        const mockRes = {
+          status: () => ({ json: (response) => response })
+        }
+        let validationResult = { error: null }
+        const next = (error) => { validationResult = error || { error: null } }
+
+        validateICCInput(mockReq, mockRes, next)
+        if (validationResult.error) {
+          return sendResponse(false, null, validationResult.error)
+        }
+
         // Check if it's a feeder validation request (new engine)
         if (params.material && params.size && params.I_base) {
           try {
@@ -263,6 +315,19 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const params = JSON.parse(body)
+
+        // Apply input validation
+        const mockReq = { body: params }
+        const mockRes = {
+          status: () => ({ json: (response) => response })
+        }
+        let validationResult = { error: null }
+        const next = (error) => { validationResult = error || { error: null } }
+
+        validateOptimizerInput(mockReq, mockRes, next)
+        if (validationResult.error) {
+          return sendResponse(false, null, validationResult.error)
+        }
         const { breakers, faults, iterations = 100 } = params
 
         if (!breakers || !faults) {
@@ -293,7 +358,30 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
       try {
-        const systemModel = JSON.parse(body)
+        // Basic sanitization - limit body size and remove dangerous patterns
+        if (body.length > 1000000) { // 1MB limit
+          return sendResponse(false, null, 'Request body too large')
+        }
+
+        // Remove potential prototype pollution patterns
+        const sanitizedBody = body.replace(/\b__proto__\b/g, '')
+          .replace(/\bconstructor\b/g, '')
+          .replace(/\bprototype\b/g, '')
+
+        const systemModel = JSON.parse(sanitizedBody)
+
+        // Apply input validation
+        const mockReq = { body: systemModel, method: 'POST' }
+        const mockRes = {
+          status: () => ({ json: (response) => response })
+        }
+        let validationResult = { error: null }
+        const next = (error) => { validationResult = error || { error: null } }
+
+        validateJSONBody(mockReq, mockRes, next)
+        if (validationResult.error) {
+          return sendResponse(false, null, validationResult.error)
+        }
 
         // Generate cache key from system model hash (normalized for stable key)
         const normalized = JSON.stringify(systemModel, Object.keys(systemModel).sort())
@@ -340,7 +428,6 @@ const server = http.createServer((req, res) => {
       try {
         const _jsonString = JSON.stringify(result)
       } catch (serializeError) {
-        console.error('JSON serialization error:', serializeError)
         // Send fallback result
         const fallbackResult = {
           method: 'legacy_fallback',
@@ -359,7 +446,6 @@ const server = http.createServer((req, res) => {
       sendResponse(true, result)
 
     } catch (error) {
-      console.error('Error in /icc endpoint:', error)
       sendResponse(false, null, `ICC calculation error: ${error.message}`)
     }
 

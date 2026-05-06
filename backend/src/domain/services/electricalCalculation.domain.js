@@ -140,7 +140,7 @@ class ElectricalCalculationDomain {
       // Cálculo ICC básico
       const voltage = baseCalculation.sistema?.voltaje || 480; // voltage (V)
       const impedance = 0.1; // Impedancia típica // Unit: Ω (Ohms)
-      const Icc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3)) * impedance);).toFixed(6)); // voltage (V)
+      const Icc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3) * impedance)).toFixed(6))); // voltage (V)
 
       // eslint-disable-next-line no-console
       console.timeEnd('corto-circuito');

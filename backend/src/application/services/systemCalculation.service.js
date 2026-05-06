@@ -86,7 +86,7 @@ class SystemCalculationService {
         // Cálculo ICC básico sin worker
         const voltage = data.voltage || 480; // voltage (V)
         const impedance = data.impedance || 0.1; // impedance (Ω)
-        const Icc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3)) * impedance);).toFixed(6)); // voltage (V)
+        const Icc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3) * impedance)).toFixed(6))); // voltage (V)
 
         return {
           Icc: Math.round(Icc * 100) / 100,
