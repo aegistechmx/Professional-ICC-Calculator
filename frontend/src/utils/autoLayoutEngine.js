@@ -106,7 +106,7 @@ export class AutoLayoutEngine {
    * Layout por Tipo Eléctrico
    * Organiza según flujo eléctrico típico
    */
-  electricalTypeLayout(nodes, edges) {
+  electricalTypeLayout(nodes) {
     const { spacingX, spacingY, startX, startY } = this.config;
 
     // Definir niveles por tipo
@@ -139,7 +139,7 @@ export class AutoLayoutEngine {
       const y = startY + levelIndex * spacingY;
 
       // Distribuir horizontalmente
-      const totalWidth = (levelNodes.length - 1) * spacingX;
+      // const totalWidth = (levelNodes.length - 1) * spacingX; // Unused variable removed
       const centerX = startX + 400; // Centro aproximado
 
       levelNodes.forEach((node, index) => {
@@ -163,7 +163,7 @@ export class AutoLayoutEngine {
    * Layout Radial (subestación tipo)
    * Fuente en centro, cargas distribuidas en círculo
    */
-  radialLayout(nodes, edges) {
+  radialLayout(nodes) {
     const { startX, startY, spacingX } = this.config;
     const centerX = startX + 400;
     const centerY = startY + 300;
@@ -247,7 +247,7 @@ export class AutoLayoutEngine {
     }
 
     const positions = {};
-    let currentY = startY;
+    // let currentY = startY; // Unused variable removed
 
     // DFS para layout en árbol
     const layoutNode = (nodeId, depth, x) => {

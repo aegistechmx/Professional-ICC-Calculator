@@ -5,27 +5,27 @@
 
 // === CÁLCULO TÉRMICO DE CONDUCTOR ===
 
-export function calcularTemperaturaConductor(edge, results) {
+export function calcularTemperaturaConductor(edge, _results) {
   const I = edge.current || 0;
-  
+
   // Capacidad del conductor (ampacidad) - desde backend o configuración
   const Imax = edge.Imax || edge.data?.ampacity || 200;
-  
+
   // Parámetros térmicos típicos para conductores de cobre
   const Tamb = 30;     // Temperatura ambiente (°C)
   const Tmax = 90;     // Temperatura máxima del aislamiento (°C) - XLPE típico
-  
+
   // Factor de carga (loading)
   const loading = I / Imax;
-  
+
   // Temperatura estimada usando modelo simplificado
   // T = Tamb + (Tmax - Tamb) * (loading^2)
   // El cuadrado representa el calentamiento por I²R
   const T = Tamb + (Tmax - Tamb) * Math.pow(loading, 2);
-  
+
   // Clamp loading para visualización (máximo 2x = 200% de carga)
   const clampedLoading = Math.min(loading, 2);
-  
+
   return {
     T,                           // Temperatura estimada (°C)
     loading: clampedLoading,      // Factor de carga (0-2)
@@ -44,7 +44,7 @@ export function calcularTemperaturaConductor(edge, results) {
 
 // === ESTADO TÉRMICO ===
 
-function getThermalStatus(loading, temperature) {
+function getThermalStatus(loading, _temperature) {
   if (loading < 0.5) return 'safe';
   if (loading < 0.8) return 'normal';
   if (loading < 1.0) return 'caution';
@@ -55,7 +55,7 @@ function getThermalStatus(loading, temperature) {
 
 // === MAPEO DE COLOR HEATMAP (REAL) ===
 
-export function getThermalColor(loading, temperature = null) {
+export function getThermalColor(loading, _temperature = null) {
   // Basado en estándares de color térmico industrial
   if (loading < 0.5) return '#00c853';      // Verde - circuito sano
   if (loading < 0.8) return '#ffd600';      // Amarillo - carga media
@@ -75,17 +75,17 @@ export function getThermalGradient(loading) {
     { stop: 1.0, color: '#ff3d00' },   // Rojo
     { stop: 1.2, color: '#d50000' }    // Rojo oscuro
   ];
-  
+
   for (let i = 0; i < colors.length - 1; i++) {
     const current = colors[i];
     const next = colors[i + 1];
-    
+
     if (loading >= current.stop && loading <= next.stop) {
       const progress = (loading - current.stop) / (next.stop - current.stop);
       return interpolateColor(current.color, next.color, progress);
     }
   }
-  
+
   return colors[colors.length - 1].color;
 }
 
@@ -95,12 +95,12 @@ function interpolateColor(color1, color2, progress) {
   // Convertir hex a RGB
   const c1 = hexToRgb(color1);
   const c2 = hexToRgb(color2);
-  
+
   // Interpolar
   const r = Math.round(c1.r + (c2.r - c1.r) * progress);
   const g = Math.round(c1.g + (c2.g - c1.g) * progress);
   const b = Math.round(c1.b + (c2.b - c1.b) * progress);
-  
+
   return rgbToHex(r, g, b);
 }
 
@@ -123,7 +123,7 @@ export function thermalPulse(time, loading, frequency = 0.005) {
   // Pulso más rápido con mayor carga
   const adjustedFrequency = frequency * (1 + loading);
   const amplitude = Math.min(2, loading * 1.5); // Amplitud proporcional a carga
-  
+
   return Math.sin(time * adjustedFrequency + loading * 3) * amplitude;
 }
 
@@ -133,35 +133,35 @@ export function drawThermalEdge(ctx, edge, thermal, time = 0) {
   const { x1, y1, x2, y2 } = edge;
   const color = getThermalColor(thermal.loading, thermal.T);
   const pulse = thermalPulse(time, thermal.loading);
-  
+
   ctx.save();
-  
+
   // Glow proporcional a la carga térmica
   ctx.shadowColor = color;
   ctx.shadowBlur = 10 + thermal.loading * 25;
-  
+
   // Línea principal con grosor variable
   ctx.strokeStyle = color;
   ctx.lineWidth = 3 + thermal.loading * 4 + pulse;
   ctx.lineCap = 'round';
-  
+
   ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
   ctx.stroke();
-  
+
   // Efecto de "respiración" para cargas altas
   if (thermal.loading > 0.8) {
     ctx.globalAlpha = 0.3 + Math.sin(time * 0.003) * 0.2;
     ctx.lineWidth = (3 + thermal.loading * 4) * 1.5;
     ctx.strokeStyle = getThermalGradient(thermal.loading);
-    
+
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
   }
-  
+
   ctx.restore();
 }
 
@@ -169,43 +169,43 @@ export function drawThermalEdge(ctx, edge, thermal, time = 0) {
 
 export function drawTemperatureIndicator(ctx, x, y, thermal, size = 20) {
   const color = getThermalColor(thermal.loading, thermal.T);
-  
+
   ctx.save();
-  
+
   // Círculo principal
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc(x, y, size, 0, Math.PI * 2);
   ctx.fill();
-  
+
   // Glow
   ctx.shadowColor = color;
   ctx.shadowBlur = 15;
   ctx.fill();
-  
+
   // Texto de temperatura
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 12px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(`${Math.round(thermal.T)}°`, x, y);
-  
+
   ctx.restore();
 }
 
 // === ACTUALIZACIÓN DE CAPA TÉRMICA ===
 
-export function updateThermalLayer(edges, results, deltaTime = 0.016) {
+export function updateThermalLayer(edges, results, _deltaTime = 0.016) {
   return edges.map(edge => {
     const thermal = calcularTemperaturaConductor(edge, results);
-    
+
     // Inercia térmica (suavizado de cambios)
     if (edge.thermal) {
       const smoothingFactor = 0.1; // Suavizado 10%
       thermal.T = edge.thermal.T * (1 - smoothingFactor) + thermal.T * smoothingFactor;
       thermal.loading = edge.thermal.loading * (1 - smoothingFactor) + thermal.loading * smoothingFactor;
     }
-    
+
     return {
       ...edge,
       thermal
@@ -229,18 +229,18 @@ export function analyzeThermalSystem(edges) {
     maxLoading: 0,
     overloadedEdges: []
   };
-  
+
   let totalLoading = 0;
-  
+
   edges.forEach(edge => {
     if (!edge.thermal) return;
-    
+
     const { loading, T, status } = edge.thermal;
-    
+
     totalLoading += loading;
     analysis.maxTemperature = Math.max(analysis.maxTemperature, T);
     analysis.maxLoading = Math.max(analysis.maxLoading, loading);
-    
+
     // Contar por estado
     switch (status) {
       case 'safe': analysis.safeEdges++; break;
@@ -248,15 +248,15 @@ export function analyzeThermalSystem(edges) {
       case 'caution': analysis.cautionEdges++; break;
       case 'warning': analysis.warningEdges++; break;
       case 'danger': analysis.dangerEdges++; break;
-      case 'critical': 
+      case 'critical':
         analysis.criticalEdges++;
         analysis.overloadedEdges.push(edge.id);
         break;
     }
   });
-  
+
   analysis.averageLoading = edges.length > 0 ? totalLoading / edges.length : 0;
-  
+
   // Calcular score de salud térmica (0-100)
   const statusWeights = {
     safe: 100,
@@ -266,19 +266,19 @@ export function analyzeThermalSystem(edges) {
     danger: 20,
     critical: 0
   };
-  
+
   let totalScore = 0;
   let edgeCount = 0;
-  
+
   edges.forEach(edge => {
     if (edge.thermal) {
       totalScore += statusWeights[edge.thermal.status] || 0;
       edgeCount++;
     }
   });
-  
+
   analysis.thermalHealthScore = edgeCount > 0 ? totalScore / edgeCount : 100;
-  
+
   return analysis;
 }
 
@@ -287,10 +287,10 @@ export function analyzeThermalSystem(edges) {
 export function simulateCooling(thermal, ambientTemp = 30, deltaTime = 1) {
   // Constante de tiempo térmica (simplificada)
   const tau = 1800; // 30 minutos en segundos
-  
+
   // Enfriamiento exponencial hacia temperatura ambiente
   const coolingRate = deltaTime / tau;
-  
+
   return {
     ...thermal,
     T: thermal.T + (ambientTemp - thermal.T) * coolingRate,
@@ -302,7 +302,7 @@ export function simulateCooling(thermal, ambientTemp = 30, deltaTime = 1) {
 
 export function checkThermalAlerts(thermal) {
   const alerts = [];
-  
+
   if (thermal.T > 85) {
     alerts.push({
       type: 'critical',
@@ -316,7 +316,7 @@ export function checkThermalAlerts(thermal) {
       threshold: 75
     });
   }
-  
+
   if (thermal.loading > 1.2) {
     alerts.push({
       type: 'critical',
@@ -330,7 +330,7 @@ export function checkThermalAlerts(thermal) {
       threshold: 100
     });
   }
-  
+
   return alerts;
 }
 

@@ -168,7 +168,7 @@ function costFunction(cell, grid, cableMap, options = {}) {
  * Algoritmo A* mejorado para pathfinding ortogonal
  */
 export function aStar(grid, start, end, cableMap, options = {}) {
-  const { avoidNodes: _avoidNodes = true, minimizeCrossings: _minimizeCrossings = true } = options;
+  // const { avoidNodes: _avoidNodes = true, minimizeCrossings: _minimizeCrossings = true } = options; // Unused variables removed
 
   // Validar puntos
   if (!isValidPoint(grid, start) || !isValidPoint(grid, end)) {
@@ -419,7 +419,7 @@ export function calculateManhattanRoute(sourceNode, targetNode, allNodes, existi
 /**
  * Ajustar punto al borde del nodo más cercano a la dirección objetivo
  */
-function adjustToNodeBorder(point, targetPoint, _cellSize) {
+function adjustToNodeBorder(point, targetPoint) {
   const dx = targetPoint.x - point.x;
   const dy = targetPoint.y - point.y;
 
@@ -498,7 +498,7 @@ function assignFeederIds(edges) {
   const sourceFeeders = new Map();
   const feederAssignments = new Map();
 
-  edges.forEach((edge, _index) => {
+  edges.forEach((edge) => {
     const source = edge.source;
     const currentCount = sourceFeeders.get(source) || 0;
     const feederId = `F${(currentCount % 5) + 1}`; // Ciclar entre F1-F5

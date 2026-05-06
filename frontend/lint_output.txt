@@ -1,0 +1,593 @@
+
+> icc-calculator-frontend@1.0.0 lint
+> eslint src/**/*.{js,jsx}
+
+
+C:\Professional ICC Calculator\frontend\src\components\AutoCoordinationPanel.jsx
+   11:3   warning  'adjustCurveForCoordination' is defined but never used                                                                                                                                                                            no-unused-vars
+   25:5   warning  'simulation' is assigned a value but never used                                                                                                                                                                                   no-unused-vars
+  220:53  error    'edges' is not defined                                                                                                                                                                                                            no-undef
+  229:6   warning  React Hook useCallback has an unnecessary dependency: 'edges'. Either exclude it or remove the dependency array. Outer scope values like 'edges' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+  229:28  error    'edges' is not defined                                                                                                                                                                                                            no-undef
+  236:6   warning  React Hook useEffect has a missing dependency: 'analyzeCoordination'. Either include it or remove the dependency array                                                                                                            react-hooks/exhaustive-deps
+
+C:\Professional ICC Calculator\frontend\src\components\AutoLayoutPanel.jsx
+    8:10  warning  'calculateElectricalLayout' is defined but never used  no-unused-vars
+  145:41  warning  'index' is defined but never used                      no-unused-vars
+  203:13  warning  'level' is assigned a value but never used             no-unused-vars
+  553:7   warning  'maxObjectValues' is assigned a value but never used   no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\AutoLayoutToolbar.jsx
+  51:35  warning  'config' is assigned a value but never used  no-unused-vars
+  85:7   warning  Unexpected console statement                 no-console
+  88:7   warning  Unexpected console statement                 no-console
+
+C:\Professional ICC Calculator\frontend\src\components\AutoTuningPanel.jsx
+  334:58  error  Parsing error: Unexpected token `>`. Did you mean `&gt;` or `{">"}`?
+
+C:\Professional ICC Calculator\frontend\src\components\CoordinationPanel.jsx
+   10:3   warning  'generateTCCMarks' is defined but never used       no-unused-vars
+   16:37  warning  'width' is assigned a value but never used         no-unused-vars
+   16:37  warning  'width' is missing in props validation             react/prop-types
+   16:50  warning  'height' is assigned a value but never used        no-unused-vars
+   16:50  warning  'height' is missing in props validation            react/prop-types
+  110:9   warning  'breakerNodes' is assigned a value but never used  no-unused-vars
+  142:55  warning  'index' is defined but never used                  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\CoordinationStatusPanel.jsx
+   10:3   warning  'coordinationResult' is missing in props validation                                   react/prop-types
+   11:3   warning  'onApplyChanges' is missing in props validation                                       react/prop-types
+   12:3   warning  'onReset' is missing in props validation                                              react/prop-types
+   13:3   warning  'isLoading' is missing in props validation                                            react/prop-types
+   40:5   warning  'coordinationResult.status' is missing in props validation                            react/prop-types
+   41:5   warning  'coordinationResult.breakers' is missing in props validation                          react/prop-types
+   42:5   warning  'coordinationResult.originalBreakers' is missing in props validation                  react/prop-types
+   43:5   warning  'coordinationResult.iterations' is missing in props validation                        react/prop-types
+   44:5   warning  'coordinationResult.history' is missing in props validation                           react/prop-types
+   45:5   warning  'coordinationResult.finalStatus' is missing in props validation                       react/prop-types
+   46:5   warning  'coordinationResult.message' is missing in props validation                           react/prop-types
+   50:32  warning  'coordinationResult.finalStatus.quality' is missing in props validation               react/prop-types
+   53:28  warning  'coordinationResult.breakers.map' is missing in props validation                      react/prop-types
+   57:24  warning  'coordinationResult.originalBreakers[].TMS' is missing in props validation            react/prop-types
+   60:19  warning  'coordinationResult.originalBreakers[].TMS' is missing in props validation            react/prop-types
+   62:33  warning  'coordinationResult.originalBreakers[].TMS' is missing in props validation            react/prop-types
+   65:27  warning  'coordinationResult.originalBreakers[].pickup' is missing in props validation         react/prop-types
+   68:19  warning  'coordinationResult.originalBreakers[].pickup' is missing in props validation         react/prop-types
+   70:36  warning  'coordinationResult.originalBreakers[].pickup' is missing in props validation         react/prop-types
+   73:34  warning  'coordinationResult.originalBreakers[].instantaneous' is missing in props validation  react/prop-types
+   76:19  warning  'coordinationResult.originalBreakers[].instantaneous' is missing in props validation  react/prop-types
+   78:43  warning  'coordinationResult.originalBreakers[].instantaneous' is missing in props validation  react/prop-types
+  110:23  warning  'coordinationResult.finalStatus.pairs' is missing in props validation                 react/prop-types
+  110:30  warning  'coordinationResult.finalStatus.pairs.map' is missing in props validation             react/prop-types
+  163:27  warning  'coordinationResult.history.length' is missing in props validation                    react/prop-types
+  169:59  warning  'coordinationResult.history.length' is missing in props validation                    react/prop-types
+  173:24  warning  'coordinationResult.history.map' is missing in props validation                       react/prop-types
+  205:29  warning  'coordinationResult.finalStatus.pairs' is missing in props validation                 react/prop-types
+  206:19  warning  'coordinationResult.finalStatus.pairs.filter' is missing in props validation          react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\ElectricalEditor.jsx
+   8:3   warning  'addEdge' is defined but never used                                                                                         no-unused-vars
+  53:51  warning  'setGraph' is assigned a value but never used                                                                               no-unused-vars
+  67:6   warning  React Hook React.useEffect has a missing dependency: 'setReactFlowNodes'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  71:6   warning  React Hook React.useEffect has a missing dependency: 'setReactFlowEdges'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Professional ICC Calculator\frontend\src\components\ElectricalTooltip.jsx
+   9:45  warning  'node' is missing in props validation                   react/prop-types
+   9:51  warning  'visible' is missing in props validation                react/prop-types
+  12:11  warning  'node.data' is missing in props validation              react/prop-types
+  12:17  warning  'node.type' is missing in props validation              react/prop-types
+  26:51  warning  'node.data.voltaje' is missing in props validation      react/prop-types
+  33:47  warning  'node.data.kva' is missing in props validation          react/prop-types
+  34:52  warning  'node.data.primario' is missing in props validation     react/prop-types
+  35:54  warning  'node.data.secundario' is missing in props validation   react/prop-types
+  36:54  warning  'node.data.Z' is missing in props validation            react/prop-types
+  41:46  warning  'node.data.In' is missing in props validation           react/prop-types
+  42:47  warning  'node.data.Icu' is missing in props validation          react/prop-types
+  43:41  warning  'node.data.tipo' is missing in props validation         react/prop-types
+  49:51  warning  'node.data.I_carga' is missing in props validation      react/prop-types
+  50:52  warning  'node.data.longitud' is missing in props validation     react/prop-types
+  56:51  warning  'node.data.tension' is missing in props validation      react/prop-types
+  57:42  warning  'node.data.fases' is missing in props validation        react/prop-types
+  83:47  warning  'node.type.toUpperCase' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\FaultAnimationLayer.jsx
+    8:10  warning  'useParticleEngine' is defined but never used      no-unused-vars
+   11:39  warning  'width' is missing in props validation             react/prop-types
+   11:53  warning  'height' is missing in props validation            react/prop-types
+   21:5   warning  'triggerFault' is assigned a value but never used  no-unused-vars
+   22:5   warning  'clearFault' is assigned a value but never used    no-unused-vars
+   23:5   warning  'tripBreaker' is assigned a value but never used   no-unused-vars
+   37:9   warning  'getEdgePath' is assigned a value but never used   no-unused-vars
+  255:29  error    'edges' is not defined                             no-undef
+  387:34  warning  'nodeId' is missing in props validation            react/prop-types
+  391:9   warning  'node' is assigned a value but never used          no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\FaultPropagationLayer.jsx
+   10:3   warning  'FaultWave' is defined but never used                                                                                   no-unused-vars
+   11:3   warning  'spawnFaultParticles' is defined but never used                                                                         no-unused-vars
+   15:41  warning  'width' is missing in props validation                                                                                  react/prop-types
+   15:55  warning  'height' is missing in props validation                                                                                 react/prop-types
+   86:6   warning  React Hook useEffect has a missing dependency: 'simulation'. Either include it or remove the dependency array           react-hooks/exhaustive-deps
+  115:6   warning  React Hook useEffect has a missing dependency: 'nodes'. Either include it or remove the dependency array                react-hooks/exhaustive-deps
+  130:6   warning  React Hook useCallback has a missing dependency: 'isUpstreamBreaker'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  226:65  warning  'breaker' is defined but never used                                                                                     no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\FaultSimulationPanel.jsx
+   6:27  warning  'useEffect' is defined but never used                                                                                  no-unused-vars
+  10:3   warning  'nodes' is missing in props validation                                                                                 react/prop-types
+  11:3   warning  'edges' is missing in props validation                                                                                 react/prop-types
+  12:3   warning  'onSimulationStart' is missing in props validation                                                                     react/prop-types
+  13:3   warning  'onSimulationEnd' is missing in props validation                                                                       react/prop-types
+  14:3   warning  'onApplyState' is missing in props validation                                                                          react/prop-types
+  28:10  warning  'indiceFrame' is assigned a value but never used                                                                       no-unused-vars
+  31:35  warning  'nodes.filter' is missing in props validation                                                                          react/prop-types
+  77:7   warning  Unexpected console statement                                                                                           no-console
+  81:6   warning  React Hook useCallback has a missing dependency: 'iniciarAnimacion'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Professional ICC Calculator\frontend\src\components\FlowParticles.jsx
+   22:33  warning  'edgeId' is missing in props validation              react/prop-types
+   22:41  warning  'width' is missing in props validation               react/prop-types
+   22:54  warning  'height' is missing in props validation              react/prop-types
+   25:9   warning  'particlesRef' is assigned a value but never used    no-unused-vars
+   27:11  warning  'flow' is assigned a value but never used            no-unused-vars
+   27:28  warning  'animationSpeed' is assigned a value but never used  no-unused-vars
+  129:38  warning  'edgeId' is missing in props validation              react/prop-types
+  130:11  warning  'flow' is assigned a value but never used            no-unused-vars
+  189:38  warning  'edgeId' is missing in props validation              react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\GridSnapAndRouting.jsx
+    6:40  warning  'useMemo' is defined but never used                                                                                                                   no-unused-vars
+   57:15  warning  'midY' is assigned a value but never used                                                                                                             no-unused-vars
+  103:6   warning  React Hook useCallback has missing dependencies: 'getIntersectionPoint' and 'lineIntersectsRect'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  144:12  warning  'p1' is assigned a value but never used                                                                                                               no-unused-vars
+  144:16  warning  'p2' is assigned a value but never used                                                                                                               no-unused-vars
+  396:5   warning  'nodes' is assigned a value but never used                                                                                                            no-unused-vars
+  397:5   warning  'edges' is assigned a value but never used                                                                                                            no-unused-vars
+  425:31  warning  'gridSize' is missing in props validation                                                                                                             react/prop-types
+  425:46  warning  'showGrid' is missing in props validation                                                                                                             react/prop-types
+  478:30  warning  'edge' is missing in props validation                                                                                                                 react/prop-types
+  478:36  warning  'style' is missing in props validation                                                                                                                react/prop-types
+  482:52  warning  'edge.source' is missing in props validation                                                                                                          react/prop-types
+  483:52  warning  'edge.target' is missing in props validation                                                                                                          react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\ICCModule.jsx
+   10:3   warning  'systemModel' is missing in props validation  react/prop-types
+   11:3   warning  'onResults' is missing in props validation    react/prop-types
+   12:3   warning  'onReady' is missing in props validation      react/prop-types
+   13:3   warning  'onRefresh' is missing in props validation    react/prop-types
+   14:3   warning  'onExport' is missing in props validation     react/prop-types
+   15:3   warning  'className' is missing in props validation    react/prop-types
+   52:11  warning  Unexpected console statement                  no-console
+   57:11  warning  Unexpected console statement                  no-console
+   62:11  warning  Unexpected console statement                  no-console
+   67:11  warning  Unexpected console statement                  no-console
+   71:11  warning  Unexpected console statement                  no-console
+   76:11  warning  Unexpected console statement                  no-console
+   81:11  warning  Unexpected console statement                  no-console
+   87:11  warning  Unexpected console statement                  no-console
+   93:13  warning  Unexpected console statement                  no-console
+  108:7   warning  Unexpected console statement                  no-console
+  139:11  warning  Unexpected console statement                  no-console
+
+C:\Professional ICC Calculator\frontend\src\components\IcoreLogoAnimated.jsx
+  10:3  warning  'active' is missing in props validation         react/prop-types
+  11:3  warning  'faultDetected' is missing in props validation  react/prop-types
+  12:3  warning  'size' is missing in props validation           react/prop-types
+  13:3  warning  'playSound' is missing in props validation      react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\NodeStatusIndicator.jsx
+   10:39  warning  'nodeId' is missing in props validation         react/prop-types
+   10:47  warning  'size' is missing in props validation           react/prop-types
+   10:58  warning  'showLabel' is missing in props validation      react/prop-types
+  170:35  warning  'nodeId' is missing in props validation         react/prop-types
+  170:43  warning  'className' is missing in props validation      react/prop-types
+  171:35  warning  'isWarning' is assigned a value but never used  no-unused-vars
+  207:36  warning  'nodeId' is missing in props validation         react/prop-types
+  208:46  warning  'isNormal' is assigned a value but never used   no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\ParticleLayer.jsx
+  10:33  warning  'width' is missing in props validation   react/prop-types
+  10:47  warning  'height' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\ProfessionalTCCPanel.jsx
+    9:10  warning  'BreakerLibrary' is defined but never used         no-unused-vars
+    9:48  warning  'validateCompatibility' is defined but never used  no-unused-vars
+   11:40  warning  'width' is assigned a value but never used         no-unused-vars
+   11:40  warning  'width' is missing in props validation             react/prop-types
+   11:53  warning  'height' is assigned a value but never used        no-unused-vars
+   11:53  warning  'height' is missing in props validation            react/prop-types
+  104:69  warning  'index' is defined but never used                  no-unused-vars
+  117:49  warning  'index' is defined but never used                  no-unused-vars
+  207:62  warning  'index' is defined but never used                  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\ProjectSetupModal.jsx
+  49:45  warning  'onStart' is missing in props validation  react/prop-types
+  49:54  warning  'onClose' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\RealTimeSimulationLayer.jsx
+    8:31  warning  'BreakerState' is defined but never used                                                                           no-unused-vars
+   21:43  warning  'width' is missing in props validation                                                                             react/prop-types
+   21:57  warning  'height' is missing in props validation                                                                            react/prop-types
+  209:6   warning  React Hook useCallback has an unnecessary dependency: 'results'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Professional ICC Calculator\frontend\src\components\SimulationEngine.jsx
+  22:36  warning  'children' is missing in props validation                                                                                  react/prop-types
+  92:6   warning  React Hook useCallback has a missing dependency: 'updateParticleSystem'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Professional ICC Calculator\frontend\src\components\SnapGuides.jsx
+   9:38  warning  'guides' is missing in props validation             react/prop-types
+   9:46  warning  'visible' is missing in props validation            react/prop-types
+  12:11  warning  'guides.vertical' is missing in props validation    react/prop-types
+  12:26  warning  'guides.horizontal' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\TCCChart.jsx
+   10:3   warning  'curves' is missing in props validation             react/prop-types
+   11:3   warning  'faultCurrent' is missing in props validation       react/prop-types
+   12:3   warning  'selectedNode' is missing in props validation       react/prop-types
+   13:3   warning  'width' is missing in props validation              react/prop-types
+   14:3   warning  'height' is missing in props validation             react/prop-types
+   15:3   warning  'title' is missing in props validation              react/prop-types
+  339:27  warning  'curve' is missing in props validation              react/prop-types
+  339:34  warning  'faultCurrent' is missing in props validation       react/prop-types
+  339:48  warning  'scaleX' is missing in props validation             react/prop-types
+  339:56  warning  'scaleY' is missing in props validation             react/prop-types
+  342:24  warning  'curve.data' is missing in props validation         react/prop-types
+  343:26  warning  'curve.data.reduce' is missing in props validation  react/prop-types
+  348:23  warning  'curve.data.find' is missing in props validation    react/prop-types
+  394:29  warning  'curves' is missing in props validation             react/prop-types
+  394:37  warning  'faultCurrent' is missing in props validation       react/prop-types
+  396:16  warning  'curves.length' is missing in props validation      react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\TCCChartWithCoordination.jsx
+   11:3   warning  'curves' is missing in props validation                    react/prop-types
+   12:3   warning  'coordinationResult' is missing in props validation        react/prop-types
+   13:3   warning  'faultCurrent' is missing in props validation              react/prop-types
+   14:3   warning  'selectedNode' is missing in props validation              react/prop-types
+   15:3   warning  'width' is missing in props validation                     react/prop-types
+   16:3   warning  'height' is missing in props validation                    react/prop-types
+   17:3   warning  'showCrossings' is missing in props validation             react/prop-types
+  157:27  warning  'crossing' is missing in props validation                  react/prop-types
+  157:37  warning  'index' is missing in props validation                     react/prop-types
+  212:23  warning  'crossing.I' is missing in props validation                react/prop-types
+  212:25  warning  'crossing.I.toFixed' is missing in props validation        react/prop-types
+  212:53  warning  'crossing.deficit' is missing in props validation          react/prop-types
+  212:61  warning  'crossing.deficit.toFixed' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\TCCLiveChart.jsx
+   17:32  warning  'width' is missing in props validation                react/prop-types
+   17:45  warning  'height' is missing in props validation               react/prop-types
+   17:59  warning  'showGrid' is missing in props validation             react/prop-types
+   22:27  warning  'simulation' is assigned a value but never used       no-unused-vars
+   91:9   warning  'getCurrentFromX' is assigned a value but never used  no-unused-vars
+  101:9   warning  'getTimeFromY' is assigned a value but never used     no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\TCCPanel.jsx
+    9:36  warning  'selectedNode' is missing in props validation                       react/prop-types
+    9:50  warning  'results' is missing in props validation                            react/prop-types
+    9:59  warning  'onClose' is missing in props validation                            react/prop-types
+   14:17  warning  'Icu' is assigned a value but never used                            no-unused-vars
+  115:13  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  115:19  warning  'selectedNode.type' is missing in props validation                  react/prop-types
+  117:37  warning  'selectedNode.data.protection' is missing in props validation       react/prop-types
+  118:54  warning  'selectedNode.data.protection' is missing in props validation       react/prop-types
+  120:20  warning  'selectedNode.data.label' is missing in props validation            react/prop-types
+  130:20  warning  'selectedNode.data.label' is missing in props validation            react/prop-types
+  185:40  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  185:46  warning  'selectedNode.data.label' is missing in props validation            react/prop-types
+  185:68  warning  'selectedNode.id' is missing in props validation                    react/prop-types
+  200:52  warning  'i' is defined but never used                                       no-unused-vars
+  216:62  warning  'i' is defined but never used                                       no-unused-vars
+  311:23  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  311:29  warning  'selectedNode.data.protection' is missing in props validation       react/prop-types
+  314:33  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  314:38  warning  'selectedNode.data.protection' is missing in props validation       react/prop-types
+  314:49  warning  'selectedNode.data.protection.tipo' is missing in props validation  react/prop-types
+  317:23  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  317:29  warning  'selectedNode.data.In' is missing in props validation               react/prop-types
+  320:33  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  320:38  warning  'selectedNode.data.In' is missing in props validation               react/prop-types
+  323:23  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  323:29  warning  'selectedNode.data.Icu' is missing in props validation              react/prop-types
+  326:33  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  326:38  warning  'selectedNode.data.Icu' is missing in props validation              react/prop-types
+  329:23  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  329:29  warning  'selectedNode.data.I_carga' is missing in props validation          react/prop-types
+  332:33  warning  'selectedNode.data' is missing in props validation                  react/prop-types
+  332:38  warning  'selectedNode.data.I_carga' is missing in props validation          react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\ThermalHeatmapLayer.jsx
+  266:24  error  Parsing error: Unexpected token `>`. Did you mean `&gt;` or `{">"}`?
+
+C:\Professional ICC Calculator\frontend\src\components\edges\FlowEdge.jsx
+   11:3   warning  'id' is missing in props validation                    react/prop-types
+   12:3   warning  'sourceX' is missing in props validation               react/prop-types
+   13:3   warning  'sourceY' is missing in props validation               react/prop-types
+   14:3   warning  'targetX' is missing in props validation               react/prop-types
+   15:3   warning  'targetY' is missing in props validation               react/prop-types
+   16:3   warning  'data' is missing in props validation                  react/prop-types
+   17:3   warning  'selected' is missing in props validation              react/prop-types
+   59:15  warning  'data.points' is missing in props validation           react/prop-types
+   59:30  warning  'data.points' is missing in props validation           react/prop-types
+   59:37  warning  'data.points.length' is missing in props validation    react/prop-types
+   60:19  warning  'data.points' is missing in props validation           react/prop-types
+   61:10  warning  'data.points.map' is missing in props validation       react/prop-types
+   70:13  warning  'data.points' is missing in props validation           react/prop-types
+   74:15  warning  'data.points' is missing in props validation           react/prop-types
+   74:30  warning  'data.points' is missing in props validation           react/prop-types
+   74:37  warning  'data.points.length' is missing in props validation    react/prop-types
+   75:40  warning  'data.points' is missing in props validation           react/prop-types
+   75:47  warning  'data.points.length' is missing in props validation    react/prop-types
+   76:19  warning  'data.points' is missing in props validation           react/prop-types
+   76:37  warning  'data.points[].x' is missing in props validation       react/prop-types
+   79:13  warning  'data.points' is missing in props validation           react/prop-types
+   82:15  warning  'data.points' is missing in props validation           react/prop-types
+   82:30  warning  'data.points' is missing in props validation           react/prop-types
+   82:37  warning  'data.points.length' is missing in props validation    react/prop-types
+   83:40  warning  'data.points' is missing in props validation           react/prop-types
+   83:47  warning  'data.points.length' is missing in props validation    react/prop-types
+   84:19  warning  'data.points' is missing in props validation           react/prop-types
+   84:37  warning  'data.points[].y' is missing in props validation       react/prop-types
+   87:13  warning  'data.points' is missing in props validation           react/prop-types
+   92:31  warning  'data.current' is missing in props validation          react/prop-types
+   92:52  warning  'data.animated' is missing in props validation         react/prop-types
+  103:34  warning  'data.tripped' is missing in props validation          react/prop-types
+  105:39  warning  'data.fault' is missing in props validation            react/prop-types
+  105:69  warning  'data.tripped' is missing in props validation          react/prop-types
+  109:32  warning  'data.fault' is missing in props validation            react/prop-types
+  144:15  warning  'data.current' is missing in props validation          react/prop-types
+  144:32  warning  'data.capacity' is missing in props validation         react/prop-types
+  162:20  warning  'data.current' is missing in props validation          react/prop-types
+  164:23  warning  'data.current' is missing in props validation          react/prop-types
+  164:31  warning  'data.current.toFixed' is missing in props validation  react/prop-types
+  167:20  warning  'data.capacity' is missing in props validation         react/prop-types
+  169:25  warning  'data.capacity' is missing in props validation         react/prop-types
+  172:20  warning  'data.current' is missing in props validation          react/prop-types
+  172:37  warning  'data.capacity' is missing in props validation         react/prop-types
+  174:26  warning  'data.current' is missing in props validation          react/prop-types
+  174:41  warning  'data.capacity' is missing in props validation         react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\edges\OrthogonalEdge.jsx
+    7:39  warning  'getBezierPath' is defined but never used            no-unused-vars
+   11:3   warning  'id' is missing in props validation                  react/prop-types
+   12:3   warning  'sourceX' is missing in props validation             react/prop-types
+   13:3   warning  'sourceY' is missing in props validation             react/prop-types
+   14:3   warning  'targetX' is missing in props validation             react/prop-types
+   15:3   warning  'targetY' is missing in props validation             react/prop-types
+   16:3   warning  'sourcePosition' is defined but never used           no-unused-vars
+   16:3   warning  'sourcePosition' is missing in props validation      react/prop-types
+   17:3   warning  'targetPosition' is defined but never used           no-unused-vars
+   17:3   warning  'targetPosition' is missing in props validation      react/prop-types
+   18:3   warning  'data' is missing in props validation                react/prop-types
+   19:3   warning  'selected' is missing in props validation            react/prop-types
+   20:3   warning  'animated' is missing in props validation            react/prop-types
+   24:15  warning  'data.points' is missing in props validation         react/prop-types
+   24:30  warning  'data.points' is missing in props validation         react/prop-types
+   24:37  warning  'data.points.length' is missing in props validation  react/prop-types
+   25:19  warning  'data.points' is missing in props validation         react/prop-types
+   30:13  warning  'data.points' is missing in props validation         react/prop-types
+   57:15  warning  'data.fault' is missing in props validation          react/prop-types
+   58:15  warning  'data.tripped' is missing in props validation        react/prop-types
+   59:15  warning  'data.overload' is missing in props validation       react/prop-types
+   60:27  warning  'data.animated' is missing in props validation       react/prop-types
+   66:26  warning  'data.length' is missing in props validation         react/prop-types
+   66:43  warning  'data.length' is missing in props validation         react/prop-types
+   67:29  warning  'data.impedance' is missing in props validation      react/prop-types
+   67:49  warning  'data.impedance' is missing in props validation      react/prop-types
+   68:27  warning  'data.current' is missing in props validation        react/prop-types
+   68:45  warning  'data.current' is missing in props validation        react/prop-types
+   80:25  warning  'data.fault' is missing in props validation          react/prop-types
+   80:51  warning  'data.tripped' is missing in props validation        react/prop-types
+   82:34  warning  'data.tripped' is missing in props validation        react/prop-types
+   85:26  warning  'data.fault' is missing in props validation          react/prop-types
+  144:20  warning  'data.fault' is missing in props validation          react/prop-types
+  147:20  warning  'data.tripped' is missing in props validation        react/prop-types
+  155:27  warning  'data.animated' is missing in props validation       react/prop-types
+  155:47  warning  'data.fault' is missing in props validation          react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\nodes\SourceNode.jsx
+  10:38  warning  'data' is missing in props validation          react/prop-types
+  10:44  warning  'selected' is missing in props validation      react/prop-types
+  46:48  warning  'data.label' is missing in props validation    react/prop-types
+  56:34  warning  'data.voltaje' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\nodes\electrical\BreakerSymbol.jsx
+  10:41  warning  'data' is missing in props validation         react/prop-types
+  10:47  warning  'selected' is missing in props validation     react/prop-types
+  11:11  warning  'results' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\nodes\electrical\LoadSymbol.jsx
+  10:38  warning  'data' is missing in props validation         react/prop-types
+  10:44  warning  'selected' is missing in props validation     react/prop-types
+  11:11  warning  'results' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\nodes\electrical\PanelSymbol.jsx
+  10:39  warning  'data' is missing in props validation         react/prop-types
+  10:45  warning  'selected' is missing in props validation     react/prop-types
+  11:11  warning  'results' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\nodes\electrical\SourceSymbol.jsx
+  10:40  warning  'data' is missing in props validation      react/prop-types
+  10:46  warning  'selected' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\nodes\electrical\TransformerSymbol.jsx
+  10:45  warning  'data' is missing in props validation         react/prop-types
+  10:51  warning  'selected' is missing in props validation     react/prop-types
+  11:11  warning  'results' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\particles\BreakerEffects.js
+  333:56  warning  'tripTime' is defined but never used        no-unused-vars
+  339:13  warning  'speed' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\particles\FaultAnimationExample.jsx
+  13:34  warning  'initialNodes' is missing in props validation                                                                                react/prop-types
+  13:53  warning  'initialEdges' is missing in props validation                                                                                react/prop-types
+  63:6   warning  React Hook useCallback has a missing dependency: 'startOriginalAnimation'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Professional ICC Calculator\frontend\src\components\particles\FaultParticleEngine.js
+  216:66  warning  'tccEvaluation' is defined but never used   no-unused-vars
+  275:13  warning  'fault' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\particles\ParticleCanvas.jsx
+   11:3   warning  'graph' is missing in props validation                react/prop-types
+   12:3   warning  'onNodeUpdate' is missing in props validation         react/prop-types
+   13:3   warning  'onEdgeUpdate' is missing in props validation         react/prop-types
+   14:3   warning  'enabled' is missing in props validation              react/prop-types
+   15:3   warning  'options' is missing in props validation              react/prop-types
+   16:3   warning  'style' is missing in props validation                react/prop-types
+   25:5   warning  'activeFaults' is assigned a value but never used     no-unused-vars
+   26:5   warning  'trippedBreakers' is assigned a value but never used  no-unused-vars
+  151:34  warning  'graph.nodes' is missing in props validation          react/prop-types
+  151:41  warning  'graph.nodes.length' is missing in props validation   react/prop-types
+  152:40  warning  'graph.nodes' is missing in props validation          react/prop-types
+  152:46  warning  'graph.nodes.find' is missing in props validation     react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\components\particles\ParticleSystem.js
+  305:22  warning  '_edgeId' is defined but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\components\particles\PathUtils.js
+  18:5  warning  Unexpected console statement  no-console
+
+C:\Professional ICC Calculator\frontend\src\components\properties\TransformerFields.jsx
+  72:5  warning  Unexpected console statement  no-console
+
+C:\Professional ICC Calculator\frontend\src\hooks\useAutoCalculate.js
+  32:5  warning  'getRealtimeResult' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\hooks\useCopyPaste.js
+  15:3  warning  'resetPasteCount' is defined but never used        no-unused-vars
+  23:5  warning  'addNode' is assigned a value but never used       no-unused-vars
+  24:5  warning  'addEdge' is assigned a value but never used       no-unused-vars
+  25:5  warning  'removeNode' is assigned a value but never used    no-unused-vars
+  26:5  warning  'removeEdge' is assigned a value but never used    no-unused-vars
+  28:5  warning  'selectedEdge' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\hooks\useFaultParticleAnimation.js
+  110:6  warning  React Hook useCallback has a missing dependency: 'handleBreakerTrip'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Professional ICC Calculator\frontend\src\hooks\useIframeCommunication.js
+  95:7  warning  Unexpected console statement  no-console
+
+C:\Professional ICC Calculator\frontend\src\hooks\useParticleEngine.js
+    6:42  warning  'useMemo' is defined but never used                                                                                                                                              no-unused-vars
+   15:9   warning  The 'CONFIG' object makes the dependencies of useCallback Hook (at line 151) change on every render. To fix this, wrap the initialization of 'CONFIG' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   15:9   warning  The 'CONFIG' object makes the dependencies of useCallback Hook (at line 276) change on every render. To fix this, wrap the initialization of 'CONFIG' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   15:9   warning  The 'CONFIG' object makes the dependencies of useCallback Hook (at line 316) change on every render. To fix this, wrap the initialization of 'CONFIG' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   15:9   warning  The 'CONFIG' object makes the dependencies of useCallback Hook (at line 328) change on every render. To fix this, wrap the initialization of 'CONFIG' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  454:15  warning  'key' is assigned a value but never used                                                                                                                                         no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\hooks\useSmartSnap.js
+   26:5   warning  'enableAngles' is assigned a value but never used  no-unused-vars
+   31:9   warning  'snapCache' is assigned a value but never used     no-unused-vars
+  279:36  warning  'newMode' is defined but never used                no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\hooks\useUndoRedo.js
+   97:6   warning  React Hook useEffect has missing dependencies: 'edges' and 'nodes'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  100:39  warning  'e' is defined but never used                                                                                           no-unused-vars
+  100:42  warning  'node' is defined but never used                                                                                        no-unused-vars
+  249:9   warning  'history' is assigned a value but never used                                                                            no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\modules\cortocircuito\components\FormICC.jsx
+  3:35  warning  'onCalculate' is missing in props validation  react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\modules\cortocircuito\components\ResultsICC.jsx
+    1:38   warning  'result' is missing in props validation                                  react/prop-types
+    1:46   warning  'loading' is missing in props validation                                 react/prop-types
+    1:55   warning  'error' is missing in props validation                                   react/prop-types
+    1:62   warning  'optimization' is missing in props validation                            react/prop-types
+    1:76   warning  'onOptimize' is missing in props validation                              react/prop-types
+    6:11   warning  'result.ok' is missing in props validation                               react/prop-types
+    6:15   warning  'result.ampacity' is missing in props validation                         react/prop-types
+    6:25   warning  'result.interrupting' is missing in props validation                     react/prop-types
+    6:39   warning  'result.voltageDrop' is missing in props validation                      react/prop-types
+    6:52   warning  'result.coordination' is missing in props validation                     react/prop-types
+    6:66   warning  'result.invariants' is missing in props validation                       react/prop-types
+   35:50   warning  'result.ampacity.I_tabla' is missing in props validation                 react/prop-types
+   36:42   warning  'result.ampacity.F_temp' is missing in props validation                  react/prop-types
+   36:49   warning  'result.ampacity.F_temp.toFixed' is missing in props validation          react/prop-types
+   37:43   warning  'result.ampacity.F_group' is missing in props validation                 react/prop-types
+   37:51   warning  'result.ampacity.F_group.toFixed' is missing in props validation         react/prop-types
+   38:45   warning  'result.ampacity.parallels' is missing in props validation               react/prop-types
+   39:42   warning  'result.ampacity.I_corr' is missing in props validation                  react/prop-types
+   39:49   warning  'result.ampacity.I_corr.toFixed' is missing in props validation          react/prop-types
+   40:53   warning  'result.ampacity.I_terminal' is missing in props validation              react/prop-types
+   41:44   warning  'result.ampacity.I_design' is missing in props validation                react/prop-types
+   41:53   warning  'result.ampacity.I_design.toFixed' is missing in props validation        react/prop-types
+   42:43   warning  'result.ampacity.I_final' is missing in props validation                 react/prop-types
+   42:51   warning  'result.ampacity.I_final.toFixed' is missing in props validation         react/prop-types
+   44:54   warning  'result.ampacity.check' is missing in props validation                   react/prop-types
+   44:60   warning  'result.ampacity.check.ok' is missing in props validation                react/prop-types
+   45:21   warning  'result.ampacity.check' is missing in props validation                   react/prop-types
+   45:27   warning  'result.ampacity.check.msg' is missing in props validation               react/prop-types
+   52:53   warning  'result.interrupting.ok' is missing in props validation                  react/prop-types
+   53:25   warning  'result.interrupting.msg' is missing in props validation                 react/prop-types
+   62:43   warning  'result.voltageDrop.deltaV' is missing in props validation               react/prop-types
+   62:50   warning  'result.voltageDrop.deltaV.toFixed' is missing in props validation       react/prop-types
+   63:51   warning  'result.voltageDrop.percent' is missing in props validation              react/prop-types
+   63:59   warning  'result.voltageDrop.percent.toFixed' is missing in props validation      react/prop-types
+   65:54   warning  'result.voltageDrop.check' is missing in props validation                react/prop-types
+   65:60   warning  'result.voltageDrop.check.ok' is missing in props validation             react/prop-types
+   65:109  warning  'result.voltageDrop.check' is missing in props validation                react/prop-types
+   65:115  warning  'result.voltageDrop.check.level' is missing in props validation          react/prop-types
+   66:26   warning  'result.voltageDrop.check' is missing in props validation                react/prop-types
+   66:32   warning  'result.voltageDrop.check.msg' is missing in props validation            react/prop-types
+   76:52   warning  'result.coordination.t_up' is missing in props validation                react/prop-types
+   76:57   warning  'result.coordination.t_up.toFixed' is missing in props validation        react/prop-types
+   77:54   warning  'result.coordination.t_down' is missing in props validation              react/prop-types
+   77:61   warning  'result.coordination.t_down.toFixed' is missing in props validation      react/prop-types
+   78:48   warning  'result.coordination.margin' is missing in props validation              react/prop-types
+   78:55   warning  'result.coordination.margin.toFixed' is missing in props validation      react/prop-types
+   80:60   warning  'result.coordination.coordinated' is missing in props validation         react/prop-types
+   81:27   warning  'result.coordination.msg' is missing in props validation                 react/prop-types
+   85:26   warning  'result.coordination.coordinated' is missing in props validation         react/prop-types
+  101:27   warning  'optimization.success' is missing in props validation                    react/prop-types
+  105:48   warning  'optimization.improvement' is missing in props validation                react/prop-types
+  106:53   warning  'optimization.iterations' is missing in props validation                 react/prop-types
+  107:52   warning  'optimization.metrics' is missing in props validation                    react/prop-types
+  107:60   warning  'optimization.metrics.minMargin' is missing in props validation          react/prop-types
+  108:53   warning  'optimization.metrics' is missing in props validation                    react/prop-types
+  108:61   warning  'optimization.metrics.avgMargin' is missing in props validation          react/prop-types
+  111:60   warning  'optimization.metrics' is missing in props validation                    react/prop-types
+  111:68   warning  'optimization.metrics.coordinated' is missing in props validation        react/prop-types
+  112:27   warning  'optimization.metrics' is missing in props validation                    react/prop-types
+  112:35   warning  'optimization.metrics.coordinated' is missing in props validation        react/prop-types
+  120:29   warning  'optimization.optimized' is missing in props validation                  react/prop-types
+  120:39   warning  'optimization.optimized.map' is missing in props validation              react/prop-types
+  124:48   warning  'optimization.original' is missing in props validation                   react/prop-types
+  124:60   warning  'optimization.original[].pickup' is missing in props validation          react/prop-types
+  124:67   warning  'optimization.original[].pickup.toFixed' is missing in props validation  react/prop-types
+  125:45   warning  'optimization.original' is missing in props validation                   react/prop-types
+  125:57   warning  'optimization.original[].tms' is missing in props validation             react/prop-types
+  125:61   warning  'optimization.original[].tms.toFixed' is missing in props validation     react/prop-types
+  126:46   warning  'optimization.original' is missing in props validation                   react/prop-types
+  126:58   warning  'optimization.original[].inst' is missing in props validation            react/prop-types
+  126:63   warning  'optimization.original[].inst.toFixed' is missing in props validation    react/prop-types
+  139:51   warning  'result.invariants.nonZeroTable' is missing in props validation          react/prop-types
+  140:55   warning  'result.invariants.terminalDefined' is missing in props validation       react/prop-types
+  141:45   warning  'result.invariants.noNaN' is missing in props validation                 react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\pages\ICCPage.jsx
+  173:3   warning  'buses' is missing in props validation              react/prop-types
+  174:3   warning  'breakers' is missing in props validation           react/prop-types
+  175:3   warning  'faultBus' is missing in props validation           react/prop-types
+  176:3   warning  'result' is missing in props validation             react/prop-types
+  177:3   warning  'status' is missing in props validation             react/prop-types
+  178:3   warning  'onBusClick' is missing in props validation         react/prop-types
+  181:30  warning  'buses.map' is missing in props validation          react/prop-types
+  182:31  warning  'result.buses' is missing in props validation       react/prop-types
+  182:38  warning  'result.buses.find' is missing in props validation  react/prop-types
+  274:17  warning  'breakers.map' is missing in props validation       react/prop-types
+
+C:\Professional ICC Calculator\frontend\src\utils\faultPropagation.js
+  177:44  warning  '_deltaTime' is assigned a value but never used  no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\utils\thermalEngine.js
+    8:52  warning  '_results' is defined but never used               no-unused-vars
+   47:36  warning  '_temperature' is defined but never used           no-unused-vars
+   58:42  warning  '_temperature' is assigned a value but never used  no-unused-vars
+  198:52  warning  '_deltaTime' is assigned a value but never used    no-unused-vars
+
+C:\Professional ICC Calculator\frontend\src\utils\visualEffects.js
+  332:44  warning  '_deltaTime' is assigned a value but never used  no-unused-vars
+
+Ô£û 476 problems (5 errors, 471 warnings)
+

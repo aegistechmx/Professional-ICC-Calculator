@@ -4,7 +4,7 @@ import { create } from 'zustand';
  * Store global del sistema eléctrico (single source of truth)
  * Usa Zustand para gestión de estado
  */
-export const useSystemStore = create((set, get) => ({
+export const useSystemStore = create((set) => ({
   // Modelo del sistema
   systemModel: {
     buses: [
@@ -14,30 +14,30 @@ export const useSystemStore = create((set, get) => ({
       { id: 'bus4', name: 'Carga 2', voltage: 480, position: { x: 500, y: 150 } }
     ],
     branches: [
-      { 
-        id: 'br1', 
-        from: 'bus1', 
-        to: 'bus2', 
+      {
+        id: 'br1',
+        from: 'bus1',
+        to: 'bus2',
         material: 'Cu',
         size: 300,
         current: 300,
         nConductors: 3,
         length: 50
       },
-      { 
-        id: 'br2', 
-        from: 'bus2', 
-        to: 'bus3', 
+      {
+        id: 'br2',
+        from: 'bus2',
+        to: 'bus3',
         material: 'Cu',
         size: 150,
         current: 150,
         nConductors: 3,
         length: 30
       },
-      { 
-        id: 'br3', 
-        from: 'bus2', 
-        to: 'bus4', 
+      {
+        id: 'br3',
+        from: 'bus2',
+        to: 'bus4',
         material: 'Cu',
         size: 150,
         current: 150,

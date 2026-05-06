@@ -173,6 +173,7 @@ export function testSharedEngine() {
     });
 
     if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
       console.log('2. Cálculo ampacidad:', ampacity);
     }
 
@@ -181,10 +182,7 @@ export function testSharedEngine() {
   }).then(iccEngine => {
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.log('4. Motor ICC completo cargado:', Object.keys(iccEngine));
-      }
+      console.log('4. Motor ICC completo cargado:', Object.keys(iccEngine));
     }
 
     // Probar cálculo completo

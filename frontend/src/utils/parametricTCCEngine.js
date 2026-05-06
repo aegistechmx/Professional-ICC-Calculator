@@ -295,7 +295,8 @@ export function autoCoordinate(upstream, downstream, options = {}) {
 // ========================================
 
 function applyIntelligentAdjustment(breaker, cross, step = 0.1, preserveSensitivity = true) {
-  const { upstreamZone, upstreamMultiplier } = cross;
+  const { upstreamZone } = cross;
+  // const { upstreamMultiplier } = cross; // Unused variable removed
   const { ratings } = breaker;
 
   let adjusted = false;

@@ -7,8 +7,6 @@ import { useSystemStore } from '../store/systemStore';
 import { useLiveAnalysis } from '../hooks/useLiveAnalysis';
 import TCCChart from '../components/TCCChart';
 import IcoreLogoAnimated from '../components/IcoreLogoAnimated';
-import PropTypes from 'prop-types';
-import { graphPropTypes, iccResultPropTypes, eventHandlerPropTypes } from '../propTypes';
 
 export default function ICCPage() {
   const systemModel = useSystemStore(s => s.systemModel);
@@ -173,35 +171,12 @@ export default function ICCPage() {
  */
 function UnifilarDiagram({
   buses,
-  branches,
   breakers,
   faultBus,
   result,
   status,
-  onBusClick,
-  onBusDrag
+  onBusClick
 }) {
-  // Validate props
-  UnifilarDiagram.propTypes = {
-    buses: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      position: PropTypes.shape({
-        x: PropTypes.number.isRequired,
-        y: PropTypes.number.isRequired
-      }),
-      data: PropTypes.object
-    })).isRequired,
-    branches: PropTypes.array,
-    breakers: PropTypes.array,
-    faultBus: PropTypes.string,
-    result: PropTypes.shape({
-      buses: PropTypes.array
-    }),
-    status: PropTypes.string,
-    onBusClick: PropTypes.func,
-    onBusDrag: PropTypes.func
-  };
   // Transformar resultado para mostrar Isc en nodos
   const nodesWithIsc = buses.map(bus => {
     const busResult = result?.buses?.find(b => b.id === bus.id);
