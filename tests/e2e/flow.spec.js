@@ -25,13 +25,13 @@ test.describe('Flujo End-to-End Completo icore-icc', () => {
         await page.getByRole('button', { name: /Eliminar|Limpiar|Clear/i }).click().catch(() => { });
         await page.waitForTimeout(1200);
 
-        // 2. Agregar Transformador - usar drag and drop
-        const transformer = page.locator('div[draggable="true"]:has-text("Transformador")');
-        await transformer.dragTo(page.locator('.react-flow__pane').nth(0));
+        // 2. Agregar Transformador - click y luego click en canvas
+        await page.locator('div[draggable="true"]:has-text("Transformador")').click();
+        await page.locator('.react-flow__pane').click({ position: { x: 250, y: 180 } });
 
-        // 3. Agregar Breaker - usar drag and drop
-        const breaker = page.locator('div[draggable="true"]:has-text("Breaker")');
-        await breaker.dragTo(page.locator('.react-flow__pane').nth(0));
+        // 3. Agregar Breaker - click y luego click en canvas
+        await page.locator('div[draggable="true"]:has-text("Breaker")').click();
+        await page.locator('.react-flow__pane').click({ position: { x: 580, y: 180 } });
 
         console.log('✅ Componentes agregados al canvas');
 
