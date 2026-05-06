@@ -2,7 +2,6 @@
 const { test, expect } = require('@playwright/test');
 
 test.describe('Flujo End-to-End Completo icore-icc', () => {
-
     test('Crear diagrama → Calcular ICC → Generar PDF', async ({ page }) => {
         test.setTimeout(120_000);
 
@@ -17,8 +16,8 @@ test.describe('Flujo End-to-End Completo icore-icc', () => {
 
         console.log('✅ Página cargada correctamente');
 
-        // Esperar botones del sidebar
-        await expect(page.locator('button:has-text("Transformador")')).toBeVisible({
+        // Esperar componentes del sidebar
+        await expect(page.locator('div[draggable="true"]:has-text("Transformador")')).toBeVisible({
             timeout: 30000
         });
 
@@ -26,13 +25,13 @@ test.describe('Flujo End-to-End Completo icore-icc', () => {
         await page.getByRole('button', { name: /Eliminar|Limpiar|Clear/i }).click().catch(() => { });
         await page.waitForTimeout(1200);
 
-        // 2. Agregar Transformador
-        await page.locator('button:has-text("Transformador")').first().click();
-        await page.locator('.react-flow__pane').click({ position: { x: 250, y: 180 } });
+        // 2. Agregar Transformador - usar drag and drop
+        const transformer = page.locator('div[draggable="true"]:has-text("Transformador")');
+        await transformer.dragTo(page.locator('.react-flow__pane').nth(0));
 
-        // 3. Agregar Breaker
-        await page.locator('button:has-text("Breaker")').first().click();
-        await page.locator('.react-flow__pane').click({ position: { x: 580, y: 180 } });
+        // 3. Agregar Breaker - usar drag and drop
+        const breaker = page.locator('div[draggable="true"]:has-text("Breaker")');
+        await breaker.dragTo(page.locator('.react-flow__pane').nth(0));
 
         console.log('✅ Componentes agregados al canvas');
 
