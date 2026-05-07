@@ -77,7 +77,7 @@ global.testUtils = {
   createMockPowerSystem: (busCount = 3) => {
     const buses = [];
     const branches = [];
-    
+
     for (let i = 1; i <= busCount; i++) {
       if (i === 1) {
         buses.push({ id: i, type: 'slack', voltage: 1.0, angle: 0.0 });
@@ -87,7 +87,7 @@ global.testUtils = {
         buses.push({ id: i, type: 'pq', power: -0.3, reactive: -0.1 });
       }
     }
-    
+
     for (let i = 1; i < busCount; i++) {
       branches.push({
         from: i,
@@ -95,7 +95,7 @@ global.testUtils = {
         impedance: { real: 0.01, imag: 0.03 }
       });
     }
-    
+
     return { buses, branches };
   },
 
@@ -153,10 +153,8 @@ afterEach(() => {
 // Setup and teardown hooks
 beforeAll(() => {
   // Initialize test database if needed
-  console.log('Test environment initialized');
 });
 
 afterAll(() => {
   // Cleanup test environment
-  console.log('Test environment cleaned up');
 });

@@ -2,7 +2,7 @@
  * Cálculo de Diseño y Verificación NOM 310 / 110.14
  */
 
-const { assertPositive } = require('./guards.js');
+const { assertPositive } = require('./guards.js')
 
 /**
  * Calcula corriente de diseño
@@ -13,9 +13,9 @@ const { assertPositive } = require('./guards.js');
  * @throws {Error} Si los parámetros son inválidos
  */
 function calcDesignCurrent({ I_base, Fcc = 1.25 }) {
-  assertPositive('I_base', I_base);
-  assertPositive('Fcc', Fcc);
-  return { I_design: I_base * Fcc };
+  assertPositive('I_base', I_base)
+  assertPositive('Fcc', Fcc)
+  return { I_design: parseFloat((I_base * Fcc).toFixed(6)) }
 }
 
 /**
@@ -27,11 +27,11 @@ function calcDesignCurrent({ I_base, Fcc = 1.25 }) {
  * @throws {Error} Si el resultado es inválido
  */
 function finalAmpacity({ I_corr, I_terminal }) {
-  const I_final = Math.min(I_corr, I_terminal);
+  const I_final = Math.min(I_corr, I_terminal)
   if (!isFinite(I_final)) {
-    throw new Error('I_final inválida');
+    throw new Error('I_final inválida')
   }
-  return { I_final };
+  return { I_final }
 }
 
 /**
@@ -42,18 +42,18 @@ function finalAmpacity({ I_corr, I_terminal }) {
  * @returns {Object} Resultados de la verificación
  */
 function checkAmpacity({ I_final, I_design }) {
-  const ok = I_final >= I_design;
+  const ok = I_final >= I_design
   return {
     ok,
     margin: (I_final - I_design) / I_design, // puede ser negativo
     msg: ok
       ? 'Cumple ampacidad'
-      : `NO cumple ampacidad: I_final=${I_final.toFixed(1)}A < I_diseño=${I_design.toFixed(1)}A`
-  };
+      : `NO cumple ampacidad: I_final=${I_final.toFixed(1)}A < I_diseño=${I_design.toFixed(1)}A`,
+  }
 }
 
 module.exports = {
   calcDesignCurrent,
   finalAmpacity,
-  checkAmpacity
-};
+  checkAmpacity,
+}

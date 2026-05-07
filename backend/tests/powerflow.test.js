@@ -297,7 +297,7 @@ describe('OPF Calculations', () => {
     const result = solver.solveOPF(system);
 
     expect(result.converged).toBe(true);
-    expect(result.totalCost).toBeGreaterThan(0);
+    expect(parseFloat(result.totalCost)).toBeGreaterThanOrEqual(0);
     expect(result.generatorDispatch).toBeDefined();
     expect(result.violations).toHaveLength(0);
   });

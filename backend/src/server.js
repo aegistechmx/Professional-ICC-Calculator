@@ -1,3 +1,6 @@
+// Initialize module aliases for @ imports
+require('module-alias/register')
+
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
@@ -16,7 +19,7 @@ const {
   _validateFeederInput,
   validateGraphInput,
   validateOptimizerInput,
-  validateJSONBody
+  validateJSONBody,
 } = require('./middleware/validation')
 const crypto = require('crypto')
 
@@ -64,7 +67,7 @@ const server = http.createServer((req, res) => {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       version: '1.0.0',
-      service: 'ICC Professional API'
+      service: 'ICC Professional API',
     })
 
     // ROOT ENDPOINT: GET / - Serve HTML UI
@@ -75,7 +78,7 @@ const server = http.createServer((req, res) => {
 
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
       })
       res.end(htmlContent)
     } catch (error) {
@@ -83,17 +86,19 @@ const server = http.createServer((req, res) => {
       sendResponse(true, {
         name: 'ICC Calculator Professional API',
         version: '1.0.0',
-        description: 'Professional Power System Calculation API with IEEE 1584 Standards',
+        description:
+          'Professional Power System Calculation API with IEEE 1584 Standards',
         endpoints: {
           health: 'GET /api/health',
           calculate: 'POST /api/icc',
           info: 'GET /api/',
           root: 'GET /',
-          legacy: 'GET /icc'
+          legacy: 'GET /icc',
         },
         standards: ['IEEE 1584', 'IEC 60909'],
         precision: '6 decimal places internal, 2 decimal places output',
-        message: 'Welcome to ICC Professional API - Use POST /api/icc for calculations'
+        message:
+          'Welcome to ICC Professional API - Use POST /api/icc for calculations',
       })
     }
 
@@ -102,7 +107,8 @@ const server = http.createServer((req, res) => {
     sendResponse(true, {
       name: 'ICC Calculator Professional API',
       version: '1.0.0',
-      description: 'Professional Power System Calculation API with IEEE 1584 Standards',
+      description:
+        'Professional Power System Calculation API with IEEE 1584 Standards',
       endpoints: {
         health: 'GET /api/health',
         calculate: 'POST /api/icc',
@@ -111,14 +117,17 @@ const server = http.createServer((req, res) => {
         optimize: 'POST /api/optimize',
         info: 'GET /api/',
         root: 'GET /',
-        legacy: 'GET /icc'
+        legacy: 'GET /icc',
       },
       standards: ['IEEE 1584', 'IEC 60909'],
-      precision: '6 decimal places internal, 2 decimal places output'
+      precision: '6 decimal places internal, 2 decimal places output',
     })
 
     // CORTOCIRCUITO ENDPOINT: POST /api/cortocircuito/calculate
-  } else if (req.method === 'POST' && req.url === '/api/cortocircuito/calculate') {
+  } else if (
+    req.method === 'POST' &&
+    req.url === '/api/cortocircuito/calculate'
+  ) {
     let body = ''
 
     req.on('data', chunk => {
@@ -128,12 +137,14 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         // Basic sanitization - limit body size and remove dangerous patterns
-        if (body.length > 1000000) { // 1MB limit
+        if (body.length > 1000000) {
+          // 1MB limit
           return sendResponse(false, null, 'Request body too large')
         }
 
         // Remove potential prototype pollution patterns
-        const sanitizedBody = body.replace(/\b__proto__\b/g, '')
+        const sanitizedBody = body
+          .replace(/\b__proto__\b/g, '')
           .replace(/\bconstructor\b/g, '')
           .replace(/\bprototype\b/g, '')
 
@@ -142,10 +153,12 @@ const server = http.createServer((req, res) => {
         // Apply input validation
         const mockReq = { body: data }
         const mockRes = {
-          status: () => ({ json: (response) => response })
+          status: () => ({ json: response => response }),
         }
         let validationResult = { error: null }
-        const next = (error) => { validationResult = error || { error: null } }
+        const next = error => {
+          validationResult = error || { error: null }
+        }
 
         validateGraphInput(mockReq, mockRes, next)
         if (validationResult.error) {
@@ -154,7 +167,6 @@ const server = http.createServer((req, res) => {
         const nodes = data.nodes || []
         const edges = data.edges || []
         const systemMode = data.systemMode || 'normal'
-
 
         // Calculate ICC per node using proper electrical formulas
         const nodeResults = {}
@@ -166,19 +178,25 @@ const server = http.createServer((req, res) => {
           let impedance = 0.1 // Default impedance
 
           // Find edges connected to this node
-          const connectedEdges = edges.filter(e => e.source === node.id || e.target === node.id)
+          const connectedEdges = edges.filter(
+            e => e.source === node.id || e.target === node.id
+          )
 
           // Calculate impedance based on node type and connections
           switch (nodeType) {
             case 'transformer':
               // Transformer impedance: typically 5-6% of rating
-              impedance = 0.05 // 5% impedance
-              isc = systemVoltage / (Math.sqrt(3) * impedance)
+              impedance = parseFloat((0.05).toFixed(6)) // 5% impedance
+              isc = parseFloat(
+                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
+              )
               break
             case 'generator':
               // Generator subtransient reactance: typically 15-25%
-              impedance = 0.08 // 8% subtransient reactance
-              isc = systemVoltage / (Math.sqrt(3) * impedance)
+              impedance = parseFloat((0.08).toFixed(6)) // 8% subtransient reactance
+              isc = parseFloat(
+                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
+              )
               break
             case 'breaker':
               // Breaker inherits ICC from upstream source
@@ -187,37 +205,47 @@ const server = http.createServer((req, res) => {
                 const sourceNode = nodes.find(n => n.id === sourceEdge.source)
                 const sourceResult = nodeResults[sourceNode?.id]
                 if (sourceResult) {
-                  isc = sourceResult.isc_3f * 0.95 // 5% voltage drop through breaker
+                  isc = parseFloat((sourceResult.isc_3f * 0.95).toFixed(6)) // 5% voltage drop through breaker
                 } else {
-                  impedance = 0.06
-                  isc = systemVoltage / (Math.sqrt(3) * impedance)
+                  impedance = parseFloat((0.06).toFixed(6))
+                  isc = parseFloat(
+                    (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
+                  )
                 }
               } else {
-                impedance = 0.06
-                isc = systemVoltage / (Math.sqrt(3) * impedance)
+                impedance = parseFloat((0.06).toFixed(6))
+                isc = parseFloat(
+                  (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
+                )
               }
               break
             case 'panel':
               // Panel impedance: includes conductors and protective devices
-              impedance = 0.12 // Higher impedance due to distribution
-              isc = systemVoltage / (Math.sqrt(3) * impedance)
+              impedance = parseFloat((0.12).toFixed(6)) // Higher impedance due to distribution
+              isc = parseFloat(
+                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
+              )
               break
             case 'generator_ats':
               // Automatic Transfer Switch: depends on system mode
               if (systemMode === 'emergency') {
-                impedance = 0.08
-                isc = systemVoltage / (Math.sqrt(3) * impedance)
+                impedance = parseFloat((0.08).toFixed(6))
+                isc = parseFloat(
+                  (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
+                )
               } else {
                 isc = 0 // No contribution in normal mode
               }
               break
             default:
-              impedance = 0.15
-              isc = systemVoltage / (Math.sqrt(3) * impedance)
+              impedance = parseFloat((0.15).toFixed(6))
+              isc = parseFloat(
+                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
+              )
           }
 
           // Apply safety factor and convert to reasonable range
-          isc = Math.min(Math.max(isc, 1000), 10000) // Limit between 1kA-10kA
+          isc = Math.min(Math.max(isc, 1000), 10000) // Limit between 1000-10000
 
           nodeResults[node.id] = {
             isc_3f: Math.round(isc),
@@ -228,7 +256,7 @@ const server = http.createServer((req, res) => {
             connectedEdges: connectedEdges.length,
             impedance: Math.round(impedance * 1000) / 1000, // 3 decimal places
             voltage: systemVoltage,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           }
         })
 
@@ -240,16 +268,25 @@ const server = http.createServer((req, res) => {
               totalNodes: nodes.length,
               totalEdges: edges.length,
               systemMode,
-              maxIcc: Math.max(...Object.values(nodeResults).map(r => r.isc_3f_ka || 0)),
-              minIcc: Math.min(...Object.values(nodeResults).filter(r => r.isc_3f_ka > 0).map(r => r.isc_3f_ka || Infinity))
-            }
-          }
+              maxIcc: Math.max(
+                ...Object.values(nodeResults).map(r => r.isc_3f_ka || 0)
+              ),
+              minIcc: Math.min(
+                ...Object.values(nodeResults)
+                  .filter(r => r.isc_3f_ka > 0)
+                  .map(r => r.isc_3f_ka || Infinity)
+              ),
+            },
+          },
         }
 
         sendResponse(true, result.data)
-
       } catch (error) {
-        sendResponse(false, null, 'Error en cálculo de cortocircuito: ' + error.message)
+        sendResponse(
+          false,
+          null,
+          'Error en cálculo de cortocircuito: ' + error.message
+        )
       }
     })
 
@@ -268,10 +305,12 @@ const server = http.createServer((req, res) => {
         // Apply input validation
         const mockReq = { body: params }
         const mockRes = {
-          status: () => ({ json: (response) => response })
+          status: () => ({ json: response => response }),
         }
         let validationResult = { error: null }
-        const next = (error) => { validationResult = error || { error: null } }
+        const next = error => {
+          validationResult = error || { error: null }
+        }
 
         validateICCInput(mockReq, mockRes, next)
         if (validationResult.error) {
@@ -292,13 +331,16 @@ const server = http.createServer((req, res) => {
           const Z = params.impedance || params.Z || 0.05 // impedance (Ω)
 
           if (Z <= 0) {
-            return sendResponse(false, null, 'La impedancia debe ser mayor a cero')
+            return sendResponse(
+              false,
+              null,
+              'La impedancia debe ser mayor a cero'
+            )
           }
 
           const result = runICC({ V, Z })
           sendResponse(true, result)
         }
-
       } catch (error) {
         sendResponse(false, null, 'Error en formato de datos')
       }
@@ -319,10 +361,12 @@ const server = http.createServer((req, res) => {
         // Apply input validation
         const mockReq = { body: params }
         const mockRes = {
-          status: () => ({ json: (response) => response })
+          status: () => ({ json: response => response }),
         }
         let validationResult = { error: null }
-        const next = (error) => { validationResult = error || { error: null } }
+        const next = error => {
+          validationResult = error || { error: null }
+        }
 
         validateOptimizerInput(mockReq, mockRes, next)
         if (validationResult.error) {
@@ -338,11 +382,10 @@ const server = http.createServer((req, res) => {
           breakers,
           faults,
           iterations,
-          temperature: 1.0
+          temperature: 1.0,
         })
 
         sendResponse(true, result)
-
       } catch (error) {
         sendResponse(false, null, error.message)
       }
@@ -359,12 +402,14 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         // Basic sanitization - limit body size and remove dangerous patterns
-        if (body.length > 1000000) { // 1MB limit
+        if (body.length > 1000000) {
+          // 1MB limit
           return sendResponse(false, null, 'Request body too large')
         }
 
         // Remove potential prototype pollution patterns
-        const sanitizedBody = body.replace(/\b__proto__\b/g, '')
+        const sanitizedBody = body
+          .replace(/\b__proto__\b/g, '')
           .replace(/\bconstructor\b/g, '')
           .replace(/\bprototype\b/g, '')
 
@@ -373,10 +418,12 @@ const server = http.createServer((req, res) => {
         // Apply input validation
         const mockReq = { body: systemModel, method: 'POST' }
         const mockRes = {
-          status: () => ({ json: (response) => response })
+          status: () => ({ json: response => response }),
         }
         let validationResult = { error: null }
-        const next = (error) => { validationResult = error || { error: null } }
+        const next = error => {
+          validationResult = error || { error: null }
+        }
 
         validateJSONBody(mockReq, mockRes, next)
         if (validationResult.error) {
@@ -384,11 +431,11 @@ const server = http.createServer((req, res) => {
         }
 
         // Generate cache key from system model hash (normalized for stable key)
-        const normalized = JSON.stringify(systemModel, Object.keys(systemModel).sort())
-        const key = crypto
-          .createHash('md5')
-          .update(normalized)
-          .digest('hex')
+        const normalized = JSON.stringify(
+          systemModel,
+          Object.keys(systemModel).sort()
+        )
+        const key = crypto.createHash('md5').update(normalized).digest('hex')
 
         // Check cache
         const cached = getCached(key)
@@ -403,14 +450,17 @@ const server = http.createServer((req, res) => {
         setCached(key, result)
 
         sendResponse(true, { ...result, cached: false })
-
       } catch (error) {
         sendResponse(false, null, error.message)
       }
     })
 
     // TEMPORARY ALIASES (legacy support)
-  } else if (req.url === '/icc' || req.url === '/cortocircuito/calculate' || req.url === '/api/cortocircuito/calculate') {
+  } else if (
+    req.url === '/icc' ||
+    req.url === '/cortocircuito/calculate' ||
+    req.url === '/api/cortocircuito/calculate'
+  ) {
     try {
       const V = 220
       const Z = 0.05
@@ -436,7 +486,7 @@ const server = http.createServer((req, res) => {
           impedance: Z,
           precision: 'IEEE_1584',
           formula: 'Isc = V / (sqrt(3) * Z)',
-          error: 'Serialization error, using fallback'
+          error: 'Serialization error, using fallback',
         }
         sendResponse(true, fallbackResult)
         return
@@ -444,7 +494,6 @@ const server = http.createServer((req, res) => {
 
       // Send the validated result
       sendResponse(true, result)
-
     } catch (error) {
       sendResponse(false, null, `ICC calculation error: ${error.message}`)
     }

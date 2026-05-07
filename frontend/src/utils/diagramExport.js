@@ -9,63 +9,73 @@
  */
 export function exportToSVG(svgElement, filename = 'diagrama-unifilar') {
   if (!svgElement) {
-    console.error('[EXPORT] No se encontró elemento SVG');
-    return false;
+    console.error('[EXPORT] No se encontró elemento SVG')
+    return false
   }
 
   try {
     // Clonar el SVG para modificarlo
-    const svgClone = svgElement.cloneNode(true);
+    const svgClone = svgElement.cloneNode(true)
 
     // Añadir atributos necesarios
-    svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svgClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+    svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    svgClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
 
     // Convertir a string
-    const svgData = new XMLSerializer().serializeToString(svgClone);
+    const svgData = new XMLSerializer().serializeToString(svgClone)
 
     // Crear blob
-    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
 
     // Descargar
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${filename}.svg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${filename}.svg`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
 
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url)
 
-    return true;
+    return true
   } catch (error) {
-    console.error('[EXPORT] Error al exportar SVG:', error);
-    return false;
+    console.error('[EXPORT] Error al exportar SVG:', error)
+    return false
   }
 }
 
 /**
  * Exportar diagrama a PDF con formato ingeniería
  */
-export function exportToPDF(nodes, edges, projectInfo, filename = 'plano-ingenieria') {
+export function exportToPDF(
+  nodes,
+  edges,
+  projectInfo,
+  filename = 'plano-ingenieria'
+) {
   // Esta función requiere jsPDF
   // Por ahora, exportamos a SVG que puede convertirse a PDF
-  console.warn('[EXPORT] jsPDF no está instalado. Exportando a SVG en su lugar.');
-  return exportToSVG(document.querySelector('.react-flow__viewport svg'), filename);
+  console.warn(
+    '[EXPORT] jsPDF no está instalado. Exportando a SVG en su lugar.'
+  )
+  return exportToSVG(
+    document.querySelector('.react-flow__viewport svg'),
+    filename
+  )
 }
 
 /**
  * Generar tabla de cargas para exportación
  */
 export function generateLoadTable(nodes, edges) {
-  const loads = nodes.filter(n => n.type === 'load' || n.type === 'motor');
+  const loads = nodes.filter(n => n.type === 'load' || n.type === 'motor')
 
   return loads.map(node => {
-    const incomingEdges = edges.filter(e => e.target === node.id);
+    const incomingEdges = edges.filter(e => e.target === node.id)
     const totalCurrent = incomingEdges.reduce((sum, edge) => {
-      return sum + (edge.data?.current || 0);
-    }, 0);
+      return sum + (edge.data?.current || 0)
+    }, 0)
 
     return {
       id: node.id,
@@ -74,19 +84,21 @@ export function generateLoadTable(nodes, edges) {
       current: node.data?.I_carga || totalCurrent,
       voltage: node.data?.voltaje || '-',
       power: node.data?.potencia || '-',
-      protection: node.data?.protection?.tipo || '-'
-    };
-  });
+      protection: node.data?.protection?.tipo || '-',
+    }
+  })
 }
 
 /**
  * Generar tabla de protecciones para exportación
  */
 export function generateProtectionTable(nodes) {
-  const protections = nodes.filter(n => n.type === 'breaker' || n.data?.protection);
+  const protections = nodes.filter(
+    n => n.type === 'breaker' || n.data?.protection
+  )
 
   return protections.map(node => {
-    const protection = node.data?.protection || node.data;
+    const protection = node.data?.protection || node.data
 
     return {
       id: node.id,
@@ -95,9 +107,9 @@ export function generateProtectionTable(nodes) {
       In: protection?.In || '-',
       Icu: protection?.Icu || '-',
       Isc: protection?.Isc || '-',
-      conductor: node.data?.conductor?.calibre || '-'
-    };
-  });
+      conductor: node.data?.conductor?.calibre || '-',
+    }
+  })
 }
 
 /**
@@ -111,8 +123,8 @@ export function generatePlanHeader(projectInfo) {
     scale = '1:100',
     norm = 'NOM-001-SEDE-2012',
     engineer = 'Ing. Responsable',
-    revision = 'A'
-  } = projectInfo || {};
+    revision = 'A',
+  } = projectInfo || {}
 
   return `
     <div class="plan-header">
@@ -144,7 +156,7 @@ export function generatePlanHeader(projectInfo) {
         </div>
       </div>
     </div>
-  `;
+  `
 }
 
 /**
@@ -156,20 +168,24 @@ export function generateLegend() {
     { name: 'Transformador', symbol: '🔄' },
     { name: 'Breaker', symbol: '⃤' },
     { name: 'Panel', symbol: '⬛' },
-    { name: 'Carga/Motor', symbol: 'Ⓜ' }
-  ];
+    { name: 'Carga/Motor', symbol: 'Ⓜ' },
+  ]
 
   return `
     <div class="plan-legend">
       <h4>Leyenda de Símbolos</h4>
-      ${symbols.map(s => `
+      ${symbols
+        .map(
+          s => `
         <div class="legend-item">
           <span class="legend-symbol">${s.symbol}</span>
           <span class="legend-name">${s.name}</span>
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
     </div>
-  `;
+  `
 }
 
 /**
@@ -187,25 +203,31 @@ export function generateTechnicalNotes() {
         <li>Este plano es para referencia únicamente</li>
       </ul>
     </div>
-  `;
+  `
 }
 
 /**
  * Exportar diagrama completo con encabezado, tablas y notas
  */
-export function exportCompletePlan(svgElement, nodes, edges, projectInfo, filename = 'plano-completo') {
+export function exportCompletePlan(
+  svgElement,
+  nodes,
+  edges,
+  projectInfo,
+  filename = 'plano-completo'
+) {
   if (!svgElement) {
-    console.error('[EXPORT] No se encontró elemento SVG');
-    return false;
+    console.error('[EXPORT] No se encontró elemento SVG')
+    return false
   }
 
   try {
     // Generar contenido adicional
-    const header = generatePlanHeader(projectInfo);
-    const legend = generateLegend();
-    const notes = generateTechnicalNotes();
-    const loadTable = generateLoadTable(nodes, edges);
-    const protectionTable = generateProtectionTable(nodes);
+    const header = generatePlanHeader(projectInfo)
+    const legend = generateLegend()
+    const notes = generateTechnicalNotes()
+    const loadTable = generateLoadTable(nodes, edges)
+    const protectionTable = generateProtectionTable(nodes)
 
     // Crear HTML completo
     const htmlContent = `
@@ -317,7 +339,9 @@ export function exportCompletePlan(svgElement, nodes, edges, projectInfo, filena
                 </tr>
               </thead>
               <tbody>
-                ${loadTable.map(row => `
+                ${loadTable
+                  .map(
+                    row => `
                   <tr>
                     <td>${row.id}</td>
                     <td>${row.label}</td>
@@ -326,7 +350,9 @@ export function exportCompletePlan(svgElement, nodes, edges, projectInfo, filena
                     <td>${row.voltage}</td>
                     <td>${row.power}</td>
                   </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </tbody>
             </table>
           </div>
@@ -344,7 +370,9 @@ export function exportCompletePlan(svgElement, nodes, edges, projectInfo, filena
                 </tr>
               </thead>
               <tbody>
-                ${protectionTable.map(row => `
+                ${protectionTable
+                  .map(
+                    row => `
                   <tr>
                     <td>${row.id}</td>
                     <td>${row.label}</td>
@@ -353,7 +381,9 @@ export function exportCompletePlan(svgElement, nodes, edges, projectInfo, filena
                     <td>${row.Icu}</td>
                     <td>${row.conductor}</td>
                   </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </tbody>
             </table>
           </div>
@@ -362,25 +392,25 @@ export function exportCompletePlan(svgElement, nodes, edges, projectInfo, filena
         ${notes}
       </body>
       </html>
-    `;
+    `
 
     // Crear blob y descargar
-    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${filename}.html`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${filename}.html`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
 
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url)
 
-    return true;
+    return true
   } catch (error) {
-    console.error('[EXPORT] Error al exportar plano completo:', error);
-    return false;
+    console.error('[EXPORT] Error al exportar plano completo:', error)
+    return false
   }
 }
 
@@ -393,5 +423,5 @@ export default {
   generatePlanHeader,
   generateLegend,
   generateTechnicalNotes,
-  exportCompletePlan
-};
+  exportCompletePlan,
+}

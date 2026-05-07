@@ -51,7 +51,7 @@ const IEEE_519_LIMITS = {
       '50 < Isc/IL < 100': { odd: 10.0, even: 4.0 },
       '100 < Isc/IL < 1000': { odd: 12.0, even: 5.5 },
       'Isc/IL > 1000': { odd: 15.0, even: 7.0 },
-    }
+    },
   },
   '69-138kV': {
     maxCurrentDemand: 50,
@@ -61,7 +61,7 @@ const IEEE_519_LIMITS = {
       '50 < Isc/IL < 100': { odd: 7.5, even: 3.0 },
       '100 < Isc/IL < 1000': { odd: 10.0, even: 4.0 },
       'Isc/IL > 1000': { odd: 12.0, even: 5.5 },
-    }
+    },
   },
   '>138kV': {
     maxCurrentDemand: 100,
@@ -71,8 +71,8 @@ const IEEE_519_LIMITS = {
       '50 < Isc/IL < 100': { odd: 5.0, even: 2.0 },
       '100 < Isc/IL < 1000': { odd: 7.5, even: 3.0 },
       'Isc/IL > 1000': { odd: 10.0, even: 4.0 },
-    }
-  }
+    },
+  },
 }
 
 /**
@@ -133,7 +133,7 @@ export function validateHarmonicsIEEE519(harmonics, voltage, isc, il) {
         type: 'violation',
         measured: percentage,
         limit,
-        message: `${harmonic}th harmonic exceeds IEEE 519 limit: ${percentage.toFixed(2)}% > ${limit}%`
+        message: `${harmonic}th harmonic exceeds IEEE 519 limit: ${percentage.toFixed(2)}% > ${limit}%`,
       })
     } else if (percentage > limit * 0.8) {
       warnings.push({
@@ -141,7 +141,7 @@ export function validateHarmonicsIEEE519(harmonics, voltage, isc, il) {
         type: 'warning',
         measured: percentage,
         limit,
-        message: `${harmonic}th harmonic approaching IEEE 519 limit: ${percentage.toFixed(2)}% (limit: ${limit}%)`
+        message: `${harmonic}th harmonic approaching IEEE 519 limit: ${percentage.toFixed(2)}% (limit: ${limit}%)`,
       })
     }
   })
@@ -153,14 +153,14 @@ export function validateHarmonicsIEEE519(harmonics, voltage, isc, il) {
       type: 'thd_violation',
       measured: thd,
       limit: thdLimit,
-      message: `THD exceeds recommended limit: ${thd.toFixed(2)}% > ${thdLimit}%`
+      message: `THD exceeds recommended limit: ${thd.toFixed(2)}% > ${thdLimit}%`,
     })
   } else if (thd > thdLimit * 0.8) {
     warnings.push({
       type: 'thd_warning',
       measured: thd,
       limit: thdLimit,
-      message: `THD approaching recommended limit: ${thd.toFixed(2)}% (limit: ${thdLimit}%)`
+      message: `THD approaching recommended limit: ${thd.toFixed(2)}% (limit: ${thdLimit}%)`,
     })
   }
 
@@ -174,9 +174,13 @@ export function validateHarmonicsIEEE519(harmonics, voltage, isc, il) {
     summary: {
       totalViolations: violations.length,
       totalWarnings: warnings.length,
-      worstHarmonic: violations.length > 0 ?
-        violations.reduce((worst, v) => v.measured > worst.measured ? v : worst) : null,
-    }
+      worstHarmonic:
+        violations.length > 0
+          ? violations.reduce((worst, v) =>
+              v.measured > worst.measured ? v : worst
+            )
+          : null,
+    },
   }
 }
 
@@ -197,7 +201,7 @@ export function calculateKFactor(harmonics) {
     .reduce((sum, h, index) => {
       const harmonicOrder = index + 1
       const harmonicRatio = (h || 0) / fundamental
-      return sum + (harmonicOrder ** 2) * (harmonicRatio ** 2)
+      return sum + harmonicOrder ** 2 * harmonicRatio ** 2
     }, 0)
 
   return Math.max(kFactor, 1.0) // Minimum K-factor of 1.0
@@ -215,7 +219,7 @@ export function generateHarmonicSpectrum(loadType, fundamental = 100) {
   switch (loadType) {
     case 'rectifier':
       // 6-pulse rectifier: 5th, 7th, 11th, 13th, 17th, 19th
-      harmonics[5] = fundamental * 0.20
+      harmonics[5] = fundamental * 0.2
       harmonics[7] = fundamental * 0.14
       harmonics[11] = fundamental * 0.09
       harmonics[13] = fundamental * 0.07
@@ -226,8 +230,8 @@ export function generateHarmonicSpectrum(loadType, fundamental = 100) {
     case 'vfd':
       // Variable Frequency Drive: significant 5th, 7th, 11th, 13th
       harmonics[5] = fundamental * 0.35
-      harmonics[7] = fundamental * 0.20
-      harmonics[11] = fundamental * 0.10
+      harmonics[7] = fundamental * 0.2
+      harmonics[11] = fundamental * 0.1
       harmonics[13] = fundamental * 0.08
       break
 
@@ -235,24 +239,24 @@ export function generateHarmonicSpectrum(loadType, fundamental = 100) {
       // UPS: 3rd, 5th, 7th, 9th, 11th
       harmonics[3] = fundamental * 0.25
       harmonics[5] = fundamental * 0.15
-      harmonics[7] = fundamental * 0.10
+      harmonics[7] = fundamental * 0.1
       harmonics[9] = fundamental * 0.08
       harmonics[11] = fundamental * 0.06
       break
 
     case 'led':
       // LED lighting: 3rd, 5th, 7th
-      harmonics[3] = fundamental * 0.80
-      harmonics[5] = fundamental * 0.50
-      harmonics[7] = fundamental * 0.30
+      harmonics[3] = fundamental * 0.8
+      harmonics[5] = fundamental * 0.5
+      harmonics[7] = fundamental * 0.3
       break
 
     default:
       // Generic non-linear load
-      harmonics[3] = fundamental * 0.30
-      harmonics[5] = fundamental * 0.20
+      harmonics[3] = fundamental * 0.3
+      harmonics[5] = fundamental * 0.2
       harmonics[7] = fundamental * 0.15
-      harmonics[9] = fundamental * 0.10
+      harmonics[9] = fundamental * 0.1
   }
 
   return harmonics

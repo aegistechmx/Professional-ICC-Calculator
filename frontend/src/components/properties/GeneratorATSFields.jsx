@@ -67,10 +67,10 @@ export default function GeneratorATSFields({ node, updateNode }) {
           {localParams.mode === 'auto'
             ? 'Transferencia automática cuando falle la red principal'
             : localParams.mode === 'manual'
-            ? 'Operación manual mediante interruptores'
-            : localParams.mode === 'test'
-            ? 'Modo de prueba sin transferencia real'
-            : 'Modo mantenimiento - sin transferencia'}
+              ? 'Operación manual mediante interruptores'
+              : localParams.mode === 'test'
+                ? 'Modo de prueba sin transferencia real'
+                : 'Modo mantenimiento - sin transferencia'}
         </p>
       </div>
 
@@ -80,7 +80,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
         </label>
         <select
           value={localParams.transferTime || 30}
-          onChange={e => handleParamChange('transferTime', Number(e.target.value))}
+          onChange={e =>
+            handleParamChange('transferTime', Number(e.target.value))
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Seleccionar tiempo...</option>
@@ -107,7 +109,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
         </label>
         <select
           value={localParams.startDelay || 10}
-          onChange={e => handleParamChange('startDelay', Number(e.target.value))}
+          onChange={e =>
+            handleParamChange('startDelay', Number(e.target.value))
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Seleccionar retardo...</option>
@@ -131,7 +135,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
         </label>
         <select
           value={localParams.coolDownTime || 300}
-          onChange={e => handleParamChange('coolDownTime', Number(e.target.value))}
+          onChange={e =>
+            handleParamChange('coolDownTime', Number(e.target.value))
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Seleccionar tiempo...</option>
@@ -155,7 +161,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
         </label>
         <select
           value={localParams.fuelCapacity || 500}
-          onChange={e => handleParamChange('fuelCapacity', Number(e.target.value))}
+          onChange={e =>
+            handleParamChange('fuelCapacity', Number(e.target.value))
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Seleccionar capacidad...</option>
@@ -183,7 +191,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
         </label>
         <select
           value={localParams.fuelConsumption || 15}
-          onChange={e => handleParamChange('fuelConsumption', Number(e.target.value))}
+          onChange={e =>
+            handleParamChange('fuelConsumption', Number(e.target.value))
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Seleccionar consumo...</option>
@@ -231,7 +241,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
           </label>
           <select
             value={localParams.autoStart || 1}
-            onChange={e => handleParamChange('autoStart', Number(e.target.value))}
+            onChange={e =>
+              handleParamChange('autoStart', Number(e.target.value))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="1">Habilitado</option>
@@ -245,7 +257,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
           </label>
           <select
             value={localParams.weeklyTest || 1}
-            onChange={e => handleParamChange('weeklyTest', Number(e.target.value))}
+            onChange={e =>
+              handleParamChange('weeklyTest', Number(e.target.value))
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="1">Habilitada</option>
@@ -256,7 +270,9 @@ export default function GeneratorATSFields({ node, updateNode }) {
 
       <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
         <h4 className="text-sm font-semibold text-blue-900 mb-2">
-          {localParams.mode === 'test' ? '  Modo de Prueba ATS' : '  Información ATS Generador'}
+          {localParams.mode === 'test'
+            ? '  Modo de Prueba ATS'
+            : '  Información ATS Generador'}
         </h4>
         <ul className="text-xs text-blue-800 space-y-1">
           <li>
@@ -269,14 +285,21 @@ export default function GeneratorATSFields({ node, updateNode }) {
             <strong>Transferencia:</strong> Sin interrupción de energía
           </li>
           <li>
-            <strong>Autonomía:</strong> {Math.round((localParams.fuelCapacity || 500) / (localParams.fuelConsumption || 15))} horas
+            <strong>Autonomía:</strong>{' '}
+            {Math.round(
+              (localParams.fuelCapacity || 500) /
+                (localParams.fuelConsumption || 15)
+            )}{' '}
+            horas
           </li>
         </ul>
       </div>
 
       <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
         <h4 className="text-sm font-semibold text-yellow-900 mb-2">
-          {localParams.mode === 'maintenance' ? '  Mantenimiento Activo' : '  Consideraciones Generador'}
+          {localParams.mode === 'maintenance'
+            ? '  Mantenimiento Activo'
+            : '  Consideraciones Generador'}
         </h4>
         <ul className="text-xs text-yellow-800 space-y-1">
           <li>El generador debe tener capacidad para la carga total</li>

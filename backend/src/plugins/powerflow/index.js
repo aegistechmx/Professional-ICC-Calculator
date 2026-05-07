@@ -14,7 +14,8 @@ module.exports = {
   dependencies: [],
 
   async init(context) {
-    context.powerflow = { // power (W)
+    context.powerflow = {
+      // power (W)
       methods: {
         NR: solveLoadFlowRobust,
         FDLF: solveFDLF,
@@ -39,13 +40,15 @@ module.exports = {
     let result
     switch (method) {
       case 'NR':
-        result = context.powerflow.methods.NR(system, { // power (W)
+        result = context.powerflow.methods.NR(system, {
+          // power (W)
           tolerance,
           maxIterations,
         })
         break
       case 'FDLF':
-        result = context.powerflow.methods.FDLF(system, { // power (W)
+        result = context.powerflow.methods.FDLF(system, {
+          // power (W)
           tolerance,
           maxIterations,
         })

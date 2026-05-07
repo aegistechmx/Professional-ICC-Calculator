@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * infrastructure/workers/job.worker.js - Professional distributed job worker
  *
@@ -85,7 +85,11 @@ function calculateScenarioMetrics(system, pfResult) {
     ...system.buses.map(b => {
       const voltage = pfResult.voltages[b.id] // voltage (V)
       return voltage
-        ? toElectricalPrecision(parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)).toFixed(6))
+        ? toElectricalPrecision(
+            parseFloat(
+              Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)
+            ).toFixed(6)
+          )
         : Infinity
     })
   )
@@ -94,7 +98,11 @@ function calculateScenarioMetrics(system, pfResult) {
     ...system.buses.map(b => {
       const voltage = pfResult.voltages[b.id] // voltage (V)
       return voltage
-        ? toElectricalPrecision(parseFloat(Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)).toFixed(6))
+        ? toElectricalPrecision(
+            parseFloat(
+              Math.sqrt(voltage.re * voltage.re + voltage.im * voltage.im)
+            ).toFixed(6)
+          )
         : 0
     })
   )
@@ -301,8 +309,10 @@ function calculateMonteCarloStats(results) {
   const meanImbalance =
     loadGenImbalances.reduce((sum, val) => sum + val, 0) /
     loadGenImbalances.length
-  const voltageViolations = results.map(r => // voltage (V)
-    r.metrics ? r.metrics.voltageViolations : 0
+  const voltageViolations = results.map(
+    (
+      r // voltage (V)
+    ) => (r.metrics ? r.metrics.voltageViolations : 0)
   )
   const meanVoltageViolations =
     voltageViolations.reduce((sum, val) => sum + val, 0) / // voltage (V)
@@ -316,14 +326,22 @@ function calculateMonteCarloStats(results) {
     statistics: {
       loadGenerationImbalance: {
         mean: meanImbalance,
-        min: toElectricalPrecision(parseFloat(Math.min(...loadGenImbalances)).toFixed(6)),
-        max: toElectricalPrecision(parseFloat(Math.max(...loadGenImbalances)).toFixed(6)),
+        min: toElectricalPrecision(
+          parseFloat(Math.min(...loadGenImbalances)).toFixed(6)
+        ),
+        max: toElectricalPrecision(
+          parseFloat(Math.max(...loadGenImbalances)).toFixed(6)
+        ),
         std: calculateStandardDeviation(loadGenImbalances, meanImbalance),
       },
       voltageViolations: {
         mean: meanVoltageViolations,
-        min: toElectricalPrecision(parseFloat(Math.min(...voltageViolations)).toFixed(6)),
-        max: toElectricalPrecision(parseFloat(Math.max(...voltageViolations)).toFixed(6)),
+        min: toElectricalPrecision(
+          parseFloat(Math.min(...voltageViolations)).toFixed(6)
+        ),
+        max: toElectricalPrecision(
+          parseFloat(Math.max(...voltageViolations)).toFixed(6)
+        ),
         std: calculateStandardDeviation(
           voltageViolations,
           meanVoltageViolations

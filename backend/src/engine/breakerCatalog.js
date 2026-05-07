@@ -16,20 +16,20 @@ const BREAKER_CATALOG = {
         // Puntos de curva térmica (I/In vs t en segundos)
         points: [
           { I: 1.05, t: 7200 }, // 2 horas a 105%
-          { I: 1.2, t: 1200 },  // 20 min a 120%
-          { I: 1.5, t: 180 },   // 3 min a 150%
-          { I: 2.0, t: 60 },    // 1 min a 200%
-          { I: 4.0, t: 10 },    // 10s a 400%
-          { I: 6.0, t: 3 },     // 3s a 600%
-          { I: 8.0, t: 1.5 },   // 1.5s a 800%
-          { I: 10.0, t: 0.8 }   // 0.8s a 1000%
-        ]
+          { I: 1.2, t: 1200 }, // 20 min a 120%
+          { I: 1.5, t: 180 }, // 3 min a 150%
+          { I: 2.0, t: 60 }, // 1 min a 200%
+          { I: 4.0, t: 10 }, // 10s a 400%
+          { I: 6.0, t: 3 }, // 3s a 600%
+          { I: 8.0, t: 1.5 }, // 1.5s a 800%
+          { I: 10.0, t: 0.8 }, // 0.8s a 1000%
+        ],
       },
       magnetic: {
         pickup: 10, // 10x In (instantáneo)
         tolerance: 0.2, // ±20%
-        clearingTime: 0.02 // 20ms
-      }
+        clearingTime: 0.02, // 20ms
+      },
     },
     MGA32500: {
       brand: 'Schneider',
@@ -45,14 +45,14 @@ const BREAKER_CATALOG = {
           { I: 4.0, t: 10 },
           { I: 6.0, t: 3 },
           { I: 8.0, t: 1.5 },
-          { I: 10.0, t: 0.8 }
-        ]
+          { I: 10.0, t: 0.8 },
+        ],
       },
       magnetic: {
         pickup: 10,
         tolerance: 0.2,
-        clearingTime: 0.02
-      }
+        clearingTime: 0.02,
+      },
     },
     MGA31600: {
       brand: 'Schneider',
@@ -68,15 +68,15 @@ const BREAKER_CATALOG = {
           { I: 4.0, t: 10 },
           { I: 6.0, t: 3 },
           { I: 8.0, t: 1.5 },
-          { I: 10.0, t: 0.8 }
-        ]
+          { I: 10.0, t: 0.8 },
+        ],
       },
       magnetic: {
         pickup: 10,
         tolerance: 0.2,
-        clearingTime: 0.02
-      }
-    }
+        clearingTime: 0.02,
+      },
+    },
   },
 
   // ABB - SACE Smax
@@ -95,15 +95,15 @@ const BREAKER_CATALOG = {
           { I: 4.0, t: 10 },
           { I: 6.0, t: 3 },
           { I: 8.0, t: 1.5 },
-          { I: 10.0, t: 0.8 }
-        ]
+          { I: 10.0, t: 0.8 },
+        ],
       },
       magnetic: {
         pickup: 10,
         tolerance: 0.2,
-        clearingTime: 0.02
-      }
-    }
+        clearingTime: 0.02,
+      },
+    },
   },
 
   // Eaton - Cutler-Hammer
@@ -122,17 +122,17 @@ const BREAKER_CATALOG = {
           { I: 4.0, t: 10 },
           { I: 6.0, t: 3 },
           { I: 8.0, t: 1.5 },
-          { I: 10.0, t: 0.8 }
-        ]
+          { I: 10.0, t: 0.8 },
+        ],
       },
       magnetic: {
         pickup: 10,
         tolerance: 0.2,
-        clearingTime: 0.02
-      }
-    }
-  }
-};
+        clearingTime: 0.02,
+      },
+    },
+  },
+}
 
 /**
  * Obtiene breaker del catálogo
@@ -143,12 +143,12 @@ const BREAKER_CATALOG = {
  */
 function getBreaker(brand, model) {
   if (!BREAKER_CATALOG[brand]) {
-    throw new Error(`Marca no encontrada: ${brand}`);
+    throw new Error(`Marca no encontrada: ${brand}`)
   }
   if (!BREAKER_CATALOG[brand][model]) {
-    throw new Error(`Modelo no encontrado: ${brand} ${model}`);
+    throw new Error(`Modelo no encontrado: ${brand} ${model}`)
   }
-  return BREAKER_CATALOG[brand][model];
+  return BREAKER_CATALOG[brand][model]
 }
 
 /**
@@ -156,21 +156,21 @@ function getBreaker(brand, model) {
  * @returns {Array} Lista de breakers
  */
 function listBreakers() {
-  const list = [];
+  const list = []
   for (const brand in BREAKER_CATALOG) {
     for (const model in BREAKER_CATALOG[brand]) {
       list.push({
         brand,
         model,
-        ...BREAKER_CATALOG[brand][model]
-      });
+        ...BREAKER_CATALOG[brand][model],
+      })
     }
   }
-  return list;
+  return list
 }
 
 module.exports = {
   BREAKER_CATALOG,
   getBreaker,
-  listBreakers
-};
+  listBreakers,
+}

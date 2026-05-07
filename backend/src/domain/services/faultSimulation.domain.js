@@ -1,4 +1,4 @@
-const { toElectricalPrecision } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * backend/src/domain/services/faultSimulation.domain.js
  * Motor de Simulación de Fallas Dinámica
@@ -7,8 +7,8 @@ const { toElectricalPrecision } = require('../../utils/electricalUtils');
 
 class FaultSimulationEngine {
   constructor() {
-    this.dt = 0.01; // Paso de tiempo en segundos
-    this.maxTime = 2.0; // Tiempo máximo de simulación
+    this.dt = 0.01 // Paso de tiempo en segundos
+    this.maxTime = 2.0 // Tiempo máximo de simulación
   }
 
   /**
@@ -18,18 +18,18 @@ class FaultSimulationEngine {
    * @returns {Object} Timeline de eventos
    */
   simulate(sistema, falla) {
-    const { tipo = '3F', nodo, tiempoInicio = 0, duracion = 0.2 } = falla;
+    const { tipo = '3F', nodo, tiempoInicio = 0, duracion = 0.2 } = falla
 
     // Inicializar estado
-    let t = 0;
-    const eventos = [];
-    const nodosEstado = this._inicializarNodos(sistema);
-    const protecciones = this._inicializarProtecciones(sistema);
+    let t = 0
+    const eventos = []
+    const nodosEstado = this._inicializarNodos(sistema)
+    const protecciones = this._inicializarProtecciones(sistema)
 
     // Loop de simulación
     while (t <= this.maxTime) {
       // Determinar estado de la falla
-      const fallaActiva = this._isFallaActiva(t, tiempoInicio, duracion, nodo);
+      const fallaActiva = this._isFallaActiva(t, tiempoInicio, duracion, nodo)
 
       // Calcular corrientes en cada nodo
       const estadoActual = this._calcularEstado(
@@ -38,13 +38,13 @@ class FaultSimulationEngine {
         fallaActiva,
         nodo,
         tipo
-      );
+      )
 
       // Evaluar disparo de protecciones
-      const disparos = this._evaluarDisparos(protecciones, estadoActual, t);
+      const disparos = this._evaluarDisparos(protecciones, estadoActual, t)
 
       // Aplicar disparos al estado
-      this._aplicarDisparos(nodosEstado, protecciones, disparos);
+      this._aplicarDisparos(nodosEstado, protecciones, disparos)
 
       // Registrar evento
       eventos.push({
@@ -54,24 +54,26 @@ class FaultSimulationEngine {
           corriente: toElectricalPrecision(parseFloat(n.corriente.toFixed(2))),
           voltaje: toElectricalPrecision(parseFloat(n.voltaje.toFixed(1))),
           activo: n.activo,
-          protegido: n.protegido
+          protegido: n.protegido,
         })),
         disparos: disparos.map(d => ({
           proteccionId: d.proteccionId,
-          tiempoDisparo: toElectricalPrecision(parseFloat(d.tiempoDisparo.toFixed(3))),
-          tipoDisparo: d.tipoDisparo
+          tiempoDisparo: toElectricalPrecision(
+            parseFloat(d.tiempoDisparo.toFixed(3))
+          ),
+          tipoDisparo: d.tipoDisparo,
         })),
-        fallaActiva
-      });
+        fallaActiva,
+      })
 
-      t += this.dt;
+      t += this.dt
     }
 
     return {
       timeline: eventos,
       resumen: this._generarResumen(eventos, falla),
-      estadisticas: this._calcularEstadisticas(eventos)
-    };
+      estadisticas: this._calcularEstadisticas(eventos),
+    }
   }
 
   /**
@@ -87,19 +89,19 @@ class FaultSimulationEngine {
       activo: true,
       protegido: false,
       corriente: node.data?.I_carga || 0,
-      voltaje: node.data?.voltaje || 0
-    }));
+      voltaje: node.data?.voltaje || 0,
+    }))
   }
 
   /**
    * Inicializar protecciones
    */
   _inicializarProtecciones(sistema) {
-    const protecciones = [];
+    const protecciones = []
 
     sistema.nodes.forEach(node => {
       if (node.type === 'breaker' || node.data?.protection) {
-        const prot = node.data?.protection || node.data;
+        const prot = node.data?.protection || node.data
 
         protecciones.push({
           id: node.id,
@@ -109,13 +111,13 @@ class FaultSimulationEngine {
           tipo: prot?.tipo || 'termomagnético',
           curva: this._getCurvaProteccion(prot?.tipo || 'termomagnético'),
           disparado: false,
-          tiempoDisparo: null
-        });
+          tiempoDisparo: null,
+        })
       }
 
       // Protección asociada a cargas
       if (node.data?.protection) {
-        const prot = node.data.protection;
+        const prot = node.data.protection
         protecciones.push({
           id: `prot-${node.id}`,
           nodeId: node.id,
@@ -125,12 +127,12 @@ class FaultSimulationEngine {
           curva: this._getCurvaProteccion(prot?.tipo || 'termomagnético'),
           disparado: false,
           tiempoDisparo: null,
-          upstream: true
-        });
+          upstream: true,
+        })
       }
-    });
+    })
 
-    return protecciones;
+    return protecciones
   }
 
   /**
@@ -142,21 +144,21 @@ class FaultSimulationEngine {
         return {
           k: 100,
           n: 2,
-          instantaneo: 10
-        };
+          instantaneo: 10,
+        }
       case 'electronico':
         return {
           k: 50,
           n: 1.5,
-          instantaneo: 15
-        };
+          instantaneo: 15,
+        }
       case 'termomagnético':
       default:
         return {
           k: 80,
           n: 2,
-          instantaneo: 10
-        };
+          instantaneo: 10,
+        }
     }
   }
 
@@ -164,7 +166,7 @@ class FaultSimulationEngine {
    * Verificar si la falla está activa
    */
   _isFallaActiva(t, tiempoInicio, duracion, _nodoFalla) {
-    return t >= tiempoInicio && t <= (tiempoInicio + duracion);
+    return t >= tiempoInicio && t <= tiempoInicio + duracion
   }
 
   /**
@@ -176,95 +178,94 @@ class FaultSimulationEngine {
         return {
           ...node,
           corriente: 0,
-          voltaje: 0
-        };
+          voltaje: 0,
+        }
       }
 
-      let I = node.I_base;
-      let V = node.V_base;
+      let I = node.I_base
+      let V = node.V_base
 
       // Aplicar efecto de falla
       if (fallaActiva && node.id === nodoFalla) {
         // Multiplicador según tipo de falla
         const multiplicadores = {
-          '3F': 10,    // Trifásica
-          '2F': 8.66,  // Bifásica
-          '1F': 5,     // Monofásica
-          'FT': 6      // Fase-tierra
-        };
+          '3F': 10, // Trifásica
+          '2F': 8.66, // Bifásica
+          '1F': 5, // Monofásica
+          FT: 6, // Fase-tierra
+        }
 
-        I *= multiplicadores[tipoFalla] || 10;
-        V *= 0.1; // Caída de tensión severa
+        I *= multiplicadores[tipoFalla] || 10
+        V *= 0.1 // Caída de tensión severa
       } else if (fallaActiva) {
         // Nodos cercanos afectados
-        V *= 0.7; // Caída de tensión por falla
+        V *= 0.7 // Caída de tensión por falla
       }
 
       return {
         ...node,
         corriente: I,
         voltaje: V,
-        protegido: protecciones.some(p =>
-          p.nodeId === node.id && p.disparado
-        )
-      };
-    });
+        protegido: protecciones.some(p => p.nodeId === node.id && p.disparado),
+      }
+    })
   }
 
   /**
    * Evaluar disparos de protecciones
    */
   _evaluarDisparos(protecciones, estado, t) {
-    const disparos = [];
+    const disparos = []
 
     protecciones.forEach(prot => {
-      if (prot.disparado) return;
+      if (prot.disparado) return
 
-      const nodeEstado = estado.find(n => n.id === prot.nodeId);
-      if (!nodeEstado) return;
+      const nodeEstado = estado.find(n => n.id === prot.nodeId)
+      if (!nodeEstado) return
 
-      const I = nodeEstado.corriente; // current (A)
-      const In = prot.In;
+      const I = nodeEstado.corriente // current (A)
+      const In = prot.In
 
       // Evaluar si debe disparar
-      const tiempoDisparo = this._calcularTiempoDisparo(I, In, prot.curva);
+      const tiempoDisparo = this._calcularTiempoDisparo(I, In, prot.curva)
 
       if (tiempoDisparo !== null && tiempoDisparo <= t) {
         disparos.push({
           proteccionId: prot.id,
           tiempoDisparo: t,
-          tipoDisparo: I / In > prot.curva.instantaneo ? 'instantaneo' : 'temporizado'
-        });
+          tipoDisparo:
+            I / In > prot.curva.instantaneo ? 'instantaneo' : 'temporizado',
+        })
       }
-    });
+    })
 
-    return disparos;
+    return disparos
   }
 
   /**
    * Calcular tiempo de disparo según curva
    */
   _calcularTiempoDisparo(I, In, curva) {
-    const ratio = I / In;
+    const ratio = I / In
 
     // No opera si I < In
     if (ratio < 1.0) {
-      return null;
+      return null
     }
 
     // Disparo instantáneo
     if (ratio > curva.instantaneo) {
-      return 0.02; // 20 ms
+      return 0.02 // 20 ms
     }
 
     // Curva inversa - prevenir división por cero
-    const denominador = Math.pow(ratio - 1, curva.n);
+    const denominador = Math.pow(ratio - 1, curva.n)
     if (denominador < 1e-6) {
-      return 0.1; // Valor mínimo de seguridad
+      return 0.1 // Valor mínimo de seguridad
     }
 
-    const tiempo = curva.k / denominador;
-    return Math.max(0.1, tiempo / 100); // Normalizar a segundos
+    const tiempo = curva.k / denominador
+    return Math.max(0.1, tiempo / 100) // Normalizar a segundos
   }
 
   /**
@@ -272,31 +273,35 @@ class FaultSimulationEngine {
    */
   _aplicarDisparos(nodos, protecciones, disparos) {
     disparos.forEach(disparo => {
-      const prot = protecciones.find(p => p.id === disparo.proteccionId);
+      const prot = protecciones.find(p => p.id === disparo.proteccionId)
       if (prot) {
-        prot.disparado = true;
-        prot.tiempoDisparo = disparo.tiempoDisparo;
+        prot.disparado = true
+        prot.tiempoDisparo = disparo.tiempoDisparo
 
         // Desactivar nodo protegido
-        const node = nodos.find(n => n.id === prot.nodeId);
+        const node = nodos.find(n => n.id === prot.nodeId)
         if (node) {
-          node.activo = false;
-          node.protegido = true;
+          node.activo = false
+          node.protegido = true
         }
       }
-    });
+    })
   }
 
   /**
    * Generar resumen de simulación
    */
   _generarResumen(eventos, falla) {
-    const ultimoEstado = eventos[eventos.length - 1];
-    const primerDisparo = eventos.find(e => e.disparos.length > 0);
+    const ultimoEstado = eventos[eventos.length - 1]
+    const primerDisparo = eventos.find(e => e.disparos.length > 0)
 
-    const nodosDesenergizados = ultimoEstado.estado.filter(n => !n.activo).length;
-    const nodosEnergizados = ultimoEstado.estado.filter(n => n.activo).length;
-    const proteccionesOperadas = ultimoEstado.estado.filter(n => n.protegido).length;
+    const nodosDesenergizados = ultimoEstado.estado.filter(
+      n => !n.activo
+    ).length
+    const nodosEnergizados = ultimoEstado.estado.filter(n => n.activo).length
+    const proteccionesOperadas = ultimoEstado.estado.filter(
+      n => n.protegido
+    ).length
 
     return {
       tipoFalla: falla.tipo,
@@ -306,8 +311,8 @@ class FaultSimulationEngine {
       nodosRestaurados: nodosEnergizados,
       proteccionesOperadas: proteccionesOperadas,
       tiempoTotalSimulacion: ultimoEstado.t,
-      coordenacionExitosa: this._verificarCoordinacion(eventos)
-    };
+      coordenacionExitosa: this._verificarCoordinacion(eventos),
+    }
   }
 
   /**
@@ -317,48 +322,55 @@ class FaultSimulationEngine {
     const disparos = eventos
       .filter(e => e.disparos.length > 0)
       .map(e => e.disparos)
-      .flat();
+      .flat()
 
-    if (disparos.length < 2) return true;
+    if (disparos.length < 2) return true
 
     // Verificar que hay margen de tiempo entre disparos
-    const tiempos = disparos.map(d => d.tiempoDisparo).sort((a, b) => a - b);
+    const tiempos = disparos.map(d => d.tiempoDisparo).sort((a, b) => a - b)
 
     for (let i = 1; i < tiempos.length; i++) {
-      const delta = tiempos[i] - tiempos[i - 1];
-      if (delta < 0.1) { // Menos de 100ms no es suficiente coordinación
-        return false;
+      const delta = tiempos[i] - tiempos[i - 1]
+      if (delta < 0.1) {
+        // Menos de 100ms no es suficiente coordinación
+        return false
       }
     }
 
-    return true;
+    return true
   }
 
   /**
    * Calcular estadísticas
    */
   _calcularEstadisticas(eventos) {
-    const corrientesMaximas = {}; // current (A)
-    const voltajesMinimos = {}; // voltage (V)
+    const corrientesMaximas = {} // current (A)
+    const voltajesMinimos = {} // voltage (V)
 
     eventos.forEach(e => {
       e.estado.forEach(node => {
-        if (!corrientesMaximas[node.id] || node.corriente > corrientesMaximas[node.id]) {
-          corrientesMaximas[node.id] = node.corriente; // current (A)
+        if (
+          !corrientesMaximas[node.id] ||
+          node.corriente > corrientesMaximas[node.id]
+        ) {
+          corrientesMaximas[node.id] = node.corriente // current (A)
         }
-        if (!voltajesMinimos[node.id] || node.voltaje < voltajesMinimos[node.id]) {
-          voltajesMinimos[node.id] = node.voltaje; // voltage (V)
+        if (
+          !voltajesMinimos[node.id] ||
+          node.voltaje < voltajesMinimos[node.id]
+        ) {
+          voltajesMinimos[node.id] = node.voltaje // voltage (V)
         }
-      });
-    });
+      })
+    })
 
     return {
       corrientesMaximas,
       voltajesMinimos,
       pasosSimulacion: eventos.length,
-      tiempoTotal: eventos[eventos.length - 1]?.t || 0
-    };
+      tiempoTotal: eventos[eventos.length - 1]?.t || 0,
+    }
   }
 }
 
-module.exports = FaultSimulationEngine;
+module.exports = FaultSimulationEngine

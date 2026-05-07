@@ -3,8 +3,8 @@
  * Siempre definido según 60/75°C
  */
 
-const { getAmpacity } = require('./catalogs.js');
-const { assertEnum } = require('./guards.js');
+const { getAmpacity } = require('./catalogs.js')
+const { assertEnum } = require('./guards.js')
 
 /**
  * Calcula el límite de terminal
@@ -15,23 +15,19 @@ const { assertEnum } = require('./guards.js');
  * @returns {Object} Resultados del cálculo
  * @throws {Error} Si los parámetros son inválidos
  */
-function calcTerminalLimit({
-  material = 'Cu',
-  size,
-  terminalTempC = 75
-}) {
-  assertEnum('terminalTempC', terminalTempC, [60, 75]);
+function calcTerminalLimit({ material = 'Cu', size, terminalTempC = 75 }) {
+  assertEnum('terminalTempC', terminalTempC, [60, 75])
 
   // REGLA: Terminal siempre limita con 60°C o 75°C
-  const I_terminal = getAmpacity(material, terminalTempC, size);
+  const I_terminal = getAmpacity(material, terminalTempC, size)
 
   if (!I_terminal || I_terminal <= 0) {
-    throw new Error('Límite de terminal inválido');
+    throw new Error('Límite de terminal inválido')
   }
 
-  return { I_terminal };
+  return { I_terminal }
 }
 
 module.exports = {
-  calcTerminalLimit
-};
+  calcTerminalLimit,
+}

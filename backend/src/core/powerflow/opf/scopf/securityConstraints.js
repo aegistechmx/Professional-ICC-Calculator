@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * securityConstraints.js - Security constraints for SCOPF
  *
@@ -181,7 +181,8 @@ function updateSystemGeneration(system, solution) {
 function checkVoltageViolations(voltages, options) {
   const violations = []
 
-  voltages.forEach((V, i) => { // voltage (V)
+  voltages.forEach((V, i) => {
+    // voltage (V)
     const magnitude = Math.sqrt(V.re * V.re + V.im * V.im)
 
     if (magnitude < options.voltageMin) {
@@ -228,7 +229,9 @@ function checkLineFlowViolations(system, pfResult, limitFactor) {
   pfResult.flows.forEach((flow, _i) => {
     const branch = system.branches.find(b => b.id === flow.id)
     if (branch && branch.limit) {
-      const loading = toElectricalPrecision(parseFloat((Math.abs(flow.power)) / branch.limit).toFixed(6)); // power (W)
+      const loading = toElectricalPrecision(
+        parseFloat(Math.abs(flow.power) / branch.limit).toFixed(6)
+      ) // power (W)
       const limit = branch.limit * limitFactor
 
       if (Math.abs(flow.power) > limit) {

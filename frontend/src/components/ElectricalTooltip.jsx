@@ -3,84 +3,137 @@
  * Muestra Isc, Icu, carga y otros datos relevantes
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import './ElectricalTooltip.css';
+import React from 'react'
+import PropTypes from 'prop-types'
+import './ElectricalTooltip.css'
 
 export default function ElectricalTooltip({ node, visible }) {
-  if (!visible || !node) return null;
+  if (!visible || !node) return null
 
-  const { data, type } = node;
-  const { results, label, status } = data || {};
+  const { data, type } = node
+  const { results, label, status } = data || {}
 
   // Formatear valores
   const format = (value, unit = '', decimals = 2) => {
-    if (value === undefined || value === null) return '-';
-    return `${Number(value).toFixed(decimals)} ${unit}`;
-  };
+    if (value === undefined || value === null) return '-'
+    return `${Number(value).toFixed(decimals)} ${unit}`
+  }
 
   // Datos específicos por tipo
   const getTypeSpecificData = () => {
     switch (type) {
       case 'source':
         return [
-          { label: 'Voltaje', value: format(data?.voltaje || results?.voltage, 'V', 0), color: 'blue' },
-          { label: 'Isc', value: format(results?.shortCircuitCurrent, 'kA'), color: 'red' },
-          { label: 'Potencia', value: format(results?.availablePower, 'kW'), color: 'green' }
-        ];
+          {
+            label: 'Voltaje',
+            value: format(data?.voltaje || results?.voltage, 'V', 0),
+            color: 'blue',
+          },
+          {
+            label: 'Isc',
+            value: format(results?.shortCircuitCurrent, 'kA'),
+            color: 'red',
+          },
+          {
+            label: 'Potencia',
+            value: format(results?.availablePower, 'kW'),
+            color: 'green',
+          },
+        ]
 
       case 'transformer':
         return [
           { label: 'kVA', value: format(data?.kva, 'kVA', 1), color: 'purple' },
-          { label: 'Primario', value: format(data?.primario, 'V', 0), color: 'blue' },
-          { label: 'Secundario', value: format(data?.secundario, 'V', 0), color: 'blue' },
-          { label: 'Impedancia', value: format(data?.Z, '%'), color: 'orange' }
-        ];
+          {
+            label: 'Primario',
+            value: format(data?.primario, 'V', 0),
+            color: 'blue',
+          },
+          {
+            label: 'Secundario',
+            value: format(data?.secundario, 'V', 0),
+            color: 'blue',
+          },
+          { label: 'Impedancia', value: format(data?.Z, '%'), color: 'orange' },
+        ]
 
       case 'breaker':
         return [
           { label: 'In', value: format(data?.In, 'A', 0), color: 'green' },
           { label: 'Icu', value: format(data?.Icu, 'kA', 1), color: 'red' },
-          { label: 'Tipo', value: data?.tipo || 'Termomagnético', color: 'gray' }
-        ];
+          {
+            label: 'Tipo',
+            value: data?.tipo || 'Termomagnético',
+            color: 'gray',
+          },
+        ]
 
       case 'load':
       case 'motor':
         return [
-          { label: 'I carga', value: format(data?.I_carga, 'A', 1), color: 'green' },
-          { label: 'Longitud', value: format(data?.longitud, 'm', 0), color: 'gray' },
-          { label: 'Caída', value: format(results?.voltageDrop, '%'), color: 'orange' }
-        ];
+          {
+            label: 'I carga',
+            value: format(data?.I_carga, 'A', 1),
+            color: 'green',
+          },
+          {
+            label: 'Longitud',
+            value: format(data?.longitud, 'm', 0),
+            color: 'gray',
+          },
+          {
+            label: 'Caída',
+            value: format(results?.voltageDrop, '%'),
+            color: 'orange',
+          },
+        ]
 
       case 'panel':
         return [
-          { label: 'Voltaje', value: format(data?.tension, 'V', 0), color: 'blue' },
+          {
+            label: 'Voltaje',
+            value: format(data?.tension, 'V', 0),
+            color: 'blue',
+          },
           { label: 'Fases', value: data?.fases || 3, color: 'yellow' },
-          { label: 'Carga total', value: format(results?.totalLoad, 'A'), color: 'green' }
-        ];
+          {
+            label: 'Carga total',
+            value: format(results?.totalLoad, 'A'),
+            color: 'green',
+          },
+        ]
 
       default:
-        return [];
+        return []
     }
-  };
+  }
 
-  const specificData = getTypeSpecificData();
+  const specificData = getTypeSpecificData()
 
   // Color del estado
   const getStatusColor = () => {
     switch (status) {
-      case 'calculated': return '#10b981';
-      case 'error': return '#ef4444';
-      case 'tripped': return '#dc2626';
-      case 'overload': return '#f59e0b';
-      case 'pending': return '#f59e0b';
-      default: return '#6b7280';
+      case 'calculated':
+        return '#10b981'
+      case 'error':
+        return '#ef4444'
+      case 'tripped':
+        return '#dc2626'
+      case 'overload':
+        return '#f59e0b'
+      case 'pending':
+        return '#f59e0b'
+      default:
+        return '#6b7280'
     }
-  };
+  }
 
   return (
     <div className="electrical-tooltip-container">
-      <div className="tooltip-header" style={{ borderLeftColor: getStatusColor() }}>
+      <div
+        className="tooltip-header"
+        style={{ borderLeftColor: getStatusColor() }}
+      >
         <span className="tooltip-type">{type?.toUpperCase()}</span>
         <span className="tooltip-label">{label || type}</span>
       </div>
@@ -133,7 +186,9 @@ export default function ElectricalTooltip({ node, visible }) {
               {results.caida?.porcentaje !== undefined && (
                 <div className="data-item">
                   <span className="data-label">Caída tensión:</span>
-                  <span className={`data-value ${results.caida.porcentaje > 3 ? 'color-red' : 'color-green'}`}>
+                  <span
+                    className={`data-value ${results.caida.porcentaje > 3 ? 'color-red' : 'color-green'}`}
+                  >
                     {format(results.caida.porcentaje, '%')}
                   </span>
                 </div>
@@ -153,10 +208,10 @@ export default function ElectricalTooltip({ node, visible }) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 ElectricalTooltip.propTypes = {
   node: PropTypes.object,
-  visible: PropTypes.bool
-};
+  visible: PropTypes.bool,
+}

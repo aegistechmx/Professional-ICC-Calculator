@@ -11,9 +11,12 @@
  * @returns {number} Total cost ($/hour)
  */
 function totalCost(generators) {
-  return generators.reduce((sum, gen) => {
-    return sum + gen.getCost()
+  const total = generators.reduce((sum, gen) => {
+    const cost = gen.getCost()
+    const numericCost = typeof cost === 'string' ? parseFloat(cost) : cost
+    return sum + numericCost
   }, 0)
+  return Math.round(total * 1000000) / 1000000
 }
 
 /**

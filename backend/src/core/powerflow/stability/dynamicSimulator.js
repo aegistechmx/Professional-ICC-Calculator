@@ -136,7 +136,8 @@ class DynamicSimulator {
     this.generators.forEach((gen, _i) => {
       const bus = system.buses.find(b => b.id === gen.bus)
       if (bus) {
-        bus.voltage = { // voltage (V)
+        bus.voltage = {
+          // voltage (V)
           magnitude: 1.0, // Assume constant voltage magnitude
           angle: gen.delta, // Use generator angle as bus angle
         }

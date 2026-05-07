@@ -9,8 +9,8 @@ const {
   _toDisplayPrecision,
   formatElectricalValue,
   _getPrecisionForType,
-  _validatePrecision
-} = require('./precision');
+  _validatePrecision,
+} = require('./precision')
 
 /**
  * Convert to electrical precision (backward compatibility)
@@ -19,7 +19,7 @@ const {
  * @returns {number} Value with electrical precision
  */
 function toElectricalPrecision(value, precision = 6) {
-  return toPrecision(value, precision);
+  return toPrecision(value, precision)
 }
 
 /**
@@ -30,8 +30,10 @@ function toElectricalPrecision(value, precision = 6) {
  * @param {number} length - Length in km (optional, default 1)
  * @returns {Object} Voltage drop { magnitude, angle }
  */
-function calculateVoltageDrop(current, resistance, reactance, length = 5) { // current (A)
-  if (typeof current !== 'number' || isNaN(current)) { // current (A)
+function calculateVoltageDrop(current, resistance, reactance, length = 5) {
+  // current (A)
+  if (typeof current !== 'number' || isNaN(current)) {
+    // current (A)
     throw new Error('Current must be a valid number')
   }
   if (typeof resistance !== 'number' || isNaN(resistance)) {
@@ -41,13 +43,18 @@ function calculateVoltageDrop(current, resistance, reactance, length = 5) { // c
     throw new Error('Reactance must be a valid number')
   }
 
-  const voltageDrop = { // voltage (V)
-    real: current * resistance * length,
-    imag: current * reactance * length,
+  const voltageDrop = {
+    // voltage (V)
+    real: parseFloat((current * resistance * length).toFixed(6)),
+    imag: parseFloat((current * reactance * length).toFixed(6)),
   }
 
-  const magnitude = toElectricalPrecision(Math.sqrt(voltageDrop.real ** 2 + voltageDrop.imag ** 2), 'voltage') // voltage (V)
-  const angle = toElectricalPrecision(Math.atan2(voltageDrop.imag, voltageDrop.real), 'angle') // voltage (V)
+  const magnitude = parseFloat(
+    Math.sqrt(voltageDrop.real ** 2 + voltageDrop.imag ** 2).toFixed(6)
+  )
+  const angle = toElectricalPrecision(
+    Math.atan2(voltageDrop.imag, voltageDrop.real)
+  )
 
   return {
     magnitude: toElectricalPrecision(magnitude),
@@ -63,14 +70,15 @@ function calculateVoltageDrop(current, resistance, reactance, length = 5) { // c
  * @returns {number} Power loss in watts
  */
 function calculatePowerLoss(current, resistance) {
-  if (typeof current !== 'number' || isNaN(current)) { // current (A)
+  if (typeof current !== 'number' || isNaN(current)) {
+    // current (A)
     throw new Error('Current must be a valid number')
   }
   if (typeof resistance !== 'number' || isNaN(resistance)) {
     throw new Error('Resistance must be a valid number')
   }
 
-  const powerLoss = toElectricalPrecision(current ** 2 * resistance, 'power'); // current (A)
+  const powerLoss = parseFloat((current ** 2 * resistance).toFixed(6))
   return powerLoss
 }
 
@@ -81,19 +89,23 @@ function calculatePowerLoss(current, resistance) {
  * @returns {number} Short circuit current in amperes
  */
 function calculateShortCircuitCurrent(voltage, impedance) {
-  if (typeof voltage !== 'number' || isNaN(voltage)) { // voltage (V)
+  if (typeof voltage !== 'number' || isNaN(voltage)) {
+    // voltage (V)
     throw new Error('Voltage must be a valid number')
   }
   // Allow simple number impedance for test compatibility
-  if (typeof impedance === 'number') { // impedance (Ω)
-    if (impedance === 0) { // impedance (Ω)
+  if (typeof impedance === 'number') {
+    // impedance (Ω)
+    if (impedance === 0) {
+      // impedance (Ω)
       throw new Error('Impedance cannot be zero for short circuit calculation')
     }
-    const isc = toElectricalPrecision(voltage / (Math.sqrt(3) * impedance), 'current') // voltage (V)
+    const isc = parseFloat((voltage / (Math.sqrt(3) * impedance)).toFixed(6))
     return isc
   }
 
-  if (!impedance || typeof impedance !== 'object') { // impedance (Ω)
+  if (!impedance || typeof impedance !== 'object') {
+    // impedance (Ω)
     throw new Error(
       'Impedance must be a valid object with real and imag properties'
     )
@@ -105,12 +117,14 @@ function calculateShortCircuitCurrent(voltage, impedance) {
     throw new Error('Impedance components must be valid numbers')
   }
 
-  const z = toElectricalPrecision(Math.sqrt(impedance.real ** 2 + impedance.imag ** 2), 'impedance'); // impedance (Ω)
+  const z = parseFloat(
+    Math.sqrt(impedance.real ** 2 + impedance.imag ** 2).toFixed(6)
+  )
   if (z === 0) {
     throw new Error('Impedance cannot be zero for short circuit calculation')
   }
 
-  const isc = toElectricalPrecision(voltage / (Math.sqrt(3) * z), 'current') // voltage (V)
+  const isc = parseFloat((voltage / (Math.sqrt(3) * z)).toFixed(6))
   return isc
 }
 
@@ -130,7 +144,7 @@ function calculatePowerFactor(realPower, apparentPower) {
   if (apparentPower === 0) {
     return 0 // Power factor is 0 when apparent power is 0
   }
-  return toElectricalPrecision(realPower / apparentPower, 'coordination');
+  return parseFloat((realPower / apparentPower).toFixed(6))
 }
 
 /**
@@ -140,17 +154,21 @@ function calculatePowerFactor(realPower, apparentPower) {
  * @returns {number} Apparent power in VA
  */
 function calculateApparentPower(voltage, current) {
-  if (typeof voltage !== 'number' || isNaN(voltage)) { // voltage (V)
+  if (typeof voltage !== 'number' || isNaN(voltage)) {
+    // voltage (V)
     throw new Error('Voltage must be a valid number')
   }
-  if (typeof current !== 'number' || isNaN(current)) { // current (A)
+  if (typeof current !== 'number' || isNaN(current)) {
+    // current (A)
     throw new Error('Current must be a valid number')
   }
 
   // Apparent Power = V × I × √3, then convert to kVA
-  const apparentPowerVA = voltage * current * Math.sqrt(3)
-  const apparentPowerKVA = apparentPowerVA / 1000
-  return toElectricalPrecision(apparentPowerKVA, 'power')
+  const apparentPowerVA = parseFloat(
+    (voltage * current * Math.sqrt(3)).toFixed(6)
+  )
+  const apparentPowerKVA = parseFloat((apparentPowerVA / 1000).toFixed(6))
+  return apparentPowerKVA
 }
 
 /**
@@ -161,7 +179,8 @@ function calculateApparentPower(voltage, current) {
  * @returns {number} Converted power value
  */
 function convertPowerUnits(power, fromUnit, toUnit) {
-  if (typeof power !== 'number' || isNaN(power)) { // power (W)
+  if (typeof power !== 'number' || isNaN(power)) {
+    // power (W)
     throw new Error('Power must be a valid number')
   }
   if (typeof fromUnit !== 'string' || typeof toUnit !== 'string') {
@@ -191,8 +210,8 @@ function convertPowerUnits(power, fromUnit, toUnit) {
   const fromMultiplier = units[fromUnit]
   const toMultiplier = units[toUnit]
 
-  const powerInWatts = toElectricalPrecision(power * fromMultiplier, 'power'); // power (W)
-  return toElectricalPrecision(powerInWatts / toMultiplier, 'power')
+  const powerInWatts = parseFloat((power * fromMultiplier).toFixed(6))
+  return parseFloat((powerInWatts / toMultiplier).toFixed(6))
 }
 
 /**
@@ -204,21 +223,25 @@ function validateElectricalParams(params) {
   const errors = []
 
   // Validate voltage levels
-  if (params.voltage !== undefined) { // voltage (V)
-    if (params.voltage <= 0 || params.voltage > 1000000) { // voltage (V)
+  if (params.voltage !== undefined) {
+    // voltage (V)
+    if (params.voltage <= 0 || params.voltage > 1000000) {
+      // voltage (V)
       errors.push('Voltage must be between 0 and 1,000,000 V')
     }
   }
 
   // Validate current
-  if (params.current !== undefined) { // current (A)
+  if (params.current !== undefined) {
+    // current (A)
     if (params.current < 0 || params.current > 100000) {
       errors.push('Current must be between 0 and 100,000 A')
     }
   }
 
   // Validate impedance - allow negative reactance (capacitive)
-  if (params.impedance !== undefined) { // impedance (Ω)
+  if (params.impedance !== undefined) {
+    // impedance (Ω)
     if (params.impedance.real < 0) {
       errors.push('Resistance must be non-negative')
     }
@@ -233,8 +256,9 @@ function validateElectricalParams(params) {
   }
 
   // Validate power
-  if (params.power !== undefined) { // power (W)
-    if (toElectricalPrecision(Math.abs(params.power), 'power') > 10000) {
+  if (params.power !== undefined) {
+    // power (W)
+    if (toElectricalPrecision(Math.abs(params.power)) > 10000) {
       errors.push('Power magnitude should not exceed 10 MW')
     }
   }
@@ -252,16 +276,21 @@ function validateElectricalParams(params) {
  * @param {number} powerFactor - Power factor (0-1)
  * @returns {Object} Three-phase power { real, reactive, apparent }
  */
-function calculateThreePhasePower(voltage, current, powerFactor = 1) { // voltage (V)
-  const apparentPower = calculateApparentPower(voltage, current) // voltage (V)
-  const realPower = toElectricalPrecision(apparentPower * powerFactor, 'power'); // power (W)
-  const reactivePower = toElectricalPrecision(Math.sqrt(apparentPower ** 2 - realPower ** 2), 'power');
+function calculateThreePhasePower(voltage, current, powerFactor = 1) {
+  // voltage (V)
+  const apparentPower = calculateApparentPower(voltage, current)
+  const realPower = parseFloat((apparentPower * powerFactor).toFixed(6))
+  const reactivePowerSquared = parseFloat(
+    (apparentPower ** 2 - realPower ** 2).toFixed(6)
+  )
+  const reactivePower =
+    reactivePowerSquared >= 0 ? Math.sqrt(reactivePowerSquared) : 0
 
   return {
-    real: toElectricalPrecision(realPower, 'power'),
-    reactive: toElectricalPrecision(reactivePower, 'power'),
-    apparent: toElectricalPrecision(apparentPower, 'power'),
-    powerFactor: toElectricalPrecision(powerFactor, 'coordination'),
+    real: parseFloat(realPower.toFixed(6)),
+    reactive: parseFloat(reactivePower.toFixed(6)),
+    apparent: parseFloat(apparentPower.toFixed(6)),
+    powerFactor: parseFloat(powerFactor.toFixed(6)),
   }
 }
 
@@ -300,21 +329,30 @@ function convertPerUnitToActual(puValue, baseValue) {
   return toElectricalPrecision(puValue * baseValue)
 }
 
-
 /**
  * Convert voltage between units
  * @param {number} value - Voltage value
- * @param {string} fromUnit - Source unit ('V', 'kV', 'MV')
- * @param {string} toUnit - Target unit ('V', 'kV', 'MV')
+ * @param {string} fromUnit - Source unit ('V', 'kV', 'MV', 'per-unit')
+ * @param {string} toUnit - Target unit ('V', 'kV', 'MV', 'per-unit')
+ * @param {number} baseVoltage - Base voltage for per-unit conversion
  * @returns {number} Converted voltage
  */
-function convertVoltage(value, fromUnit, toUnit) {
+function convertVoltage(value, fromUnit, toUnit, baseVoltage = null) {
   const conversions = { V: 1, kV: 1000, MV: 1000000 }
+
+  // Handle per-unit conversions
+  if (fromUnit === 'per-unit' && baseVoltage) {
+    return parseFloat((value * baseVoltage).toFixed(6))
+  }
+  if (toUnit === 'per-unit' && baseVoltage) {
+    return parseFloat((value / baseVoltage).toFixed(6))
+  }
+
   if (!conversions[fromUnit] || !conversions[toUnit]) {
     throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
   }
-  const volts = value * conversions[fromUnit]
-  return toElectricalPrecision(volts / conversions[toUnit])
+  const volts = parseFloat((value * conversions[fromUnit]).toFixed(6))
+  return parseFloat((volts / conversions[toUnit]).toFixed(6))
 }
 
 /**
@@ -329,8 +367,8 @@ function convertCurrent(value, fromUnit, toUnit) {
   if (!conversions[fromUnit] || !conversions[toUnit]) {
     throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
   }
-  const amps = value * conversions[fromUnit]
-  return toElectricalPrecision(amps / conversions[toUnit])
+  const amps = parseFloat((value * conversions[fromUnit]).toFixed(6))
+  return parseFloat((amps / conversions[toUnit]).toFixed(6))
 }
 
 /**
@@ -347,9 +385,11 @@ function calculateReactivePower(apparentPower, activePower) {
     throw new Error('Active power must be a valid number')
   }
   // Q = sqrt(S^2 - P^2)
-  const reactiveSquared = Math.pow(apparentPower, 2) - Math.pow(activePower, 2)
+  const reactiveSquared = parseFloat(
+    (Math.pow(apparentPower, 2) - Math.pow(activePower, 2)).toFixed(6)
+  )
   if (reactiveSquared < 0) return 0
-  return toElectricalPrecision(Math.sqrt(reactiveSquared))
+  return parseFloat(Math.sqrt(reactiveSquared).toFixed(6))
 }
 
 /**
@@ -360,28 +400,53 @@ function calculateReactivePower(apparentPower, activePower) {
  * @returns {number} Converted power
  */
 function convertPower(value, fromUnit, toUnit) {
-  const conversions = { W: 1, kW: 1000, MW: 1000000, VA: 1, kVA: 1000, MVA: 1000000 }
+  const conversions = {
+    W: 1,
+    kW: 1000,
+    MW: 1000000,
+    GW: 1000000000,
+    VA: 1,
+    kVA: 1000,
+    MVA: 1000000,
+  }
   if (!conversions[fromUnit] || !conversions[toUnit]) {
     throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
   }
-  const watts = value * conversions[fromUnit]
-  return toElectricalPrecision(watts / conversions[toUnit])
+  const watts = parseFloat((value * conversions[fromUnit]).toFixed(6))
+  return parseFloat((watts / conversions[toUnit]).toFixed(6))
 }
 
 /**
  * Convert impedance between units
  * @param {number} value - Impedance value
- * @param {string} fromUnit - Source unit ('Ω', 'kΩ', 'MΩ')
- * @param {string} toUnit - Target unit ('Ω', 'kΩ', 'MΩ')
+ * @param {string} fromUnit - Source unit ('Ω', 'kΩ', 'MΩ', 'pu')
+ * @param {string} toUnit - Target unit ('Ω', 'kΩ', 'MΩ', 'pu')
+ * @param {number} baseImpedance - Base impedance for per-unit conversion
  * @returns {number} Converted impedance
  */
-function convertImpedance(value, fromUnit, toUnit) {
-  const conversions = { 'Ω': 1, 'kΩ': 1000, 'MΩ': 1000000, 'ohms': 1, 'kohms': 1000, 'Mohms': 1000000 }
+function convertImpedance(value, fromUnit, toUnit, baseImpedance = null) {
+  const conversions = {
+    Ω: 1,
+    kΩ: 1000,
+    MΩ: 1000000,
+    ohms: 1,
+    kohms: 1000,
+    Mohms: 1000000,
+  }
+
+  // Handle per-unit conversions
+  if (fromUnit === 'pu' && baseImpedance) {
+    return parseFloat((value * baseImpedance).toFixed(6))
+  }
+  if (toUnit === 'pu' && baseImpedance) {
+    return parseFloat((value / baseImpedance).toFixed(6))
+  }
+
   if (!conversions[fromUnit] || !conversions[toUnit]) {
     throw new Error(`Invalid unit conversion: ${fromUnit} to ${toUnit}`)
   }
-  const ohms = value * conversions[fromUnit]
-  return toElectricalPrecision(ohms / conversions[toUnit])
+  const ohms = parseFloat((value * conversions[fromUnit]).toFixed(6))
+  return parseFloat((ohms / conversions[toUnit]).toFixed(6))
 }
 
 /**
@@ -397,10 +462,28 @@ function validateElectricalValue(value, type, unit) {
   }
 
   const ranges = {
-    voltage: { V: { min: 0, max: 1000000 }, kV: { min: 0, max: 1000 } },
-    current: { A: { min: 0, max: 100000 }, kA: { min: 0, max: 100 } },
-    power: { W: { min: -1000000000, max: 1000000000 }, kW: { min: -1000000, max: 1000000 } },
-    impedance: { Ω: { min: 0, max: 10000 }, kΩ: { min: 0, max: 10 } },
+    voltage: {
+      V: { min: 0, max: 1000000 },
+      kV: { min: 0, max: 1000 },
+      'per-unit': { min: 0, max: 2 },
+    },
+    current: {
+      A: { min: 0, max: 100000 },
+      kA: { min: 0, max: 100 },
+      mA: { min: 0, max: 1000000 },
+    },
+    power: {
+      W: { min: -1000000000, max: 1000000000 },
+      kW: { min: -1000000, max: 1000000 },
+      MW: { min: -1000, max: 1000 },
+      MVA: { min: -1000, max: 1000 },
+      GW: { min: -10, max: 10 },
+    },
+    impedance: {
+      Ω: { min: 0, max: 10000 },
+      kΩ: { min: 0, max: 10 },
+      pu: { min: 0, max: 5 },
+    },
   }
 
   const range = ranges[type]?.[unit]

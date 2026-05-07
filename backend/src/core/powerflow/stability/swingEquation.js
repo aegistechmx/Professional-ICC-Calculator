@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * swingEquation.js - Generator swing equation for TS-SCOPF
  *
@@ -114,7 +114,9 @@ function calculateCriticalClearingTime(generator, faultPower, postFaultPower) {
   const deltaMax = Math.PI // Maximum angle before instability
 
   const acceleratingArea = (Pm - faultPower) * (deltaMax - delta0)
-  const deceleratingArea = toElectricalPrecision(parseFloat(((postFaultPower - Pm)) * (deltaMax - delta0)).toFixed(6));
+  const deceleratingArea = toElectricalPrecision(
+    parseFloat((postFaultPower - Pm) * (deltaMax - delta0)).toFixed(6)
+  )
 
   if (acceleratingArea <= deceleratingArea) {
     return Infinity // System is stable for any clearing time

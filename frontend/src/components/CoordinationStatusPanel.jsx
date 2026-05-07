@@ -3,19 +3,19 @@
  * Muestra estado visual de coordinación con colores ETAP-style
  */
 
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import './CoordinationStatusPanel.css';
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+import './CoordinationStatusPanel.css'
 
 export default function CoordinationStatusPanel({
   coordinationResult,
   onApplyChanges,
   onReset,
-  isLoading = false
+  isLoading = false,
 }) {
-  const [showHistory, setShowHistory] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedPair, setSelectedPair] = useState(null);
+  const [showHistory, setShowHistory] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [selectedPair, setSelectedPair] = useState(null)
 
   if (!coordinationResult) {
     return (
@@ -34,7 +34,7 @@ export default function CoordinationStatusPanel({
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   const {
@@ -44,47 +44,53 @@ export default function CoordinationStatusPanel({
     iterations,
     history,
     finalStatus,
-    message
-  } = coordinationResult;
+    message,
+  } = coordinationResult
 
-  const isCoordinated = status === 'COORDINATED';
-  const quality = finalStatus?.quality || 0;
+  const isCoordinated = status === 'COORDINATED'
+  const quality = finalStatus?.quality || 0
 
   // Comparar valores originales vs coordinados
-  const changes = breakers.map((b, i) => {
-    const orig = originalBreakers[i];
-    const changes = [];
+  const changes = breakers
+    .map((b, i) => {
+      const orig = originalBreakers[i]
+      const changes = []
 
-    if (b.TMS !== orig.TMS) {
-      changes.push({
-        param: 'TMS',
-        old: orig.TMS,
-        new: b.TMS,
-        percent: ((b.TMS / orig.TMS - 1) * 100).toFixed(1)
-      });
-    }
-    if (b.pickup !== orig.pickup) {
-      changes.push({
-        param: 'Pickup',
-        old: orig.pickup,
-        new: b.pickup,
-        percent: ((b.pickup / orig.pickup - 1) * 100).toFixed(1)
-      });
-    }
-    if (b.instantaneous !== orig.instantaneous) {
-      changes.push({
-        param: 'Instantáneo',
-        old: orig.instantaneous,
-        new: b.instantaneous,
-        percent: ((b.instantaneous / orig.instantaneous - 1) * 100).toFixed(1)
-      });
-    }
+      if (b.TMS !== orig.TMS) {
+        changes.push({
+          param: 'TMS',
+          old: orig.TMS,
+          new: b.TMS,
+          percent: ((b.TMS / orig.TMS - 1) * 100).toFixed(1),
+        })
+      }
+      if (b.pickup !== orig.pickup) {
+        changes.push({
+          param: 'Pickup',
+          old: orig.pickup,
+          new: b.pickup,
+          percent: ((b.pickup / orig.pickup - 1) * 100).toFixed(1),
+        })
+      }
+      if (b.instantaneous !== orig.instantaneous) {
+        changes.push({
+          param: 'Instantáneo',
+          old: orig.instantaneous,
+          new: b.instantaneous,
+          percent: ((b.instantaneous / orig.instantaneous - 1) * 100).toFixed(
+            1
+          ),
+        })
+      }
 
-    return { breaker: b, changes };
-  }).filter(c => c.changes.length > 0);
+      return { breaker: b, changes }
+    })
+    .filter(c => c.changes.length > 0)
 
   return (
-    <div className={`coordination-panel ${isCoordinated ? 'success' : 'partial'}`}>
+    <div
+      className={`coordination-panel ${isCoordinated ? 'success' : 'partial'}`}
+    >
       {/* Header */}
       <div className="panel-header">
         <div className="status-indicator">
@@ -93,7 +99,9 @@ export default function CoordinationStatusPanel({
         </div>
         <div className="quality-score">
           <span className="score-label">Calidad</span>
-          <span className={`score-value ${quality >= 80 ? 'good' : quality >= 50 ? 'medium' : 'bad'}`}>
+          <span
+            className={`score-value ${quality >= 80 ? 'good' : quality >= 50 ? 'medium' : 'bad'}`}
+          >
             {quality}%
           </span>
         </div>
@@ -112,7 +120,9 @@ export default function CoordinationStatusPanel({
           <div
             key={index}
             className={`pair-card ${pair.status.toLowerCase()} ${selectedPair === index ? 'selected' : ''}`}
-            onClick={() => setSelectedPair(selectedPair === index ? null : index)}
+            onClick={() =>
+              setSelectedPair(selectedPair === index ? null : index)
+            }
           >
             <div className="pair-header">
               <span className="pair-name">{pair.pair}</span>
@@ -122,12 +132,18 @@ export default function CoordinationStatusPanel({
             </div>
             {selectedPair === index && pair.status === 'CONFLICT' && (
               <div className="pair-details">
-                <span className="conflict-count">{pair.crossings} conflictos</span>
+                <span className="conflict-count">
+                  {pair.crossings} conflictos
+                </span>
                 {pair.worstPoint && (
                   <div className="worst-point">
                     <span>Peor punto:</span>
                     <span>I={pair.worstPoint.I.toFixed(1)}A</span>
-                    <span>Δt={(pair.worstPoint.tUp - pair.worstPoint.tDown).toFixed(3)}s</span>
+                    <span>
+                      Δt=
+                      {(pair.worstPoint.tUp - pair.worstPoint.tDown).toFixed(3)}
+                      s
+                    </span>
                   </div>
                 )}
               </div>
@@ -142,7 +158,9 @@ export default function CoordinationStatusPanel({
           <h4>Ajustes Realizados</h4>
           {changes.map((item, index) => (
             <div key={index} className="change-item">
-              <span className="breaker-name">{item.breaker.id || `Breaker ${index + 1}`}</span>
+              <span className="breaker-name">
+                {item.breaker.id || `Breaker ${index + 1}`}
+              </span>
               <div className="change-list">
                 {item.changes.map((change, i) => (
                   <div key={i} className="change-detail">
@@ -175,7 +193,9 @@ export default function CoordinationStatusPanel({
                 <div key={i} className="history-item">
                   <span className="iteration">#{h.iteration}</span>
                   <span className="pair">{h.pair}</span>
-                  <span className={`adjustment ${h.adjustment.toLowerCase().replace('_', '-')}`}>
+                  <span
+                    className={`adjustment ${h.adjustment.toLowerCase().replace('_', '-')}`}
+                  >
                     {h.adjustment.replace('_', ' ')}
                   </span>
                   <span className="value">
@@ -229,21 +249,17 @@ export default function CoordinationStatusPanel({
         >
           {isLoading ? 'Aplicando...' : 'Aplicar Cambios'}
         </button>
-        <button
-          className="btn-reset"
-          onClick={onReset}
-          disabled={isLoading}
-        >
+        <button className="btn-reset" onClick={onReset} disabled={isLoading}>
           Revertir
         </button>
       </div>
     </div>
-  );
+  )
 }
 
 CoordinationStatusPanel.propTypes = {
   coordinationResult: PropTypes.object,
   onApplyChanges: PropTypes.func,
   onReset: PropTypes.func,
-  isLoading: PropTypes.bool
-};
+  isLoading: PropTypes.bool,
+}

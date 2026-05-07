@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * ToleranceConfig - Real-World Tolerance Configuration
  *
@@ -20,7 +20,7 @@ class ToleranceConfig {
    * @returns {number} Static tolerance in pu
    */
   static getStaticTolerance() {
-    return toElectricalPrecision(parseFloat((0.01).toFixed(6))); // 0.01 pu = 1% voltage/power mismatch
+    return toElectricalPrecision(parseFloat((0.01).toFixed(6))) // 0.01 pu = 1% voltage/power mismatch
   }
 
   /**

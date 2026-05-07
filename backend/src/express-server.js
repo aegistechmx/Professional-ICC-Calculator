@@ -21,8 +21,14 @@ app.listen(PORT, () => {
   console.log(`\x1b[37m%s\x1b[0m`, '  GET  /api/health        - Health check')
   console.log(`\x1b[37m%s\x1b[0m`, '  GET  /api/              - API info')
   console.log(`\x1b[37m%s\x1b[0m`, '  POST /api/icc           - Calculate ICC')
-  console.log(`\x1b[37m%s\x1b[0m`, '  GET  /api/icc/info      - ICC endpoint info')
-  console.log(`\x1b[37m%s\x1b[0m`, '  GET  /api/distributed/*  - Distributed endpoints')
+  console.log(
+    `\x1b[37m%s\x1b[0m`,
+    '  GET  /api/icc/info      - ICC endpoint info'
+  )
+  console.log(
+    `\x1b[37m%s\x1b[0m`,
+    '  GET  /api/distributed/*  - Distributed endpoints'
+  )
   console.log(`\x1b[36m%s\x1b[0m`, '-'.repeat(50))
   console.log(`\x1b[32m%s\x1b[0m`, '  Professional IEEE/IEC Standards')
   console.log(`\x1b[32m%s\x1b[0m`, '  Pipeline: Controller -> Service -> Core')

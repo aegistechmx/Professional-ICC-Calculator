@@ -11,7 +11,7 @@
  */
 function assertElectricalPrecision(name, v) {
   if (typeof v !== 'number' || !isFinite(v)) {
-    throw new Error(`Valor inválido en ${name}: ${v}`);
+    throw new Error(`Valor inválido en ${name}: ${v}`)
   }
 }
 
@@ -22,8 +22,8 @@ function assertElectricalPrecision(name, v) {
  * @throws {Error} Si el valor no es un número positivo
  */
 function assertPositive(name, v) {
-  assertElectricalPrecision(name, v);
-  if (v <= 0) throw new Error(`${name} debe ser > 0 (recibido ${v})`);
+  assertElectricalPrecision(name, v)
+  if (v <= 0) throw new Error(`${name} debe ser > 0 (recibido ${v})`)
 }
 
 /**
@@ -35,12 +35,14 @@ function assertPositive(name, v) {
  */
 function assertEnum(name, v, list) {
   if (!list.includes(v)) {
-    throw new Error(`${name} inválido: ${v}. Valores permitidos: ${list.join(', ')}`);
+    throw new Error(
+      `${name} inválido: ${v}. Valores permitidos: ${list.join(', ')}`
+    )
   }
 }
 
 module.exports = {
   assertElectricalPrecision,
   assertPositive,
-  assertEnum
-};
+  assertEnum,
+}

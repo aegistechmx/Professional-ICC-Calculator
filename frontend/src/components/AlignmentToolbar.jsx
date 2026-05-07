@@ -3,9 +3,9 @@
  * Botones para alinear, distribuir y organizar nodos
  */
 
-import React from 'react';
-import { useGraphStore } from '../store/graphStore';
-import { useHistoryStore } from '../store/historyStore';
+import React from 'react'
+import { useGraphStore } from '../store/graphStore'
+import { useHistoryStore } from '../store/historyStore'
 import {
   alignLeft,
   alignRight,
@@ -16,50 +16,50 @@ import {
   distributeHorizontal,
   distributeVertical,
   distributeGrid,
-  getBoundingBox
-} from '../utils/alignmentTools';
-import './AlignmentToolbar.css';
+  getBoundingBox,
+} from '../utils/alignmentTools'
+import './AlignmentToolbar.css'
 
 export default function AlignmentToolbar() {
-  const { nodes, edges, setGraph } = useGraphStore();
-  const { saveState } = useHistoryStore();
+  const { nodes, edges, setGraph } = useGraphStore()
+  const { saveState } = useHistoryStore()
 
-  const selectedCount = nodes.filter(n => n.selected).length;
-  const hasSelection = selectedCount > 0;
-  const canAlign = selectedCount >= 2;
-  const canDistribute = selectedCount >= 3;
+  const selectedCount = nodes.filter(n => n.selected).length
+  const hasSelection = selectedCount > 0
+  const canAlign = selectedCount >= 2
+  const canDistribute = selectedCount >= 3
 
   const handleAlign = (alignFn, name) => {
-    if (!canAlign) return;
+    if (!canAlign) return
 
     // Guardar estado antes de alinear
-    saveState();
+    saveState()
 
-    const newNodes = alignFn(nodes);
-    setGraph(newNodes, edges);
+    const newNodes = alignFn(nodes)
+    setGraph(newNodes, edges)
 
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      console.log(`[ALIGN] ${name}: ${selectedCount} nodos`);
+      console.log(`[ALIGN] ${name}: ${selectedCount} nodos`)
     }
-  };
+  }
 
   const handleDistribute = (distributeFn, name) => {
-    if (!canDistribute) return;
+    if (!canDistribute) return
 
     // Guardar estado antes de distribuir
-    saveState();
+    saveState()
 
-    const newNodes = distributeFn(nodes);
-    setGraph(newNodes, edges);
+    const newNodes = distributeFn(nodes)
+    setGraph(newNodes, edges)
 
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      console.log(`[DISTRIBUTE] ${name}: ${selectedCount} nodos`);
+      console.log(`[DISTRIBUTE] ${name}: ${selectedCount} nodos`)
     }
-  };
+  }
 
-  const boundingBox = hasSelection ? getBoundingBox(nodes) : null;
+  const boundingBox = hasSelection ? getBoundingBox(nodes) : null
 
   return (
     <div className="alignment-toolbar">
@@ -190,16 +190,15 @@ export default function AlignmentToolbar() {
       <div className="toolbar-section">
         <span className="section-title">Info</span>
         <div className="selection-info">
-          <span className="info-item">
-            {selectedCount} nodos seleccionados
-          </span>
+          <span className="info-item">{selectedCount} nodos seleccionados</span>
           {boundingBox && (
             <span className="info-item">
-              {Math.round(boundingBox.width)} × {Math.round(boundingBox.height)} px
+              {Math.round(boundingBox.width)} × {Math.round(boundingBox.height)}{' '}
+              px
             </span>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }

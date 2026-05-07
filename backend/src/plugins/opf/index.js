@@ -42,7 +42,8 @@ module.exports = {
     console.log(`⚡ OPF: Running economic dispatch optimization...`)
 
     // Get power flow result first
-    const pfResult = await context.engine.run('powerflow', 'run', { // power (W)
+    const pfResult = await context.engine.run('powerflow', 'run', {
+      // power (W)
       system,
       options: { method: powerFlowMethod },
     })

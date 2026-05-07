@@ -99,10 +99,14 @@ function initializeVoltages(buses) {
         im: toElectricalPrecision(mag * Math.sin(ang)),
       }
     } else if (bus.type === 'PV') {
-      const mag = toElectricalPrecision(bus.voltage?.magnitude || 1.0, 'voltage') // voltage (V)
+      const mag = toElectricalPrecision(
+        bus.voltage?.magnitude || 1.0,
+        'voltage'
+      ) // voltage (V)
       // voltage (V)
       const ang = toElectricalPrecision(
-        ((bus.voltage?.angle || 0) * Math.PI) / 180, 'angle'
+        ((bus.voltage?.angle || 0) * Math.PI) / 180,
+        'angle'
       )
       // voltage (V)
       return {
@@ -145,13 +149,28 @@ function applyCorrections(V, corrections, buses) {
     if (i === slackIndex) continue
 
     if (correctionIndex < corrections.length) {
-      const dTheta = toElectricalPrecision(corrections[correctionIndex], 'angle')
-      const currentMag = toElectricalPrecision(Math.hypot(V[i].re, V[i].im), 'voltage') // current (A)
-      const currentAng = toElectricalPrecision(Math.atan2(V[i].im, V[i].re), 'angle') // current (A)
+      const dTheta = toElectricalPrecision(
+        corrections[correctionIndex],
+        'angle'
+      )
+      const currentMag = toElectricalPrecision(
+        Math.hypot(V[i].re, V[i].im),
+        'voltage'
+      ) // current (A)
+      const currentAng = toElectricalPrecision(
+        Math.atan2(V[i].im, V[i].re),
+        'angle'
+      ) // current (A)
       const newAng = toElectricalPrecision(currentAng + dTheta, 'angle') // current (A)
 
-      newV[i].re = toElectricalPrecision(currentMag * Math.cos(newAng), 'voltage') // current (A)
-      newV[i].im = toElectricalPrecision(currentMag * Math.sin(newAng), 'voltage') // current (A)
+      newV[i].re = toElectricalPrecision(
+        currentMag * Math.cos(newAng),
+        'voltage'
+      ) // current (A)
+      newV[i].im = toElectricalPrecision(
+        currentMag * Math.sin(newAng),
+        'voltage'
+      ) // current (A)
       correctionIndex++
     }
   }
@@ -160,16 +179,26 @@ function applyCorrections(V, corrections, buses) {
   pq.forEach(i => {
     if (correctionIndex < corrections.length) {
       const dV = toElectricalPrecision(corrections[correctionIndex], 'voltage')
-      const currentMag = toElectricalPrecision( // current (A)
-        Math.hypot(newV[i].re, newV[i].im), 'voltage'
+      const currentMag = toElectricalPrecision(
+        // current (A)
+        Math.hypot(newV[i].re, newV[i].im),
+        'voltage'
       )
-      const currentAng = toElectricalPrecision( // current (A)
-        Math.atan2(newV[i].im, newV[i].re), 'angle'
+      const currentAng = toElectricalPrecision(
+        // current (A)
+        Math.atan2(newV[i].im, newV[i].re),
+        'angle'
       )
       const newMag = toElectricalPrecision(currentMag + dV, 'voltage') // No clamping
 
-      newV[i].re = toElectricalPrecision(newMag * Math.cos(currentAng), 'voltage') // current (A)
-      newV[i].im = toElectricalPrecision(newMag * Math.sin(currentAng), 'voltage') // current (A)
+      newV[i].re = toElectricalPrecision(
+        newMag * Math.cos(currentAng),
+        'voltage'
+      ) // current (A)
+      newV[i].im = toElectricalPrecision(
+        newMag * Math.sin(currentAng),
+        'voltage'
+      ) // current (A)
       correctionIndex++
     }
   })

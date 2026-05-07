@@ -3,7 +3,7 @@
  * Editor visual con React Flow para sistemas eléctricos
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react'
 import ReactFlow, {
   Background,
   Controls,
@@ -11,20 +11,20 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   Panel,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+} from 'reactflow'
+import 'reactflow/dist/style.css'
 
-import { useGraphStore } from '../store/graphStore';
-import { useAutoCalculate } from '../hooks/useAutoCalculate';
-import SourceNode from './nodes/SourceNode';
-import LoadNode from './nodes/LoadNode';
-import TransformerNode from './nodes/TransformerNode';
-import BreakerNode from './nodes/BreakerNode';
-import BusNode from './nodes/BusNode';
-import CustomEdge from './edges/CustomEdge';
-import NodeToolbar from './NodeToolbar';
-import ResultsPanel from './ResultsPanel';
-import './ElectricalEditor.css';
+import { useGraphStore } from '../store/graphStore'
+import { useAutoCalculate } from '../hooks/useAutoCalculate'
+import SourceNode from './nodes/SourceNode'
+import LoadNode from './nodes/LoadNode'
+import TransformerNode from './nodes/TransformerNode'
+import BreakerNode from './nodes/BreakerNode'
+import BusNode from './nodes/BusNode'
+import CustomEdge from './edges/CustomEdge'
+import NodeToolbar from './NodeToolbar'
+import ResultsPanel from './ResultsPanel'
+import './ElectricalEditor.css'
 
 // Tipos de nodos personalizados
 const nodeTypes = {
@@ -33,45 +33,80 @@ const nodeTypes = {
   transformer: TransformerNode,
   breaker: BreakerNode,
   bus: BusNode,
-};
+}
 
 const edgeTypes = {
   custom: CustomEdge,
-};
+}
 
 // Paleta de componentes
 const componentPalette = [
-  { type: 'source', label: 'Fuente', icon: 'source', description: 'Fuente de alimentación' },
-  { type: 'load', label: 'Carga', icon: 'load', description: 'Carga eléctrica' },
-  { type: 'transformer', label: 'Transformador', icon: 'transformer', description: 'Transformador' },
-  { type: 'breaker', label: 'Interruptor', icon: 'breaker', description: 'Interruptor automático' },
-  { type: 'bus', label: 'Barra', icon: 'bus', description: 'Barra de conexión' },
-];
+  {
+    type: 'source',
+    label: 'Fuente',
+    icon: 'source',
+    description: 'Fuente de alimentación',
+  },
+  {
+    type: 'load',
+    label: 'Carga',
+    icon: 'load',
+    description: 'Carga eléctrica',
+  },
+  {
+    type: 'transformer',
+    label: 'Transformador',
+    icon: 'transformer',
+    description: 'Transformador',
+  },
+  {
+    type: 'breaker',
+    label: 'Interruptor',
+    icon: 'breaker',
+    description: 'Interruptor automático',
+  },
+  {
+    type: 'bus',
+    label: 'Barra',
+    icon: 'bus',
+    description: 'Barra de conexión',
+  },
+]
 
 export default function ElectricalEditor() {
-  const { config, nodes, edges, results, loading, addNode, addEdge, updateNode, updateEdge } = useGraphStore();
+  const {
+    config,
+    nodes,
+    edges,
+    results,
+    loading,
+    addNode,
+    addEdge,
+    updateNode,
+    updateEdge,
+  } = useGraphStore()
 
-  const [reactFlowNodes, setReactFlowNodes, onNodesChange] = useNodesState([]);
-  const [reactFlowEdges, setReactFlowEdges, onEdgesChange] = useEdgesState([]);
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [selectedEdge, setSelectedEdge] = useState(null);
-  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const [reactFlowNodes, setReactFlowNodes, onNodesChange] = useNodesState([])
+  const [reactFlowEdges, setReactFlowEdges, onEdgesChange] = useEdgesState([])
+  const [selectedNode, setSelectedNode] = useState(null)
+  const [selectedEdge, setSelectedEdge] = useState(null)
+  const [reactFlowInstance, setReactFlowInstance] = useState(null)
 
   // Auto-cálculo hook
-  useAutoCalculate();
+  useAutoCalculate()
 
   // Sincronizar store con ReactFlow
   React.useEffect(() => {
-    setReactFlowNodes(nodes);
-  }, [nodes, setReactFlowNodes]);
+    setReactFlowNodes(nodes)
+  }, [nodes, setReactFlowNodes])
 
   React.useEffect(() => {
-    setReactFlowEdges(edges);
-  }, [edges, setReactFlowEdges]);
+    setReactFlowEdges(edges)
+  }, [edges, setReactFlowEdges])
 
   // Manejar conexión de nodos
   const onConnect = useCallback(
-    (params) => {
+    params => {
       const newEdge = {
         id: `edge-${Date.now()}`,
         source: params.source,
@@ -80,46 +115,46 @@ export default function ElectricalEditor() {
         data: {
           impedance: 0.05,
           length: 10,
-          material: config?.material || 'cobre'
-        }
-      };
+          material: config?.material || 'cobre',
+        },
+      }
 
-      addEdge(newEdge);
+      addEdge(newEdge)
     },
     [addEdge, config]
-  );
+  )
 
   // Manejar selección de nodos
   const onNodeClick = useCallback((event, node) => {
-    setSelectedNode(node);
-    setSelectedEdge(null);
-  }, []);
+    setSelectedNode(node)
+    setSelectedEdge(null)
+  }, [])
 
   // Manejar selección de edges
   const onEdgeClick = useCallback((event, edge) => {
-    setSelectedEdge(edge);
-    setSelectedNode(null);
-  }, []);
+    setSelectedEdge(edge)
+    setSelectedNode(null)
+  }, [])
 
   // Manejar arrastre desde paleta
-  const onDragOver = useCallback((event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
+  const onDragOver = useCallback(event => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+  }, [])
 
   const onDrop = useCallback(
-    (event) => {
-      event.preventDefault();
+    event => {
+      event.preventDefault()
 
-      const reactFlowBounds = event.target.getBoundingClientRect();
-      const type = event.dataTransfer.getData('application/reactflow');
+      const reactFlowBounds = event.target.getBoundingClientRect()
+      const type = event.dataTransfer.getData('application/reactflow')
 
-      if (!type) return;
+      if (!type) return
 
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
-      });
+      })
 
       const newNode = {
         id: `${type}-${Date.now()}`,
@@ -129,80 +164,88 @@ export default function ElectricalEditor() {
           label: `${type.charAt(0).toUpperCase() + type.slice(1)} ${nodes.length + 1}`,
           voltaje: type === 'source' ? config?.voltajeBase || 480 : undefined,
           I_carga: type === 'load' ? 150 : undefined,
-          longitud: type === 'load' ? 30 : undefined
-        }
-      };
+          longitud: type === 'load' ? 30 : undefined,
+        },
+      }
 
-      addNode(newNode);
+      addNode(newNode)
     },
     [reactFlowInstance, addNode, nodes.length, config]
-  );
+  )
 
   // Manejar arrastre desde paleta
   const onDragStart = (event, nodeType) => {
-    event.dataTransfer.setData('application/reactflow', nodeType);
-    event.dataTransfer.effectAllowed = 'move';
-  };
+    event.dataTransfer.setData('application/reactflow', nodeType)
+    event.dataTransfer.effectAllowed = 'move'
+  }
 
   // Actualizar datos de nodo
-  const updateNodeData = useCallback((nodeId, data) => {
-    updateNode(nodeId, data);
-  }, [updateNode]);
+  const updateNodeData = useCallback(
+    (nodeId, data) => {
+      updateNode(nodeId, data)
+    },
+    [updateNode]
+  )
 
   // Actualizar datos de edge
-  const updateEdgeData = useCallback((edgeId, data) => {
-    updateEdge(edgeId, data);
-  }, [updateEdge]);
+  const updateEdgeData = useCallback(
+    (edgeId, data) => {
+      updateEdge(edgeId, data)
+    },
+    [updateEdge]
+  )
 
   // Obtener nodos con resultados
   const nodesWithResults = useMemo(() => {
-    if (!results?.data?.graphAnalysis?.nodes) return reactFlowNodes;
+    if (!results?.data?.graphAnalysis?.nodes) return reactFlowNodes
 
     return reactFlowNodes.map(node => {
-      const nodeResult = results.data.graphAnalysis.nodes.find(n => n.id === node.id);
+      const nodeResult = results.data.graphAnalysis.nodes.find(
+        n => n.id === node.id
+      )
 
       return {
         ...node,
         data: {
           ...node.data,
           results: nodeResult?.calculatedData || {},
-          status: nodeResult?.calculatedData ? 'calculated' : 'pending'
-        }
-      };
-    });
-  }, [reactFlowNodes, results]);
+          status: nodeResult?.calculatedData ? 'calculated' : 'pending',
+        },
+      }
+    })
+  }, [reactFlowNodes, results])
 
   // Obtener edges con resultados
   const edgesWithResults = useMemo(() => {
-    if (!results?.data?.graphAnalysis?.edges) return reactFlowEdges;
+    if (!results?.data?.graphAnalysis?.edges) return reactFlowEdges
 
     return reactFlowEdges.map(edge => {
-      const edgeResult = results.data.graphAnalysis.edges.find(e =>
-        e.from === edge.source && e.to === edge.target
-      );
+      const edgeResult = results.data.graphAnalysis.edges.find(
+        e => e.from === edge.source && e.to === edge.target
+      )
 
       return {
         ...edge,
         data: {
           ...edge.data,
           results: edgeResult?.calculatedData || {},
-          status: edgeResult?.calculatedData ? 'calculated' : 'pending'
-        }
-      };
-    });
-  }, [reactFlowEdges, results]);
+          status: edgeResult?.calculatedData ? 'calculated' : 'pending',
+        },
+      }
+    })
+  }, [reactFlowEdges, results])
 
   // Renderizar paleta de componentes
   const renderComponentPalette = () => (
     <div className="component-palette">
       <h3>Componentes</h3>
       <div className="palette-grid">
-        {componentPalette.map((component) => (
+        {componentPalette.map(component => (
           <div
             key={component.type}
             className="palette-item"
             draggable
-            onDragStart={(event) => onDragStart(event, component.type)}
+            onDragStart={event => onDragStart(event, component.type)}
           >
             <div className={`palette-icon ${component.type}`}>
               {getComponentIcon(component.type)}
@@ -212,10 +255,10 @@ export default function ElectricalEditor() {
         ))}
       </div>
     </div>
-  );
+  )
 
   // Obtener icono de componente
-  const getComponentIcon = (type) => {
+  const getComponentIcon = type => {
     const icons = {
       source: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -241,18 +284,21 @@ export default function ElectricalEditor() {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.31-2.69-6-6-6H10c-3.31 0-6 2.69-6 6v10z" />
         </svg>
-      )
-    };
-    return icons[type] || icons.source;
-  };
+      ),
+    }
+    return icons[type] || icons.source
+  }
 
   if (!config) {
     return (
       <div className="no-config">
         <h2>Configuración del Proyecto</h2>
-        <p>Por favor configure el proyecto antes de comenzar a diseñar el sistema eléctrico.</p>
+        <p>
+          Por favor configure el proyecto antes de comenzar a diseñar el sistema
+          eléctrico.
+        </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -281,10 +327,10 @@ export default function ElectricalEditor() {
           <Background color="#f0f0f0" gap={20} />
           <Controls />
           <MiniMap
-            nodeColor={(node) => {
-              if (node.data.status === 'calculated') return '#10b981';
-              if (node.data.status === 'error') return '#ef4444';
-              return '#6b7280';
+            nodeColor={node => {
+              if (node.data.status === 'calculated') return '#10b981'
+              if (node.data.status === 'error') return '#ef4444'
+              return '#6b7280'
             }}
             maskColor="rgba(255, 255, 255, 0.8)"
           />
@@ -298,7 +344,9 @@ export default function ElectricalEditor() {
                 <span>Conexiones: {edges.length}</span>
                 <span>Voltaje: {config.voltajeBase}V</span>
               </div>
-              {loading && <div className="loading-indicator">Calculando...</div>}
+              {loading && (
+                <div className="loading-indicator">Calculando...</div>
+              )}
             </div>
           </Panel>
 
@@ -332,9 +380,11 @@ export default function ElectricalEditor() {
                 type="number"
                 step="0.01"
                 value={selectedEdge.data?.impedance || 0.05}
-                onChange={(e) => updateEdgeData(selectedEdge.id, {
-                  impedance: parseFloat(e.target.value)
-                })}
+                onChange={e =>
+                  updateEdgeData(selectedEdge.id, {
+                    impedance: parseFloat(e.target.value),
+                  })
+                }
               />
             </label>
             <label>
@@ -342,18 +392,22 @@ export default function ElectricalEditor() {
               <input
                 type="number"
                 value={selectedEdge.data?.length || 10}
-                onChange={(e) => updateEdgeData(selectedEdge.id, {
-                  length: parseFloat(e.target.value)
-                })}
+                onChange={e =>
+                  updateEdgeData(selectedEdge.id, {
+                    length: parseFloat(e.target.value),
+                  })
+                }
               />
             </label>
             <label>
               Material:
               <select
                 value={selectedEdge.data?.material || 'cobre'}
-                onChange={(e) => updateEdgeData(selectedEdge.id, {
-                  material: e.target.value
-                })}
+                onChange={e =>
+                  updateEdgeData(selectedEdge.id, {
+                    material: e.target.value,
+                  })
+                }
               >
                 <option value="cobre">Cobre</option>
                 <option value="aluminio">Aluminio</option>
@@ -364,5 +418,5 @@ export default function ElectricalEditor() {
         </div>
       )}
     </div>
-  );
+  )
 }

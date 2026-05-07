@@ -37,20 +37,22 @@ const CapBankNode = memo(({ data, selected }) => {
     >
       {/* Capacitor symbol */}
       <div style={{ marginBottom: '8px', fontSize: '20px' }}>||</div>
-      
+
       <div style={{ whiteSpace: 'pre-line', lineHeight: '1.2' }}>
         {getDisplayText()}
       </div>
 
       {/* Power factor indicator */}
       {data.results?.powerFactor && (
-        <div style={{ 
-          marginTop: '4px', 
-          fontSize: '10px',
-          padding: '2px 4px',
-          backgroundColor: 'rgba(255,255,255,0.2)',
-          borderRadius: '4px'
-        }}>
+        <div
+          style={{
+            marginTop: '4px',
+            fontSize: '10px',
+            padding: '2px 4px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: '4px',
+          }}
+        >
           PF: {data.results.powerFactor.toFixed(3)}
         </div>
       )}

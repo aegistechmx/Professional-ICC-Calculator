@@ -49,7 +49,13 @@ router.use('*', (req, res) => {
     error: 'Endpoint not found',
     path: req.originalUrl,
     method: req.method,
-    availableEndpoints: ['/health', '/', '/api/distributed/*', '/api/icc', '/api/icc/info'],
+    availableEndpoints: [
+      '/health',
+      '/',
+      '/api/distributed/*',
+      '/api/icc',
+      '/api/icc/info',
+    ],
   })
 })
 

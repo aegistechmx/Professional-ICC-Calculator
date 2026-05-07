@@ -26,7 +26,6 @@ import { snap } from '../utils/snap'
 import { validateConnection } from '../utils/validation'
 import CableEdge from './edges/CableEdge'
 
-
 const Editor = React.memo(function Editor() {
   const reactFlowWrapper = useRef(null)
   const {
@@ -43,21 +42,27 @@ const Editor = React.memo(function Editor() {
   const storeEdges = useStore(state => state.edges)
 
   // Memoize node and edge types to prevent recreation
-  const memoizedNodeTypes = useMemo(() => ({
-    breaker: BreakerNode,
-    transformer: TransformerNode,
-    panel: PanelNode,
-    load: LoadNode,
-    motor: MotorNode,
-    generator: GeneratorNode,
-    generator_ats: GeneratorATSNode,
-    ats: ATSNode,
-    capacitorBank: CapBankNode,
-  }), [])
+  const memoizedNodeTypes = useMemo(
+    () => ({
+      breaker: BreakerNode,
+      transformer: TransformerNode,
+      panel: PanelNode,
+      load: LoadNode,
+      motor: MotorNode,
+      generator: GeneratorNode,
+      generator_ats: GeneratorATSNode,
+      ats: ATSNode,
+      capacitorBank: CapBankNode,
+    }),
+    []
+  )
 
-  const memoizedEdgeTypes = useMemo(() => ({
-    cable: CableEdge,
-  }), [])
+  const memoizedEdgeTypes = useMemo(
+    () => ({
+      cable: CableEdge,
+    }),
+    []
+  )
 
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])

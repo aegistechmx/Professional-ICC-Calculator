@@ -73,11 +73,13 @@ class DirectionalProtection {
     // Calculate angle difference between current and voltage
     let angle
 
-    if (this.polarizing === 'voltage' && V) { // voltage (V)
+    if (this.polarizing === 'voltage' && V) {
+      // voltage (V)
       // voltage (V)
       // Voltage polarizing: angle = angle(I) - angle(V)
       angle = I.angle - V.angle
-    } else if (this.polarizing === 'current' && I) { // current (A)
+    } else if (this.polarizing === 'current' && I) {
+      // current (A)
       // current (A)
       // Current polarizing: angle = angle(I) relative to reference
       angle = I.angle

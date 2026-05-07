@@ -4,7 +4,7 @@
  * Algoritmo: Búsqueda iterativa con función de costo
  */
 
-const { getTripTimeReal } = require('./tccCoordination.js');
+const { getTripTimeReal } = require('./tccCoordination.js')
 
 /**
  * Restringe valor entre mínimo y máximo
@@ -14,7 +14,7 @@ const { getTripTimeReal } = require('./tccCoordination.js');
  * @returns {number} Valor restringido
  */
 function clamp(val, min, max) {
-  return Math.max(min, Math.min(max, val));
+  return Math.max(min, Math.min(max, val))
 }
 
 /**
@@ -24,7 +24,7 @@ function clamp(val, min, max) {
  * @returns {number} Factor aleatorio
  */
 function randomFactor(min, max) {
-  return Math.random() * (max - min) + min;
+  return Math.random() * (max - min) + min
 }
 
 /**
@@ -33,13 +33,13 @@ function randomFactor(min, max) {
  */
 function enforceLimits(b) {
   // Pickup: entre 1.1x y 1.5x In (zona térmica)
-  b.pickup = clamp(b.pickup, 1.1 * b.In, 1.5 * b.In);
+  b.pickup = clamp(b.pickup, 1.1 * b.In, 1.5 * b.In)
 
   // Inst: entre 5x y 12x In (zona magnética)
-  b.inst = clamp(b.inst, 5 * b.In, 12 * b.In);
+  b.inst = clamp(b.inst, 5 * b.In, 12 * b.In)
 
   // TMS: entre 0.05 y 1.0
-  b.tms = clamp(b.tms, 0.05, 1.0);
+  b.tms = clamp(b.tms, 0.05, 1.0)
 }
 
 /**
@@ -49,40 +49,40 @@ function enforceLimits(b) {
  * @returns {number} Costo total (menor es mejor)
  */
 function costFunction(breakers, faults) {
-  let cost = 0;
-  const MARGIN_MIN = 0.2; // 200 ms mínimo
+  let cost = 0
+  const MARGIN_MIN = 0.2 // 200 ms mínimo
 
   for (const fault of faults) {
     // Evaluar coordinación entre pares upstream-downstream
     for (let i = 0; i < breakers.length - 1; i++) {
-      const up = breakers[i];
-      const down = breakers[i + 1];
+      const up = breakers[i]
+      const down = breakers[i + 1]
 
-      const t_up = getTripTimeReal(up, fault.I);
-      const t_down = getTripTimeReal(down, fault.I);
+      const t_up = getTripTimeReal(up, fault.I)
+      const t_down = getTripTimeReal(down, fault.I)
 
-      const margin = t_up - t_down;
+      const margin = t_up - t_down
 
       // Penaliza mala coordinación (margen insuficiente)
       if (margin < MARGIN_MIN) {
-        cost += 1000 * (MARGIN_MIN - margin);
+        cost += 1000 * (MARGIN_MIN - margin)
       }
 
       // Penaliza gravemente si upstream dispara antes (selectividad perdida)
       if (t_up < t_down) {
-        cost += 5000;
+        cost += 5000
       }
 
       // Penaliza lentitud (tiempo total excesivo)
       if (t_down > 2.0) {
-        cost += 100 * (t_down - 2.0);
+        cost += 100 * (t_down - 2.0)
       }
     }
 
     // Penaliza falta de sensibilidad (no detecta falla mínima)
-    const lastBreaker = breakers[breakers.length - 1];
+    const lastBreaker = breakers[breakers.length - 1]
     if (fault.I_min && fault.I_min < lastBreaker.pickup) {
-      cost += 2000;
+      cost += 2000
     }
   }
 
@@ -90,15 +90,15 @@ function costFunction(breakers, faults) {
   for (const b of breakers) {
     // Penaliza TMS muy alto (lento)
     if (b.tms > 0.5) {
-      cost += 50 * (b.tms - 0.5);
+      cost += 50 * (b.tms - 0.5)
     }
     // Penaliza pickup muy alto (poco sensible)
     if (b.pickup > 1.3 * b.In) {
-      cost += 30 * ((b.pickup / b.In) - 1.3);
+      cost += 30 * (b.pickup / b.In - 1.3)
     }
   }
 
-  return cost;
+  return cost
 }
 
 /**
@@ -107,7 +107,7 @@ function costFunction(breakers, faults) {
  * @returns {Array} Copia profunda
  */
 function cloneBreakers(breakers) {
-  return JSON.parse(JSON.stringify(breakers));
+  return JSON.parse(JSON.stringify(breakers))
 }
 
 /**
@@ -116,21 +116,21 @@ function cloneBreakers(breakers) {
  * @returns {Array} Breakers mutados
  */
 function mutateBreakers(breakers) {
-  const mutated = cloneBreakers(breakers);
+  const mutated = cloneBreakers(breakers)
 
   for (const b of mutated) {
     // Mutar pickup ±10%
-    b.pickup *= randomFactor(0.9, 1.1);
+    b.pickup *= randomFactor(0.9, 1.1)
     // Mutar TMS ±20%
-    b.tms *= randomFactor(0.8, 1.2);
+    b.tms *= randomFactor(0.8, 1.2)
     // Mutar instantáneo ±10%
-    b.inst *= randomFactor(0.9, 1.1);
+    b.inst *= randomFactor(0.9, 1.1)
 
     // Aplicar restricciones
-    enforceLimits(b);
+    enforceLimits(b)
   }
 
-  return mutated;
+  return mutated
 }
 
 /**
@@ -146,50 +146,52 @@ function optimizeBreakers({
   breakers,
   faults,
   iterations = 100,
-  temperature = 1.0
+  temperature = 1.0,
 }) {
   // Validar entrada
   if (!breakers || breakers.length < 2) {
-    throw new Error('Se necesitan al menos 2 breakers para coordinación');
+    throw new Error('Se necesitan al menos 2 breakers para coordinación')
   }
   if (!faults || faults.length === 0) {
-    throw new Error('Se necesita al menos un escenario de falla');
+    throw new Error('Se necesita al menos un escenario de falla')
   }
 
   // Inicializar con configuración actual
-  let best = cloneBreakers(breakers);
-  let bestCost = costFunction(best, faults);
+  let best = cloneBreakers(breakers)
+  let bestCost = costFunction(best, faults)
 
-  let current = cloneBreakers(breakers); // current (A)
-  let currentCost = bestCost; // current (A)
+  let current = cloneBreakers(breakers) // current (A)
+  let currentCost = bestCost // current (A)
 
-  const history = [{
-    iteration: 0,
-    cost: bestCost,
-    breakers: cloneBreakers(best)
-  }];
+  const history = [
+    {
+      iteration: 0,
+      cost: bestCost,
+      breakers: cloneBreakers(best),
+    },
+  ]
 
   // Algoritmo: Hill Climbing con Simulated Annealing
   for (let iter = 0; iter < iterations; iter++) {
     // Generar candidato mutando el actual
-    const candidate = mutateBreakers(current); // current (A)
-    const candidateCost = costFunction(candidate, faults);
+    const candidate = mutateBreakers(current) // current (A)
+    const candidateCost = costFunction(candidate, faults)
 
     // Calcular probabilidad de aceptación (Simulated Annealing)
-    const temp = temperature * (1 - iter / iterations); // Enfriamiento
-    const delta = candidateCost - currentCost; // current (A)
+    const temp = temperature * (1 - iter / iterations) // Enfriamiento
+    const delta = candidateCost - currentCost // current (A)
 
     // Aceptar si mejora, o con probabilidad si empeora (para escapar mínimos locales)
-    const accept = delta < 0 || Math.random() < Math.exp(-delta / temp);
+    const accept = delta < 0 || Math.random() < Math.exp(-delta / temp)
 
     if (accept) {
-      current = candidate; // current (A)
-      currentCost = candidateCost; // current (A)
+      current = candidate // current (A)
+      currentCost = candidateCost // current (A)
 
       // Actualizar mejor global
       if (candidateCost < bestCost) {
-        best = cloneBreakers(candidate);
-        bestCost = candidateCost;
+        best = cloneBreakers(candidate)
+        bestCost = candidateCost
       }
     }
 
@@ -198,25 +200,29 @@ function optimizeBreakers({
       history.push({
         iteration: iter + 1,
         cost: bestCost,
-        breakers: cloneBreakers(best)
-      });
+        breakers: cloneBreakers(best),
+      })
     }
   }
 
   // Calcular métricas finales
-  const finalMetrics = calculateMetrics(best, faults);
+  const finalMetrics = calculateMetrics(best, faults)
 
   return {
     success: bestCost < 1000, // Éxito si costo bajo
     originalCost: costFunction(breakers, faults),
     optimizedCost: bestCost,
-    improvement: ((costFunction(breakers, faults) - bestCost) / costFunction(breakers, faults) * 100).toFixed(1),
+    improvement: (
+      ((costFunction(breakers, faults) - bestCost) /
+        costFunction(breakers, faults)) *
+      100
+    ).toFixed(1),
     original: breakers,
     optimized: best,
     metrics: finalMetrics,
     history: history,
-    iterations
-  };
+    iterations,
+  }
 }
 
 /**
@@ -226,40 +232,40 @@ function optimizeBreakers({
  * @returns {Object} Métricas calculadas
  */
 function calculateMetrics(breakers, faults) {
-  const margins = [];
-  const times = [];
+  const margins = []
+  const times = []
 
   for (const fault of faults) {
     for (let i = 0; i < breakers.length - 1; i++) {
-      const up = breakers[i];
-      const down = breakers[i + 1];
+      const up = breakers[i]
+      const down = breakers[i + 1]
 
-      const t_up = getTripTimeReal(up, fault.I);
-      const t_down = getTripTimeReal(down, fault.I);
+      const t_up = getTripTimeReal(up, fault.I)
+      const t_down = getTripTimeReal(down, fault.I)
 
       margins.push({
         pair: `${up.model}-${down.model}`,
         fault: fault.I,
         margin: t_up - t_down,
         t_up,
-        t_down
-      });
+        t_down,
+      })
 
-      times.push(t_down);
+      times.push(t_down)
     }
   }
 
-  const minMargin = Math.min(...margins.map(m => m.margin));
-  const avgMargin = margins.reduce((a, m) => a + m.margin, 0) / margins.length;
-  const maxTime = Math.max(...times);
+  const minMargin = Math.min(...margins.map(m => m.margin))
+  const avgMargin = margins.reduce((a, m) => a + m.margin, 0) / margins.length
+  const maxTime = Math.max(...times)
 
   return {
     margins,
     minMargin: minMargin.toFixed(3),
     avgMargin: avgMargin.toFixed(3),
     maxTime: maxTime.toFixed(3),
-    coordinated: minMargin >= 0.2
-  };
+    coordinated: minMargin >= 0.2,
+  }
 }
 
 /**
@@ -268,35 +274,39 @@ function calculateMetrics(breakers, faults) {
  * @returns {string} Reporte formateado
  */
 function generateReport(result) {
-  const lines = [];
+  const lines = []
 
-  lines.push('📊 REPORTE DE AUTO-COORDINACIÓN');
-  lines.push('');
-  lines.push(`Estado: ${result.success ? '✅ ÉXITO' : '⚠️ MEJORADO (con advertencias)'}`);
-  lines.push(`Mejora: ${result.improvement}%`);
-  lines.push(`Iteraciones: ${result.iterations}`);
-  lines.push('');
-  lines.push('📈 Métricas:');
-  lines.push(`  Margen mínimo: ${result.metrics.minMargin}s`);
-  lines.push(`  Margen promedio: ${result.metrics.avgMargin}s`);
-  lines.push(`  Tiempo máximo: ${result.metrics.maxTime}s`);
-  lines.push('');
-  lines.push('🔧 Ajustes optimizados:');
+  lines.push('📊 REPORTE DE AUTO-COORDINACIÓN')
+  lines.push('')
+  lines.push(
+    `Estado: ${result.success ? '✅ ÉXITO' : '⚠️ MEJORADO (con advertencias)'}`
+  )
+  lines.push(`Mejora: ${result.improvement}%`)
+  lines.push(`Iteraciones: ${result.iterations}`)
+  lines.push('')
+  lines.push('📈 Métricas:')
+  lines.push(`  Margen mínimo: ${result.metrics.minMargin}s`)
+  lines.push(`  Margen promedio: ${result.metrics.avgMargin}s`)
+  lines.push(`  Tiempo máximo: ${result.metrics.maxTime}s`)
+  lines.push('')
+  lines.push('🔧 Ajustes optimizados:')
 
   for (let i = 0; i < result.optimized.length; i++) {
-    const opt = result.optimized[i];
-    const orig = result.original[i];
-    lines.push(`  ${opt.model}:`);
-    lines.push(`    Pickup: ${orig.pickup.toFixed(0)}A → ${opt.pickup.toFixed(0)}A`);
-    lines.push(`    TMS: ${orig.tms.toFixed(3)} → ${opt.tms.toFixed(3)}`);
-    lines.push(`    Inst: ${orig.inst.toFixed(0)}A → ${opt.inst.toFixed(0)}A`);
+    const opt = result.optimized[i]
+    const orig = result.original[i]
+    lines.push(`  ${opt.model}:`)
+    lines.push(
+      `    Pickup: ${orig.pickup.toFixed(0)}A → ${opt.pickup.toFixed(0)}A`
+    )
+    lines.push(`    TMS: ${orig.tms.toFixed(3)} → ${opt.tms.toFixed(3)}`)
+    lines.push(`    Inst: ${orig.inst.toFixed(0)}A → ${opt.inst.toFixed(0)}A`)
   }
 
-  return lines.join('\n');
+  return lines.join('\n')
 }
 
 module.exports = {
   costFunction,
   optimizeBreakers,
-  generateReport
-};
+  generateReport,
+}

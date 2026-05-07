@@ -23,8 +23,15 @@ export default function GeneratorATSNode({ data, selected }) {
           {/* Generator ATS Symbol - Generator with ATS switch */}
           <circle cx="20" cy="20" r="8" fill="#3b82f6" />
           <rect x="16" y="12" width="8" height="12" fill="#6b7280" rx="1" />
-          <path d="M 12 20 L 16 16 M 24 20 L 20 16" stroke="#374151" strokeWidth="2" fill="none" />
-          <text x="20" y="35" textAnchor="middle" fontSize="10" fill="#374151">ATS</text>
+          <path
+            d="M 12 20 L 16 16 M 24 20 L 20 16"
+            stroke="#374151"
+            strokeWidth="2"
+            fill="none"
+          />
+          <text x="20" y="35" textAnchor="middle" fontSize="10" fill="#374151">
+            ATS
+          </text>
         </svg>
 
         <div className="text-xs">
@@ -39,5 +46,5 @@ export default function GeneratorATSNode({ data, selected }) {
 
 GeneratorATSNode.propTypes = {
   data: PropTypes.object.isRequired,
-  selected: PropTypes.bool
+  selected: PropTypes.bool,
 }

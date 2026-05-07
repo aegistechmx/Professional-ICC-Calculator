@@ -4,8 +4,12 @@
  * REGLA CLAVE: Calcular con 90°C pero limitar con terminal 75°C
  */
 
-const { getAmpacity, TEMP_FACTOR_90C, GROUPING_FACTOR } = require('./catalogs.js');
-const { assertPositive, assertEnum } = require('./guards.js');
+const {
+  getAmpacity,
+  TEMP_FACTOR_90C,
+  GROUPING_FACTOR,
+} = require('./catalogs.js')
+const { assertPositive, assertEnum } = require('./guards.js')
 
 /**
  * Calcula ampacidad corregida
@@ -23,30 +27,30 @@ function calcAmpacity({
   size,
   ambientC = 30,
   nConductors = 3,
-  parallels = 1
+  parallels = 1,
 }) {
-  assertEnum('material', material, ['Cu', 'Al']);
-  assertPositive('ambientC', ambientC);
-  assertPositive('nConductors', nConductors);
-  assertPositive('parallels', parallels);
+  assertEnum('material', material, ['Cu', 'Al'])
+  assertPositive('ambientC', ambientC)
+  assertPositive('nConductors', nConductors)
+  assertPositive('parallels', parallels)
 
   // REGLA NOM: Calcular con 90°C (conductores tipo THHN/THWN)
-  const I_tabla_90C = getAmpacity(material, 90, size); // NUNCA 0
-  const F_temp = TEMP_FACTOR_90C(ambientC);
-  const F_group = GROUPING_FACTOR(nConductors);
+  const I_tabla_90C = getAmpacity(material, 90, size) // NUNCA 0
+  const F_temp = TEMP_FACTOR_90C(ambientC)
+  const F_group = GROUPING_FACTOR(nConductors)
 
   // Corriente corregida por conductor y luego por paralelos
-  const I_corr = I_tabla_90C * F_temp * F_group * parallels;
+  const I_corr = I_tabla_90C * F_temp * F_group * parallels
 
   return {
     I_tabla: I_tabla_90C,
     F_temp,
     F_group,
     parallels,
-    I_corr
-  };
+    I_corr,
+  }
 }
 
 module.exports = {
-  calcAmpacity
-};
+  calcAmpacity,
+}

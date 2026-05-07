@@ -3,20 +3,20 @@
  * Muestra los diferentes estados del logo
  */
 
-import { useState } from 'react';
-import IcoreLogoAnimated from './IcoreLogoAnimated';
+import { useState } from 'react'
+import IcoreLogoAnimated from './IcoreLogoAnimated'
 
 export default function LogoDemo() {
-  const [active, setActive] = useState(true);
-  const [faultDetected, setFaultDetected] = useState(false);
-  const [playSound, setPlaySound] = useState(false);
-  const [size, setSize] = useState(200);
+  const [active, setActive] = useState(true)
+  const [faultDetected, setFaultDetected] = useState(false)
+  const [playSound, setPlaySound] = useState(false)
+  const [size, setSize] = useState(200)
 
   const triggerFault = () => {
-    setFaultDetected(true);
+    setFaultDetected(true)
     // Auto-reset después de 3 segundos
-    setTimeout(() => setFaultDetected(false), 3000);
-  };
+    setTimeout(() => setFaultDetected(false), 3000)
+  }
 
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-white">
@@ -26,7 +26,7 @@ export default function LogoDemo() {
 
       {/* Logo principal */}
       <div className="flex justify-center mb-12">
-        <IcoreLogoAnimated 
+        <IcoreLogoAnimated
           active={active}
           faultDetected={faultDetected}
           size={size}
@@ -37,14 +37,16 @@ export default function LogoDemo() {
       {/* Controles */}
       <div className="max-w-md mx-auto space-y-6 bg-gray-800 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Controles</h2>
-        
+
         {/* Toggle Activo */}
         <div className="flex items-center justify-between">
           <label className="text-gray-300">Modo Activo</label>
           <button
             onClick={() => setActive(!active)}
             className={`px-4 py-2 rounded ${
-              active ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-600 hover:bg-gray-700'
+              active
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-600 hover:bg-gray-700'
             }`}
           >
             {active ? 'ON' : 'OFF'}
@@ -57,7 +59,9 @@ export default function LogoDemo() {
           <button
             onClick={() => setPlaySound(!playSound)}
             className={`px-4 py-2 rounded ${
-              playSound ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'
+              playSound
+                ? 'bg-green-600 hover:bg-green-700'
+                : 'bg-gray-600 hover:bg-gray-700'
             }`}
           >
             {playSound ? 'ON' : 'OFF'}
@@ -66,15 +70,13 @@ export default function LogoDemo() {
 
         {/* Tamaño */}
         <div>
-          <label className="text-gray-300 block mb-2">
-            Tamaño: {size}px
-          </label>
+          <label className="text-gray-300 block mb-2">Tamaño: {size}px</label>
           <input
             type="range"
             min="100"
             max="400"
             value={size}
-            onChange={(e) => setSize(Number(e.target.value))}
+            onChange={e => setSize(Number(e.target.value))}
             className="w-full accent-blue-500"
           />
         </div>
@@ -84,8 +86,8 @@ export default function LogoDemo() {
           onClick={triggerFault}
           disabled={faultDetected}
           className={`w-full py-3 rounded-lg font-bold text-lg ${
-            faultDetected 
-              ? 'bg-red-600 animate-pulse' 
+            faultDetected
+              ? 'bg-red-600 animate-pulse'
               : 'bg-red-500 hover:bg-red-600'
           }`}
         >
@@ -102,7 +104,7 @@ export default function LogoDemo() {
             Sin animaciones, opacidad reducida
           </p>
         </div>
-        
+
         <div className="bg-gray-800 p-4 rounded text-center">
           <div className="text-4xl mb-2">⚡</div>
           <h3 className="font-semibold text-blue-400">Activo</h3>
@@ -110,7 +112,7 @@ export default function LogoDemo() {
             Anillo girando, rayo pulsando, glow azul
           </p>
         </div>
-        
+
         <div className="bg-gray-800 p-4 rounded text-center">
           <div className="text-4xl mb-2">🔥</div>
           <h3 className="font-semibold text-red-400">Falla</h3>
@@ -124,7 +126,7 @@ export default function LogoDemo() {
       <div className="max-w-2xl mx-auto mt-12 bg-gray-800 p-6 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Uso en tu aplicación:</h3>
         <pre className="bg-gray-900 p-4 rounded text-sm overflow-x-auto">
-{`import IcoreLogoAnimated from './components/IcoreLogoAnimated';
+          {`import IcoreLogoAnimated from './components/IcoreLogoAnimated';
 
 // En tu componente:
 <IcoreLogoAnimated 
@@ -134,12 +136,10 @@ export default function LogoDemo() {
   playSound={true}       // Reproducir sonido zap
 />`}
         </pre>
-        
-        <p className="text-gray-400 mt-4 text-sm">
-          Conecta con tu motor ICC:
-        </p>
+
+        <p className="text-gray-400 mt-4 text-sm">Conecta con tu motor ICC:</p>
         <pre className="bg-gray-900 p-4 rounded text-sm overflow-x-auto mt-2">
-{`const faultDetected = result?.fault?.Isc > 0;
+          {`const faultDetected = result?.fault?.Isc > 0;
 const isRunning = status === 'running';
 
 <IcoreLogoAnimated 
@@ -149,5 +149,5 @@ const isRunning = status === 'running';
         </pre>
       </div>
     </div>
-  );
+  )
 }

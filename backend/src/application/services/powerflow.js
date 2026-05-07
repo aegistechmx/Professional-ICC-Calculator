@@ -5,6 +5,7 @@
  */
 
 const { solveNR, solveFDLF } = require('@/core/powerflow/solvers') // power (W)
+const { defaultLogger } = require('@/debug/logger')
 
 /**
  * Run power flow analysis
@@ -14,40 +15,45 @@ const { solveNR, solveFDLF } = require('@/core/powerflow/solvers') // power (W)
  */
 async function runPowerFlow(system, options = {}) {
   const { method = 'FDLF', tolerance = 1e-6, maxIterations = 20 } = options
+  const logger = defaultLogger.child('PowerFlow')
 
-  // eslint-disable-next-line no-console
-  console.log('⚡ PowerFlow: Running ' + method + ' analysis...')
+  try {
+    logger.info('Running power flow analysis', {
+      method,
+      tolerance,
+      maxIterations,
+    })
 
-  let result
-  switch (method) {
-    case 'NR':
-      result = await solveNR(system, { tolerance, maxIterations })
-      break
-    case 'FDLF':
-      result = await solveFDLF(system, { tolerance, maxIterations })
-      break
-    default:
-      throw new Error('Unknown power flow method: ' + method)
-  }
+    let result
+    switch (method) {
+      case 'NR':
+        result = await solveNR(system, { tolerance, maxIterations })
+        break
+      case 'FDLF':
+        result = await solveFDLF(system, { tolerance, maxIterations })
+        break
+      default:
+        throw new Error('Unknown power flow method: ' + method)
+    }
 
-  // eslint-disable-next-line no-console
-  console.log(
-    '⚡ PowerFlow: ' +
-      (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +
-      ' in ' +
-      result.iterations +
-      ' iterations'
-  )
+    logger.info('Power flow finished', {
+      converged: result.converged,
+      iterations: result.iterations,
+    })
 
-  return {
-    method,
-    converged: result.converged,
-    iterations: result.iterations,
-    voltages: result.voltages,
-    flows: result.flows,
-    system,
-    options,
-    timestamp: new Date().toISOString(),
+    return {
+      method,
+      converged: result.converged,
+      iterations: result.iterations,
+      voltages: result.voltages,
+      flows: result.flows,
+      system,
+      options,
+      timestamp: new Date().toISOString(),
+    }
+  } catch (error) {
+    logger.error('Power flow failed', { error: error.message })
+    throw error
   }
 }
 

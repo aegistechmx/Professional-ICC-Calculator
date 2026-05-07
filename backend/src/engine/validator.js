@@ -4,13 +4,17 @@
  * Pipeline completo: Ampacidad → Caída de Tensión → Coordinación TCC
  */
 
-const { calcAmpacity } = require('./ampacity.js');
-const { calcTerminalLimit } = require('./terminal.js');
-const { calcDesignCurrent, finalAmpacity, checkAmpacity } = require('./design.js');
-const { checkInterrupting } = require('./interrupting.js');
-const { calcVoltageDrop, checkVoltageDrop } = require('./voltageDrop.js');
-const { checkCoordination } = require('./tccCoordination.js');
-const { assertPositive } = require('./guards.js');
+const { calcAmpacity } = require('./ampacity.js')
+const { calcTerminalLimit } = require('./terminal.js')
+const {
+  calcDesignCurrent,
+  finalAmpacity,
+  checkAmpacity,
+} = require('./design.js')
+const { checkInterrupting } = require('./interrupting.js')
+const { calcVoltageDrop, checkVoltageDrop } = require('./voltageDrop.js')
+const { checkCoordination } = require('./tccCoordination.js')
+const { assertPositive } = require('./guards.js')
 
 /**
  * Valida alimentador completo
@@ -50,77 +54,79 @@ function validateFeeder(input) {
     Icu_kA,
     Isc_kA,
     voltageDrop: vdParams,
-    coordination: coordParams
-  } = input;
+    coordination: coordParams,
+  } = input
 
   // Guards clave
-  assertPositive('I_base', I_base);
-  assertPositive('Icu_kA', Icu_kA);
-  assertPositive('Isc_kA', Isc_kA);
+  assertPositive('I_base', I_base)
+  assertPositive('Icu_kA', Icu_kA)
+  assertPositive('Isc_kA', Isc_kA)
 
   // Validar unidades (asumimos kA por defecto, pero permitimos especificar A)
-  const Isc_unit = input.Isc_unit || 'kA'; // 'kA' | 'A'
+  const Isc_unit = input.Isc_unit || 'kA' // 'kA' | 'A'
   if (Isc_unit !== 'kA' && Isc_unit !== 'A') {
-    throw new Error(`Isc_unit debe ser 'kA' o 'A', recibido: ${Isc_unit}`);
+    throw new Error(`Isc_unit debe ser 'kA' o 'A', recibido: ${Isc_unit}`)
   }
 
   // 1) Ampacidad
-  const amp = calcAmpacity({ material, size, ambientC, nConductors, parallels });
+  const amp = calcAmpacity({ material, size, ambientC, nConductors, parallels })
 
   // 2) Terminal
-  const term = calcTerminalLimit({ material, size, terminalTempC });
+  const term = calcTerminalLimit({ material, size, terminalTempC })
 
   // 3) Diseño
-  const { I_design } = calcDesignCurrent({ I_base, Fcc });
+  const { I_design } = calcDesignCurrent({ I_base, Fcc })
 
   // 4) Final
   const { I_final } = finalAmpacity({
     I_corr: amp.I_corr,
-    I_terminal: term.I_terminal
-  });
+    I_terminal: term.I_terminal,
+  })
 
   // 5) Checks ampacidad e interruptiva
-  const ampCheck = checkAmpacity({ I_final, I_design });
-  const intCheck = checkInterrupting({ Icu_kA, Isc_kA });
+  const ampCheck = checkAmpacity({ I_final, I_design })
+  const intCheck = checkInterrupting({ Icu_kA, Isc_kA })
 
   // 6) Caída de tensión (si se proporcionan parámetros)
-  let voltageDropResult = null; // voltage (V)
+  let voltageDropResult = null // voltage (V)
   if (vdParams) {
     const vdCalc = calcVoltageDrop({
       I: I_base,
-      ...vdParams
-    });
-    const vdCheck = checkVoltageDrop(vdCalc.percent);
-    voltageDropResult = { // voltage (V)
+      ...vdParams,
+    })
+    const vdCheck = checkVoltageDrop(vdCalc.percent)
+    voltageDropResult = {
+      // voltage (V)
       ...vdCalc,
-      check: vdCheck
-    };
+      check: vdCheck,
+    }
   }
 
   // 7) Coordinación TCC (si se proporcionan parámetros)
-  let coordinationResult = null;
+  let coordinationResult = null
   if (coordParams) {
-    const I_fault = Isc_unit === 'A' ? Isc_kA : Isc_kA * 1000; // Convertir a amperes
+    const I_fault = Isc_unit === 'A' ? Isc_kA : Isc_kA * 1000 // Convertir a amperes
     const coordCheck = checkCoordination({
       ...coordParams,
-      I_fault
-    });
-    coordinationResult = coordCheck;
+      I_fault,
+    })
+    coordinationResult = coordCheck
   }
 
   // Invariantes útiles
   const invariants = {
     nonZeroTable: amp.I_tabla > 0,
     terminalDefined: term.I_terminal > 0,
-    noNaN: [amp.I_corr, I_design, I_final].every(Number.isFinite)
-  };
+    noNaN: [amp.I_corr, I_design, I_final].every(Number.isFinite),
+  }
 
   // Estado global
-  const checks = [ampCheck.ok, intCheck.ok];
-  if (voltageDropResult) checks.push(voltageDropResult.check.ok);
-  if (coordinationResult) checks.push(coordinationResult.coordinated);
+  const checks = [ampCheck.ok, intCheck.ok]
+  if (voltageDropResult) checks.push(voltageDropResult.check.ok)
+  if (coordinationResult) checks.push(coordinationResult.coordinated)
 
-  const okGlobal = checks.every(Boolean) && Object.values(invariants).every(Boolean);
+  const okGlobal =
+    checks.every(Boolean) && Object.values(invariants).every(Boolean)
 
   return {
     ok: okGlobal,
@@ -129,18 +135,18 @@ function validateFeeder(input) {
       ...term,
       I_design,
       I_final,
-      check: ampCheck
+      check: ampCheck,
     },
     interrupting: intCheck,
     voltageDrop: voltageDropResult,
     coordination: coordinationResult,
     invariants,
     debug: {
-      input
-    }
-  };
+      input,
+    },
+  }
 }
 
 module.exports = {
-  validateFeeder
-};
+  validateFeeder,
+}

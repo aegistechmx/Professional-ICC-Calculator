@@ -7,15 +7,15 @@
  * Standard precision levels for different calculation types
  */
 const PRECISION_LEVELS = {
-  INTERNAL: 6,      // Internal calculations (IEEE 1584 requirement)
-  DISPLAY: 2,       // Display output for users
-  CRITICAL: 8,      // Critical safety calculations
-  COORDINATION: 4,   // Protection coordination
-  VOLTAGE: 3,       // Voltage levels
-  CURRENT: 2,        // Current values
-  POWER: 2,          // Power calculations
-  IMPEDANCE: 6       // Impedance values
-};
+  INTERNAL: 6, // Internal calculations (IEEE 1584 requirement)
+  DISPLAY: 2, // Display output for users
+  CRITICAL: 8, // Critical safety calculations
+  COORDINATION: 4, // Protection coordination
+  VOLTAGE: 3, // Voltage levels
+  CURRENT: 2, // Current values
+  POWER: 2, // Power calculations
+  IMPEDANCE: 6, // Impedance values
+}
 
 /**
  * Convert to electrical precision with specified decimal places
@@ -25,9 +25,9 @@ const PRECISION_LEVELS = {
  */
 function toElectricalPrecision(value, precision = PRECISION_LEVELS.INTERNAL) {
   if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
-    return value;
+    return value
   }
-  return Number(value.toFixed(precision));
+  return Number(value.toFixed(precision))
 }
 
 /**
@@ -37,8 +37,8 @@ function toElectricalPrecision(value, precision = PRECISION_LEVELS.INTERNAL) {
  * @returns {number} Value with display precision
  */
 function toDisplayPrecision(value, type = 'default') {
-  const precision = getPrecisionForType(type, 'display');
-  return toElectricalPrecision(value, precision);
+  const precision = getPrecisionForType(type, 'display')
+  return toElectricalPrecision(value, precision)
 }
 
 /**
@@ -48,46 +48,57 @@ function toDisplayPrecision(value, type = 'default') {
  * @returns {number} Precision level
  */
 function getPrecisionForType(type, context = 'internal') {
-  const contextKey = context === 'display' ? 'DISPLAY' : 'INTERNAL';
-  
-  switch (type.toLowerCase()) {
+  const contextKey = context === 'display' ? 'DISPLAY' : 'INTERNAL'
+
+  // Handle case where type might be a number
+  const typeStr = typeof type === 'string' ? type : String(type)
+
+  switch (typeStr.toLowerCase()) {
     case 'voltage':
     case 'voltaje':
-      return context === 'display' ? PRECISION_LEVELS.VOLTAGE : PRECISION_LEVELS.INTERNAL;
-    
+      return context === 'display'
+        ? PRECISION_LEVELS.VOLTAGE
+        : PRECISION_LEVELS.INTERNAL
+
     case 'current':
     case 'corriente':
     case 'isc':
     case 'icc':
-      return context === 'display' ? PRECISION_LEVELS.CURRENT : PRECISION_LEVELS.INTERNAL;
-    
+      return context === 'display'
+        ? PRECISION_LEVELS.CURRENT
+        : PRECISION_LEVELS.INTERNAL
+
     case 'power':
     case 'potencia':
     case 'mw':
     case 'mvar':
     case 'mva':
-      return context === 'display' ? PRECISION_LEVELS.POWER : PRECISION_LEVELS.INTERNAL;
-    
+      return context === 'display'
+        ? PRECISION_LEVELS.POWER
+        : PRECISION_LEVELS.INTERNAL
+
     case 'impedance':
     case 'impedancia':
     case 'resistance':
     case 'resistencia':
     case 'reactance':
     case 'reactancia':
-      return context === 'display' ? PRECISION_LEVELS.IMPEDANCE : PRECISION_LEVELS.INTERNAL;
-    
+      return context === 'display'
+        ? PRECISION_LEVELS.IMPEDANCE
+        : PRECISION_LEVELS.INTERNAL
+
     case 'coordination':
     case 'coordinacion':
     case 'tcc':
-      return PRECISION_LEVELS.COORDINATION;
-    
+      return PRECISION_LEVELS.COORDINATION
+
     case 'critical':
     case 'safety':
     case 'seguridad':
-      return PRECISION_LEVELS.CRITICAL;
-    
+      return PRECISION_LEVELS.CRITICAL
+
     default:
-      return PRECISION_LEVELS[contextKey] || PRECISION_LEVELS.INTERNAL;
+      return PRECISION_LEVELS[contextKey] || PRECISION_LEVELS.INTERNAL
   }
 }
 
@@ -98,13 +109,19 @@ function getPrecisionForType(type, context = 'internal') {
  * @param {string} type - Calculation type for precision
  * @returns {string} Formatted value with unit
  */
-function formatElectricalValue(value, unit = '', type = 'default') {
+function formatElectricalValue(value, unit = '', precision = null) {
   if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
-    return `Invalid ${unit}`;
+    return `Invalid ${unit}`
   }
-  
-  const precision = getPrecisionForType(type, 'display');
-  return `${value.toFixed(precision)} ${unit}`.trim();
+
+  // If custom precision is provided, use it
+  if (precision !== null) {
+    return `${value.toFixed(precision)} ${unit}`.trim()
+  }
+
+  // Otherwise use type-based precision
+  const typePrecision = getPrecisionForType(unit, 'display')
+  return `${value.toFixed(typePrecision)} ${unit}`.trim()
 }
 
 /**
@@ -115,11 +132,11 @@ function formatElectricalValue(value, unit = '', type = 'default') {
  */
 function roundToPrecision(value, precision = PRECISION_LEVELS.INTERNAL) {
   if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
-    return value;
+    return value
   }
-  
-  const factor = Math.pow(10, precision);
-  return Math.round(value * factor) / factor;
+
+  const factor = Math.pow(10, precision)
+  return Math.round(value * factor) / factor
 }
 
 /**
@@ -130,22 +147,25 @@ function roundToPrecision(value, precision = PRECISION_LEVELS.INTERNAL) {
  */
 function validatePrecision(value, type = 'default') {
   if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
-    return { valid: false, error: 'Value must be a finite number' };
+    return { valid: false, error: 'Value must be a finite number' }
   }
-  
-  const requiredPrecision = getPrecisionForType(type, 'internal');
-  const rounded = roundToPrecision(value, requiredPrecision);
-  const difference = Math.abs(value - rounded);
-  
+
+  const requiredPrecision = getPrecisionForType(type, 'internal')
+  const rounded = roundToPrecision(value, requiredPrecision)
+  const difference = Math.abs(value - rounded)
+
   // Check if difference is within acceptable tolerance (1e-12 for double precision)
-  const tolerance = Math.pow(10, -requiredPrecision - 6);
-  
+  const tolerance = Math.pow(10, -requiredPrecision - 6)
+
   return {
     valid: difference <= tolerance,
-    error: difference > tolerance ? `Value does not meet ${requiredPrecision} decimal place precision requirement` : null,
+    error:
+      difference > tolerance
+        ? `Value does not meet ${requiredPrecision} decimal place precision requirement`
+        : null,
     rounded,
-    tolerance
-  };
+    tolerance,
+  }
 }
 
 /**
@@ -156,16 +176,16 @@ function validatePrecision(value, type = 'default') {
  * @returns {number} Converted precision value
  */
 function convertPrecision(value, fromType, toType) {
-  const fromPrecision = getPrecisionForType(fromType, 'internal');
-  const toPrecision = getPrecisionForType(toType, 'internal');
-  
+  const fromPrecision = getPrecisionForType(fromType, 'internal')
+  const toPrecision = getPrecisionForType(toType, 'internal')
+
   if (fromPrecision === toPrecision) {
-    return value;
+    return value
   }
-  
+
   // Round to source precision first, then to target precision
-  const rounded = roundToPrecision(value, fromPrecision);
-  return roundToPrecision(rounded, toPrecision);
+  const rounded = roundToPrecision(value, fromPrecision)
+  return roundToPrecision(rounded, toPrecision)
 }
 
 module.exports = {
@@ -176,5 +196,5 @@ module.exports = {
   formatElectricalValue,
   roundToPrecision,
   validatePrecision,
-  convertPrecision
-};
+  convertPrecision,
+}

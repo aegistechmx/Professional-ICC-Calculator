@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * CrossEngineValidator - Cross-Engine Validation
  *
@@ -102,7 +102,8 @@ class CrossEngineValidator {
       const opfResult = opfEngine.run ? opfEngine.run(system) : nrResult
 
       // Compare voltages
-      const voltageDiff = this.compareVoltages( // voltage (V)
+      const voltageDiff = this.compareVoltages(
+        // voltage (V)
         // voltage (V)
         nrResult.voltages,
         opfResult.voltages
@@ -117,10 +118,10 @@ class CrossEngineValidator {
 
       // Check if within tolerance
       const tolerance = this.options.tolerance
-      const voltageOK = voltageDiff < tolerance // voltage (V)
+      const voltageOK = parseFloat((voltageDiff < tolerance).toFixed(6)) // voltage (V)
       // voltage (V)
-      const angleOK = angleDiff < tolerance
-      const powerOK = powerDiff < tolerance // power (W)
+      const angleOK = parseFloat((angleDiff < tolerance).toFixed(6))
+      const powerOK = parseFloat((powerDiff < tolerance).toFixed(6)) // power (W)
       // power (W)
 
       if (voltageOK && angleOK && powerOK) {
@@ -198,7 +199,8 @@ class CrossEngineValidator {
       const iccFromZbus = this.calculateICCFromZbus(zbusResult.Zbus, system)
 
       // Compare fault currents
-      const currentDiff = this.compareFaultCurrents( // current (A)
+      const currentDiff = this.compareFaultCurrents(
+        // current (A)
         // current (A)
         iccResult.currents,
         iccFromZbus
@@ -206,7 +208,7 @@ class CrossEngineValidator {
 
       // Check if within tolerance
       const tolerance = this.options.tolerance
-      const currentOK = currentDiff < tolerance // current (A)
+      const currentOK = parseFloat((currentDiff < tolerance).toFixed(6)) // current (A)
       // current (A)
 
       if (currentOK) {
@@ -270,7 +272,8 @@ class CrossEngineValidator {
       // Check if initial dynamics voltages match NR
       const initialVoltages = dynamicsResult.voltages[0] // voltage (V)
       // voltage (V)
-      const voltageDiff = this.compareVoltages( // voltage (V)
+      const voltageDiff = this.compareVoltages(
+        // voltage (V)
         // voltage (V)
         nrResult.voltages,
         initialVoltages
@@ -286,9 +289,9 @@ class CrossEngineValidator {
 
       // Check if within tolerance
       const tolerance = this.options.tolerance
-      const voltageOK = voltageDiff < tolerance // voltage (V)
+      const voltageOK = parseFloat((voltageDiff < tolerance).toFixed(6)) // voltage (V)
       // voltage (V)
-      const angleOK = angleDiff < tolerance
+      const angleOK = parseFloat((angleDiff < tolerance).toFixed(6))
 
       if (voltageOK && angleOK) {
         this.results.passed.push({
@@ -373,7 +376,9 @@ class CrossEngineValidator {
     if (!voltagesA || !voltagesB) return Infinity
 
     let maxDiff = 0
-    const minLen = toElectricalPrecision(parseFloat((Math.min(voltagesA.length, voltagesB.length))).toFixed(6)); // voltage (V)
+    const minLen = toElectricalPrecision(
+      parseFloat(Math.min(voltagesA.length, voltagesB.length)).toFixed(6)
+    ) // voltage (V)
     // voltage (V)
 
     for (let i = 0; i < minLen; i++) {
@@ -392,8 +397,12 @@ class CrossEngineValidator {
             )
           : toElectricalPrecision(parseFloat(voltagesB[i].toFixed(6)))
 
-      const diff = toElectricalPrecision(parseFloat(Math.abs(valA - valB)).toFixed(6))
-      maxDiff = toElectricalPrecision(parseFloat(Math.max(maxDiff, diff)).toFixed(6))
+      const diff = toElectricalPrecision(
+        parseFloat(Math.abs(valA - valB)).toFixed(6)
+      )
+      maxDiff = toElectricalPrecision(
+        parseFloat(Math.max(maxDiff, diff)).toFixed(6)
+      )
     }
 
     return maxDiff
@@ -429,11 +438,15 @@ class CrossEngineValidator {
     if (!powerA || !powerB) return Infinity
 
     let maxDiff = 0
-    const minLen = toElectricalPrecision(parseFloat((Math.min(powerA.length, powerB.length))).toFixed(6)); // power (W)
+    const minLen = toElectricalPrecision(
+      parseFloat(Math.min(powerA.length, powerB.length)).toFixed(6)
+    ) // power (W)
     // power (W)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = toElectricalPrecision(parseFloat((Math.abs(powerA[i] - powerB[i]))).toFixed(6)); // power (W)
+      const diff = toElectricalPrecision(
+        parseFloat(Math.abs(powerA[i] - powerB[i])).toFixed(6)
+      ) // power (W)
       // power (W)
       maxDiff = Math.max(maxDiff, diff)
     }
@@ -451,11 +464,15 @@ class CrossEngineValidator {
     if (!currentsA || !currentsB) return Infinity
 
     let maxDiff = 0
-    const minLen = toElectricalPrecision(parseFloat((Math.min(currentsA.length, currentsB.length))).toFixed(6)); // current (A)
+    const minLen = toElectricalPrecision(
+      parseFloat(Math.min(currentsA.length, currentsB.length)).toFixed(6)
+    ) // current (A)
     // current (A)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = toElectricalPrecision(parseFloat((Math.abs(currentsA[i] - currentsB[i]))).toFixed(6)); // current (A)
+      const diff = toElectricalPrecision(
+        parseFloat(Math.abs(currentsA[i] - currentsB[i])).toFixed(6)
+      ) // current (A)
       // current (A)
       maxDiff = Math.max(maxDiff, diff)
     }

@@ -65,7 +65,8 @@ function evaluateViolations(result, model, limits = {}) {
   }
 
   // Voltage violations
-  result.voltages.forEach((v, i) => { // voltage (V)
+  result.voltages.forEach((v, i) => {
+    // voltage (V)
     const magnitude = Math.sqrt(v.re * v.re + v.im * v.im)
 
     if (magnitude < Vmin * 0.9 || magnitude > Vmax * 1.1) {

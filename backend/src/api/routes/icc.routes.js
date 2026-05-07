@@ -5,7 +5,9 @@
  */
 
 const router = require('express').Router()
-const { calculateShortCircuitCurrent } = require('../../shared/utils/electricalUtils')
+const {
+  calculateShortCircuitCurrent,
+} = require('../../shared/utils/electricalUtils')
 
 /**
  * Calculate ICC (short circuit current)
@@ -16,24 +18,27 @@ router.post('/calculate', (req, res) => {
     const { voltage, impedance } = req.body // voltage (V)
 
     // Validate inputs
-    if (!voltage || typeof voltage !== 'number') { // voltage (V)
+    if (!voltage || typeof voltage !== 'number') {
+      // voltage (V)
       return res.status(400).json({
         error: 'Voltage is required and must be a number',
-        code: 'INVALID_VOLTAGE'
+        code: 'INVALID_VOLTAGE',
       })
     }
 
-    if (!impedance || typeof impedance !== 'number') { // impedance (Ω)
+    if (!impedance || typeof impedance !== 'number') {
+      // impedance (Ω)
       return res.status(400).json({
         error: 'Impedance is required and must be a number',
-        code: 'INVALID_IMPEDANCE'
+        code: 'INVALID_IMPEDANCE',
       })
     }
 
-    if (impedance === 0) { // impedance (Ω)
+    if (impedance === 0) {
+      // impedance (Ω)
       return res.status(400).json({
         error: 'Impedance cannot be zero',
-        code: 'ZERO_IMPEDANCE'
+        code: 'ZERO_IMPEDANCE',
       })
     }
 
@@ -46,21 +51,20 @@ router.post('/calculate', (req, res) => {
       result: {
         voltage,
         impedance,
-        isc_3f: isc,           // Three-phase fault current
-        isc_1f: isc * 0.577,   // Single line-to-ground fault current (1/sqrt(3))
+        isc_3f: isc, // Three-phase fault current
+        isc_1f: isc * 0.577, // Single line-to-ground fault current (1/sqrt(3))
         isc_3f_ka: isc / 1000, // Three-phase in kA
         isc_1f_ka: (isc * 0.577) / 1000, // Single line-to-ground in kA
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     })
-
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('ICC calculation error:', error)
     res.status(500).json({
       error: 'Internal calculation error',
       code: 'CALCULATION_ERROR',
-      message: error.message
+      message: error.message,
     })
   }
 })
@@ -74,7 +78,7 @@ router.get('/health', (req, res) => {
     service: 'ICC Calculator',
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: '1.0.0',
   })
 })
 

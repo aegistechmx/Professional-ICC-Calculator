@@ -4,7 +4,9 @@
  * Responsibility: Implement Newton-Raphson algorithm for power flow analysis
  */
 
-const { toElectricalPrecision } = require('../../../shared/utils/electricalUtils')
+const {
+  toElectricalPrecision,
+} = require('../../../shared/utils/electricalUtils')
 
 class NewtonRaphsonSolver {
   constructor(options = {}) {
@@ -313,7 +315,8 @@ class NewtonRaphsonSolver {
   }
 
   formatVoltages(voltages) {
-    return voltages.map((v, i) => ({ // voltage (V)
+    return voltages.map((v, i) => ({
+      // voltage (V)
       bus: i + 1,
       magnitude: v.magnitude || 1.0, // Default to 1.0 if undefined
       angle: v.angle || 0.0, // Default to 0 if undefined
@@ -469,15 +472,17 @@ class NewtonRaphsonSolver {
   calculateTotalCost(dispatch, costs) {
     return dispatch.reduce((total, gen) => {
       const cost = costs[gen.bus]
-      return toElectricalPrecision(parseFloat((total + gen.power * (cost?.b || 20))).toFixed(6));
+      return toElectricalPrecision(
+        parseFloat(total + gen.power * (cost?.b || 20)).toFixed(6)
+      )
     }, 0)
   }
 
   calculateLosses(power, _branch) {
     // Simplified loss calculation (2% loss assumption)
-    const lossFactor = 0.02;
-    const result = toElectricalPrecision(Math.abs(power.real)) * lossFactor;
-    return toElectricalPrecision(parseFloat(result.toFixed(6)));
+    const lossFactor = 0.02
+    const result = toElectricalPrecision(Math.abs(power.real)) * lossFactor
+    return toElectricalPrecision(parseFloat(result.toFixed(6)))
   }
 }
 

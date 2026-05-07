@@ -1,40 +1,40 @@
-import { useState } from 'react';
-import { calcularICC, optimizarCoordinacion } from '../services/iccService';
+import { useState } from 'react'
+import { calcularICC, optimizarCoordinacion } from '../services/iccService'
 
 export function useICC() {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
-  const [optimization, setOptimization] = useState(null);
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState(null)
+  const [optimization, setOptimization] = useState(null)
 
-  const runICC = async (data) => {
-    setLoading(true);
-    setError(null);
-    setOptimization(null);
+  const runICC = async data => {
+    setLoading(true)
+    setError(null)
+    setOptimization(null)
 
     try {
-      const res = await calcularICC(data);
-      setResult(res);
+      const res = await calcularICC(data)
+      setResult(res)
     } catch (err) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const runOptimization = async (breakers, faults) => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
-      const res = await optimizarCoordinacion(breakers, faults);
-      setOptimization(res);
+      const res = await optimizarCoordinacion(breakers, faults)
+      setOptimization(res)
     } catch (err) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  return { runICC, runOptimization, loading, result, error, optimization };
+  return { runICC, runOptimization, loading, result, error, optimization }
 }

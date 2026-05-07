@@ -40,7 +40,7 @@ export default function TransformerFields({ node, updateNode }) {
   }
 
   // Función para propagar la tensión secundaria a equipos conectados
-  const propagateSecondaryVoltage = (secondaryVoltage) => {
+  const propagateSecondaryVoltage = secondaryVoltage => {
     // Importar el store para obtener todos los nodos
     const { useStore } = require('../store/useStore')
     const { nodes, edges } = useStore.getState()
@@ -63,12 +63,11 @@ export default function TransformerFields({ node, updateNode }) {
       if (equipment.data && equipment.data.parameters) {
         const updatedParams = {
           ...equipment.data.parameters,
-          tension: secondaryVoltage // Propagar la tensión secundaria
+          tension: secondaryVoltage, // Propagar la tensión secundaria
         }
         updateNode(equipment.id, { parameters: updatedParams })
       }
     })
-
   }
 
   return (

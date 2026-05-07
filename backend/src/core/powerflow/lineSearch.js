@@ -1,4 +1,4 @@
-const { toElectricalPrecision } = require('../../shared/utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * core/powerflow/lineSearch.js - Line search with backtracking for NR stability
  *

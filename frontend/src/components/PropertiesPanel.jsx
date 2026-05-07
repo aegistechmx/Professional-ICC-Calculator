@@ -59,7 +59,7 @@ export default function PropertiesPanel() {
         longitud: selectedEdge.data.longitud || 10,
         paralelo: selectedEdge.data.paralelo || 1,
         temp: selectedEdge.data.temp || 30,
-        numConductores: selectedEdge.data.numConductores || 3
+        numConductores: selectedEdge.data.numConductores || 3,
       }
       return calculateCableResults(edgeData)
     }
@@ -155,7 +155,9 @@ export default function PropertiesPanel() {
       case 'ats':
         return <ATSFields node={selectedNode} updateNode={updateNode} />
       case 'generator_ats':
-        return <GeneratorATSFields node={selectedNode} updateNode={updateNode} />
+        return (
+          <GeneratorATSFields node={selectedNode} updateNode={updateNode} />
+        )
       case 'panel':
       case 'motor':
       case 'generator':
@@ -212,13 +214,13 @@ export default function PropertiesPanel() {
                       style={{
                         backgroundColor: selectedNode.data.results.isc
                           ? getICCBackgroundColor(
-                            selectedNode.data.results.isc / 1000
-                          )
+                              selectedNode.data.results.isc / 1000
+                            )
                           : '#f3f4f6',
                         color: selectedNode.data.results.isc
                           ? getICCTextColor(
-                            selectedNode.data.results.isc / 1000
-                          )
+                              selectedNode.data.results.isc / 1000
+                            )
                           : '#1f2937',
                         border: `1px solid ${selectedNode.data.results.isc ? getICCColor(selectedNode.data.results.isc / 1000) : '#6b7280'}`,
                       }}
@@ -238,10 +240,11 @@ export default function PropertiesPanel() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Estado:</span>
                       <span
-                        className={`px-2 py-1 text-xs font-semibold rounded ${selectedNode.data.results.estado === 'OK'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                          }`}
+                        className={`px-2 py-1 text-xs font-semibold rounded ${
+                          selectedNode.data.results.estado === 'OK'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
                       >
                         {selectedNode.data.results.estado}
                       </span>
@@ -257,13 +260,13 @@ export default function PropertiesPanel() {
                           style={{
                             backgroundColor: selectedNode.data.results.isc
                               ? getICCBackgroundColor(
-                                selectedNode.data.results.isc / 1000
-                              )
+                                  selectedNode.data.results.isc / 1000
+                                )
                               : '#f3f4f6',
                             color: selectedNode.data.results.isc
                               ? getICCTextColor(
-                                selectedNode.data.results.isc / 1000
-                              )
+                                  selectedNode.data.results.isc / 1000
+                                )
                               : '#1f2937',
                           }}
                         >
@@ -288,14 +291,14 @@ export default function PropertiesPanel() {
                       </div>
                       {getICCLevel(selectedNode.data.results.isc / 1000)
                         .warning && (
-                          <div className="mt-1 text-xs text-amber-600">
-                            ⚠️{' '}
-                            {
-                              getICCLevel(selectedNode.data.results.isc / 1000)
-                                .warning
-                            }
-                          </div>
-                        )}
+                        <div className="mt-1 text-xs text-amber-600">
+                          ⚠️{' '}
+                          {
+                            getICCLevel(selectedNode.data.results.isc / 1000)
+                              .warning
+                          }
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -343,10 +346,11 @@ export default function PropertiesPanel() {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Estado:</span>
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded ${cableResults.estado === 'OK'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                        }`}
+                      className={`px-2 py-1 text-xs font-semibold rounded ${
+                        cableResults.estado === 'OK'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
                     >
                       {cableResults.estado}
                     </span>

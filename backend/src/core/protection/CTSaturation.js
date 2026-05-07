@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * CTSaturation - Current Transformer Saturation Model
  *
@@ -54,7 +54,9 @@ class CTSaturation {
    */
   calculateSecondaryCurrent(primaryCurrent) {
     // Ideal secondary current (without saturation)
-    const idealSecondary = toElectricalPrecision(parseFloat((primaryCurrent / this.ratio)).toFixed(6));
+    const idealSecondary = toElectricalPrecision(
+      parseFloat(primaryCurrent / this.ratio).toFixed(6)
+    )
 
     // Calculate secondary voltage
     const secondaryVoltage =
@@ -101,18 +103,28 @@ class CTSaturation {
     }
 
     // Saturation region
-    const overVoltage = toElectricalPrecision(parseFloat(((voltage - this.kneePoint)) / this.saturationVoltage).toFixed(6)); // voltage (V)
+    const overVoltage = toElectricalPrecision(
+      parseFloat((voltage - this.kneePoint) / this.saturationVoltage).toFixed(6)
+    ) // voltage (V)
     // voltage (V)
 
     switch (type) {
       case 'exponential':
-        return toElectricalPrecision(parseFloat((Math.exp(-a * overVoltage))).toFixed(6));
+        return toElectricalPrecision(
+          parseFloat(Math.exp(-a * overVoltage)).toFixed(6)
+        )
       case 'tanh':
-        return toElectricalPrecision(parseFloat((Math.tanh(b / overVoltage))).toFixed(6));
+        return toElectricalPrecision(
+          parseFloat(Math.tanh(b / overVoltage)).toFixed(6)
+        )
       case 'polynomial':
-        return toElectricalPrecision(parseFloat((1.0 / (1.0 + a * Math.pow(overVoltage, b)))).toFixed(6));
+        return toElectricalPrecision(
+          parseFloat(1.0 / (1.0 + a * Math.pow(overVoltage, b))).toFixed(6)
+        )
       default:
-        return toElectricalPrecision(parseFloat((Math.exp(-a * overVoltage))).toFixed(6));
+        return toElectricalPrecision(
+          parseFloat(Math.exp(-a * overVoltage)).toFixed(6)
+        )
     }
   }
 
@@ -212,7 +224,8 @@ class CTSaturationProtection {
    * @param {number} currentTime - Current simulation time (s)
    * @returns {Object} Protection evaluation result
    */
-  evaluate(measurement, currentTime = 0) { // current (A)
+  evaluate(measurement, currentTime = 0) {
+    // current (A)
     // current (A)
     const { I } = measurement
 
@@ -227,7 +240,9 @@ class CTSaturationProtection {
     this.state.ctSaturated = ctResult.isSaturated
 
     // Check trip condition using measured current (with saturation)
-    const measured_pu = toElectricalPrecision(parseFloat((this.state.measuredCurrent / this.ratedCurrent)).toFixed(6));
+    const measured_pu = toElectricalPrecision(
+      parseFloat(this.state.measuredCurrent / this.ratedCurrent).toFixed(6)
+    )
     const shouldTrip = measured_pu >= this.pickup
 
     // Update trip state

@@ -11,33 +11,37 @@
  * @returns {Array} Array de puntos [{x, y}]
  */
 export function edgeToPath(edge, nodes, options = {}) {
-  const from = nodes.find(n => n.id === edge.source);
-  const to = nodes.find(n => n.id === edge.target);
+  const from = nodes.find(n => n.id === edge.source)
+  const to = nodes.find(n => n.id === edge.target)
 
   if (!from || !to) {
-    return [];
+    return []
   }
 
-  const fromPos = from.position || { x: 0, y: 0 };
-  const toPos = to.position || { x: 0, y: 0 };
+  const fromPos = from.position || { x: 0, y: 0 }
+  const toPos = to.position || { x: 0, y: 0 }
 
   // Camino simple línea recta
   const path = [
     { x: fromPos.x, y: fromPos.y },
-    { x: toPos.x, y: toPos.y }
-  ];
+    { x: toPos.x, y: toPos.y },
+  ]
 
   // Si se requieren curvas Bezier, generar puntos intermedios
   if (options.curved && options.curvePoints > 2) {
-    return generateCurvedPath(fromPos, toPos, options.curvePoints);
+    return generateCurvedPath(fromPos, toPos, options.curvePoints)
   }
 
   // Si se requieren puntos intermedios para movimiento más suave
   if (options.intermediatePoints && options.intermediatePoints > 2) {
-    return generateIntermediatePoints(fromPos, toPos, options.intermediatePoints);
+    return generateIntermediatePoints(
+      fromPos,
+      toPos,
+      options.intermediatePoints
+    )
   }
 
-  return path;
+  return path
 }
 
 /**
@@ -48,35 +52,35 @@ export function edgeToPath(edge, nodes, options = {}) {
  * @returns {Array} Array de puntos curvados
  */
 function generateCurvedPath(from, to, points = 10) {
-  const path = [];
+  const path = []
 
   // Calcular punto de control para curva Bezier cuadrática
-  const midX = (from.x + to.x) / 2;
-  const midY = (from.y + to.y) / 2;
+  const midX = (from.x + to.x) / 2
+  const midY = (from.y + to.y) / 2
 
   // Offset perpendicular para crear curva
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const length = Math.sqrt(dx * dx + dy * dy);
+  const dx = to.x - from.x
+  const dy = to.y - from.y
+  const length = Math.sqrt(dx * dx + dy * dy)
 
-  if (length === 0) return [from, to];
+  if (length === 0) return [from, to]
 
   // Normalizar y aplicar offset perpendicular
-  const perpX = -dy / length;
-  const perpY = dx / length;
-  const curveOffset = length * 0.2; // 20% de la longitud
+  const perpX = -dy / length
+  const perpY = dx / length
+  const curveOffset = length * 0.2 // 20% de la longitud
 
-  const controlX = midX + perpX * curveOffset;
-  const controlY = midY + perpY * curveOffset;
+  const controlX = midX + perpX * curveOffset
+  const controlY = midY + perpY * curveOffset
 
   // Generar puntos a lo largo de la curva Bezier
   for (let i = 0; i <= points; i++) {
-    const t = i / points;
-    const point = quadraticBezier(from, { x: controlX, y: controlY }, to, t);
-    path.push(point);
+    const t = i / points
+    const point = quadraticBezier(from, { x: controlX, y: controlY }, to, t)
+    path.push(point)
   }
 
-  return path;
+  return path
 }
 
 /**
@@ -88,15 +92,13 @@ function generateCurvedPath(from, to, points = 10) {
  * @returns {Object} Punto interpolado
  */
 function quadraticBezier(p0, p1, p2, t) {
-  const x = Math.pow(1 - t, 2) * p0.x +
-    2 * (1 - t) * t * p1.x +
-    Math.pow(t, 2) * p2.x;
+  const x =
+    Math.pow(1 - t, 2) * p0.x + 2 * (1 - t) * t * p1.x + Math.pow(t, 2) * p2.x
 
-  const y = Math.pow(1 - t, 2) * p0.y +
-    2 * (1 - t) * t * p1.y +
-    Math.pow(t, 2) * p2.y;
+  const y =
+    Math.pow(1 - t, 2) * p0.y + 2 * (1 - t) * t * p1.y + Math.pow(t, 2) * p2.y
 
-  return { x, y };
+  return { x, y }
 }
 
 /**
@@ -107,16 +109,16 @@ function quadraticBezier(p0, p1, p2, t) {
  * @returns {Array} Array de puntos
  */
 function generateIntermediatePoints(from, to, points = 5) {
-  const path = [];
+  const path = []
 
   for (let i = 0; i <= points; i++) {
-    const t = i / points;
-    const x = from.x + (to.x - from.x) * t;
-    const y = from.y + (to.y - from.y) * t;
-    path.push({ x, y });
+    const t = i / points
+    const x = from.x + (to.x - from.x) * t
+    const y = from.y + (to.y - from.y) * t
+    path.push({ x, y })
   }
 
-  return path;
+  return path
 }
 
 /**
@@ -126,45 +128,45 @@ function generateIntermediatePoints(from, to, points = 5) {
  * @returns {Array} Array de edges hacia la fuente
  */
 export function getUpstreamPath(graph, startNodeId) {
-  const path = [];
-  let current = startNodeId;
-  const visited = new Set();
-  visited.add(startNodeId); // Mark start node as visited to detect cycles back to start
+  const path = []
+  let current = startNodeId
+  const visited = new Set()
+  visited.add(startNodeId) // Mark start node as visited to detect cycles back to start
 
-  let shouldContinue = true;
+  let shouldContinue = true
   while (shouldContinue) {
     // Encontrar edge que termina en el nodo actual
-    const edge = graph.edges?.find(e => e.target === current);
+    const edge = graph.edges?.find(e => e.target === current)
 
     if (!edge) {
-      shouldContinue = false;
-      break;
+      shouldContinue = false
+      break
     }
 
     // Evitar ciclos - detener si encontramos el nodo inicial
     if (visited.has(edge.source)) {
-      shouldContinue = false;
-      break;
+      shouldContinue = false
+      break
     }
-    visited.add(edge.source);
+    visited.add(edge.source)
 
-    path.push(edge);
-    current = edge.source;
+    path.push(edge)
+    current = edge.source
 
     // Detener en nodos específicos (breakers o source)
     if (current.includes('breaker') || current.includes('source')) {
-      shouldContinue = false;
-      break;
+      shouldContinue = false
+      break
     }
 
     // Límite de seguridad
     if (path.length > 50) {
-      shouldContinue = false;
-      break;
+      shouldContinue = false
+      break
     }
   }
 
-  return path;
+  return path
 }
 
 /**
@@ -175,12 +177,14 @@ export function getUpstreamPath(graph, startNodeId) {
  * @returns {Array} Array de caminos [{path, edgeId}]
  */
 export function edgesToParticlePaths(edges, nodes, options = {}) {
-  return edges.map(edge => ({
-    edgeId: edge.id,
-    path: edgeToPath(edge, nodes, options),
-    source: edge.source,
-    target: edge.target
-  })).filter(p => p.path.length > 0);
+  return edges
+    .map(edge => ({
+      edgeId: edge.id,
+      path: edgeToPath(edge, nodes, options),
+      source: edge.source,
+      target: edge.target,
+    }))
+    .filter(p => p.path.length > 0)
 }
 
 /**
@@ -191,22 +195,22 @@ export function edgesToParticlePaths(edges, nodes, options = {}) {
  * @returns {boolean} True si está aguas arriba
  */
 export function isUpstreamOfBreaker(particle, breakerId, graph) {
-  const breakerNode = graph.nodes.find(n => n.id === breakerId);
-  if (!breakerNode) return false;
+  const breakerNode = graph.nodes.find(n => n.id === breakerId)
+  if (!breakerNode) return false
 
-  const particlePos = particle.getPosition();
-  const breakerPos = breakerNode.position || { x: 0, y: 0 };
+  const particlePos = particle.getPosition()
+  const breakerPos = breakerNode.position || { x: 0, y: 0 }
 
   // Lógica simple: si la partícula está más cerca de la fuente
   // que el breaker, está aguas arriba
   const distanceToParticle = Math.sqrt(
     Math.pow(particlePos.x, 2) + Math.pow(particlePos.y, 2)
-  );
+  )
   const distanceToBreaker = Math.sqrt(
     Math.pow(breakerPos.x, 2) + Math.pow(breakerPos.y, 2)
-  );
+  )
 
-  return distanceToParticle < distanceToBreaker;
+  return distanceToParticle < distanceToBreaker
 }
 
 /**
@@ -216,9 +220,9 @@ export function isUpstreamOfBreaker(particle, breakerId, graph) {
  * @returns {number} Distancia euclidiana
  */
 export function distance(p1, p2) {
-  const dx = p2.x - p1.x;
-  const dy = p2.y - p1.y;
-  return Math.sqrt(dx * dx + dy * dy);
+  const dx = p2.x - p1.x
+  const dy = p2.y - p1.y
+  return Math.sqrt(dx * dx + dy * dy)
 }
 
 /**
@@ -227,11 +231,11 @@ export function distance(p1, p2) {
  * @returns {Object} Vector normalizado
  */
 export function normalizeVector(vector) {
-  const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-  if (length === 0) return { x: 0, y: 0 };
+  const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y)
+  if (length === 0) return { x: 0, y: 0 }
 
   return {
     x: vector.x / length,
-    y: vector.y / length
-  };
+    y: vector.y / length,
+  }
 }

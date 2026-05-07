@@ -60,10 +60,10 @@ describe('Electrical Edge Cases Tests', () => {
     });
 
     test('should handle large power values', () => {
-      const largePower = 5000000; // 5 MW in W
-      const converted = convertPower(largePower, 'W', 'MW');
+      const largePower = 5000000000; // 5 GW in W
+      const converted = convertPower(largePower, 'W', 'GW');
       expect(converted).toBe(5);
-      expect(validateElectricalValue(5, 'power', 'MW').valid).toBe(true);
+      expect(validateElectricalValue(5, 'power', 'GW').valid).toBe(true);
     });
   });
 
@@ -140,10 +140,10 @@ describe('Electrical Edge Cases Tests', () => {
   describe('Unit Conversion Edge Cases', () => {
     test('should handle per-unit conversions with extreme values', () => {
       const baseVoltage = 13.8;
-      
+
       // Very low per-unit value
       expect(convertVoltage(0.001, 'per-unit', 'kV', baseVoltage)).toBeCloseTo(0.0138, 6);
-      
+
       // Very high per-unit value
       expect(convertVoltage(2.0, 'per-unit', 'kV', baseVoltage)).toBeCloseTo(27.6, 6);
     });
@@ -151,13 +151,13 @@ describe('Electrical Edge Cases Tests', () => {
     test('should handle impedance conversion with zero base', () => {
       expect(() => {
         convertImpedance(1, 'Ω', 'pu', 0);
-      }).not.toThrow(); // Current implementation doesn't throw for zero base
+      }).toThrow(); // Should throw for zero base impedance
     });
 
     test('should handle current conversion across orders of magnitude', () => {
       // mA to kA
       expect(convertCurrent(1000000, 'mA', 'kA')).toBe(1);
-      
+
       // kA to mA
       expect(convertCurrent(1, 'kA', 'mA')).toBe(1000000);
     });
@@ -190,10 +190,10 @@ describe('Electrical Edge Cases Tests', () => {
   describe('Real-World Scenarios', () => {
     test('should handle typical distribution system voltages', () => {
       const distributionVoltages = [4.16, 13.8, 34.5, 69, 115, 138, 230, 345, 500, 765]; // kV
-      
+
       distributionVoltages.forEach(voltage => {
         expect(validateElectricalValue(voltage, 'voltage', 'kV').valid).toBe(true);
-        
+
         // Test per-unit conversion
         const puValue = convertVoltage(voltage, 'kV', 'per-unit', voltage);
         expect(puValue).toBe(1);
@@ -202,10 +202,10 @@ describe('Electrical Edge Cases Tests', () => {
 
     test('should handle typical fault current levels', () => {
       const faultCurrents = [1, 5, 10, 20, 30, 40, 50, 63]; // kA
-      
+
       faultCurrents.forEach(current => {
         expect(validateElectricalValue(current, 'current', 'kA').valid).toBe(true);
-        
+
         // Test conversion to amps
         const amps = convertCurrent(current, 'kA', 'A');
         expect(amps).toBe(current * 1000);
@@ -219,13 +219,13 @@ describe('Electrical Edge Cases Tests', () => {
         { mw: 100, mvar: 40 },    // Large load
         { mw: 500, mvar: 200 }    // Very large load
       ];
-      
+
       loads.forEach(load => {
         expect(validateElectricalValue(load.mw, 'power', 'MW').valid).toBe(true);
-        
+
         const apparentPower = Math.sqrt(load.mw ** 2 + load.mvar ** 2);
         const powerFactor = load.mw / apparentPower;
-        
+
         expect(powerFactor).toBeGreaterThan(0);
         expect(powerFactor).toBeLessThanOrEqual(1);
       });
@@ -235,13 +235,13 @@ describe('Electrical Edge Cases Tests', () => {
   describe('Calculation Accuracy Edge Cases', () => {
     test('should maintain accuracy in iterative calculations', () => {
       let value = 1.0;
-      
+
       // Simulate iterative calculation
       for (let i = 0; i < 100; i++) {
         value = value * 1.001 + 0.001;
         value = toElectricalPrecision(value);
       }
-      
+
       // Should not accumulate excessive error
       expect(value).toBeGreaterThan(1.1);
       expect(value).toBeLessThan(1.3); // Adjusted range for actual result
@@ -249,23 +249,23 @@ describe('Electrical Edge Cases Tests', () => {
 
     test('should handle matrix-like calculations with precision', () => {
       const values = [1.234567, 2.345678, 3.456789];
-      
+
       // Simulate matrix operation
       const result = values.reduce((sum, val) => {
         return toElectricalPrecision(sum + val * 0.999);
       }, 0);
-      
+
       expect(result).toBeCloseTo(7.0, 1); // Adjusted for actual result
     });
 
     test('should handle complex power calculations', () => {
       const realPower = 100; // MW
       const reactivePower = 50; // MVAR
-      
+
       const apparentPower = Math.sqrt(realPower ** 2 + reactivePower ** 2);
       const powerFactor = realPower / apparentPower;
       const angle = Math.acos(powerFactor);
-      
+
       expect(toElectricalPrecision(apparentPower)).toBeCloseTo(111.803, 3);
       expect(toElectricalPrecision(powerFactor)).toBeCloseTo(0.894, 3);
       expect(toElectricalPrecision(angle)).toBeCloseTo(0.464, 3); // Adjusted for actual result
@@ -275,11 +275,11 @@ describe('Electrical Edge Cases Tests', () => {
   describe('Performance Edge Cases', () => {
     test('should handle large arrays of electrical values', () => {
       const largeArray = Array(10000).fill(0).map((_, i) => i * 0.001);
-      
+
       const startTime = performance.now();
       const processed = largeArray.map(val => toElectricalPrecision(val));
       const endTime = performance.now();
-      
+
       expect(processed.length).toBe(10000);
       expect(endTime - startTime).toBeLessThan(100); // Should complete in <100ms
     });
@@ -287,14 +287,14 @@ describe('Electrical Edge Cases Tests', () => {
     test('should handle repeated conversions efficiently', () => {
       const value = 13.8;
       const iterations = 1000;
-      
+
       const startTime = performance.now();
       for (let i = 0; i < iterations; i++) {
         convertVoltage(value, 'kV', 'V');
         convertVoltage(value, 'V', 'kV');
       }
       const endTime = performance.now();
-      
+
       expect(endTime - startTime).toBeLessThan(50); // Should complete in <50ms
     });
   });
@@ -307,7 +307,7 @@ describe('Electrical Edge Cases Tests', () => {
         'HV': [69, 115, 138, 161, 230], // kV
         'EHV': [345, 500, 765] // kV (1100 may exceed validation range)
       };
-      
+
       Object.values(ieeeVoltageLevels).flat().forEach(voltage => {
         expect(validateElectricalValue(voltage, 'voltage', 'kV').valid).toBe(true);
       });
@@ -316,7 +316,7 @@ describe('Electrical Edge Cases Tests', () => {
     test('should follow IEEE 1584 arc flash standards', () => {
       // Typical working distances for arc flash calculations
       const workingDistances = [457, 610, 760, 910, 1060]; // mm
-      
+
       workingDistances.forEach(distance => {
         const distanceInMeters = distance / 1000;
         expect(distanceInMeters).toBeGreaterThan(0.4);
@@ -331,7 +331,7 @@ describe('Electrical Edge Cases Tests', () => {
         { r: 0.1, x: 0.5 },   // Medium impedance
         { r: 0.5, x: 2.0 }    // High impedance
       ];
-      
+
       impedances.forEach(imp => {
         // X/R ratio should be reasonable
         const xrRatio = imp.x / imp.r;

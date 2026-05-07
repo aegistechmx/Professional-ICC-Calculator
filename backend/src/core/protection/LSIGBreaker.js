@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * LSIGBreaker - Real Breaker Protection (Long, Short, Instant, Ground)
  *
@@ -114,7 +114,7 @@ class LSIGBreaker {
     // current (A)
 
     // Multiple of pickup
-    const M = toElectricalPrecision(parseFloat((current / pickup).toFixed(6)));
+    const M = toElectricalPrecision(parseFloat((current / pickup).toFixed(6)))
 
     switch (curve) {
       case 'standard_inverse':
@@ -142,7 +142,9 @@ class LSIGBreaker {
       return { trip: false, reason: 'Long time disabled' }
     }
 
-    const current_pu = toElectricalPrecision(parseFloat((current / this.ratedCurrent)).toFixed(6)); // current (A)
+    const current_pu = toElectricalPrecision(
+      parseFloat(current / this.ratedCurrent).toFixed(6)
+    ) // current (A)
     // current (A)
 
     if (current_pu < this.longTime.pickup) {
@@ -180,7 +182,9 @@ class LSIGBreaker {
       return { trip: false, reason: 'Short time disabled' }
     }
 
-    const current_pu = toElectricalPrecision(parseFloat((current / this.ratedCurrent)).toFixed(6)); // current (A)
+    const current_pu = toElectricalPrecision(
+      parseFloat(current / this.ratedCurrent).toFixed(6)
+    ) // current (A)
     // current (A)
 
     if (current_pu < this.shortTime.pickup) {
@@ -218,7 +222,9 @@ class LSIGBreaker {
       return { trip: false, reason: 'Instantaneous disabled' }
     }
 
-    const current_pu = toElectricalPrecision(parseFloat((current / this.ratedCurrent)).toFixed(6)); // current (A)
+    const current_pu = toElectricalPrecision(
+      parseFloat(current / this.ratedCurrent).toFixed(6)
+    ) // current (A)
     // current (A)
 
     if (current_pu < this.instantaneous.pickup) {
@@ -248,7 +254,9 @@ class LSIGBreaker {
       return { trip: false, reason: 'Ground protection disabled' }
     }
 
-    const current_pu = toElectricalPrecision(parseFloat((groundCurrent / this.ratedCurrent)).toFixed(6)); // current (A)
+    const current_pu = toElectricalPrecision(
+      parseFloat(groundCurrent / this.ratedCurrent).toFixed(6)
+    ) // current (A)
     // current (A)
 
     if (current_pu < this.ground.pickup) {
@@ -284,7 +292,8 @@ class LSIGBreaker {
    * @param {number} currentTime - Current simulation time (s)
    * @returns {Object} Complete LSIG evaluation result
    */
-  evaluate(measurement, currentTime = 0) { // current (A)
+  evaluate(measurement, currentTime = 0) {
+    // current (A)
     // current (A)
     const { I, Ig } = measurement
 

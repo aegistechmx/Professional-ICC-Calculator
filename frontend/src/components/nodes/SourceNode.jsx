@@ -3,30 +3,32 @@
  * Componente React Flow para fuente de alimentación con visualización de resultados
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Handle, Position } from 'reactflow';
-import './SourceNode.css';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { Handle, Position } from 'reactflow'
+import './SourceNode.css'
 
 export default function SourceNode({ data, selected }) {
-  const { results, status } = data || {};
+  const { results, status } = data || {}
 
   // Determinar clase de estado
   const getStatusClass = () => {
-    if (status === 'calculated') return 'calculated';
-    if (status === 'error') return 'error';
-    if (status === 'pending') return 'pending';
-    return 'default';
-  };
+    if (status === 'calculated') return 'calculated'
+    if (status === 'error') return 'error'
+    if (status === 'pending') return 'pending'
+    return 'default'
+  }
 
   // Formatear valores
   const formatValue = (value, unit = '', decimals = 2) => {
-    if (value === undefined || value === null) return '-';
-    return `${Number(value).toFixed(decimals)}${unit}`;
-  };
+    if (value === undefined || value === null) return '-'
+    return `${Number(value).toFixed(decimals)}${unit}`
+  }
 
   return (
-    <div className={`source-node ${getStatusClass()} ${selected ? 'selected' : ''}`}>
+    <div
+      className={`source-node ${getStatusClass()} ${selected ? 'selected' : ''}`}
+    >
       {/* Handles de conexión */}
       <Handle
         type="source"
@@ -124,10 +126,10 @@ export default function SourceNode({ data, selected }) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 SourceNode.propTypes = {
   data: PropTypes.object,
-  selected: PropTypes.bool
-};
+  selected: PropTypes.bool,
+}

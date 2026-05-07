@@ -3,4 +3,4 @@
  * Simplifica el import en otros componentes
  */
 
-export { default } from './IcoreLogoAnimated.jsx';
+export { default } from './IcoreLogoAnimated.jsx'

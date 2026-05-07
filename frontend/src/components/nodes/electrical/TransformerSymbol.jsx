@@ -4,31 +4,40 @@
  * Transformador con doble bobina
  */
 
-import React from 'react';
-import { Handle, Position } from 'reactflow';
-import './ElectricalSymbols.css';
+import React from 'react'
+import { Handle, Position } from 'reactflow'
+import './ElectricalSymbols.css'
 
 export default function TransformerSymbol({ data, selected }) {
-  const { status, label, kva, primario, secundario } = data || {};
+  const { status, label, kva, primario, secundario } = data || {}
 
   const formatValue = (value, unit = '', decimals = 0) => {
-    if (value === undefined || value === null) return '-';
-    return `${Number(value).toFixed(decimals)}${unit}`;
-  };
+    if (value === undefined || value === null) return '-'
+    return `${Number(value).toFixed(decimals)}${unit}`
+  }
 
   const getStatusColor = () => {
-    if (status === 'calculated') return '#10b981';
-    if (status === 'error') return '#ef4444';
-    if (status === 'pending') return '#f59e0b';
-    return '#8b5cf6';
-  };
+    if (status === 'calculated') return '#10b981'
+    if (status === 'error') return '#ef4444'
+    if (status === 'pending') return '#f59e0b'
+    return '#8b5cf6'
+  }
 
   return (
-    <div className={`electrical-node transformer ${selected ? 'selected' : ''}`}>
+    <div
+      className={`electrical-node transformer ${selected ? 'selected' : ''}`}
+    >
       <Handle type="target" position={Position.Left} className="handle-left" />
-      <Handle type="source" position={Position.Right} className="handle-right" />
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="handle-right"
+      />
 
-      <div className="symbol-container" style={{ borderColor: getStatusColor() }}>
+      <div
+        className="symbol-container"
+        style={{ borderColor: getStatusColor() }}
+      >
         <svg width="60" height="70" viewBox="0 0 60 70" className="iec-symbol">
           {/* Primera bobina (primario) - arco hacia derecha */}
           <path
@@ -49,11 +58,33 @@ export default function TransformerSymbol({ data, selected }) {
           />
 
           {/* Líneas de conexión */}
-          <line x1="5" y1="25" x2="15" y2="25" stroke={getStatusColor()} strokeWidth="2" />
-          <line x1="45" y1="25" x2="55" y2="25" stroke={getStatusColor()} strokeWidth="2" />
+          <line
+            x1="5"
+            y1="25"
+            x2="15"
+            y2="25"
+            stroke={getStatusColor()}
+            strokeWidth="2"
+          />
+          <line
+            x1="45"
+            y1="25"
+            x2="55"
+            y2="25"
+            stroke={getStatusColor()}
+            strokeWidth="2"
+          />
 
           {/* Indicador de núcleo */}
-          <line x1="28" y1="20" x2="32" y2="30" stroke={getStatusColor()} strokeWidth="1" strokeDasharray="2,2" />
+          <line
+            x1="28"
+            y1="20"
+            x2="32"
+            y2="30"
+            stroke={getStatusColor()}
+            strokeWidth="1"
+            strokeDasharray="2,2"
+          />
         </svg>
 
         {status && (
@@ -75,5 +106,5 @@ export default function TransformerSymbol({ data, selected }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

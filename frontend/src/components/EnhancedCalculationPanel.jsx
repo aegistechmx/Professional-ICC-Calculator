@@ -18,7 +18,7 @@ const EnhancedCalculationPanel = () => {
     useWorker: true,
     validateStandards: true,
     includeHarmonics: false,
-    batchSize: 50
+    batchSize: 50,
   })
 
   const nodes = useStore(state => state.nodes)
@@ -36,7 +36,7 @@ const EnhancedCalculationPanel = () => {
     calculatePowerFlow: workerPowerFlow,
     validateStandards: workerValidation,
     clearError,
-    clearResults
+    clearResults,
   } = useSmartCalculation('/src/workers/calculation.worker.js')
 
   /**
@@ -62,9 +62,9 @@ const EnhancedCalculationPanel = () => {
           parameters: {
             nodes,
             edges,
-            results: iccResults
+            results: iccResults,
           },
-          standards: ['IEEE1584', 'IEC60909', 'IEEE141']
+          standards: ['IEEE1584', 'IEC60909', 'IEEE141'],
         }
 
         const validationResults = await workerValidation(
@@ -79,18 +79,26 @@ const EnhancedCalculationPanel = () => {
         return {
           ...iccResults,
           validation: validationResults,
-          compliance: complianceReport
+          compliance: complianceReport,
         }
       }
 
       return iccResults
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Enhanced ICC calculation failed:', error)
       throw error
     }
-  }, [nodes, edges, calculationOptions, workerICC, calculateICC, workerValidation, clearError, clearResults])
+  }, [
+    nodes,
+    edges,
+    calculationOptions,
+    workerICC,
+    calculateICC,
+    workerValidation,
+    clearError,
+    clearResults,
+  ])
 
   /**
    * Run harmonic analysis
@@ -116,7 +124,6 @@ const EnhancedCalculationPanel = () => {
       )
 
       return harmonicResults
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Harmonic analysis failed:', error)
@@ -135,7 +142,11 @@ const EnhancedCalculationPanel = () => {
       let powerFlowResults
 
       if (calculationOptions.useWorker) {
-        powerFlowResults = await workerPowerFlow(nodes, edges, calculationOptions)
+        powerFlowResults = await workerPowerFlow(
+          nodes,
+          edges,
+          calculationOptions
+        )
       } else {
         powerFlowResults = await calculatePowerFlow()
       }
@@ -148,9 +159,9 @@ const EnhancedCalculationPanel = () => {
             buses: powerFlowResults.results,
             branches: edges,
             baseMVA: 100,
-            baseKV: 0.48
+            baseKV: 0.48,
           },
-          standards: ['IEEE141']
+          standards: ['IEEE141'],
         }
 
         const validationResults = await workerValidation(
@@ -161,18 +172,26 @@ const EnhancedCalculationPanel = () => {
 
         return {
           ...powerFlowResults,
-          validation: validationResults
+          validation: validationResults,
         }
       }
 
       return powerFlowResults
-
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Enhanced power flow failed:', error)
       throw error
     }
-  }, [nodes, edges, calculationOptions, workerPowerFlow, calculatePowerFlow, workerValidation, clearError, clearResults])
+  }, [
+    nodes,
+    edges,
+    calculationOptions,
+    workerPowerFlow,
+    calculatePowerFlow,
+    workerValidation,
+    clearError,
+    clearResults,
+  ])
 
   /**
    * Render calculation progress
@@ -186,9 +205,7 @@ const EnhancedCalculationPanel = () => {
           <span className="text-sm font-medium text-blue-900">
             Calculating...
           </span>
-          <span className="text-sm text-blue-700">
-            {progress.toFixed(1)}%
-          </span>
+          <span className="text-sm text-blue-700">{progress.toFixed(1)}%</span>
         </div>
         <div className="w-full bg-blue-200 rounded-full h-2">
           <div
@@ -216,9 +233,7 @@ const EnhancedCalculationPanel = () => {
             <h3 className="text-sm font-medium text-red-800">
               Calculation Error
             </h3>
-            <div className="mt-2 text-sm text-red-700">
-              {error}
-            </div>
+            <div className="mt-2 text-sm text-red-700">{error}</div>
           </div>
         </div>
       </div>
@@ -240,20 +255,27 @@ const EnhancedCalculationPanel = () => {
           {results.calculationTime && (
             <p>Calculation time: {results.calculationTime.toFixed(2)}ms</p>
           )}
-          {results.nodeCount && (
-            <p>Nodes processed: {results.nodeCount}</p>
-          )}
+          {results.nodeCount && <p>Nodes processed: {results.nodeCount}</p>}
           {results.validation && (
             <div className="mt-2">
-              <p>Standards validation: {results.validation.overallValid ? 'PASS' : 'FAIL'}</p>
+              <p>
+                Standards validation:{' '}
+                {results.validation.overallValid ? 'PASS' : 'FAIL'}
+              </p>
               {results.validation.summary && (
-                <p>Issues: {results.validation.summary.totalErrors} errors, {results.validation.summary.totalWarnings} warnings</p>
+                <p>
+                  Issues: {results.validation.summary.totalErrors} errors,{' '}
+                  {results.validation.summary.totalWarnings} warnings
+                </p>
               )}
             </div>
           )}
           {results.compliance && (
             <div className="mt-2">
-              <p>Compliance score: {results.compliance.compliance.score.toFixed(1)}%</p>
+              <p>
+                Compliance score:{' '}
+                {results.compliance.compliance.score.toFixed(1)}%
+              </p>
               <p>Status: {results.compliance.compliance.overall}</p>
             </div>
           )}
@@ -275,15 +297,16 @@ const EnhancedCalculationPanel = () => {
             { id: 'icc', label: 'Short Circuit', icon: '' },
             { id: 'powerflow', label: 'Power Flow', icon: '~' },
             { id: 'harmonics', label: 'Harmonics', icon: '' },
-            { id: 'standards', label: 'Standards', icon: ' ' }
+            { id: 'standards', label: 'Standards', icon: ' ' },
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`${activeTab === tab.id
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+              className={`${
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
             >
               <span>{tab.icon}</span>
               {tab.label}
@@ -294,31 +317,41 @@ const EnhancedCalculationPanel = () => {
 
       {/* Options */}
       <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-sm font-medium text-gray-900 mb-2">Calculation Options</h3>
+        <h3 className="text-sm font-medium text-gray-900 mb-2">
+          Calculation Options
+        </h3>
         <div className="space-y-2">
           <label className="flex items-center">
             <input
               type="checkbox"
               checked={calculationOptions.useWorker}
-              onChange={(e) => setCalculationOptions(prev => ({
-                ...prev,
-                useWorker: e.target.checked
-              }))}
+              onChange={e =>
+                setCalculationOptions(prev => ({
+                  ...prev,
+                  useWorker: e.target.checked,
+                }))
+              }
               className="mr-2"
             />
-            <span className="text-sm text-gray-700">Use Web Worker (faster)</span>
+            <span className="text-sm text-gray-700">
+              Use Web Worker (faster)
+            </span>
           </label>
           <label className="flex items-center">
             <input
               type="checkbox"
               checked={calculationOptions.validateStandards}
-              onChange={(e) => setCalculationOptions(prev => ({
-                ...prev,
-                validateStandards: e.target.checked
-              }))}
+              onChange={e =>
+                setCalculationOptions(prev => ({
+                  ...prev,
+                  validateStandards: e.target.checked,
+                }))
+              }
               className="mr-2"
             />
-            <span className="text-sm text-gray-700">Validate IEEE/IEC Standards</span>
+            <span className="text-sm text-gray-700">
+              Validate IEEE/IEC Standards
+            </span>
           </label>
         </div>
       </div>
@@ -337,7 +370,8 @@ const EnhancedCalculationPanel = () => {
               Short Circuit Analysis
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Calculate short circuit currents with IEEE 1584 and IEC 60909 compliance
+              Calculate short circuit currents with IEEE 1584 and IEC 60909
+              compliance
             </p>
             <button
               onClick={runEnhancedICCCalculation}

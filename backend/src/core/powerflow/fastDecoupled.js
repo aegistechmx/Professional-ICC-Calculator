@@ -180,7 +180,9 @@ function solveFDLF(system, options = {}) {
     let correctionIndex = 0
     for (let i = 0; i < system.buses.length; i++) {
       if (i !== slackIndex && correctionIndex < deltaTheta.length) {
-        const dTheta_i = toElectricalPrecision(deltaTheta[correctionIndex] * acceleration)
+        const dTheta_i = toElectricalPrecision(
+          deltaTheta[correctionIndex] * acceleration
+        )
         const currentMag = toElectricalPrecision(getV(i)) // current (A)
         const currentAng = toElectricalPrecision(getTheta(i)) // current (A)
         const newAng = toElectricalPrecision(currentAng + dTheta_i) // current (A)
@@ -196,7 +198,9 @@ function solveFDLF(system, options = {}) {
     for (let i = 0; i < pqBuses.length; i++) {
       if (correctionIndex < deltaV.length) {
         const busIdx = pqBuses[i]
-        const dV_i = toElectricalPrecision(deltaV[correctionIndex] * acceleration)
+        const dV_i = toElectricalPrecision(
+          deltaV[correctionIndex] * acceleration
+        )
         const currentMag = toElectricalPrecision(getV(busIdx)) // current (A)
         const currentAng = toElectricalPrecision(getTheta(busIdx)) // current (A)
         const newMag = toElectricalPrecision(currentMag + dV_i) // current (A)

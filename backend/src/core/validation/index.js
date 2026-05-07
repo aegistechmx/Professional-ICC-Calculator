@@ -17,6 +17,10 @@ const { StressTest } = require('./StressTest')
 const { EdgeCasesTest } = require('./EdgeCasesTest')
 const { CascadeTest } = require('./CascadeTest')
 const { ExternalValidation } = require('./ExternalValidation')
+const {
+  MexicanStandardsValidator,
+  NOM001SEDE2012Validator,
+} = require('./mexicanStandards')
 
 module.exports = {
   SystemValidator,
@@ -26,4 +30,6 @@ module.exports = {
   EdgeCasesTest,
   CascadeTest,
   ExternalValidation,
+  MexicanStandardsValidator,
+  NOM001SEDE2012Validator,
 }

@@ -63,23 +63,25 @@ const isValidLocalStorageData = (data, key) => {
   // Validate nodes structure
   if (key.includes('nodes')) {
     if (!Array.isArray(data)) return false
-    return data.every(node =>
-      node &&
-      typeof node === 'object' &&
-      typeof node.id === 'string' &&
-      typeof node.type === 'string'
+    return data.every(
+      node =>
+        node &&
+        typeof node === 'object' &&
+        typeof node.id === 'string' &&
+        typeof node.type === 'string'
     )
   }
 
   // Validate edges structure
   if (key.includes('edges')) {
     if (!Array.isArray(data)) return false
-    return data.every(edge =>
-      edge &&
-      typeof edge === 'object' &&
-      typeof edge.id === 'string' &&
-      typeof edge.source === 'string' &&
-      typeof edge.target === 'string'
+    return data.every(
+      edge =>
+        edge &&
+        typeof edge === 'object' &&
+        typeof edge.id === 'string' &&
+        typeof edge.source === 'string' &&
+        typeof edge.target === 'string'
     )
   }
 
@@ -253,32 +255,32 @@ function sanitizeGraph(graph) {
   sanitized.edges = graph.edges.map(edge => {
     const edgeData = { ...edge.data }
 
-      // Validar parámetros de cable
-      ;['longitud', 'paralelo', 'temp', 'numConductores'].forEach(key => {
-        let value = edgeData[key]
+    // Validar parámetros de cable
+    ;['longitud', 'paralelo', 'temp', 'numConductores'].forEach(key => {
+      let value = edgeData[key]
 
-        // Convert string numbers to actual numbers first
-        if (typeof value === 'string' && value !== '') {
-          const parsed = Number(value)
-          if (!Number.isNaN(parsed)) {
-            value = parsed
-          }
+      // Convert string numbers to actual numbers first
+      if (typeof value === 'string' && value !== '') {
+        const parsed = Number(value)
+        if (!Number.isNaN(parsed)) {
+          value = parsed
         }
+      }
 
-        if (
-          value !== undefined &&
-          typeof value === 'number' &&
-          !Number.isNaN(value)
-        ) {
-          const validation = validateValue(key, value)
-          if (!validation.valid) {
-            validationErrors.push(`Cable ${edge.id} - ${validation.message}`)
-            edgeData[key] = validation.clamped
-          } else {
-            edgeData[key] = validation.value
-          }
+      if (
+        value !== undefined &&
+        typeof value === 'number' &&
+        !Number.isNaN(value)
+      ) {
+        const validation = validateValue(key, value)
+        if (!validation.valid) {
+          validationErrors.push(`Cable ${edge.id} - ${validation.message}`)
+          edgeData[key] = validation.clamped
+        } else {
+          edgeData[key] = validation.value
         }
-      })
+      }
+    })
 
     return {
       ...edge,
@@ -700,7 +702,7 @@ export const useStore = create((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           voltage: 220,
-          impedance: 0.05
+          impedance: 0.05,
         }),
       })
 
@@ -717,8 +719,8 @@ export const useStore = create((set, get) => ({
           ...n.data,
           results: {
             Icc: data.data.Icc,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         },
       }))
 
@@ -729,8 +731,8 @@ export const useStore = create((set, get) => ({
           ...e.data,
           results: {
             Icc: data.data.Icc,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         },
       }))
 
@@ -750,7 +752,7 @@ export const useStore = create((set, get) => ({
           resultsByEdgeId: newEdges.reduce((acc, e) => {
             acc[e.id] = e.data.results
             return acc
-          }, {})
+          }, {}),
         },
         shortCircuitResults: data,
         validationErrors: [],

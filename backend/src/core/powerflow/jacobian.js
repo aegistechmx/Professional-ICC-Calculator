@@ -108,7 +108,8 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
     // =========================
     // J12 = dP/dV
     // =========================
-    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) { // voltage (V)
+    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) {
+      // voltage (V)
       const j = voltageIndex[jIdx] // voltage (V)
 
       const Vi = getV(i)
@@ -139,7 +140,8 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
   // =========================
   // J21 = dQ/dθ
   // =========================
-  for (let iIdx = 0; iIdx < voltageIndex.length; iIdx++) { // voltage (V)
+  for (let iIdx = 0; iIdx < voltageIndex.length; iIdx++) {
+    // voltage (V)
     const i = voltageIndex[iIdx] // voltage (V)
     let col = 0
 
@@ -176,7 +178,8 @@ function buildJacobian(V, G, B, _P, _Q, buses) {
     // =========================
     // J22 = dQ/dV
     // =========================
-    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) { // voltage (V)
+    for (let jIdx = 0; jIdx < voltageIndex.length; jIdx++) {
+      // voltage (V)
       const j = voltageIndex[jIdx] // voltage (V)
 
       const Vi = getV(i)

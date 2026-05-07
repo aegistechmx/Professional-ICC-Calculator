@@ -5,9 +5,9 @@
  * Operaciones atómicas para prevenir race conditions
  */
 
-const MAX_CACHE_SIZE = 1000;
-const cache = new Map();
-let cacheOperationInProgress = false;
+const MAX_CACHE_SIZE = 1000
+const cache = new Map()
+let cacheOperationInProgress = false
 
 /**
  * Obtiene valor del cache (operación atómica)
@@ -15,14 +15,14 @@ let cacheOperationInProgress = false;
  * @returns {any} Valor cacheado o undefined
  */
 function getCached(key) {
-  if (!key || typeof key !== 'string') return undefined;
+  if (!key || typeof key !== 'string') return undefined
 
   // Operación atómica de lectura
   try {
-    return cache.get(key);
+    return cache.get(key)
   } catch (error) {
     // Log cache read errors silently to avoid console statements
-    return undefined;
+    return undefined
   }
 }
 
@@ -32,31 +32,31 @@ function getCached(key) {
  * @param {any} val - Valor a guardar
  */
 function setCached(key, val) {
-  if (!key || typeof key !== 'string') return;
+  if (!key || typeof key !== 'string') return
 
   // Prevenir race conditions con mutex simple
   if (cacheOperationInProgress) {
     // Esperar y reintentar una vez
-    setTimeout(() => setCached(key, val), 1);
-    return;
+    setTimeout(() => setCached(key, val), 1)
+    return
   }
 
-  cacheOperationInProgress = true;
+  cacheOperationInProgress = true
 
   try {
     // Operación atómica de escritura con LRU eviction
     if (cache.size >= MAX_CACHE_SIZE) {
-      const firstKey = cache.keys().next().value;
+      const firstKey = cache.keys().next().value
       if (firstKey) {
-        cache.delete(firstKey);
+        cache.delete(firstKey)
       }
     }
 
-    cache.set(key, val);
+    cache.set(key, val)
   } catch (error) {
     // Cache write errors handled silently to avoid console statements
   } finally {
-    cacheOperationInProgress = false;
+    cacheOperationInProgress = false
   }
 }
 
@@ -64,7 +64,7 @@ function setCached(key, val) {
  * Limpia todo el cache
  */
 function clearCache() {
-  cache.clear();
+  cache.clear()
 }
 
 /**
@@ -73,16 +73,16 @@ function clearCache() {
  * @returns {number} Cantidad de entradas eliminadas
  */
 function deleteCachedPattern(pattern) {
-  if (!pattern || typeof pattern !== 'string') return 0;
+  if (!pattern || typeof pattern !== 'string') return 0
 
-  let deleted = 0;
+  let deleted = 0
   for (const key of cache.keys()) {
     if (key.includes(pattern)) {
-      cache.delete(key);
-      deleted++;
+      cache.delete(key)
+      deleted++
     }
   }
-  return deleted;
+  return deleted
 }
 
 /**
@@ -92,8 +92,8 @@ function deleteCachedPattern(pattern) {
 function getCacheStats() {
   return {
     size: cache.size,
-    keys: Array.from(cache.keys())
-  };
+    keys: Array.from(cache.keys()),
+  }
 }
 
 module.exports = {
@@ -101,5 +101,5 @@ module.exports = {
   setCached,
   clearCache,
   deleteCachedPattern,
-  getCacheStats
-};
+  getCacheStats,
+}

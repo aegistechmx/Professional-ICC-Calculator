@@ -49,7 +49,7 @@ class NewtonOPFSolver {
     })
 
     // Initialize Lagrangian multipliers
-    this.lambda = 0; // power (W) balance multiplier
+    this.lambda = 0 // power (W) balance multiplier
     this.mu = [] // Generation limit multipliers
     this.nu = [] // Voltage limit multipliers
   }
@@ -69,7 +69,8 @@ class NewtonOPFSolver {
       }
     })
 
-    if (powerFlowMethod === 'FDLF') { // power (W)
+    if (powerFlowMethod === 'FDLF') {
+      // power (W)
       return solveFDLF(this.model, { tolerance, maxIterations })
     } else {
       return solve(this.model, { tolerance, maxIterations })
@@ -261,7 +262,7 @@ class NewtonOPFSolver {
     const finalPF = this.solvePowerFlow()
 
     // Calculate final results
-    results.cost = totalCost(this.generators)
+    results.cost = Number(totalCost(this.generators))
     results.generation = this.generators.map(g => ({
       id: g.id,
       bus: g.bus,
@@ -283,7 +284,7 @@ class NewtonOPFSolver {
       `Newton-OPF ${results.converged ? 'converged' : 'did not converge'} in ${results.iterations} iterations`
     )
     // eslint-disable-next-line no-console
-    console.log(`Final cost: $${results.cost.toFixed(2)}`)
+    console.log(`Final cost: $${parseFloat(results.cost.toFixed(2))}`)
 
     return results
   }

@@ -36,7 +36,7 @@ class Generator {
 
     // Current operating point
     this.P = Pmin // Start at minimum
-    this.Q = 0; // power (W)
+    this.Q = 0 // power (W)
   }
 
   /**
@@ -46,7 +46,8 @@ class Generator {
    */
   getCost(P = this.P) {
     const { a, b, c } = this.cost
-    return a * P * P + b * P + c
+    const cost = a * P * P + b * P + c
+    return cost
   }
 
   /**

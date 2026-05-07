@@ -39,9 +39,8 @@ self.onmessage = async function (e) {
       type: 'result',
       id,
       data: result,
-      success: true
+      success: true,
     })
-
   } catch (error) {
     // Send error back to main thread
     self.postMessage({
@@ -49,7 +48,7 @@ self.onmessage = async function (e) {
       id,
       error: error.message,
       stack: error.stack,
-      success: false
+      success: false,
     })
   }
 }
@@ -84,7 +83,7 @@ async function performICCCalculation(data) {
     results,
     calculationTime: endTime - startTime,
     nodeCount: nodes.length,
-    edgeCount: edges.length
+    edgeCount: edges.length,
   }
 }
 
@@ -104,7 +103,7 @@ function calculateICCBatch(nodes, edges) {
     results.push({
       nodeId: node.id,
       ...faultCurrent,
-      impedance
+      impedance,
     })
   })
 
@@ -144,9 +143,8 @@ function calculateFaultCurrent(impedance, node) {
   const { R, X } = impedance
   const Z = Math.sqrt(R * R + X * X)
 
-  const voltage = node.data?.parameters?.voltaje ||
-    node.data?.parameters?.secundario ||
-    480
+  const voltage =
+    node.data?.parameters?.voltaje || node.data?.parameters?.secundario || 480
 
   const I_sc_3f = Z > 0.001 ? voltage / (Math.sqrt(3) * Z) : 0
   const I_sc_1f = Z > 0.001 ? voltage / (2 * Z) : 0
@@ -156,7 +154,7 @@ function calculateFaultCurrent(impedance, node) {
     isc_1f: I_sc_1f,
     isc_3f_ka: I_sc_3f / 1000,
     isc_1f_ka: I_sc_1f / 1000,
-    X_R_ratio: R > 0 ? X / R : 999
+    X_R_ratio: R > 0 ? X / R : 999,
   }
 }
 
@@ -186,7 +184,7 @@ async function performHarmonicAnalysis(data) {
     individualHarmonics,
     validation,
     kFactor,
-    calculationTime: endTime - startTime
+    calculationTime: endTime - startTime,
   }
 }
 
@@ -205,8 +203,8 @@ async function performPowerFlowCalculation(data) {
     const result = {
       nodeId: node.id,
       voltage: 1.0, // Per unit
-      angle: 0,    // Degrees
-      power: calculateNodePower(node, edges)
+      angle: 0, // Degrees
+      power: calculateNodePower(node, edges),
     }
     results.push(result)
   })
@@ -217,7 +215,7 @@ async function performPowerFlowCalculation(data) {
     results,
     converged: true,
     iterations: 1,
-    calculationTime: endTime - startTime
+    calculationTime: endTime - startTime,
   }
 }
 
@@ -262,7 +260,7 @@ async function performStandardsValidation(data) {
   return {
     results,
     calculationTime: endTime - startTime,
-    overallValid: results.every(r => r.valid)
+    overallValid: results.every(r => r.valid),
   }
 }
 
@@ -296,7 +294,7 @@ async function performBatchCalculation(data) {
     results.push({
       scenarioIndex: i,
       scenarioName: scenario.name || `Scenario ${i + 1}`,
-      ...result
+      ...result,
     })
 
     // Yield control periodically
@@ -311,7 +309,7 @@ async function performBatchCalculation(data) {
     results,
     totalScenarios: scenarios.length,
     calculationTime: endTime - startTime,
-    averageTimePerScenario: (endTime - startTime) / scenarios.length
+    averageTimePerScenario: (endTime - startTime) / scenarios.length,
   }
 }
 
@@ -353,11 +351,11 @@ function findNodeById(nodeId) {
 function getCableImpedance(calibre, length) {
   // Simplified cable impedance data
   const impedances = {
-    '350': { R: 0.0518, X: 0.0769 },
+    350: { R: 0.0518, X: 0.0769 },
     '4/0': { R: 0.0852, X: 0.0796 },
     '3/0': { R: 0.1074, X: 0.0813 },
     '2/0': { R: 0.1354, X: 0.0832 },
-    '1/0': { R: 0.1707, X: 0.0852 }
+    '1/0': { R: 0.1707, X: 0.0852 },
   }
 
   const baseImpedance = impedances[calibre] || impedances['350']
@@ -365,7 +363,7 @@ function getCableImpedance(calibre, length) {
 
   return {
     R: baseImpedance.R * lengthKm,
-    X: baseImpedance.X * lengthKm
+    X: baseImpedance.X * lengthKm,
   }
 }
 
@@ -377,7 +375,7 @@ function calculateNodePower(node) {
     case 'load':
       return {
         P: params.potencia_kW || 0,
-        Q: params.potencia_kVAR || 0
+        Q: params.potencia_kVAR || 0,
       }
     case 'motor': {
       const hp = params.hp || 0
@@ -389,13 +387,13 @@ function calculateNodePower(node) {
 
       return {
         P: kW,
-        Q: kVAR
+        Q: kVAR,
       }
     }
     case 'generator':
       return {
         P: -(params.kVA || 0) * (params.fp || 0.8),
-        Q: -(params.kVA || 0) * Math.sqrt(1 - (params.fp || 0.8) ** 2)
+        Q: -(params.kVA || 0) * Math.sqrt(1 - (params.fp || 0.8) ** 2),
       }
     default:
       return { P: 0, Q: 0 }
@@ -438,7 +436,7 @@ function validateHarmonicsIEEE519(harmonics) {
     individualHarmonics: calculateIndividualHarmonics(harmonics),
     violations: thd > 5 ? [{ type: 'THD', measured: thd, limit: 5 }] : [],
     warnings: thd > 3 ? [{ type: 'THD', measured: thd, limit: 5 }] : [],
-    compliant: thd <= 5
+    compliant: thd <= 5,
   }
 }
 
@@ -448,13 +446,11 @@ function calculateKFactor(harmonics) {
   const fundamental = harmonics[1] || 0
   if (fundamental === 0) return 1.0
 
-  const kFactor = harmonics
-    .slice(1)
-    .reduce((sum, h, index) => {
-      const harmonicOrder = index + 1
-      const harmonicRatio = (h || 0) / fundamental
-      return sum + (harmonicOrder ** 2) * (harmonicRatio ** 2)
-    }, 0)
+  const kFactor = harmonics.slice(1).reduce((sum, h, index) => {
+    const harmonicOrder = index + 1
+    const harmonicRatio = (h || 0) / fundamental
+    return sum + harmonicOrder ** 2 * harmonicRatio ** 2
+  }, 0)
 
   return Math.max(kFactor, 1.0)
 }
@@ -465,7 +461,12 @@ function validateIEEE1584() {
 }
 
 function validateIEEE141() {
-  return { valid: true, errors: [], warnings: [], standard: 'IEEE 141 (Red Book)' }
+  return {
+    valid: true,
+    errors: [],
+    warnings: [],
+    standard: 'IEEE 141 (Red Book)',
+  }
 }
 
 function validateIEC60909() {
@@ -473,7 +474,12 @@ function validateIEC60909() {
 }
 
 function validateIEEE242() {
-  return { valid: true, errors: [], warnings: [], standard: 'IEEE 242 (Buff Book)' }
+  return {
+    valid: true,
+    errors: [],
+    warnings: [],
+    standard: 'IEEE 242 (Buff Book)',
+  }
 }
 
 function validateIEEE1159() {

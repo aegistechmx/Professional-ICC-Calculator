@@ -13,36 +13,41 @@ export const useSelectedEdge = () => useStore(state => state.selectedEdge)
 export const useMode = () => useStore(state => state.mode)
 export const useSystemMode = () => useStore(state => state.systemMode)
 export const useICResults = () => useStore(state => state.iccResults)
-export const usePowerFlowResults = () => useStore(state => state.powerFlowResults)
-export const useShortCircuitResults = () => useStore(state => state.shortCircuitResults)
+export const usePowerFlowResults = () =>
+  useStore(state => state.powerFlowResults)
+export const useShortCircuitResults = () =>
+  useStore(state => state.shortCircuitResults)
 
 // Action selectors to prevent function recreation
-export const useStoreActions = () => useStore(state => ({
-  setNodes: state.setNodes,
-  setEdges: state.setEdges,
-  setSelectedNode: state.setSelectedNode,
-  setSelectedEdge: state.setSelectedEdge,
-  addNode: state.addNode,
-  updateNode: state.updateNode,
-  removeNode: state.removeNode,
-  updateEdge: state.updateEdge,
-  removeEdge: state.removeEdge,
-  calculateICC: state.calculateICC,
-  calculatePowerFlow: state.calculatePowerFlow,
-  calculateShortCircuitFromGraph: state.calculateShortCircuitFromGraph,
-}))
+export const useStoreActions = () =>
+  useStore(state => ({
+    setNodes: state.setNodes,
+    setEdges: state.setEdges,
+    setSelectedNode: state.setSelectedNode,
+    setSelectedEdge: state.setSelectedEdge,
+    addNode: state.addNode,
+    updateNode: state.updateNode,
+    removeNode: state.removeNode,
+    updateEdge: state.updateEdge,
+    removeEdge: state.removeEdge,
+    calculateICC: state.calculateICC,
+    calculatePowerFlow: state.calculatePowerFlow,
+    calculateShortCircuitFromGraph: state.calculateShortCircuitFromGraph,
+  }))
 
 // Combined selector for simulation state
-export const useSimulationState = () => useStore(state => ({
-  isPlaying: state.isPlaying,
-  currentTime: state.currentTime,
-  maxTime: state.maxTime,
-  playbackSpeed: state.playbackSpeed,
-}))
+export const useSimulationState = () =>
+  useStore(state => ({
+    isPlaying: state.isPlaying,
+    currentTime: state.currentTime,
+    maxTime: state.maxTime,
+    playbackSpeed: state.playbackSpeed,
+  }))
 
 // Combined selector for validation state
-export const useValidationState = () => useStore(state => ({
-  validationErrors: state.validationErrors,
-  invalidConnections: state.invalidConnections,
-  lastValidationTime: state.lastValidationTime,
-}))
+export const useValidationState = () =>
+  useStore(state => ({
+    validationErrors: state.validationErrors,
+    invalidConnections: state.invalidConnections,
+    lastValidationTime: state.lastValidationTime,
+  }))

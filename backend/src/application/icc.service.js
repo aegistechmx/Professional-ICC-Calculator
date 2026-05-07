@@ -6,8 +6,11 @@
  */
 
 const { buildYbus } = require('../core/ybus/buildYbus')
-const { calculateFaultCurrent, createThreePhaseFault } = require('../core/powerflow/stability/faultModel') // power (W)
-const { calculateShortCircuitCurrent, toElectricalPrecision } = require('../shared/utils/electricalUtils')
+const {
+  calculateFaultCurrent,
+  createThreePhaseFault,
+} = require('../core/powerflow/stability/faultModel') // power (W)
+const { toElectricalPrecision } = require('../shared/utils/electricalUtils')
 
 /**
  * Run professional ICC calculation
@@ -23,11 +26,20 @@ function runICC(input) {
 
   try {
     // Try full professional pipeline if system data is provided and valid
-    if (system && system.buses && system.branches && system.buses.length > 0 && system.branches.length > 0) {
+    if (
+      system &&
+      system.buses &&
+      system.branches &&
+      system.buses.length > 0 &&
+      system.branches.length > 0
+    ) {
       // Check if system has valid impedance data
-      const hasValidImpedance = system.branches.every(branch =>
-        typeof branch.R === 'number' && typeof branch.X === 'number' &&
-        isFinite(branch.R) && isFinite(branch.X)
+      const hasValidImpedance = system.branches.every(
+        branch =>
+          typeof branch.R === 'number' &&
+          typeof branch.X === 'number' &&
+          isFinite(branch.R) &&
+          isFinite(branch.X)
       )
 
       if (hasValidImpedance) {
@@ -37,7 +49,6 @@ function runICC(input) {
 
     // Fallback to simple but accurate calculation
     return runSimpleICC(voltage, Z)
-
   } catch (error) {
     // Last resort fallback
     return runSimpleICC(voltage, Z)
@@ -60,7 +71,7 @@ function runProfessionalICC(system, V, Z) {
     type: 'three_phase',
     bus: findWorstFaultBus(system),
     R: Z * 0.1, // 10% of impedance as fault impedance
-    X: Z * 0.9  // 90% as reactance
+    X: Z * 0.9, // 90% as reactance
   }
 
   // Step 3: Apply fault to system
@@ -71,13 +82,19 @@ function runProfessionalICC(system, V, Z) {
 
   // Step 5: Convert to actual amperes with IEEE precision
   if (!Z || Z <= 0) {
-    throw new Error('Impedance must be greater than zero for professional ICC calculation')
+    throw new Error(
+      'Impedance must be greater than zero for professional ICC calculation'
+    )
   }
 
   // Fórmula CORRECTA para ICC trifásico - método profesional
-  const impedanceDecimal = Z / 100;  // Convertir porcentaje a decimal
-  const baseCurrent = toElectricalPrecision(parseFloat((V / (Math.sqrt(3) * impedanceDecimal)).toFixed(6)))
-  const actualCurrent = toElectricalPrecision(parseFloat((faultCurrentPU * baseCurrent).toFixed(6)))
+  const impedanceDecimal = Z / 100 // Convertir porcentaje a decimal
+  const baseCurrent = toElectricalPrecision(
+    parseFloat((V / (Math.sqrt(3) * impedanceDecimal)).toFixed(6))
+  )
+  const actualCurrent = toElectricalPrecision(
+    parseFloat((faultCurrentPU * baseCurrent).toFixed(6))
+  )
 
   return {
     method: 'professional_pipeline_corrected',
@@ -91,7 +108,7 @@ function runProfessionalICC(system, V, Z) {
     systemBranches: system.branches.length,
     precision: 'IEEE_1584_corrected',
     formula: 'Isc = V/(√3×Z) × faultCurrentPU',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   }
 }
 
@@ -103,32 +120,32 @@ function runProfessionalICC(system, V, Z) {
  */
 function runSimpleICC(V, Z, kVA = null) {
   // Fórmula CORRECTA para ICC trifásico con validación kVA
-  const voltage = V || 480;  // Default a 480V
-  const impedanceDecimal = Z / 100;  // Convertir porcentaje a decimal si Z es porcentaje
-  const Isc = voltage / (Math.sqrt(3) * impedanceDecimal);  // En amperes
+  const voltage = V || 480 // Default a 480V
+  const impedanceDecimal = Z / 100 // Convertir porcentaje a decimal si Z es porcentaje
+  const Isc = voltage / (Math.sqrt(3) * impedanceDecimal) // En amperes
 
   // Validación adicional con método de kVA si está disponible
-  let Icc_final = Isc;
-  let method = 'simple_accurate';
+  let Icc_final = Isc
+  let method = 'simple_accurate'
 
   if (kVA) {
-    const I_fl = (kVA * 1000) / (voltage * Math.sqrt(3));  // Corriente plena de carga
-    const Isc_kva = I_fl / impedanceDecimal;  // ICC basado en kVA
-    Icc_final = Math.min(Isc, Isc_kva);  // Usar el valor más conservador
-    method = 'conservative_accurate_with_kva';
+    const I_fl = (kVA * 1000) / (voltage * Math.sqrt(3)) // Corriente plena de carga
+    const Isc_kva = I_fl / impedanceDecimal // ICC basado en kVA
+    Icc_final = Math.min(Isc, Isc_kva) // Usar el valor más conservador
+    method = 'conservative_accurate_with_kva'
   }
 
   try {
     // Handle zero impedance or other errors with fallback
     if (Z <= 0) {
       // Use a very small impedance for zero impedance case
-      Icc_final = voltage / (Math.sqrt(3) * 0.000001);
-      method = 'fallback_zero_impedance';
+      Icc_final = voltage / (Math.sqrt(3) * 0.000001)
+      method = 'fallback_zero_impedance'
     }
   } catch (error) {
     // Final fallback
-    Icc_final = voltage / (Math.sqrt(3) * Math.max(Z, 0.001));
-    method = 'emergency_fallback';
+    Icc_final = voltage / (Math.sqrt(3) * Math.max(Z, 0.001))
+    method = 'emergency_fallback'
   }
 
   return {
@@ -137,15 +154,17 @@ function runSimpleICC(V, Z, kVA = null) {
     voltage: voltage,
     impedance: Z,
     kVA: kVA,
-    I_full_load: kVA ? ((kVA * 1000) / (voltage * Math.sqrt(3))).toFixed(2) + ' A' : null,
+    I_full_load: kVA
+      ? ((kVA * 1000) / (voltage * Math.sqrt(3))).toFixed(2) + ' A'
+      : null,
     Icc_simple: Isc.toFixed(2) + ' A',
     Icc_kva_method: kVA ? Icc_kva.toFixed(2) + ' A' : null,
     precision: 'IEEE_1584_corrected',
-    formula: kVA ?
-      'Isc = min[V/(√3×Z), (kVA×1000)/(V×√3×Z)]' :
-      'Isc = V/(√3×Z)',
-    timestamp: new Date().toISOString()
-  };
+    formula: kVA
+      ? 'Isc = min[V/(√3×Z), (kVA×1000)/(V×√3×Z)]'
+      : 'Isc = V/(√3×Z)',
+    timestamp: new Date().toISOString(),
+  }
 }
 
 /**
@@ -179,5 +198,5 @@ function findWorstFaultBus(system) {
 module.exports = {
   runICC,
   runProfessionalICC,
-  runSimpleICC
+  runSimpleICC,
 }

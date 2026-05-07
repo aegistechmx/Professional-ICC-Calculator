@@ -21,15 +21,20 @@ const config = {
  * @returns {Object} Database connection
  */
 function createConnection() {
+  const logger = require('@/debug/logger').defaultLogger.child('DB')
   // Placeholder for database connection
   // In production, this would use actual database library
   return {
     config,
     connected: false,
     query: async (sql, params) => {
-      // eslint-disable-next-line no-console
-      console.log('DB Query:', sql, params)
-      return { rows: [] }
+      try {
+        logger.debug('DB query', { sql, params })
+        return { rows: [] }
+      } catch (error) {
+        logger.error('DB query failed', { error: error.message })
+        throw error
+      }
     },
   }
 }
@@ -39,16 +44,22 @@ function createConnection() {
  * @returns {Promise} Database initialization
  */
 async function initializeDatabase() {
-  // eslint-disable-next-line no-console
-  console.log('Initializing database...')
-  const db = createConnection()
+  const { defaultLogger } = require('@/debug/logger')
+  const logger = defaultLogger.child('DB')
 
-  // Create tables if they don't exist
-  await createTables(db)
+  try {
+    logger.info('Initializing database...')
+    const db = createConnection()
 
-  // eslint-disable-next-line no-console
-  console.log('Database initialized')
-  return db
+    // Create tables if they don't exist
+    await createTables(db)
+
+    logger.info('Database initialized')
+    return db
+  } catch (error) {
+    logger.error('Database initialization failed', { error: error.message })
+    throw error
+  }
 }
 
 /**
@@ -56,14 +67,18 @@ async function initializeDatabase() {
  * @param {Object} db - Database connection
  */
 async function createTables(db) {
-  const tables = [
-    `CREATE TABLE IF NOT EXISTS power_systems (
+  const { defaultLogger } = require('@/debug/logger')
+  const logger = defaultLogger.child('DB')
+
+  try {
+    const tables = [
+      `CREATE TABLE IF NOT EXISTS power_systems (
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       description TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`,
-    `CREATE TABLE IF NOT EXISTS simulations (
+      `CREATE TABLE IF NOT EXISTS simulations (
       id SERIAL PRIMARY KEY,
       system_id INTEGER REFERENCES power_systems(id),
       type VARCHAR(50) NOT NULL,
@@ -71,10 +86,14 @@ async function createTables(db) {
       results JSONB,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`,
-  ]
+    ]
 
-  for (const sql of tables) {
-    await db.query(sql)
+    for (const sql of tables) {
+      await db.query(sql)
+    }
+  } catch (error) {
+    logger.error('Create tables failed', { error: error.message })
+    throw error
   }
 }
 

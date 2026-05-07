@@ -1,4 +1,4 @@
-const { solveLoadFlowRobust } = require('./newton/solver')
+const { solveLoadFlowRobust } = require('../newton/solver')
 
 module.exports = {
   solvePowerFlow: solveLoadFlowRobust,

@@ -3,23 +3,28 @@
  * Muestra cómo React se comunica con el módulo HTML existente
  */
 
-import { useState, useCallback } from 'react';
-import ICCModule from '../components/ICCModule';
+import { useState, useCallback } from 'react'
+import ICCModule from '../components/ICCModule'
 
 export default function ICCIframeDemo() {
-  const [systemModel, setSystemModel] = useState(null);
-  const [results, setResults] = useState(null);
-  const [isModuleReady, setIsModuleReady] = useState(false);
-  const [logs, setLogs] = useState([]);
+  const [systemModel, setSystemModel] = useState(null)
+  const [results, setResults] = useState(null)
+  const [isModuleReady, setIsModuleReady] = useState(false)
+  const [logs, setLogs] = useState([])
 
   // Agregar log
   const addLog = useCallback((message, type = 'info') => {
-    setLogs(prev => [...prev, {
-      message,
-      type,
-      timestamp: new Date().toLocaleTimeString()
-    }].slice(-10));
-  }, []);
+    setLogs(prev =>
+      [
+        ...prev,
+        {
+          message,
+          type,
+          timestamp: new Date().toLocaleTimeString(),
+        },
+      ].slice(-10)
+    )
+  }, [])
 
   // Cargar modelo de ejemplo
   const loadExampleModel = () => {
@@ -27,11 +32,11 @@ export default function ICCIframeDemo() {
       buses: [
         { id: 'bus1', name: 'Fuente Principal', voltage: 480 },
         { id: 'bus2', name: 'Tablero Distribución', voltage: 480 },
-        { id: 'bus3', name: 'Carga Motor 1', voltage: 480 }
+        { id: 'bus3', name: 'Carga Motor 1', voltage: 480 },
       ],
       branches: [
         { id: 'br1', from: 'bus1', to: 'bus2', size: 300, current: 250 },
-        { id: 'br2', from: 'bus2', to: 'bus3', size: 150, current: 100 }
+        { id: 'br2', from: 'bus2', to: 'bus3', size: 150, current: 100 },
       ],
       breakers: [
         {
@@ -40,7 +45,7 @@ export default function ICCIframeDemo() {
           In: 500,
           pickup: 550,
           tms: 0.5,
-          inst: 5000
+          inst: 5000,
         },
         {
           id: 'cb2',
@@ -48,26 +53,32 @@ export default function ICCIframeDemo() {
           In: 250,
           pickup: 275,
           tms: 0.1,
-          inst: 2500
-        }
-      ]
-    };
+          inst: 2500,
+        },
+      ],
+    }
 
-    setSystemModel(model);
-    addLog('Modelo de sistema cargado', 'success');
-  };
+    setSystemModel(model)
+    addLog('Modelo de sistema cargado', 'success')
+  }
 
   // Manejar resultados del módulo
-  const handleResults = useCallback((data) => {
-    setResults(data);
-    addLog(`Resultados recibidos: ${JSON.stringify(data).substring(0, 100)}...`, 'success');
-  }, [addLog]);
+  const handleResults = useCallback(
+    data => {
+      setResults(data)
+      addLog(
+        `Resultados recibidos: ${JSON.stringify(data).substring(0, 100)}...`,
+        'success'
+      )
+    },
+    [addLog]
+  )
 
   // Manejar cuando el módulo está listo
   const handleReady = useCallback(() => {
-    setIsModuleReady(true);
-    addLog('Módulo ICC listo', 'success');
-  }, [addLog]);
+    setIsModuleReady(true)
+    addLog('Módulo ICC listo', 'success')
+  }, [addLog])
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -82,8 +93,11 @@ export default function ICCIframeDemo() {
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Estado</h2>
             <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${isModuleReady ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'
-                }`} />
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  isModuleReady ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'
+                }`}
+              />
               <span className="text-gray-700">
                 {isModuleReady ? 'Módulo listo' : 'Esperando módulo...'}
               </span>
@@ -108,9 +122,9 @@ export default function ICCIframeDemo() {
 
               <button
                 onClick={() => {
-                  setSystemModel(null);
-                  setResults(null);
-                  addLog('Modelo limpiado', 'info');
+                  setSystemModel(null)
+                  setResults(null)
+                  addLog('Modelo limpiado', 'info')
                 }}
                 className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
               >
@@ -121,7 +135,9 @@ export default function ICCIframeDemo() {
 
           {/* Logs */}
           <div className="bg-black text-green-400 p-4 rounded-lg shadow font-mono text-sm">
-            <h2 className="text-white font-semibold mb-2">Logs de Comunicación</h2>
+            <h2 className="text-white font-semibold mb-2">
+              Logs de Comunicación
+            </h2>
             <div className="h-48 overflow-y-auto space-y-1">
               {logs.length === 0 ? (
                 <span className="text-gray-500">Esperando mensajes...</span>
@@ -129,11 +145,15 @@ export default function ICCIframeDemo() {
                 logs.map((log, i) => (
                   <div key={i} className="text-xs">
                     <span className="text-gray-500">[{log.timestamp}]</span>{' '}
-                    <span className={
-                      log.type === 'error' ? 'text-red-400' :
-                        log.type === 'success' ? 'text-green-400' :
-                          'text-blue-400'
-                    }>
+                    <span
+                      className={
+                        log.type === 'error'
+                          ? 'text-red-400'
+                          : log.type === 'success'
+                            ? 'text-green-400'
+                            : 'text-blue-400'
+                      }
+                    >
                       {log.message}
                     </span>
                   </div>
@@ -156,7 +176,10 @@ export default function ICCIframeDemo() {
         {/* Panel derecho: Módulo iframe */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Módulo ICC (iframe)</h2>
-          <div className="border-2 border-gray-200 rounded" style={{ height: '600px' }}>
+          <div
+            className="border-2 border-gray-200 rounded"
+            style={{ height: '600px' }}
+          >
             <ICCModule
               systemModel={systemModel}
               onResults={handleResults}
@@ -196,5 +219,5 @@ export default function ICCIframeDemo() {
         </div>
       </div>
     </div>
-  );
+  )
 }

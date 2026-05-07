@@ -271,9 +271,9 @@ describe('Electrical Precision Tests', () => {
 
   describe('Format Electrical Values', () => {
     test('should format electrical values with units and precision', () => {
-      expect(formatElectricalValue(13.812345, 'kV')).toBe('13.812345 kV');
-      expect(formatElectricalValue(1.23456789, 'MW')).toBe('1.234568 MW');
-      expect(formatElectricalValue(100.123456, 'A')).toBe('100.123456 A');
+      expect(formatElectricalValue(13.812345, 'kV')).toBe('13.81 kV');
+      expect(formatElectricalValue(1.23456789, 'MW')).toBe('1.23 MW');
+      expect(formatElectricalValue(100.123456, 'A')).toBe('100.12 A');
     });
 
     test('should handle custom precision in formatting', () => {

@@ -1,4 +1,6 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const {
+  toElectricalPrecision,
+} = require('../../../shared/utils/electricalUtils')
 /**
  * core/powerflow/solvers/powerFlowSolver.js - Base power flow solver
  *
@@ -181,7 +183,8 @@ class PowerFlowSolver {
   }
 
   formatVoltages(voltages) {
-    return voltages.map((v, i) => ({ // voltage (V)
+    return voltages.map((v, i) => ({
+      // voltage (V)
       bus: i + 1,
       magnitude: v.magnitude,
       angle: v.angle,
@@ -238,7 +241,9 @@ class PowerFlowSolver {
   calculateTotalCost(dispatch, costs) {
     return dispatch.reduce((total, gen) => {
       const cost = costs[gen.bus]
-      return toElectricalPrecision(parseFloat((total + gen.power * (cost?.b || 20))).toFixed(6));
+      return toElectricalPrecision(
+        parseFloat(total + gen.power * (cost?.b || 20)).toFixed(6)
+      )
     }, 0)
   }
 }

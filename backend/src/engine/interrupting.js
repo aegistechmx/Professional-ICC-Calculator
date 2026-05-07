@@ -3,7 +3,7 @@
  * Capacidad interruptiva del breaker vs corriente de falla
  */
 
-const { assertPositive } = require('./guards.js');
+const { assertPositive } = require('./guards.js')
 
 /**
  * Verifica si cumple capacidad interruptiva
@@ -14,20 +14,20 @@ const { assertPositive } = require('./guards.js');
  * @throws {Error} Si los parámetros son inválidos
  */
 function checkInterrupting({ Icu_kA, Isc_kA }) {
-  assertPositive('Icu_kA', Icu_kA);
-  assertPositive('Isc_kA', Isc_kA);
+  assertPositive('Icu_kA', Icu_kA)
+  assertPositive('Isc_kA', Isc_kA)
 
   // ✔️ Correcto: debe ser MAYOR o IGUAL
-  const ok = Icu_kA >= Isc_kA;
+  const ok = Icu_kA >= Isc_kA
 
   return {
     ok,
     msg: ok
       ? `Cumple interruptiva: ${Icu_kA} kA ≥ ${Isc_kA} kA`
-      : `NO cumple interruptiva: ${Icu_kA} kA < ${Isc_kA} kA`
-  };
+      : `NO cumple interruptiva: ${Icu_kA} kA < ${Isc_kA} kA`,
+  }
 }
 
 module.exports = {
-  checkInterrupting
-};
+  checkInterrupting,
+}

@@ -3,10 +3,14 @@
  * Componente que proporciona snapping a cuadrícula y enrutamiento automático de conexiones
  */
 
-import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { useGraphStore } from '../store/graphStore.js';
+import React, { useState, useCallback, useRef } from 'react'
+import PropTypes from 'prop-types'
+import { useGraphStore } from '../store/graphStore.js'
 
-export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = true }) => {
+export const GridSnapAndRouting = ({
+  gridSize: initialGridSize = 20,
+  enabled = true,
+}) => {
   const {
     nodes,
     edges,
@@ -14,122 +18,128 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
     snapToGrid,
     autoRouteEdge,
     toggleGridSnap,
-    toggleAutoLayout
-  } = useGraphStore();
+    toggleAutoLayout,
+  } = useGraphStore()
 
-  const [gridSize, setGridSize] = useState(initialGridSize);
+  const [gridSize, setGridSize] = useState(initialGridSize)
 
-  const [routingStyle, setRoutingStyle] = useState('L'); // 'L', 'S', 'direct'
-  const [showGrid, setShowGrid] = useState(true);
-  const gridOverlayRef = useRef(null);
+  const [routingStyle, setRoutingStyle] = useState('L') // 'L', 'S', 'direct'
+  const [showGrid, setShowGrid] = useState(true)
+  const gridOverlayRef = useRef(null)
 
   // === SNAP TO GRID ===
-  const snapPosition = useCallback((position) => {
-    if (!enabled || !ui.gridSnap) return position;
+  const snapPosition = useCallback(
+    position => {
+      if (!enabled || !ui.gridSnap) return position
 
-    return snapToGrid(position, gridSize);
-  }, [enabled, ui.gridSnap, gridSize, snapToGrid]);
+      return snapToGrid(position, gridSize)
+    },
+    [enabled, ui.gridSnap, gridSize, snapToGrid]
+  )
 
   // === AUTO-ROUTING ===
-  const routeConnection = useCallback((sourcePos, targetPos, style = routingStyle) => {
-    if (!ui.autoLayout) {
-      // Conexión directa si auto-layout está desactivado
-      return [sourcePos, targetPos];
-    }
+  const routeConnection = useCallback(
+    (sourcePos, targetPos, style = routingStyle) => {
+      if (!ui.autoLayout) {
+        // Conexión directa si auto-layout está desactivado
+        return [sourcePos, targetPos]
+      }
 
-    return autoRouteEdge(sourcePos, targetPos, style);
-  }, [ui.autoLayout, routingStyle, autoRouteEdge]);
+      return autoRouteEdge(sourcePos, targetPos, style)
+    },
+    [ui.autoLayout, routingStyle, autoRouteEdge]
+  )
 
   // === CALCULAR PUNTOS INTERMEDIOS PARA ROUTING ===
-  const calculateIntermediatePoints = useCallback((sourcePos, targetPos, style) => {
-    switch (style) {
-      case 'L':
-        // L-shape: horizontal luego vertical
-        return [
-          sourcePos,
-          { x: targetPos.x, y: sourcePos.y },
-          targetPos
-        ];
+  const calculateIntermediatePoints = useCallback(
+    (sourcePos, targetPos, style) => {
+      switch (style) {
+        case 'L':
+          // L-shape: horizontal luego vertical
+          return [sourcePos, { x: targetPos.x, y: sourcePos.y }, targetPos]
 
-      case 'S':
-        // S-shape: dos curvas suaves
-        const midX = (sourcePos.x + targetPos.x) / 2;
-        const midY = (sourcePos.y + targetPos.y) / 2;
+        case 'S':
+          // S-shape: dos curvas suaves
+          const midX = (sourcePos.x + targetPos.x) / 2
 
-        return [
-          sourcePos,
-          { x: midX, y: sourcePos.y },
-          { x: midX, y: targetPos.y },
-          targetPos
-        ];
+          return [
+            sourcePos,
+            { x: midX, y: sourcePos.y },
+            { x: midX, y: targetPos.y },
+            targetPos,
+          ]
 
-      case 'curved':
-        // Curva suave con punto de control
-        const controlX = (sourcePos.x + targetPos.x) / 2;
-        const controlY = Math.min(sourcePos.y, targetPos.y) - 50;
+        case 'curved':
+          // Curva suave con punto de control
+          const controlX = (sourcePos.x + targetPos.x) / 2
+          const controlY = Math.min(sourcePos.y, targetPos.y) - 50
 
-        return [
-          sourcePos,
-          { x: controlX, y: controlY },
-          targetPos
-        ];
+          return [sourcePos, { x: controlX, y: controlY }, targetPos]
 
-      case 'direct':
-      default:
-        // Línea recta
-        return [sourcePos, targetPos];
-    }
-  }, []);
+        case 'direct':
+        default:
+          // Línea recta
+          return [sourcePos, targetPos]
+      }
+    },
+    []
+  )
 
   // === DETECTAR COLISIONES ===
-  const detectCollisions = useCallback((path, obstacles = []) => {
-    const collisions = [];
+  const detectCollisions = useCallback(
+    (path, obstacles = []) => {
+      const collisions = []
 
-    for (let i = 0; i < path.length - 1; i++) {
-      const segment = [path[i], path[i + 1]];
+      for (let i = 0; i < path.length - 1; i++) {
+        const segment = [path[i], path[i + 1]]
 
-      obstacles.forEach(obstacle => {
-        if (lineIntersectsRect(segment, obstacle)) {
-          collisions.push({
-            segment: i,
-            obstacle: obstacle,
-            point: getIntersectionPoint(segment, obstacle)
-          });
-        }
-      });
-    }
+        obstacles.forEach(obstacle => {
+          if (lineIntersectsRect(segment, obstacle)) {
+            collisions.push({
+              segment: i,
+              obstacle: obstacle,
+              point: getIntersectionPoint(segment, obstacle),
+            })
+          }
+        })
+      }
 
-    return collisions;
-  }, []);
+      return collisions
+    },
+    [lineIntersectsRect, getIntersectionPoint]
+  )
 
   // === EVITAR COLISIONES ===
-  const avoidCollisions = useCallback((path, obstacles) => {
-    const collisions = detectCollisions(path, obstacles);
+  const avoidCollisions = useCallback(
+    (path, obstacles) => {
+      const collisions = detectCollisions(path, obstacles)
 
-    if (collisions.length === 0) return path;
+      if (collisions.length === 0) return path
 
-    // Simple desvío alrededor de obstáculos
-    const newPath = [...path];
+      // Simple desvío alrededor de obstáculos
+      const newPath = [...path]
 
-    collisions.forEach(collision => {
-      const { segment, point } = collision;
-      const offset = 30; // Desvío de 30px
+      collisions.forEach(collision => {
+        const { segment, point } = collision
+        const offset = 30 // Desvío de 30px
 
-      // Insertar puntos de desvío
-      const deviationPoint = {
-        x: point.x + offset,
-        y: point.y + offset
-      };
+        // Insertar puntos de desvío
+        const deviationPoint = {
+          x: point.x + offset,
+          y: point.y + offset,
+        }
 
-      newPath.splice(segment + 1, 0, deviationPoint);
-    });
+        newPath.splice(segment + 1, 0, deviationPoint)
+      })
 
-    return newPath;
-  }, [detectCollisions]);
+      return newPath
+    },
+    [detectCollisions]
+  )
 
   // === UTILIDADES GEOMÉTRICAS ===
   const lineIntersectsRect = useCallback((line, rect) => {
-    const [p1, p2] = line;
+    const [p1, p2] = line
 
     // Verificar si la línea intersecta el rectángulo
     return (
@@ -137,50 +147,51 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
       p2.x > rect.x &&
       p1.y < rect.y + rect.height &&
       p2.y > rect.y
-    );
-  }, []);
+    )
+  }, [])
 
   const getIntersectionPoint = useCallback((line, rect) => {
-    const [p1, p2] = line;
-
     // Calcular punto de intersección simple (centro del rectángulo)
     return {
       x: rect.x + rect.width / 2,
-      y: rect.y + rect.height / 2
-    };
-  }, []);
+      y: rect.y + rect.height / 2,
+    }
+  }, [])
 
   // === OPTIMIZAR PATH ===
-  const optimizePath = useCallback((path) => {
-    if (path.length <= 2) return path;
+  const optimizePath = useCallback(path => {
+    if (path.length <= 2) return path
 
     // Remover puntos redundantes
-    const optimized = [path[0]];
+    const optimized = [path[0]]
 
     for (let i = 1; i < path.length - 1; i++) {
-      const prev = optimized[optimized.length - 1];
-      const current = path[i];
-      const next = path[i + 1];
+      const prev = optimized[optimized.length - 1]
+      const current = path[i]
+      const next = path[i + 1]
 
       // Verificar si el punto actual es colineal
-      const area = (next.x - prev.x) * (current.y - prev.y) - (current.x - prev.x) * (next.y - prev.y);
+      const area =
+        (next.x - prev.x) * (current.y - prev.y) -
+        (current.x - prev.x) * (next.y - prev.y)
 
-      if (Math.abs(area) > 1) { // No es colineal
-        optimized.push(current);
+      if (Math.abs(area) > 1) {
+        // No es colineal
+        optimized.push(current)
       }
     }
 
-    optimized.push(path[path.length - 1]);
-    return optimized;
-  }, []);
+    optimized.push(path[path.length - 1])
+    return optimized
+  }, [])
 
   // === GRID OVERLAY ===
   const renderGridOverlay = useCallback(() => {
-    if (!showGrid || !gridOverlayRef.current) return null;
+    if (!showGrid || !gridOverlayRef.current) return null
 
-    const gridLines = [];
-    const maxX = Math.max(...nodes.map(n => n.position?.x || 0), 1200);
-    const maxY = Math.max(...nodes.map(n => n.position?.y || 0), 800);
+    const gridLines = []
+    const maxX = Math.max(...nodes.map(n => n.position?.x || 0), 1200)
+    const maxY = Math.max(...nodes.map(n => n.position?.y || 0), 800)
 
     // Líneas verticales
     for (let x = 0; x <= maxX; x += gridSize) {
@@ -195,7 +206,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
           strokeWidth="1"
           opacity="0.5"
         />
-      );
+      )
     }
 
     // Líneas horizontales
@@ -211,7 +222,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
           strokeWidth="1"
           opacity="0.5"
         />
-      );
+      )
     }
 
     return (
@@ -222,24 +233,29 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
       >
         {gridLines}
       </svg>
-    );
-  }, [showGrid, gridSize, nodes]);
+    )
+  }, [showGrid, gridSize, nodes])
 
   // === PANEL DE CONTROL ===
   const ControlPanel = () => (
     <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Grid y Routing</h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        Grid y Routing
+      </h3>
 
       {/* Snap to Grid */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Snap to Grid</span>
+          <span className="text-sm font-medium text-gray-700">
+            Snap to Grid
+          </span>
           <button
             onClick={toggleGridSnap}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${ui.gridSnap
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              ui.gridSnap
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+            }`}
           >
             {ui.gridSnap ? 'Activado' : 'Desactivado'}
           </button>
@@ -253,7 +269,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
             max="50"
             step="5"
             value={gridSize}
-            onChange={(e) => setGridSize(parseInt(e.target.value))}
+            onChange={e => setGridSize(parseInt(e.target.value))}
             className="flex-1"
           />
           <span className="text-sm text-gray-600 w-12">{gridSize}px</span>
@@ -263,13 +279,16 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
       {/* Auto-Routing */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Auto-Routing</span>
+          <span className="text-sm font-medium text-gray-700">
+            Auto-Routing
+          </span>
           <button
             onClick={toggleAutoLayout}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${ui.autoLayout
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              ui.autoLayout
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+            }`}
           >
             {ui.autoLayout ? 'Activado' : 'Desactivado'}
           </button>
@@ -281,7 +300,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
               type="radio"
               value="L"
               checked={routingStyle === 'L'}
-              onChange={(e) => setRoutingStyle(e.target.value)}
+              onChange={e => setRoutingStyle(e.target.value)}
               className="w-3 h-3"
             />
             <span className="text-sm text-gray-600">L-shape</span>
@@ -292,7 +311,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
               type="radio"
               value="S"
               checked={routingStyle === 'S'}
-              onChange={(e) => setRoutingStyle(e.target.value)}
+              onChange={e => setRoutingStyle(e.target.value)}
               className="w-3 h-3"
             />
             <span className="text-sm text-gray-600">S-shape</span>
@@ -303,7 +322,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
               type="radio"
               value="curved"
               checked={routingStyle === 'curved'}
-              onChange={(e) => setRoutingStyle(e.target.value)}
+              onChange={e => setRoutingStyle(e.target.value)}
               className="w-3 h-3"
             />
             <span className="text-sm text-gray-600">Curved</span>
@@ -314,7 +333,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
               type="radio"
               value="direct"
               checked={routingStyle === 'direct'}
-              onChange={(e) => setRoutingStyle(e.target.value)}
+              onChange={e => setRoutingStyle(e.target.value)}
               className="w-3 h-3"
             />
             <span className="text-sm text-gray-600">Direct</span>
@@ -325,13 +344,16 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
       {/* Grid Overlay */}
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Mostrar Grid</span>
+          <span className="text-sm font-medium text-gray-700">
+            Mostrar Grid
+          </span>
           <button
             onClick={() => setShowGrid(!showGrid)}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${showGrid
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              showGrid
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
+            }`}
           >
             {showGrid ? 'Visible' : 'Oculto'}
           </button>
@@ -361,7 +383,7 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
         </div>
       </div>
     </div>
-  );
+  )
 
   // === HOOK PERSONALIZADO PARA USO EN OTROS COMPONENTES ===
   const useGridRouting = () => ({
@@ -374,8 +396,8 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
     gridSize,
     routingStyle,
     enabled: enabled && ui.gridSnap,
-    autoRouting: ui.autoLayout
-  });
+    autoRouting: ui.autoLayout,
+  })
 
   return {
     ControlPanel,
@@ -386,51 +408,51 @@ export const GridSnapAndRouting = ({ gridSize: initialGridSize = 20, enabled = t
     calculateIntermediatePoints,
     detectCollisions,
     avoidCollisions,
-    optimizePath
-  };
-};
+    optimizePath,
+  }
+}
 
 // === HOOK PARA SNAP Y ROUTING ===
 export const useGridRouting = (gridSize = 20) => {
-  const {
-    nodes,
-    edges,
-    ui,
-    snapToGrid,
-    autoRouteEdge
-  } = useGraphStore();
+  const { ui, snapToGrid, autoRouteEdge } = useGraphStore()
 
-  const snapPosition = useCallback((position) => {
-    if (!ui.gridSnap) return position;
-    return snapToGrid(position, gridSize);
-  }, [ui.gridSnap, gridSize, snapToGrid]);
+  const snapPosition = useCallback(
+    position => {
+      if (!ui.gridSnap) return position
+      return snapToGrid(position, gridSize)
+    },
+    [ui.gridSnap, gridSize, snapToGrid]
+  )
 
-  const routeConnection = useCallback((sourcePos, targetPos, style = 'L') => {
-    if (!ui.autoLayout) {
-      return [sourcePos, targetPos];
-    }
-    return autoRouteEdge(sourcePos, targetPos, style);
-  }, [ui.autoLayout, autoRouteEdge]);
+  const routeConnection = useCallback(
+    (sourcePos, targetPos, style = 'L') => {
+      if (!ui.autoLayout) {
+        return [sourcePos, targetPos]
+      }
+      return autoRouteEdge(sourcePos, targetPos, style)
+    },
+    [ui.autoLayout, autoRouteEdge]
+  )
 
   return {
     snapPosition,
     routeConnection,
     gridSize,
     enabled: ui.gridSnap,
-    autoRouting: ui.autoLayout
-  };
-};
+    autoRouting: ui.autoLayout,
+  }
+}
 
 // === COMPONENTE DE GRID OVERLAY ===
 export const GridOverlay = ({ gridSize = 20, showGrid = true }) => {
-  const { nodes } = useGraphStore();
+  const { nodes } = useGraphStore()
 
-  const maxX = Math.max(...nodes.map(n => n.position?.x || 0), 1200);
-  const maxY = Math.max(...nodes.map(n => n.position?.y || 0), 800);
+  const maxX = Math.max(...nodes.map(n => n.position?.x || 0), 1200)
+  const maxY = Math.max(...nodes.map(n => n.position?.y || 0), 800)
 
-  if (!showGrid) return null;
+  if (!showGrid) return null
 
-  const gridLines = [];
+  const gridLines = []
 
   // Líneas verticales
   for (let x = 0; x <= maxX; x += gridSize) {
@@ -445,7 +467,7 @@ export const GridOverlay = ({ gridSize = 20, showGrid = true }) => {
         strokeWidth="1"
         opacity="0.5"
       />
-    );
+    )
   }
 
   // Líneas horizontales
@@ -461,7 +483,7 @@ export const GridOverlay = ({ gridSize = 20, showGrid = true }) => {
         strokeWidth="1"
         opacity="0.5"
       />
-    );
+    )
   }
 
   return (
@@ -471,40 +493,52 @@ export const GridOverlay = ({ gridSize = 20, showGrid = true }) => {
     >
       {gridLines}
     </svg>
-  );
-};
+  )
+}
 
 // === COMPONENTE DE EDGE ROUTING ===
 export const RoutedEdge = ({ edge, style = 'L' }) => {
-  const { nodes } = useGraphStore();
-  const { routeConnection } = useGridRouting();
+  const { nodes } = useGraphStore()
+  const { routeConnection } = useGridRouting()
 
-  const sourceNode = nodes.find(n => n.id === edge.source);
-  const targetNode = nodes.find(n => n.id === edge.target);
+  const sourceNode = nodes.find(n => n.id === edge.source)
+  const targetNode = nodes.find(n => n.id === edge.target)
 
   if (!sourceNode?.position || !targetNode?.position) {
-    return null;
+    return null
   }
 
-  const path = routeConnection(sourceNode.position, targetNode.position, style);
+  const path = routeConnection(sourceNode.position, targetNode.position, style)
 
   // Generar path SVG
   const pathData = path.reduce((acc, point, index) => {
     if (index === 0) {
-      return `M ${point.x} ${point.y}`;
+      return `M ${point.x} ${point.y}`
     } else {
-      return `${acc} L ${point.x} ${point.y}`;
+      return `${acc} L ${point.x} ${point.y}`
     }
-  }, '');
+  }, '')
 
-  return (
-    <path
-      d={pathData}
-      stroke="#6b7280"
-      strokeWidth="2"
-      fill="none"
-    />
-  );
-};
+  return <path d={pathData} stroke="#6b7280" strokeWidth="2" fill="none" />
+}
 
-export default GridSnapAndRouting;
+GridSnapAndRouting.propTypes = {
+  gridSize: PropTypes.number,
+  enabled: PropTypes.bool,
+}
+
+GridOverlay.propTypes = {
+  gridSize: PropTypes.number,
+  showGrid: PropTypes.bool,
+}
+
+RoutedEdge.propTypes = {
+  edge: PropTypes.object.isRequired,
+  style: PropTypes.string,
+}
+
+useGridRouting.propTypes = {
+  gridSize: PropTypes.number,
+}
+
+export default GridSnapAndRouting

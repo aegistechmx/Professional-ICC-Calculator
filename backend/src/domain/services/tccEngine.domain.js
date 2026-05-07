@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * backend/src/domain/services/tccEngine.domain.js
  * Motor de Curvas TCC (Time-Current Coordination)
@@ -12,15 +12,15 @@ class TCCEngine {
       standard: { k: 0.14, alpha: 0.02, name: 'Standard Inverse' },
       very: { k: 13.5, alpha: 1, name: 'Very Inverse' },
       extreme: { k: 80, alpha: 2, name: 'Extremely Inverse' },
-      long: { k: 120, alpha: 1, name: 'Long Time Inverse' }
-    };
+      long: { k: 120, alpha: 1, name: 'Long Time Inverse' },
+    }
 
     // Curvas IEEE C37.112 (Moderately Inverse)
     this.ieeeCurves = {
       moderate: { A: 0.0515, B: 0.02, p: 0.02, name: 'Moderately Inverse' },
       very: { A: 19.61, B: 2, p: 2, name: 'Very Inverse' },
-      extreme: { A: 28.2, B: 2, p: 2, name: 'Extremely Inverse' }
-    };
+      extreme: { A: 28.2, B: 2, p: 2, name: 'Extremely Inverse' },
+    }
   }
 
   /**
@@ -32,23 +32,23 @@ class TCCEngine {
    * @returns {number} Tiempo de disparo en segundos
    */
   calculateIEC(I, Is, TMS, curveType = 'standard') {
-    const curve = this.iecCurves[curveType];
+    const curve = this.iecCurves[curveType]
     if (!curve) {
-      throw new Error(`Curva IEC no válida: ${curveType}`);
+      throw new Error(`Curva IEC no válida: ${curveType}`)
     }
 
     // Si la corriente es menor o igual al pickup, no dispara
     if (I <= Is) {
-      return Infinity;
+      return Infinity
     }
 
-    const { k, alpha } = curve;
-    
+    const { k, alpha } = curve
+
     // Fórmula IEC: t = (k * TMS) / ((I/Is)^alpha - 1)
-    const ratio = I / Is;
-    const time = (k * TMS) / (Math.pow(ratio, alpha) - 1);
-    
-    return Math.max(time, 0.02); // Mínimo 20ms (tiempo mecánico)
+    const ratio = I / Is
+    const time = (k * TMS) / (Math.pow(ratio, alpha) - 1)
+
+    return Math.max(time, 0.02) // Mínimo 20ms (tiempo mecánico)
   }
 
   /**
@@ -60,22 +60,22 @@ class TCCEngine {
    * @returns {number} Tiempo de disparo en segundos
    */
   calculateIEEE(I, Ip, curveType = 'moderate', TD = 1) {
-    const curve = this.ieeeCurves[curveType];
+    const curve = this.ieeeCurves[curveType]
     if (!curve) {
-      throw new Error(`Curva IEEE no válida: ${curveType}`);
+      throw new Error(`Curva IEEE no válida: ${curveType}`)
     }
 
     if (I <= Ip) {
-      return Infinity;
+      return Infinity
     }
 
-    const { A, B } = curve;
-    const ratio = I / Ip;
-    
+    const { A, B } = curve
+    const ratio = I / Ip
+
     // Fórmula IEEE: t = (TD * A) / ((I/Ip)^B - 1)
-    const time = (TD * A) / (Math.pow(ratio, B) - 1);
-    
-    return Math.max(time, 0.02);
+    const time = (TD * A) / (Math.pow(ratio, B) - 1)
+
+    return Math.max(time, 0.02)
   }
 
   /**
@@ -86,9 +86,9 @@ class TCCEngine {
    */
   calculateInstantaneous(I, Ii) {
     if (I >= Ii) {
-      return 0.02; // 20ms típico para disparo instantáneo
+      return 0.02 // 20ms típico para disparo instantáneo
     }
-    return null;
+    return null
   }
 
   /**
@@ -104,42 +104,42 @@ class TCCEngine {
       standard = 'IEC',
       instantaneous = null,
       Imax = 10000,
-      TD = 1
-    } = breaker;
+      TD = 1,
+    } = breaker
 
     if (!pickup) {
-      throw new Error('Se requiere pickup (corriente de ajuste)');
+      throw new Error('Se requiere pickup (corriente de ajuste)')
     }
 
-    const data = [];
-    
+    const data = []
+
     // Generar puntos desde 1.1x pickup hasta Imax
     // Usar escala logarítmica para los puntos
-    const startMultiplier = 1.1;
-    const endMultiplier = Imax / pickup;
-    const steps = 50;
-    const logStart = Math.log10(startMultiplier);
-    const logEnd = Math.log10(endMultiplier);
-    const logStep = (logEnd - logStart) / steps;
+    const startMultiplier = 1.1
+    const endMultiplier = Imax / pickup
+    const steps = 50
+    const logStart = Math.log10(startMultiplier)
+    const logEnd = Math.log10(endMultiplier)
+    const logStep = (logEnd - logStart) / steps
 
     for (let i = 0; i <= steps; i++) {
-      const multiplier = Math.pow(10, logStart + (logStep * i));
-      const I = pickup * multiplier;
-      
-      let t;
-      
+      const multiplier = Math.pow(10, logStart + logStep * i)
+      const I = pickup * multiplier
+
+      let t
+
       if (standard === 'IEC') {
-        t = this.calculateIEC(I, pickup, TMS, curve);
+        t = this.calculateIEC(I, pickup, TMS, curve)
       } else {
-        t = this.calculateIEEE(I, pickup, curve, TD);
+        t = this.calculateIEEE(I, pickup, curve, TD)
       }
 
       // Solo incluir tiempos válidos (0.02s a 1000s)
       if (t >= 0.02 && t <= 1000) {
         data.push({
           I: toElectricalPrecision(parseFloat(I.toFixed(2))),
-          t: toElectricalPrecision(parseFloat(t.toFixed(4)))
-        });
+          t: toElectricalPrecision(parseFloat(t.toFixed(4))),
+        })
       }
     }
 
@@ -147,17 +147,17 @@ class TCCEngine {
     if (instantaneous && instantaneous > pickup) {
       data.push({
         I: instantaneous,
-        t: 0.02
-      });
-      
+        t: 0.02,
+      })
+
       // Punto final de la curva instantánea
       data.push({
         I: Imax,
-        t: 0.02
-      });
+        t: 0.02,
+      })
     }
 
-    return data.sort((a, b) => a.I - b.I);
+    return data.sort((a, b) => a.I - b.I)
   }
 
   /**
@@ -169,30 +169,30 @@ class TCCEngine {
     const {
       In, // Corriente nominal
       Iarranque = 6 * In, // Corriente de arranque típica
-      tiempoArranque = 10 // Tiempo de arranque típico
-    } = load;
+      tiempoArranque = 10, // Tiempo de arranque típico
+    } = load
 
-    const data = [];
+    const data = []
 
     // Punto de operación normal
     data.push({
       I: In,
-      t: Infinity
-    });
+      t: Infinity,
+    })
 
     // Zona de arranque permitida
     data.push({
       I: Iarranque,
-      t: tiempoArranque
-    });
+      t: tiempoArranque,
+    })
 
     // Sobrecarga
     data.push({
       I: Iarranque * 1.5,
-      t: 1
-    });
+      t: 1,
+    })
 
-    return data;
+    return data
   }
 
   /**
@@ -203,42 +203,42 @@ class TCCEngine {
    * @returns {Object} Resultado de coordinación
    */
   checkCoordination(curveDownstream, curveUpstream, margin = 0.2) {
-    const conflicts = [];
-    let minTimeDifference = Infinity;
+    const conflicts = []
+    let minTimeDifference = Infinity
 
     // Para cada punto en la curva aguas abajo
     curveDownstream.forEach(p1 => {
       // Encontrar punto correspondiente en curva aguas arriba
-      const p2 = curveUpstream.find(p => Math.abs(p.I - p1.I) < p1.I * 0.01);
-      
+      const p2 = curveUpstream.find(p => Math.abs(p.I - p1.I) < p1.I * 0.01)
+
       if (p2) {
         // Verificar que aguas arriba tarde más que aguas abajo
-        const timeDifference = p2.t - p1.t;
-        const requiredMargin = p1.t * margin;
-        
+        const timeDifference = p2.t - p1.t
+        const requiredMargin = p1.t * margin
+
         if (timeDifference < requiredMargin) {
           conflicts.push({
             I: p1.I,
             tDownstream: p1.t,
             tUpstream: p2.t,
             difference: timeDifference,
-            required: requiredMargin
-          });
+            required: requiredMargin,
+          })
         }
-        
+
         if (timeDifference < minTimeDifference) {
-          minTimeDifference = timeDifference;
+          minTimeDifference = timeDifference
         }
       }
-    });
+    })
 
     return {
       isCoordinated: conflicts.length === 0,
       conflicts,
       minTimeDifference,
       margin,
-      recommendations: this._generateRecommendations(conflicts)
-    };
+      recommendations: this._generateRecommendations(conflicts),
+    }
   }
 
   /**
@@ -246,23 +246,32 @@ class TCCEngine {
    */
   _generateRecommendations(conflicts) {
     if (conflicts.length === 0) {
-      return ['Coordinación satisfactoria entre protecciones.'];
+      return ['Coordinación satisfactoria entre protecciones.']
     }
 
-    const recommendations = [];
-    
-    const avgCurrent = conflicts.reduce((sum, c) => sum + c.I, 0) / conflicts.length;
-    
+    const recommendations = []
+
+    const avgCurrent =
+      conflicts.reduce((sum, c) => sum + c.I, 0) / conflicts.length
+
     if (avgCurrent < 1000) {
-      recommendations.push('Considerar aumentar TMS de la protección aguas arriba.');
+      recommendations.push(
+        'Considerar aumentar TMS de la protección aguas arriba.'
+      )
     } else {
-      recommendations.push('Verificar si se requiere protección de respaldo adicional.');
+      recommendations.push(
+        'Verificar si se requiere protección de respaldo adicional.'
+      )
     }
-    
-    recommendations.push('Revisar curvas TCC en zona de sobrecarga (1.5x - 10x In).');
-    recommendations.push('Considerar curvas de diferente tipo si persisten conflictos.');
-    
-    return recommendations;
+
+    recommendations.push(
+      'Revisar curvas TCC en zona de sobrecarga (1.5x - 10x In).'
+    )
+    recommendations.push(
+      'Considerar curvas de diferente tipo si persisten conflictos.'
+    )
+
+    return recommendations
   }
 
   /**
@@ -274,32 +283,32 @@ class TCCEngine {
   calculateOperatingPoint(curve, Ifault) {
     // Encontrar el punto más cercano a Ifault
     const closest = curve.reduce((prev, curr) => {
-      return Math.abs(curr.I - Ifault) < Math.abs(prev.I - Ifault) ? curr : prev;
-    });
+      return Math.abs(curr.I - Ifault) < Math.abs(prev.I - Ifault) ? curr : prev
+    })
 
     // Interpolar si es necesario
-    const next = curve.find(p => p.I > closest.I);
-    let t;
-    
+    const next = curve.find(p => p.I > closest.I)
+    let t
+
     if (next) {
       // Interpolación logarítmica
-      const logI = Math.log10(Ifault);
-      const logI1 = Math.log10(closest.I);
-      const logI2 = Math.log10(next.I);
-      const logT1 = Math.log10(closest.t);
-      const logT2 = Math.log10(next.t);
-      
-      const ratio = (logI - logI1) / (logI2 - logI1);
-      t = Math.pow(10, logT1 + ratio * (logT2 - logT1));
+      const logI = Math.log10(Ifault)
+      const logI1 = Math.log10(closest.I)
+      const logI2 = Math.log10(next.I)
+      const logT1 = Math.log10(closest.t)
+      const logT2 = Math.log10(next.t)
+
+      const ratio = (logI - logI1) / (logI2 - logI1)
+      t = Math.pow(10, logT1 + ratio * (logT2 - logT1))
     } else {
-      t = closest.t;
+      t = closest.t
     }
 
     return {
       I: Ifault,
       t: toElectricalPrecision(parseFloat(t.toFixed(4))),
-      withinCurve: closest.I <= Ifault
-    };
+      withinCurve: closest.I <= Ifault,
+    }
   }
 
   /**
@@ -308,34 +317,34 @@ class TCCEngine {
    * @returns {Object} Validación con errores/warnings
    */
   validateProtection(breaker) {
-    const errors = [];
-    const warnings = [];
+    const errors = []
+    const warnings = []
 
     if (!breaker.pickup || breaker.pickup <= 0) {
-      errors.push('Pickup debe ser mayor que cero.');
+      errors.push('Pickup debe ser mayor que cero.')
     }
 
     if (breaker.TMS !== undefined && (breaker.TMS < 0.1 || breaker.TMS > 1.0)) {
-      errors.push('TMS debe estar entre 0.1 y 1.0 para IEC.');
+      errors.push('TMS debe estar entre 0.1 y 1.0 para IEC.')
     }
 
     if (breaker.TD !== undefined && (breaker.TD < 1 || breaker.TD > 10)) {
-      errors.push('TD debe estar entre 1 y 10 para IEEE.');
+      errors.push('TD debe estar entre 1 y 10 para IEEE.')
     }
 
     if (breaker.instantaneous && breaker.instantaneous < breaker.pickup) {
-      warnings.push('Disparo instantáneo debería ser mayor que pickup.');
+      warnings.push('Disparo instantáneo debería ser mayor que pickup.')
     }
 
     if (!this.iecCurves[breaker.curve] && !this.ieeeCurves[breaker.curve]) {
-      errors.push(`Tipo de curva no soportado: ${breaker.curve}`);
+      errors.push(`Tipo de curva no soportado: ${breaker.curve}`)
     }
 
     return {
       valid: errors.length === 0,
       errors,
-      warnings
-    };
+      warnings,
+    }
   }
 
   /**
@@ -346,15 +355,15 @@ class TCCEngine {
       IEC: Object.entries(this.iecCurves).map(([key, value]) => ({
         key,
         name: value.name,
-        params: { k: value.k, alpha: value.alpha }
+        params: { k: value.k, alpha: value.alpha },
       })),
       IEEE: Object.entries(this.ieeeCurves).map(([key, value]) => ({
         key,
         name: value.name,
-        params: { A: value.A, B: value.B, p: value.p }
-      }))
-    };
+        params: { A: value.A, B: value.B, p: value.p },
+      })),
+    }
   }
 }
 
-module.exports = TCCEngine;
+module.exports = TCCEngine

@@ -3,7 +3,7 @@
  * Fórmula trifásica: ΔV = √3 · I · (R·cosφ + X·sinφ) · L
  */
 
-const { assertPositive } = require('./guards.js');
+const { assertPositive } = require('./guards.js')
 
 /**
  * Calcula caída de tensión trifásica
@@ -17,34 +17,29 @@ const { assertPositive } = require('./guards.js');
  * @returns {Object} Resultados del cálculo
  * @throws {Error} Si los parámetros son inválidos
  */
-function calcVoltageDrop({
-  I,
-  V,
-  L,
-  R,
-  X,
-  fp
-}) {
-  assertPositive('I', I);
-  assertPositive('V', V);
-  assertPositive('L', L);
-  assertPositive('R', R);
-  assertPositive('X', X);
+function calcVoltageDrop({ I, V, L, R, X, fp }) {
+  assertPositive('I', I)
+  assertPositive('V', V)
+  assertPositive('L', L)
+  assertPositive('R', R)
+  assertPositive('X', X)
   if (fp <= 0 || fp > 1) {
-    throw new Error('Factor de potencia debe estar entre 0 y 1');
+    throw new Error('Factor de potencia debe estar entre 0 y 1')
   }
 
-  const L_km = L / 1000;
-  const sinPhi = Math.sqrt(1 - fp * fp);
+  const L_km = parseFloat((L / 1000).toFixed(6))
+  const sinPhi = parseFloat(Math.sqrt(1 - fp * fp).toFixed(6))
 
   // Fórmula trifásica: ΔV = √3 · I · (R·cosφ + X·sinφ) · L
-  const deltaV = Math.sqrt(3) * I * (R * fp + X * sinPhi) * L_km;
-  const percent = (deltaV / V) * 100;
+  const deltaV = parseFloat(
+    (Math.sqrt(3) * I * (R * fp + X * sinPhi) * L_km).toFixed(6)
+  )
+  const percent = parseFloat(((deltaV / V) * 100).toFixed(6))
 
   return {
     deltaV,
-    percent
-  };
+    percent,
+  }
 }
 
 /**
@@ -54,20 +49,24 @@ function calcVoltageDrop({
  */
 function checkVoltageDrop(percent) {
   if (percent <= 3) {
-    return { ok: true, level: 'OK', msg: `Caída ${percent.toFixed(2)}% ≤ 3%` };
+    return { ok: true, level: 'OK', msg: `Caída ${percent.toFixed(2)}% ≤ 3%` }
   }
   if (percent <= 5) {
-    return { ok: true, level: 'LÍMITE', msg: `Caída ${percent.toFixed(2)}% ≤ 5% (límite)` };
+    return {
+      ok: true,
+      level: 'LÍMITE',
+      msg: `Caída ${percent.toFixed(2)}% ≤ 5% (límite)`,
+    }
   }
 
   return {
     ok: false,
     level: 'VIOLACIÓN',
-    msg: `Caída ${percent.toFixed(2)}% > 5% (violación NOM)`
-  };
+    msg: `Caída ${percent.toFixed(2)}% > 5% (violación NOM)`,
+  }
 }
 
 module.exports = {
   calcVoltageDrop,
-  checkVoltageDrop
-};
+  checkVoltageDrop,
+}

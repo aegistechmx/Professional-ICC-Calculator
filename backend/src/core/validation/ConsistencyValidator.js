@@ -237,7 +237,7 @@ class ConsistencyValidator {
     // Get initial voltages from dynamics (should match power flow)
     const voltagesDyn = results.dynamics.voltages // voltage (V)
       ? // voltage (V)
-      results.dynamics.voltages[0]
+        results.dynamics.voltages[0]
       : null
 
     if (!voltagesDyn) {
@@ -397,11 +397,17 @@ class ConsistencyValidator {
     if (!currentsA || !currentsB) return Infinity
 
     let maxDiff = 0
-    const minLen = toElectricalPrecision(parseFloat((Math.min(currentsA.length, currentsB.length))).toFixed(6)); // current (A)
+    const minLen = toElectricalPrecision(
+      parseFloat(Math.min(currentsA.length, currentsB.length)).toFixed(6)
+    ) // current (A)
     // current (A)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = toElectricalPrecision(parseFloat((toElectricalPrecision(Math.abs(currentsA[i] - currentsB[i])))).toFixed(6)); // current (A)
+      const diff = toElectricalPrecision(
+        parseFloat(
+          toElectricalPrecision(Math.abs(currentsA[i] - currentsB[i]))
+        ).toFixed(6)
+      ) // current (A)
       // current (A)
       maxDiff = toElectricalPrecision(Math.max(maxDiff, diff))
     }
@@ -419,11 +425,17 @@ class ConsistencyValidator {
     if (!voltagesA || !voltagesB) return Infinity
 
     let maxDiff = 0
-    const minLen = toElectricalPrecision(parseFloat((Math.min(voltagesA.length, voltagesB.length))).toFixed(6)); // voltage (V)
+    const minLen = toElectricalPrecision(
+      parseFloat(Math.min(voltagesA.length, voltagesB.length)).toFixed(6)
+    ) // voltage (V)
     // voltage (V)
 
     for (let i = 0; i < minLen; i++) {
-      const diff = toElectricalPrecision(parseFloat((toElectricalPrecision(Math.abs(voltagesA[i] - voltagesB[i])))).toFixed(6)); // voltage (V)
+      const diff = toElectricalPrecision(
+        parseFloat(
+          toElectricalPrecision(Math.abs(voltagesA[i] - voltagesB[i]))
+        ).toFixed(6)
+      ) // voltage (V)
       // voltage (V)
       maxDiff = toElectricalPrecision(Math.max(maxDiff, diff))
     }

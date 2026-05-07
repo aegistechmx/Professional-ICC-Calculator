@@ -7,7 +7,7 @@
  * IEEE 1584-2018 Arc Flash Calculation Validation
  * Validates arc flash parameters and calculations
  */
-export const validateIEEE1584 = (parameters) => {
+export const validateIEEE1584 = parameters => {
   const errors = []
   const warnings = []
 
@@ -17,7 +17,7 @@ export const validateIEEE1584 = (parameters) => {
     arcGap,
     workingDistance,
     electrodeConfiguration,
-    enclosureSize
+    enclosureSize,
   } = parameters
 
   // Voltage validation (IEEE 1584 applies to 208V to 15,000V)
@@ -37,7 +37,9 @@ export const validateIEEE1584 = (parameters) => {
 
   // Working distance validation
   if (workingDistance < 305 || workingDistance > 2540) {
-    errors.push('Working distance must be between 305mm and 2540mm per IEEE 1584')
+    errors.push(
+      'Working distance must be between 305mm and 2540mm per IEEE 1584'
+    )
   }
 
   // Electrode configuration validation
@@ -55,7 +57,7 @@ export const validateIEEE1584 = (parameters) => {
     valid: errors.length === 0,
     errors,
     warnings,
-    standard: 'IEEE 1584-2018'
+    standard: 'IEEE 1584-2018',
   }
 }
 
@@ -63,7 +65,7 @@ export const validateIEEE1584 = (parameters) => {
  * IEEE 141 (Red Book) Power System Analysis Validation
  * Validates power flow and system analysis parameters
  */
-export const validateIEEE141 = (systemData) => {
+export const validateIEEE141 = systemData => {
   const errors = []
   const warnings = []
 
@@ -82,12 +84,17 @@ export const validateIEEE141 = (systemData) => {
   // Bus voltage validation (±10% nominal)
   buses.forEach(bus => {
     const nominalVoltage = bus.nominalVoltage || baseKV
-    const voltageDeviation = Math.abs((bus.voltage - nominalVoltage) / nominalVoltage) * 100
+    const voltageDeviation =
+      Math.abs((bus.voltage - nominalVoltage) / nominalVoltage) * 100
 
     if (voltageDeviation > 10) {
-      errors.push(`Bus ${bus.id}: Voltage deviation ${voltageDeviation.toFixed(1)}% exceeds ±10% limit`)
+      errors.push(
+        `Bus ${bus.id}: Voltage deviation ${voltageDeviation.toFixed(1)}% exceeds ±10% limit`
+      )
     } else if (voltageDeviation > 5) {
-      warnings.push(`Bus ${bus.id}: Voltage deviation ${voltageDeviation.toFixed(1)}% approaching ±10% limit`)
+      warnings.push(
+        `Bus ${bus.id}: Voltage deviation ${voltageDeviation.toFixed(1)}% approaching ±10% limit`
+      )
     }
   })
 
@@ -97,9 +104,13 @@ export const validateIEEE141 = (systemData) => {
       const loading = (branch.current / branch.rating) * 100
 
       if (loading > 100) {
-        errors.push(`Branch ${branch.id}: Overloaded at ${loading.toFixed(1)}% of rating`)
+        errors.push(
+          `Branch ${branch.id}: Overloaded at ${loading.toFixed(1)}% of rating`
+        )
       } else if (loading > 80) {
-        warnings.push(`Branch ${branch.id}: Loading ${loading.toFixed(1)}% approaching limit`)
+        warnings.push(
+          `Branch ${branch.id}: Loading ${loading.toFixed(1)}% approaching limit`
+        )
       }
     }
   })
@@ -108,7 +119,7 @@ export const validateIEEE141 = (systemData) => {
     valid: errors.length === 0,
     errors,
     warnings,
-    standard: 'IEEE 141 (Red Book)'
+    standard: 'IEEE 141 (Red Book)',
   }
 }
 
@@ -116,7 +127,7 @@ export const validateIEEE141 = (systemData) => {
  * IEC 60909 Short Circuit Calculation Validation
  * Validates short circuit calculation parameters per IEC 60909
  */
-export const validateIEC60909 = (parameters) => {
+export const validateIEC60909 = parameters => {
   const errors = []
   const warnings = []
 
@@ -124,7 +135,7 @@ export const validateIEC60909 = (parameters) => {
     systemVoltage,
     impedanceRatio,
     temperatureCorrection,
-    voltageFactor
+    voltageFactor,
   } = parameters
 
   // System voltage validation (IEC 60909 applies to 400V - 765kV)
@@ -133,7 +144,7 @@ export const validateIEC60909 = (parameters) => {
   }
 
   // Voltage factor c validation (Table 1 of IEC 60909)
-  const getVoltageFactor = (voltage) => {
+  const getVoltageFactor = voltage => {
     if (voltage >= 0.4 && voltage <= 1) return 1.0
     if (voltage > 1 && voltage <= 35) return 1.1
     return 1.1
@@ -141,12 +152,16 @@ export const validateIEC60909 = (parameters) => {
 
   const expectedC = getVoltageFactor(systemVoltage)
   if (Math.abs(voltageFactor - expectedC) > 0.01) {
-    errors.push(`Voltage factor should be ${expectedC} for ${systemVoltage}kV system per IEC 60909`)
+    errors.push(
+      `Voltage factor should be ${expectedC} for ${systemVoltage}kV system per IEC 60909`
+    )
   }
 
   // Temperature correction validation
   if (temperatureCorrection < 0.8 || temperatureCorrection > 1.2) {
-    warnings.push('Temperature correction factor outside typical range (0.8 - 1.2)')
+    warnings.push(
+      'Temperature correction factor outside typical range (0.8 - 1.2)'
+    )
   }
 
   // Impedance ratio validation (R/X ratio)
@@ -158,7 +173,7 @@ export const validateIEC60909 = (parameters) => {
     valid: errors.length === 0,
     errors,
     warnings,
-    standard: 'IEC 60909'
+    standard: 'IEC 60909',
   }
 }
 
@@ -166,7 +181,7 @@ export const validateIEC60909 = (parameters) => {
  * IEEE 242 (Buff Book) Protection Coordination Validation
  * Validates protection device coordination
  */
-export const validateIEEE242 = (protectionData) => {
+export const validateIEEE242 = protectionData => {
   const errors = []
   const warnings = []
 
@@ -178,7 +193,9 @@ export const validateIEEE242 = (protectionData) => {
 
     // Check if device can handle system fault current
     if (faultCurrentCapability < systemFaultCurrent) {
-      errors.push(`${device.type} ${device.id}: Insufficient fault current rating (${faultCurrentCapability}A < ${systemFaultCurrent}A)`)
+      errors.push(
+        `${device.type} ${device.id}: Insufficient fault current rating (${faultCurrentCapability}A < ${systemFaultCurrent}A)`
+      )
     }
 
     // Check device-specific requirements
@@ -219,9 +236,13 @@ export const validateIEEE242 = (protectionData) => {
           const margin = (nextCurveTime - curveTime) * 1000 // Convert to ms
 
           if (margin < coordinationMargin * 1000) {
-            errors.push(`Poor coordination between ${curve.deviceId} and ${nextCurve.deviceId} at ${multiple}x rating`)
+            errors.push(
+              `Poor coordination between ${curve.deviceId} and ${nextCurve.deviceId} at ${multiple}x rating`
+            )
           } else if (margin < coordinationMargin * 1000 * 1.5) {
-            warnings.push(`Marginal coordination between ${curve.deviceId} and ${nextCurve.deviceId} at ${multiple}x rating`)
+            warnings.push(
+              `Marginal coordination between ${curve.deviceId} and ${nextCurve.deviceId} at ${multiple}x rating`
+            )
           }
         }
       })
@@ -232,7 +253,7 @@ export const validateIEEE242 = (protectionData) => {
     valid: errors.length === 0,
     errors,
     warnings,
-    standard: 'IEEE 242 (Buff Book)'
+    standard: 'IEEE 242 (Buff Book)',
   }
 }
 
@@ -240,17 +261,18 @@ export const validateIEEE242 = (protectionData) => {
  * IEEE 1159 Power Quality Monitoring Validation
  * Validates power quality measurements and thresholds
  */
-export const validateIEEE1159 = (powerQualityData) => {
+export const validateIEEE1159 = powerQualityData => {
   const errors = []
   const warnings = []
 
-  const { voltage, frequency, harmonics, flicker, transients } = powerQualityData
+  const { voltage, frequency, harmonics, flicker, transients } =
+    powerQualityData
 
   // Voltage validation (ANSI C84.1 limits)
   const voltageLimits = {
     '480V': { nominal: 480, min: 456, max: 504 }, // Range A
     '208V': { nominal: 208, min: 197, max: 218 },
-    '120V': { nominal: 120, min: 114, max: 126 }
+    '120V': { nominal: 120, min: 114, max: 126 },
   }
 
   const voltageLevel = `${voltage.nominal}V`
@@ -258,15 +280,22 @@ export const validateIEEE1159 = (powerQualityData) => {
 
   if (limits) {
     if (voltage.measured < limits.min || voltage.measured > limits.max) {
-      errors.push(`Voltage ${voltage.measured}V outside ANSI C84.1 Range A (${limits.min}-${limits.max}V)`)
-    } else if (Math.abs(voltage.measured - limits.nominal) > limits.nominal * 0.05) {
+      errors.push(
+        `Voltage ${voltage.measured}V outside ANSI C84.1 Range A (${limits.min}-${limits.max}V)`
+      )
+    } else if (
+      Math.abs(voltage.measured - limits.nominal) >
+      limits.nominal * 0.05
+    ) {
       warnings.push(`Voltage deviation >5% from nominal`)
     }
   }
 
   // Frequency validation
   if (frequency.measured < 59.9 || frequency.measured > 60.1) {
-    errors.push(`Frequency ${frequency.measured}Hz outside acceptable range (59.9-60.1 Hz)`)
+    errors.push(
+      `Frequency ${frequency.measured}Hz outside acceptable range (59.9-60.1 Hz)`
+    )
   }
 
   // Harmonic validation (IEEE 519)
@@ -281,9 +310,13 @@ export const validateIEEE1159 = (powerQualityData) => {
   // Flicker validation (IEC 61000-4-15)
   if (flicker && flicker.pst) {
     if (flicker.pst > 1.0) {
-      errors.push(`Flicker Pst ${flicker.pst} exceeds IEC 61000-4-15 limit (1.0)`)
+      errors.push(
+        `Flicker Pst ${flicker.pst} exceeds IEC 61000-4-15 limit (1.0)`
+      )
     } else if (flicker.pst > 0.7) {
-      warnings.push(`Flicker Pst ${flicker.pst} approaching IEC 61000-4-15 limit`)
+      warnings.push(
+        `Flicker Pst ${flicker.pst} approaching IEC 61000-4-15 limit`
+      )
     }
   }
 
@@ -291,7 +324,9 @@ export const validateIEEE1159 = (powerQualityData) => {
   if (transients) {
     transients.forEach(transient => {
       if (transient.magnitude > voltage.nominal * 2.0) {
-        errors.push(`Transient magnitude ${transient.magnitude}V exceeds 2x nominal voltage`)
+        errors.push(
+          `Transient magnitude ${transient.magnitude}V exceeds 2x nominal voltage`
+        )
       }
     })
   }
@@ -300,7 +335,7 @@ export const validateIEEE1159 = (powerQualityData) => {
     valid: errors.length === 0,
     errors,
     warnings,
-    standard: 'IEEE 1159'
+    standard: 'IEEE 1159',
   }
 }
 
@@ -352,8 +387,10 @@ export const validateAllStandards = (calculationType, data) => {
       totalErrors: allErrors.length,
       totalWarnings: allWarnings.length,
       standardsChecked: standards.length,
-      criticalIssues: allErrors.filter(e => e.includes('exceeds') || e.includes('insufficient')),
-    }
+      criticalIssues: allErrors.filter(
+        e => e.includes('exceeds') || e.includes('insufficient')
+      ),
+    },
   }
 }
 
@@ -361,28 +398,34 @@ export const validateAllStandards = (calculationType, data) => {
  * Generate compliance report
  * Creates a formatted report of standards compliance
  */
-export const generateComplianceReport = (validationResults) => {
-  const { overallValid, errors, warnings, standards, summary } = validationResults
+export const generateComplianceReport = validationResults => {
+  const { overallValid, errors, warnings, standards, summary } =
+    validationResults
 
   const report = {
     timestamp: new Date().toISOString(),
     compliance: {
       overall: overallValid ? 'COMPLIANT' : 'NON-COMPLIANT',
-      score: Math.max(0, 100 - (summary.totalErrors * 10) - (summary.totalWarnings * 2)),
+      score: Math.max(
+        0,
+        100 - summary.totalErrors * 10 - summary.totalWarnings * 2
+      ),
       issues: {
         critical: summary.totalErrors,
         warnings: summary.totalWarnings,
-      }
+      },
     },
     standards: standards.map(std => ({
       name: std,
-      status: validationResults.results.find(r => r.standard === std)?.valid ? 'PASS' : 'FAIL'
+      status: validationResults.results.find(r => r.standard === std)?.valid
+        ? 'PASS'
+        : 'FAIL',
     })),
     details: {
       errors: errors,
-      warnings: warnings
+      warnings: warnings,
     },
-    recommendations: generateRecommendations(errors, warnings)
+    recommendations: generateRecommendations(errors, warnings),
   }
 
   return report
@@ -397,26 +440,36 @@ const generateRecommendations = (errors, warnings) => {
   // Error-based recommendations
   errors.forEach(error => {
     if (error.includes('voltage')) {
-      recommendations.push('Review system voltage levels and consider voltage regulation equipment')
+      recommendations.push(
+        'Review system voltage levels and consider voltage regulation equipment'
+      )
     }
     if (error.includes('overloaded') || error.includes('exceeds rating')) {
       recommendations.push('Upgrade equipment capacity or redistribute loads')
     }
     if (error.includes('coordination')) {
-      recommendations.push('Adjust protection device settings or select appropriate devices')
+      recommendations.push(
+        'Adjust protection device settings or select appropriate devices'
+      )
     }
     if (error.includes('harmonic')) {
-      recommendations.push('Install harmonic filters or use harmonic-rated transformers')
+      recommendations.push(
+        'Install harmonic filters or use harmonic-rated transformers'
+      )
     }
   })
 
   // Warning-based recommendations
   warnings.forEach(warning => {
     if (warning.includes('approaching')) {
-      recommendations.push('Monitor system parameters and plan for future upgrades')
+      recommendations.push(
+        'Monitor system parameters and plan for future upgrades'
+      )
     }
     if (warning.includes('range')) {
-      recommendations.push('Verify measurement accuracy and equipment specifications')
+      recommendations.push(
+        'Verify measurement accuracy and equipment specifications'
+      )
     }
   })
 

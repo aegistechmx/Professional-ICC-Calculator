@@ -5,54 +5,54 @@ import { conductoresCu } from '../catalogs/conductores'
 const CONDUCTORES_IMPEDANCIA = {
   cobre: {
     acero: {
-      '14': { R: 8.28, X: 0.187 },
-      '12': { R: 5.21, X: 0.176 },
-      '10': { R: 3.28, X: 0.164 },
-      '8': { R: 2.06, X: 0.154 },
-      '6': { R: 1.30, X: 0.143 },
-      '4': { R: 0.815, X: 0.134 },
-      '2': { R: 0.513, X: 0.125 },
-      '1': { R: 0.407, X: 0.120 },
+      14: { R: 8.28, X: 0.187 },
+      12: { R: 5.21, X: 0.176 },
+      10: { R: 3.28, X: 0.164 },
+      8: { R: 2.06, X: 0.154 },
+      6: { R: 1.3, X: 0.143 },
+      4: { R: 0.815, X: 0.134 },
+      2: { R: 0.513, X: 0.125 },
+      1: { R: 0.407, X: 0.12 },
       '1/0': { R: 0.323, X: 0.116 },
       '2/0': { R: 0.256, X: 0.113 },
-      '3/0': { R: 0.203, X: 0.110 },
+      '3/0': { R: 0.203, X: 0.11 },
       '4/0': { R: 0.161, X: 0.107 },
-      '250': { R: 0.138, X: 0.105 },
-      '300': { R: 0.115, X: 0.103 },
-      '350': { R: 0.099, X: 0.101 },
-      '400': { R: 0.087, X: 0.100 },
-      '500': { R: 0.069, X: 0.098 },
-      '600': { R: 0.058, X: 0.096 },
-      '750': { R: 0.046, X: 0.094 },
-      '1000': { R: 0.035, X: 0.092 }
+      250: { R: 0.138, X: 0.105 },
+      300: { R: 0.115, X: 0.103 },
+      350: { R: 0.099, X: 0.101 },
+      400: { R: 0.087, X: 0.1 },
+      500: { R: 0.069, X: 0.098 },
+      600: { R: 0.058, X: 0.096 },
+      750: { R: 0.046, X: 0.094 },
+      1000: { R: 0.035, X: 0.092 },
     },
     pvc: {
-      '14': { R: 8.28, X: 0.159 },
-      '12': { R: 5.21, X: 0.148 },
-      '10': { R: 3.28, X: 0.137 },
-      '8': { R: 2.06, X: 0.127 },
-      '6': { R: 1.30, X: 0.117 },
-      '4': { R: 0.815, X: 0.109 },
-      '2': { R: 0.513, X: 0.102 },
-      '1': { R: 0.407, X: 0.097 },
+      14: { R: 8.28, X: 0.159 },
+      12: { R: 5.21, X: 0.148 },
+      10: { R: 3.28, X: 0.137 },
+      8: { R: 2.06, X: 0.127 },
+      6: { R: 1.3, X: 0.117 },
+      4: { R: 0.815, X: 0.109 },
+      2: { R: 0.513, X: 0.102 },
+      1: { R: 0.407, X: 0.097 },
       '1/0': { R: 0.323, X: 0.094 },
       '2/0': { R: 0.256, X: 0.091 },
       '3/0': { R: 0.203, X: 0.088 },
       '4/0': { R: 0.161, X: 0.086 },
-      '250': { R: 0.138, X: 0.084 },
-      '300': { R: 0.115, X: 0.082 },
-      '350': { R: 0.099, X: 0.081 },
-      '400': { R: 0.087, X: 0.080 },
-      '500': { R: 0.069, X: 0.078 },
-      '600': { R: 0.058, X: 0.077 },
-      '750': { R: 0.046, X: 0.075 },
-      '1000': { R: 0.035, X: 0.073 }
-    }
+      250: { R: 0.138, X: 0.084 },
+      300: { R: 0.115, X: 0.082 },
+      350: { R: 0.099, X: 0.081 },
+      400: { R: 0.087, X: 0.08 },
+      500: { R: 0.069, X: 0.078 },
+      600: { R: 0.058, X: 0.077 },
+      750: { R: 0.046, X: 0.075 },
+      1000: { R: 0.035, X: 0.073 },
+    },
   },
   aluminio: {
     acero: {},
-    pvc: {}
-  }
+    pvc: {},
+  },
 }
 
 // Factor for aluminum (from HTML)
@@ -64,7 +64,7 @@ Object.keys(CONDUCTORES_IMPEDANCIA.cobre).forEach(tipo => {
     const d = CONDUCTORES_IMPEDANCIA.cobre[tipo][calibre]
     CONDUCTORES_IMPEDANCIA.aluminio[tipo][calibre] = {
       R: +(d.R * FACTOR_AL_COBRE).toFixed(4),
-      X: d.X
+      X: d.X,
     }
   })
 })
@@ -104,9 +104,19 @@ export function getCableImpedance(material, calibre, canalizacion) {
  * @param {number} paralelo - Number of parallel conductors
  * @returns {object} { voltageDrop, voltageDropPercent, impedanceTotal }
  */
-export function calculateVoltageDrop(current, length, impedance, voltage = 480, paralelo = 1) {
+export function calculateVoltageDrop(
+  current,
+  length,
+  impedance,
+  voltage = 480,
+  paralelo = 1
+) {
   if (!impedance || !current || !length) {
-    return { voltageDrop: 0, voltageDropPercent: 0, impedanceTotal: { R: 0, X: 0 } }
+    return {
+      voltageDrop: 0,
+      voltageDropPercent: 0,
+      impedanceTotal: { R: 0, X: 0 },
+    }
   }
 
   const lengthKm = length / 1000
@@ -121,7 +131,7 @@ export function calculateVoltageDrop(current, length, impedance, voltage = 480, 
   return {
     voltageDrop,
     voltageDropPercent,
-    impedanceTotal: { R: R_total, X: X_total, Z: Z_total }
+    impedanceTotal: { R: R_total, X: X_total, Z: Z_total },
   }
 }
 
@@ -133,7 +143,15 @@ export function calculateVoltageDrop(current, length, impedance, voltage = 480, 
  * @returns {object} Cable calculation results
  */
 export function calculateCableResults(edge, current = null, voltage = 480) {
-  const { material, calibre, canalizacion, longitud, paralelo, temp, numConductores } = edge
+  const {
+    material,
+    calibre,
+    canalizacion,
+    longitud,
+    paralelo,
+    temp,
+    numConductores,
+  } = edge
 
   // Get cable data
   const cableName = getCableName(material, calibre, canalizacion)
@@ -154,7 +172,10 @@ export function calculateCableResults(edge, current = null, voltage = 480) {
 
   // Determine status
   const maxVoltageDrop = 3 // 3% max voltage drop
-  const status = voltageDropData.voltageDropPercent <= maxVoltageDrop ? 'OK' : 'Excede límite'
+  const status =
+    voltageDropData.voltageDropPercent <= maxVoltageDrop
+      ? 'OK'
+      : 'Excede límite'
 
   return {
     cable: cableName,
@@ -170,7 +191,7 @@ export function calculateCableResults(edge, current = null, voltage = 480) {
       longitud,
       paralelo,
       temp,
-      numConductores
-    }
+      numConductores,
+    },
   }
 }

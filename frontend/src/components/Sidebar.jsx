@@ -27,13 +27,13 @@ export default function Sidebar() {
       type: 'capacitor',
       icon: '||',
       label: 'Banco de Capacitores',
-      color: 'bg-teal-500'
+      color: 'bg-teal-500',
     },
     {
       type: 'generator_ats',
       icon: 'ATS',
       label: 'Transferencia Automática',
-      color: 'bg-indigo-500'
+      color: 'bg-indigo-500',
     },
   ]
 

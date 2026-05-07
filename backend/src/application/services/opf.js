@@ -6,6 +6,7 @@
 
 const { solveOPF } = require('@/core/opf/algorithms')
 const { runPowerFlow } = require('./powerflow') // power (W)
+const { defaultLogger } = require('@/debug/logger')
 
 /**
  * Run optimal power flow analysis
@@ -20,47 +21,52 @@ async function runOPF(system, options = {}) {
     alpha = 0.5,
     powerFlowMethod = 'FDLF', // power (W)
   } = options
+  const logger = defaultLogger.child('OPF')
 
-  // eslint-disable-next-line no-console
-  console.log('⚡ OPF: Running economic dispatch optimization...')
+  try {
+    logger.info('Running OPF optimization', {
+      tolerance,
+      maxIterations,
+      alpha,
+      powerFlowMethod,
+    })
 
-  // Get base power flow solution
-  const pfResult = await runPowerFlow(system, { method: powerFlowMethod }) // power (W)
+    // Get base power flow solution
+    const pfResult = await runPowerFlow(system, { method: powerFlowMethod }) // power (W)
 
-  if (!pfResult.converged) {
-    throw new Error('Base power flow did not converge')
-  }
+    if (!pfResult.converged) {
+      throw new Error('Base power flow did not converge')
+    }
 
-  // Run OPF optimization
-  const result = await solveOPF(system, {
-    tolerance,
-    maxIterations,
-    alpha,
-    baseSolution: pfResult,
-  })
+    // Run OPF optimization
+    const result = await solveOPF(system, {
+      tolerance,
+      maxIterations,
+      alpha,
+      baseSolution: pfResult,
+    })
 
-  // eslint-disable-next-line no-console
-  console.log(
-    '⚡ OPF: ' +
-      (result.converged ? 'CONVERGED' : 'NOT CONVERGED') +
-      ' in ' +
-      result.iterations +
-      ' iterations'
-  )
-  // eslint-disable-next-line no-console
-  console.log('⚡ OPF: Final cost: $' + result.cost.toFixed(2))
+    logger.info('OPF finished', {
+      converged: result.converged,
+      iterations: result.iterations,
+      totalCost: Number(result.cost),
+    })
 
-  return {
-    converged: result.converged,
-    iterations: result.iterations,
-    cost: result.cost,
-    generation: result.generation,
-    constraints: result.violations,
-    lmp: result.lmp,
-    basePowerFlow: pfResult,
-    system,
-    options,
-    timestamp: new Date().toISOString(),
+    return {
+      converged: result.converged,
+      iterations: result.iterations,
+      totalCost: Number(result.cost),
+      generatorDispatch: result.generation,
+      violations: result.violations,
+      lmp: result.lmp,
+      basePowerFlow: pfResult,
+      system,
+      options,
+      timestamp: new Date().toISOString(),
+    }
+  } catch (error) {
+    logger.error('OPF failed', { error: error.message })
+    throw error
   }
 }
 

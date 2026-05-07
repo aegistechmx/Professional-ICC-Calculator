@@ -38,7 +38,7 @@ function App() {
 
   // Sincronización bidireccional con módulo cortocircuito (solo manual)
   useEffect(() => {
-    const handleStorageChange = (e) => {
+    const handleStorageChange = e => {
       if (e.key === 'icc-sync-nodes' && e.newValue) {
         try {
           const newNodes = JSON.parse(e.newValue)
@@ -70,11 +70,11 @@ function App() {
     const projectData = {
       nodes,
       edges,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
 
     const blob = new Blob([JSON.stringify(projectData, null, 2)], {
-      type: 'application/json'
+      type: 'application/json',
     })
 
     const url = URL.createObjectURL(blob)
@@ -93,12 +93,12 @@ function App() {
     input.type = 'file'
     input.accept = '.json'
 
-    input.onchange = (event) => {
+    input.onchange = event => {
       const file = event.target.files[0]
       if (!file) return
 
       const reader = new FileReader()
-      reader.onload = (e) => {
+      reader.onload = e => {
         try {
           const projectData = JSON.parse(e.target.result)
 
@@ -106,7 +106,9 @@ function App() {
             setNodes(projectData.nodes)
             setEdges(projectData.edges)
           } else {
-            alert('Formato de archivo inválido. El archivo debe contener nodes y edges.')
+            alert(
+              'Formato de archivo inválido. El archivo debe contener nodes y edges.'
+            )
           }
         } catch (error) {
           alert('Error al leer el archivo. Verifique que sea un JSON válido.')
@@ -130,9 +132,10 @@ function App() {
   }
 
   // Handle ICC results from HTML module (legacy - kept for compatibility)
-  const handleICCResults = (results) => {
+  const handleICCResults = results => {
     const updatedNodes = nodes.map(node => {
-      const nodeResult = results?.puntos?.find(p => p.id === node.id) ||
+      const nodeResult =
+        results?.puntos?.find(p => p.id === node.id) ||
         results?.[node.id] ||
         results?.nodeResults?.[node.id]
 
@@ -144,7 +147,11 @@ function App() {
           ...node.data,
           results: {
             ...(node.data?.results || {}),
-            isc: nodeResult.isc_3f || nodeResult.I_3F || nodeResult.Icc || nodeResult.isc,
+            isc:
+              nodeResult.isc_3f ||
+              nodeResult.I_3F ||
+              nodeResult.Icc ||
+              nodeResult.isc,
             isc_1f: nodeResult.isc_1f || nodeResult.I_1F,
             Icc: nodeResult.Icc || nodeResult.isc_3f_ka,
             timestamp: new Date().toISOString(),
@@ -172,18 +179,21 @@ function App() {
       setSyncFilename(filename)
 
       // Disparar evento storage manualmente para notificar al módulo
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'icc-sync-nodes',
-        newValue: JSON.stringify(nodes),
-        oldValue: null
-      }))
+      window.dispatchEvent(
+        new StorageEvent('storage', {
+          key: 'icc-sync-nodes',
+          newValue: JSON.stringify(nodes),
+          oldValue: null,
+        })
+      )
 
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'icc-sync-filename',
-        newValue: filename,
-        oldValue: null
-      }))
-
+      window.dispatchEvent(
+        new StorageEvent('storage', {
+          key: 'icc-sync-filename',
+          newValue: filename,
+          oldValue: null,
+        })
+      )
     } catch (error) {
       alert('Error en sincronización: ' + error.message)
     }
@@ -209,19 +219,21 @@ function App() {
             <div className="flex bg-gray-200 rounded-lg p-1">
               <button
                 onClick={() => setMode('edit')}
-                className={`px-4 py-2 rounded-md transition ${mode === 'edit'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-300'
-                  }`}
+                className={`px-4 py-2 rounded-md transition ${
+                  mode === 'edit'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-300'
+                }`}
               >
                 Modo Edición
               </button>
               <button
                 onClick={() => setMode('simulation')}
-                className={`px-4 py-2 rounded-md transition ${mode === 'simulation'
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-300'
-                  }`}
+                className={`px-4 py-2 rounded-md transition ${
+                  mode === 'simulation'
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-300'
+                }`}
               >
                 Modo Simulación
               </button>
@@ -231,20 +243,22 @@ function App() {
             <div className="flex bg-gray-200 rounded-lg p-1">
               <button
                 onClick={() => setSystemMode('normal')}
-                className={`px-4 py-2 rounded-md transition ${systemMode === 'normal'
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-300'
-                  }`}
+                className={`px-4 py-2 rounded-md transition ${
+                  systemMode === 'normal'
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-300'
+                }`}
                 title="Modo Normal: Red eléctrica activa"
               >
                 🟢 Normal
               </button>
               <button
                 onClick={() => setSystemMode('emergency')}
-                className={`px-4 py-2 rounded-md transition ${systemMode === 'emergency'
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-300'
-                  }`}
+                className={`px-4 py-2 rounded-md transition ${
+                  systemMode === 'emergency'
+                    ? 'bg-red-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-300'
+                }`}
                 title="Modo Emergencia: Generador activo"
               >
                 🔴 Emergencia
@@ -284,7 +298,10 @@ function App() {
                 className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition flex items-center gap-2"
                 title={`Sincronizar con módulo cortocircuito - ${syncFilename}`}
               >
-                🔄 <span className="hidden sm:inline truncate max-w-[150px]">{syncFilename}</span>
+                🔄{' '}
+                <span className="hidden sm:inline truncate max-w-[150px]">
+                  {syncFilename}
+                </span>
               </button>
               {mode === 'edit' && (
                 <>
@@ -438,7 +455,9 @@ function App() {
       {currentView === 'cortocircuito' && (
         <div className="fixed inset-0 bg-white z-50">
           <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-800">⚡ Módulo de Cortocircuito</h1>
+            <h1 className="text-xl font-bold text-gray-800">
+              ⚡ Módulo de Cortocircuito
+            </h1>
             <button
               onClick={() => setCurrentView('editor')}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
@@ -454,7 +473,9 @@ function App() {
         <div className="fixed inset-0 bg-gray-100 z-50 flex flex-col">
           <div className="bg-white border-b px-4 py-3 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold text-gray-800">⚡ Módulo ICC (HTML)</h1>
+              <h1 className="text-xl font-bold text-gray-800">
+                ⚡ Módulo ICC (HTML)
+              </h1>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -472,10 +493,7 @@ function App() {
             </div>
           </div>
           <div className="flex-1 p-4">
-            <ICCModule
-              onResults={handleICCResults}
-              className="h-full"
-            />
+            <ICCModule onResults={handleICCResults} className="h-full" />
           </div>
         </div>
       )}

@@ -3,10 +3,10 @@
  * Muestra corriente fluyendo en tiempo real con colores por carga
  */
 
-import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { BaseEdge, EdgeLabelRenderer } from 'reactflow';
-import './FlowEdge.css';
+import React, { useMemo } from 'react'
+import PropTypes from 'prop-types'
+import { BaseEdge, EdgeLabelRenderer } from 'reactflow'
+import './FlowEdge.css'
 
 export default function FlowEdge({
   id,
@@ -15,82 +15,82 @@ export default function FlowEdge({
   targetX,
   targetY,
   data,
-  selected
+  selected,
 }) {
   // Calcular color basado en carga vs capacidad
   const getFlowColor = () => {
-    const { current, capacity, fault, tripped, overload } = data || {};
+    const { current, capacity, fault, tripped, overload } = data || {}
 
-    if (fault) return '#dc2626'; // Rojo - falla
-    if (tripped) return '#f59e0b'; // Amarillo - disparado
-    if (overload) return '#f97316'; // Naranja - sobrecarga
+    if (fault) return '#dc2626' // Rojo - falla
+    if (tripped) return '#f59e0b' // Amarillo - disparado
+    if (overload) return '#f97316' // Naranja - sobrecarga
 
     if (current && capacity) {
-      const ratio = current / capacity;
-      if (ratio > 1) return '#dc2626'; // Sobrecarga crítica
-      if (ratio > 0.8) return '#f97316'; // Sobrecarga
-      if (ratio > 0.5) return '#eab308'; // Media carga
-      return '#10b981'; // Carga normal
+      const ratio = current / capacity
+      if (ratio > 1) return '#dc2626' // Sobrecarga crítica
+      if (ratio > 0.8) return '#f97316' // Sobrecarga
+      if (ratio > 0.5) return '#eab308' // Media carga
+      return '#10b981' // Carga normal
     }
 
-    return '#6b7280'; // Gris - sin datos
-  };
+    return '#6b7280' // Gris - sin datos
+  }
 
   // Calcular velocidad de animación basada en corriente
   const getAnimationDuration = () => {
-    const { current } = data || {};
-    if (!current) return '2s';
+    const { current } = data || {}
+    if (!current) return '2s'
 
     // Mayor corriente = animación más rápida
-    const speed = Math.max(0.5, 2 - (current / 100));
-    return `${speed}s`;
-  };
+    const speed = Math.max(0.5, 2 - current / 100)
+    return `${speed}s`
+  }
 
   // Calcular número de partículas basado en corriente
   const getParticleCount = () => {
-    const { current } = data || {};
-    if (!current) return 3;
+    const { current } = data || {}
+    if (!current) return 3
 
     // Mayor corriente = más partículas
-    return Math.min(8, Math.ceil(current / 20) + 2);
-  };
+    return Math.min(8, Math.ceil(current / 20) + 2)
+  }
 
   // Construir path
   const path = useMemo(() => {
     if (data?.points && data.points.length >= 2) {
       return data.points
         .map((point, index) => {
-          const command = index === 0 ? 'M' : 'L';
-          return `${command} ${point.x} ${point.y}`;
+          const command = index === 0 ? 'M' : 'L'
+          return `${command} ${point.x} ${point.y}`
         })
-        .join(' ');
+        .join(' ')
     }
 
     // Fallback: línea recta
-    return `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
-  }, [data?.points, sourceX, sourceY, targetX, targetY]);
+    return `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`
+  }, [data?.points, sourceX, sourceY, targetX, targetY])
 
   // Calcular centro para label
   const centerX = useMemo(() => {
     if (data?.points && data.points.length >= 2) {
-      const midIndex = Math.floor(data.points.length / 2);
-      return data.points[midIndex]?.x || (sourceX + targetX) / 2;
+      const midIndex = Math.floor(data.points.length / 2)
+      return data.points[midIndex]?.x || (sourceX + targetX) / 2
     }
-    return (sourceX + targetX) / 2;
-  }, [data?.points, sourceX, targetX]);
+    return (sourceX + targetX) / 2
+  }, [data?.points, sourceX, targetX])
 
   const centerY = useMemo(() => {
     if (data?.points && data.points.length >= 2) {
-      const midIndex = Math.floor(data.points.length / 2);
-      return data.points[midIndex]?.y || (sourceY + targetY) / 2;
+      const midIndex = Math.floor(data.points.length / 2)
+      return data.points[midIndex]?.y || (sourceY + targetY) / 2
     }
-    return (sourceY + targetY) / 2;
-  }, [data?.points, sourceY, targetY]);
+    return (sourceY + targetY) / 2
+  }, [data?.points, sourceY, targetY])
 
-  const flowColor = getFlowColor();
-  const animationDuration = getAnimationDuration();
-  const particleCount = getParticleCount();
-  const showAnimation = data?.current > 0 || data?.animated;
+  const flowColor = getFlowColor()
+  const animationDuration = getAnimationDuration()
+  const particleCount = getParticleCount()
+  const showAnimation = data?.current > 0 || data?.animated
 
   return (
     <>
@@ -101,7 +101,7 @@ export default function FlowEdge({
         style={{
           stroke: flowColor,
           strokeWidth: selected ? 3 : 2,
-          strokeDasharray: data?.tripped ? '5,5' : 'none'
+          strokeDasharray: data?.tripped ? '5,5' : 'none',
         }}
         className={`flow-edge ${data?.fault ? 'fault' : ''} ${data?.tripped ? 'tripped' : ''}`}
       />
@@ -117,7 +117,7 @@ export default function FlowEdge({
               className="flow-particle"
               style={{
                 animationDelay: `${index * (parseFloat(animationDuration) / particleCount)}s`,
-                animationDuration: animationDuration
+                animationDuration: animationDuration,
               }}
             >
               <animateMotion
@@ -157,7 +157,7 @@ export default function FlowEdge({
               fontSize: '10px',
               fontWeight: '500',
               pointerEvents: 'all',
-              zIndex: 1000
+              zIndex: 1000,
             }}
           >
             {data?.current && (
@@ -166,9 +166,7 @@ export default function FlowEdge({
               </span>
             )}
             {data?.capacity && (
-              <span className="capacity-value">
-                / {data.capacity} A
-              </span>
+              <span className="capacity-value">/ {data.capacity} A</span>
             )}
             {data?.current && data?.capacity && (
               <span className="load-percent">
@@ -179,7 +177,7 @@ export default function FlowEdge({
         </EdgeLabelRenderer>
       )}
     </>
-  );
+  )
 }
 
 FlowEdge.propTypes = {
@@ -189,15 +187,17 @@ FlowEdge.propTypes = {
   targetX: PropTypes.number.isRequired,
   targetY: PropTypes.number.isRequired,
   data: PropTypes.shape({
-    points: PropTypes.arrayOf(PropTypes.shape({
-      x: PropTypes.number,
-      y: PropTypes.number
-    })),
+    points: PropTypes.arrayOf(
+      PropTypes.shape({
+        x: PropTypes.number,
+        y: PropTypes.number,
+      })
+    ),
     current: PropTypes.number,
     capacity: PropTypes.number,
     animated: PropTypes.bool,
     fault: PropTypes.bool,
-    tripped: PropTypes.bool
+    tripped: PropTypes.bool,
   }),
-  selected: PropTypes.bool
-};
+  selected: PropTypes.bool,
+}

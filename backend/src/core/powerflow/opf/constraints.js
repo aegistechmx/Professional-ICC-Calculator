@@ -83,10 +83,12 @@ function checkGenerationLimits(generators) {
  * @param {number} Vmax - Maximum voltage (pu)
  * @returns {Object} Violation information
  */
-function checkVoltageLimits(voltages, Vmin = 0.95, Vmax = 1.05) { // voltage (V)
+function checkVoltageLimits(voltages, Vmin = 0.95, Vmax = 1.05) {
+  // voltage (V)
   const violations = []
 
-  voltages.forEach((V, i) => { // voltage (V)
+  voltages.forEach((V, i) => {
+    // voltage (V)
     const Vmag = Math.sqrt(V.re * V.re + V.im * V.im)
 
     if (Vmag < Vmin) {
@@ -169,7 +171,8 @@ function calculatePenalty(violations, penalty = 1000) {
  * @param {Object} options - Constraint options
  * @returns {Object} Overall constraint status
  */
-function checkAllConstraints(model, generators, voltages, options = {}) { // voltage (V)
+function checkAllConstraints(model, generators, voltages, options = {}) {
+  // voltage (V)
   const { Vmin = 0.95, Vmax = 1.05, penalty = 1000 } = options
 
   // Check generation limits

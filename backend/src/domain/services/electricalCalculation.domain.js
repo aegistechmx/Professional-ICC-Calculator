@@ -1,17 +1,17 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
 /**
  * domain/services/electricalCalculation.domain.js - Lógica Pura del Motor Eléctrico // Unit: Ω (Ohms)
  * Domain layer: cálculos eléctricos sin dependencias externas
  */
 
 /* eslint-disable no-console */
-const { initMotores } = require('../../infrastructure/adapters/motorAdapter');
+const { initMotores } = require('../../infrastructure/adapters/motorAdapter')
 
 class ElectricalCalculationDomain {
   constructor() {
-    this.motor = initMotores();
-    this.engineVersion = '2.1.0';
-    this.standards = ['IEEE 1584', 'IEC 60909', 'NOM-001-SEDE-2012'];
+    this.motor = initMotores()
+    this.engineVersion = '2.1.0'
+    this.standards = ['IEEE 1584', 'IEC 60909', 'NOM-001-SEDE-2012']
   }
 
   /**
@@ -21,47 +21,62 @@ class ElectricalCalculationDomain {
    * @returns {Object} Resultado del pipeline
    */
   async executePipeline(input, options = {}) {
-    const pipeline = options.mode || 'engineering';
+    const pipeline = options.mode || 'engineering'
 
     // eslint-disable-next-line no-console
-    console.log(`[DOMAIN] Iniciando pipeline: ${pipeline}`);
+    console.log(`[DOMAIN] Iniciando pipeline: ${pipeline}`)
     // eslint-disable-next-line no-console
-    console.time('pipeline-completo');
+    console.time('pipeline-completo')
 
     try {
       // 1. Normalización
-      const normalizedInput = this.normalizeInput(input);
+      const normalizedInput = this.normalizeInput(input)
 
       // 2. Cálculo base
-      const baseCalculation = await this.calculateBase(normalizedInput);
+      const baseCalculation = await this.calculateBase(normalizedInput)
 
       // 3. Corto circuito
-      const shortCircuit = await this.calculateShortCircuit(baseCalculation);
+      const shortCircuit = await this.calculateShortCircuit(baseCalculation)
 
       // 4. Protección
-      const protection = await this.calculateProtection(baseCalculation, shortCircuit);
+      const protection = await this.calculateProtection(
+        baseCalculation,
+        shortCircuit
+      )
 
       // 5. Coordinación
-      const coordination = await this.calculateCoordination(protection);
+      const coordination = await this.calculateCoordination(protection)
 
       // 6. Optimización (opcional)
-      let optimization = null;
+      let optimization = null
       if (pipeline === 'optimization' || pipeline === 'simulation') {
-        optimization = await this.optimizeSystem(baseCalculation, protection);
+        optimization = await this.optimizeSystem(baseCalculation, protection)
       }
 
       // 7. Validación final
-      const validation = await this.validateResults(baseCalculation, protection, shortCircuit);
+      const validation = await this.validateResults(
+        baseCalculation,
+        protection,
+        shortCircuit
+      )
 
       // eslint-disable-next-line no-console
-      console.timeEnd('pipeline-completo');
+      console.timeEnd('pipeline-completo')
 
       return {
         input: normalizedInput,
         pipeline: {
           mode: pipeline,
-          steps: ['normalization', 'base_calculation', 'short_circuit', 'protection', 'coordination', 'validation', 'optimization'],
-          completed: optimization ? 'optimization' : 'validation'
+          steps: [
+            'normalization',
+            'base_calculation',
+            'short_circuit',
+            'protection',
+            'coordination',
+            'validation',
+            'optimization',
+          ],
+          completed: optimization ? 'optimization' : 'validation',
         },
         results: {
           base: baseCalculation,
@@ -69,22 +84,21 @@ class ElectricalCalculationDomain {
           protection,
           coordination,
           optimization,
-          validation
+          validation,
         },
         metadata: {
           engineVersion: this.engineVersion,
           standards: this.standards,
           timestamp: new Date().toISOString(),
-          processingTime: 'measured'
-        }
-      };
-
+          processingTime: 'measured',
+        },
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd('pipeline-completo');
+      console.timeEnd('pipeline-completo')
       // eslint-disable-next-line no-console
-      console.error('[DOMAIN] Error en pipeline:', error.message);
-      throw new Error(`Pipeline execution failed: ${error.message}`);
+      console.error('[DOMAIN] Error en pipeline:', error.message)
+      throw new Error(`Pipeline execution failed: ${error.message}`)
     }
   }
 
@@ -96,8 +110,8 @@ class ElectricalCalculationDomain {
       ...input,
       normalized: true,
       timestamp: new Date().toISOString(),
-      engineVersion: this.engineVersion
-    };
+      engineVersion: this.engineVersion,
+    }
   }
 
   /**
@@ -105,25 +119,25 @@ class ElectricalCalculationDomain {
    */
   async calculateBase(input) {
     // eslint-disable-next-line no-console
-    console.log('[DOMAIN] Cálculo base...');
+    console.log('[DOMAIN] Cálculo base...')
     // eslint-disable-next-line no-console
-    console.time('calculo-base');
+    console.time('calculo-base')
 
     try {
-      const result = this.motor.ejecutar(input);
+      const result = this.motor.ejecutar(input)
 
       // eslint-disable-next-line no-console
-      console.timeEnd('calculo-base');
+      console.timeEnd('calculo-base')
       return {
         ampacidad: result.ampacidad,
         conductor: result.conductor,
         caida: result.caida,
-        sistema: result.sistema
-      };
+        sistema: result.sistema,
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd('calculo-base');
-      throw error;
+      console.timeEnd('calculo-base')
+      throw error
     }
   }
 
@@ -132,30 +146,32 @@ class ElectricalCalculationDomain {
    */
   async calculateShortCircuit(baseCalculation) {
     // eslint-disable-next-line no-console
-    console.log('[DOMAIN] Cálculo de corto circuito...');
+    console.log('[DOMAIN] Cálculo de corto circuito...')
     // eslint-disable-next-line no-console
-    console.time('corto-circuito');
+    console.time('corto-circuito')
 
     try {
       // Cálculo ICC básico
-      const voltage = baseCalculation.sistema?.voltaje || 480; // voltage (V)
-      const impedance = 0.1; // Impedancia típica // Unit: Ω (Ohms)
-      const Icc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3) * impedance)).toFixed(6))); // voltage (V)
+      const voltage = baseCalculation.sistema?.voltaje || 480 // voltage (V)
+      const impedance = 0.1 // Impedancia típica // Unit: Ω (Ohms)
+      const Icc = toElectricalPrecision(
+        parseFloat((voltage / (Math.sqrt(3) * impedance)).toFixed(6))
+      ) // voltage (V)
 
       // eslint-disable-next-line no-console
-      console.timeEnd('corto-circuito');
+      console.timeEnd('corto-circuito')
 
       return {
         Icc: Math.round(Icc * 100) / 100,
         impedance,
         voltage,
         method: 'basic_iec_60909',
-        timestamp: new Date().toISOString()
-      };
+        timestamp: new Date().toISOString(),
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd('corto-circuito');
-      throw error;
+      console.timeEnd('corto-circuito')
+      throw error
     }
   }
 
@@ -164,27 +180,31 @@ class ElectricalCalculationDomain {
    */
   async calculateProtection(baseCalculation, shortCircuit) {
     // eslint-disable-next-line no-console
-    console.log('[DOMAIN] Cálculo de protección...');
+    console.log('[DOMAIN] Cálculo de protección...')
     // eslint-disable-next-line no-console
-    console.time('proteccion');
+    console.time('proteccion')
 
     try {
-      const I_diseño = baseCalculation.sistema?.I_diseño || 187.5;
-      const Icu = shortCircuit.Icc * 1.25;
+      const I_diseño = baseCalculation.sistema?.I_diseño || 187.5
+      const Icu = shortCircuit.Icc * 1.25
 
       // Selección de breaker estándar
-      const breakers = [15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000];
+      const breakers = [
+        15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175,
+        200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600,
+        2000, 2500, 3000, 4000, 5000, 6000,
+      ]
 
-      let In = breakers[0];
+      let In = breakers[0]
       for (const breaker of breakers) {
         if (breaker >= I_diseño) {
-          In = breaker;
-          break;
+          In = breaker
+          break
         }
       }
 
       // eslint-disable-next-line no-console
-      console.timeEnd('proteccion');
+      console.timeEnd('proteccion')
 
       return {
         In,
@@ -192,12 +212,12 @@ class ElectricalCalculationDomain {
         tipo: 'LSIG',
         seleccion: 'automatica',
         criterio: 'I_diseño * 1.25',
-        timestamp: new Date().toISOString()
-      };
+        timestamp: new Date().toISOString(),
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd('proteccion');
-      throw error;
+      console.timeEnd('proteccion')
+      throw error
     }
   }
 
@@ -206,27 +226,27 @@ class ElectricalCalculationDomain {
    */
   async calculateCoordination(protection) {
     // eslint-disable-next-line no-console
-    console.log('[DOMAIN] Coordinación de protecciones...');
+    console.log('[DOMAIN] Coordinación de protecciones...')
     // eslint-disable-next-line no-console
-    console.time('coordinacion');
+    console.time('coordinacion')
 
     try {
       // Coordinación básica
-      const coordinada = protection.In <= protection.Icu * 0.8;
+      const coordinada = protection.In <= protection.Icu * 0.8
 
       // eslint-disable-next-line no-console
-      console.timeEnd('coordinacion');
+      console.timeEnd('coordinacion')
 
       return {
         coordinada,
         mensaje: coordinada ? 'Coordinación básica OK' : 'Requiere revisión',
         criterio: 'In <= 0.8 * Icu',
-        timestamp: new Date().toISOString()
-      };
+        timestamp: new Date().toISOString(),
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd('coordinacion');
-      throw error;
+      console.timeEnd('coordinacion')
+      throw error
     }
   }
 
@@ -235,34 +255,34 @@ class ElectricalCalculationDomain {
    */
   async optimizeSystem(baseCalculation, protection) {
     // eslint-disable-next-line no-console
-    console.log('[DOMAIN] Optimización del sistema...');
+    console.log('[DOMAIN] Optimización del sistema...')
     // eslint-disable-next-line no-console
-    console.time('optimizacion');
+    console.time('optimizacion')
 
     try {
       // Simulación de optimización básica
       const optimized = {
         original: {
           conductor: baseCalculation.conductor.calibre,
-          proteccion: protection.In
+          proteccion: protection.In,
         },
         optimized: {
           conductor: baseCalculation.conductor.calibre,
           proteccion: protection.In,
-          ahorro: 0
+          ahorro: 0,
         },
         iteraciones: 10,
         algoritmo: 'basic_ga',
-        convergencia: true
-      };
+        convergencia: true,
+      }
 
       // eslint-disable-next-line no-console
-      console.timeEnd('optimizacion');
-      return optimized;
+      console.timeEnd('optimizacion')
+      return optimized
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd('optimizacion');
-      throw error;
+      console.timeEnd('optimizacion')
+      throw error
     }
   }
 
@@ -271,43 +291,45 @@ class ElectricalCalculationDomain {
    */
   async validateResults(baseCalculation, protection, shortCircuit) {
     // eslint-disable-next-line no-console
-    console.log('[DOMAIN] Validación final...');
+    console.log('[DOMAIN] Validación final...')
     // eslint-disable-next-line no-console
-    console.time('validacion');
+    console.time('validacion')
 
     try {
-      const errores = [];
-      const warnings = [];
+      const errores = []
+      const warnings = []
 
       // Validación de ampacidad
-      if (baseCalculation.ampacidad?.I_final < baseCalculation.sistema?.I_diseño) {
-        errores.push('No cumple ampacidad');
+      if (
+        baseCalculation.ampacidad?.I_final < baseCalculation.sistema?.I_diseño
+      ) {
+        errores.push('No cumple ampacidad')
       }
 
       // Validación de protección
       if (protection.Icu < shortCircuit.Icc) {
-        errores.push('Protección insuficiente');
+        errores.push('Protección insuficiente')
       }
 
       // Validación de caída de tensión
       if (baseCalculation.caida?.porcentaje > 3) {
-        warnings.push('Caída de tensión > 3%');
+        warnings.push('Caída de tensión > 3%')
       }
 
       // eslint-disable-next-line no-console
-      console.timeEnd('validacion');
+      console.timeEnd('validacion')
 
       return {
         ok: errores.length === 0,
         errores,
         warnings,
         normas: this.standards,
-        timestamp: new Date().toISOString()
-      };
+        timestamp: new Date().toISOString(),
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.timeEnd('validacion');
-      throw error;
+      console.timeEnd('validacion')
+      throw error
     }
   }
 
@@ -320,9 +342,9 @@ class ElectricalCalculationDomain {
       version: this.engineVersion,
       standards: this.standards,
       capabilities: ['pipeline', 'optimization', 'validation'],
-      modes: ['fast', 'engineering', 'optimization', 'simulation']
-    };
+      modes: ['fast', 'engineering', 'optimization', 'simulation'],
+    }
   }
 }
 
-module.exports = ElectricalCalculationDomain;
+module.exports = ElectricalCalculationDomain

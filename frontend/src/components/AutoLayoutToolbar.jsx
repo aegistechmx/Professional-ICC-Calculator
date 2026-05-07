@@ -3,11 +3,15 @@
  * Botones para organizar automáticamente el sistema eléctrico
  */
 
-import React, { useState } from 'react';
-import { useGraphStore } from '../store/graphStore';
-import { useHistoryStore } from '../store/historyStore';
-import { AutoLayoutEngine, LAYOUT_STRATEGIES, detectTopology } from '../utils/autoLayoutEngine';
-import './AutoLayoutToolbar.css';
+import React, { useState } from 'react'
+import { useGraphStore } from '../store/graphStore'
+import { useHistoryStore } from '../store/historyStore'
+import {
+  AutoLayoutEngine,
+  LAYOUT_STRATEGIES,
+  detectTopology,
+} from '../utils/autoLayoutEngine'
+import './AutoLayoutToolbar.css'
 
 const LAYOUT_OPTIONS = [
   {
@@ -15,90 +19,90 @@ const LAYOUT_OPTIONS = [
     label: 'Jerárquico',
     icon: '🌳',
     description: 'Fuente → Transformador → Tablero → Cargas',
-    recommended: true
+    recommended: true,
   },
   {
     id: LAYOUT_STRATEGIES.RADIAL,
     label: 'Radial',
     icon: '☀️',
     description: 'Fuente en centro, cargas distribuidas',
-    recommended: false
+    recommended: false,
   },
   {
     id: LAYOUT_STRATEGIES.ELECTRICAL_TYPE,
     label: 'Por Tipo',
     icon: '⚡',
     description: 'Organizado por tipo de componente',
-    recommended: false
+    recommended: false,
   },
   {
     id: LAYOUT_STRATEGIES.GRID,
     label: 'Grid',
     icon: '⬜',
     description: 'Organización en cuadrícula regular',
-    recommended: false
+    recommended: false,
   },
   {
     id: LAYOUT_STRATEGIES.TREE,
     label: 'Árbol',
     icon: '🌲',
     description: 'Layout de árbol puro',
-    recommended: false
-  }
-];
+    recommended: false,
+  },
+]
 
 export default function AutoLayoutToolbar() {
-  const { nodes, edges, setGraph } = useGraphStore();
-  const { saveState } = useHistoryStore();
-  const [isOpen, setIsOpen] = useState(false);
-  const [applying, setApplying] = useState(false);
+  const { nodes, edges, setGraph } = useGraphStore()
+  const { saveState } = useHistoryStore()
+  const [isOpen, setIsOpen] = useState(false)
+  const [applying, setApplying] = useState(false)
 
   // Detectar topología y sugerir estrategia
-  const suggestedStrategy = nodes.length > 0 ? detectTopology(nodes, edges) : null;
+  const suggestedStrategy =
+    nodes.length > 0 ? detectTopology(nodes, edges) : null
 
-  const applyLayout = async (strategy) => {
+  const applyLayout = async strategy => {
     if (nodes.length === 0) {
-      showNotification('No hay nodos para organizar');
-      return;
+      showNotification('No hay nodos para organizar')
+      return
     }
 
-    setApplying(true);
+    setApplying(true)
 
     try {
       // Guardar estado antes del layout
-      saveState();
+      saveState()
 
       // Crear motor y ejecutar layout
       const engine = new AutoLayoutEngine({
         spacingX: 250,
         spacingY: 180,
         startX: 100,
-        startY: 100
-      });
+        startY: 100,
+      })
 
-      const newNodes = engine.layout(nodes, edges, strategy);
+      const newNodes = engine.layout(nodes, edges, strategy)
 
       // Aplicar nuevas posiciones
-      setGraph(newNodes, edges);
+      setGraph(newNodes, edges)
 
-      showNotification(`✅ Layout ${strategy} aplicado`);
-
+      showNotification(`✅ Layout ${strategy} aplicado`)
     } catch (error) {
-      showNotification('❌ Error al aplicar layout');
+      showNotification('❌ Error al aplicar layout')
     } finally {
-      setApplying(false);
-      setIsOpen(false);
+      setApplying(false)
+      setIsOpen(false)
     }
-  };
+  }
 
   const applySmartLayout = () => {
-    const engine = new AutoLayoutEngine();
-    const suggested = engine.suggestStrategy(nodes, edges);
-    applyLayout(suggested);
-  };
+    const engine = new AutoLayoutEngine()
+    const suggested = engine.suggestStrategy(nodes, edges)
+    applyLayout(suggested)
+  }
 
-  const nodeCount = nodes.length;
-  const edgeCount = edges.length;
+  const nodeCount = nodes.length
+  const edgeCount = edges.length
 
   return (
     <div className="auto-layout-toolbar">
@@ -112,7 +116,14 @@ export default function AutoLayoutToolbar() {
         {applying ? (
           <span className="spinner">⟳</span>
         ) : (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <rect x="3" y="3" width="7" height="7" />
             <rect x="14" y="3" width="7" height="7" />
             <rect x="14" y="14" width="7" height="7" />
@@ -128,7 +139,9 @@ export default function AutoLayoutToolbar() {
         <div className="layout-menu">
           <div className="layout-menu-header">
             <h4>Organizar Sistema</h4>
-            <span className="stats">{nodeCount} nodos, {edgeCount} conexiones</span>
+            <span className="stats">
+              {nodeCount} nodos, {edgeCount} conexiones
+            </span>
           </div>
 
           {suggestedStrategy && (
@@ -149,7 +162,9 @@ export default function AutoLayoutToolbar() {
               <span className="option-icon">🧠</span>
               <div className="option-info">
                 <span className="option-label">Inteligente</span>
-                <span className="option-desc">Detecta y aplica el mejor layout</span>
+                <span className="option-desc">
+                  Detecta y aplica el mejor layout
+                </span>
               </div>
               <span className="smart-badge">RECOMENDADO</span>
             </button>
@@ -169,18 +184,13 @@ export default function AutoLayoutToolbar() {
                   <span className="option-label">{option.label}</span>
                   <span className="option-desc">{option.description}</span>
                 </div>
-                {option.recommended && (
-                  <span className="rec-badge">⭐</span>
-                )}
+                {option.recommended && <span className="rec-badge">⭐</span>}
               </button>
             ))}
           </div>
 
           <div className="layout-footer">
-            <button
-              className="cancel-btn"
-              onClick={() => setIsOpen(false)}
-            >
+            <button className="cancel-btn" onClick={() => setIsOpen(false)}>
               Cancelar
             </button>
           </div>
@@ -192,14 +202,14 @@ export default function AutoLayoutToolbar() {
         <div className="layout-overlay" onClick={() => setIsOpen(false)} />
       )}
     </div>
-  );
+  )
 }
 
 // Helper para notificaciones
 function showNotification(message) {
-  const notification = document.createElement('div');
-  notification.className = 'layout-notification';
-  notification.textContent = message;
+  const notification = document.createElement('div')
+  notification.className = 'layout-notification'
+  notification.textContent = message
   notification.style.cssText = `
     position: fixed;
     bottom: 20px;
@@ -213,12 +223,12 @@ function showNotification(message) {
     z-index: 9999;
     animation: slideIn 0.3s ease;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  `;
+  `
 
-  document.body.appendChild(notification);
+  document.body.appendChild(notification)
 
   setTimeout(() => {
-    notification.style.animation = 'slideIn 0.3s ease reverse';
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
+    notification.style.animation = 'slideIn 0.3s ease reverse'
+    setTimeout(() => notification.remove(), 300)
+  }, 3000)
 }
