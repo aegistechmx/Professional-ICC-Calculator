@@ -9,6 +9,8 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
+const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+
 // Configuration
 const CONFIG = {
   AUTO_FIX: false,              // Disable automatic lint fix (can break things)
@@ -33,20 +35,25 @@ function log(message, color = 'reset') {
 
 function runCommand(cmd, cwd, options = {}) {
   const defaultOptions = {
-    cwd, 
+    cwd,
     encoding: 'utf8',
     stdio: 'pipe',
+    shell: true,
     timeout: CONFIG.TIMEOUT
   };
-  
+
   try {
     const result = execSync(cmd, { ...defaultOptions, ...options });
     return { success: true, output: result, exitCode: 0 };
   } catch (error) {
-    return { 
-      success: false, 
-      output: error.stdout || error.message, 
-      exitCode: error.status || 1 
+    const stdout = error.stdout ? error.stdout.toString() : '';
+    const stderr = error.stderr ? error.stderr.toString() : '';
+    const combined = [stdout, stderr].filter(Boolean).join('\n').trim();
+
+    return {
+      success: false,
+      output: combined || error.message,
+      exitCode: error.status || 1
     };
   }
 }
@@ -136,21 +143,33 @@ async function ensureBackendRunning() {
   log('⚠️  Backend not running. Attempting to start...', 'yellow');
   
   try {
-    // Start backend in background
     const backendPath = path.join(__dirname, '..', 'backend');
-    const child = spawn('npm', ['run', 'dev'], {
+    const isWin = process.platform === 'win32';
+    const spawnCommand = isWin ? 'cmd.exe' : NPM_CMD;
+    const spawnArgs = isWin ? ['/c', 'npm.cmd', 'run', 'dev'] : ['run', 'dev'];
+
+    const child = spawn(spawnCommand, spawnArgs, {
       cwd: backendPath,
       detached: true,
-      stdio: 'ignore'
+      stdio: 'ignore',
+      shell: false
     });
-    
+
+    const startupError = await new Promise((resolve) => {
+      child.on('error', (err) => resolve(err));
+      child.on('spawn', () => resolve(null));
+    });
+
     child.unref();
-    
-    // Wait for it to start
+
+    if (startupError) {
+      log(`❌ Error starting backend: ${startupError.message}`, 'red');
+      return false;
+    }
+
     log('⏳ Waiting for backend to start (5s)...', 'cyan');
     await new Promise(resolve => setTimeout(resolve, 5000));
     
-    // Check again
     const retry = await checkAPI();
     if (retry.running) {
       log('✅ Backend started successfully', 'green');
@@ -166,18 +185,17 @@ async function ensureBackendRunning() {
 }
 
 // Run frontend tests - use exit code (more reliable)
-function runFrontendTests() {
+async function runFrontendTests() {
   log('\n🧪 Running Frontend Tests...', 'cyan');
   
-  const result = runCommand('npm run test:run', path.join(__dirname, '..', 'frontend'));
+  const frontendPath = path.join(__dirname, '..', 'frontend');
+  const result = await runCommand(NPM_CMD, ['run', 'test:run'], frontendPath);
   
-  // Use exit code (more reliable than string matching)
-  if (result.exitCode !== 0) {
+  if (!result.success) {
     log('❌ Frontend tests failed', 'red');
     return { success: false, output: result.output };
   }
-  
-  // Check for actual test results (not just "0 failed" string)
+
   const hasPassingTests = result.output.includes('passed') || 
                          result.output.includes('PASS') ||
                          result.output.includes('✓');
@@ -186,25 +204,23 @@ function runFrontendTests() {
     log('✅ Frontend tests passed', 'green');
     return { success: true, output: result.output };
   }
-  
-  // No tests found - not a failure, just no coverage
+
   log('ℹ️  No frontend tests found (add tests for better coverage)', 'gray');
   return { success: true, output: result.output };
 }
 
 // Run backend tests - use exit code (more reliable)
-function runBackendTests() {
+async function runBackendTests() {
   log('\n🧪 Running Backend Tests...', 'cyan');
   
-  const result = runCommand('npm test', path.join(__dirname, '..', 'backend'));
+  const backendPath = path.join(__dirname, '..', 'backend');
+  const result = await runCommand(NPM_CMD, ['test'], backendPath);
   
-  // Use exit code (more reliable than string matching)
-  if (result.exitCode !== 0) {
+  if (!result.success) {
     log('❌ Backend tests failed', 'red');
     return { success: false, output: result.output };
   }
   
-  // Check for actual test suite results
   const hasPassingTests = result.output.includes('Test Suites:') && 
                          result.output.includes('passed');
   
@@ -212,25 +228,23 @@ function runBackendTests() {
     log('✅ Backend tests passed', 'green');
     return { success: true, output: result.output };
   }
-  
-  // No tests found - not a failure
+
   log('ℹ️  No backend tests found (add tests for better coverage)', 'gray');
   return { success: true, output: result.output };
 }
 
 // Check and fix linting issues (auto-fix is optional)
-function runLinting() {
+async function runLinting() {
   log('\n🔍 Running Linting...', 'cyan');
   
   // Frontend linting
-  const frontendResult = runCommand('npm run lint', path.join(__dirname, '..', 'frontend'));
+  const frontendResult = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'frontend'));
   if (!frontendResult.success) {
     if (CONFIG.AUTO_FIX) {
       log('⚠️  Frontend lint errors found, attempting auto-fix...', 'yellow');
-      runCommand('npm run lint:fix', path.join(__dirname, '..', 'frontend'));
+      await runCommand(NPM_CMD, ['run', 'lint:fix'], path.join(__dirname, '..', 'frontend'));
       
-      // Check again
-      const recheck = runCommand('npm run lint', path.join(__dirname, '..', 'frontend'));
+      const recheck = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'frontend'));
       if (!recheck.success) {
         log('   ❌ Some frontend lint errors require manual fixing', 'red');
       } else {
@@ -245,13 +259,13 @@ function runLinting() {
   }
   
   // Backend linting
-  const backendResult = runCommand('npm run lint', path.join(__dirname, '..', 'backend'));
+  const backendResult = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'backend'));
   if (!backendResult.success) {
     if (CONFIG.AUTO_FIX) {
       log('⚠️  Backend lint errors found, attempting auto-fix...', 'yellow');
-      runCommand('npm run lint:fix', path.join(__dirname, '..', 'backend'));
+      await runCommand(NPM_CMD, ['run', 'lint:fix'], path.join(__dirname, '..', 'backend'));
       
-      const recheck = runCommand('npm run lint', path.join(__dirname, '..', 'backend'));
+      const recheck = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'backend'));
       if (!recheck.success) {
         log('   ❌ Some backend lint errors require manual fixing', 'red');
       } else {
@@ -296,12 +310,12 @@ async function main() {
     
     // Step 3: Run linting (auto-fix is optional)
     log('\n🔍 Step 3: Running linting...', 'cyan');
-    runLinting();
+    await runLinting();
     
     // Step 4: Run tests with proper exit code checking
     log('\n🧪 Step 4: Running tests...', 'cyan');
-    const frontendResults = runFrontendTests();
-    const backendResults = runBackendTests();
+    const frontendResults = await runFrontendTests();
+    const backendResults = await runBackendTests();
     
     // Step 5: Summary
     log('\n═══════════════════════════════════════════', 'cyan');
