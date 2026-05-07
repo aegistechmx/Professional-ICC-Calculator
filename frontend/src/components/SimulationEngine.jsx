@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useRef, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useGraphStore } from '../store/graphStore.js';
 import { createAnimationLoop } from '../utils/simulationEngine.js';
 
@@ -95,7 +96,7 @@ export const SimulationEngine = ({ children }) => {
     ui,
     calculateFlows,
     calculateNodeStatus,
-    updateParticles,
+    updateParticleSystem,
     generateTCCCurves,
     autoCoordinateBreakers
   ]);
@@ -316,6 +317,10 @@ const getNodeStatusColor = (status) => {
     red: '#ef4444'
   };
   return colors[status] || '#94a3b8';
+};
+
+SimulationEngine.propTypes = {
+  children: PropTypes.node
 };
 
 export default SimulationEngine;

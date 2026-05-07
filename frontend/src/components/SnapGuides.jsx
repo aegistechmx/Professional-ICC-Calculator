@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import './SnapGuides.css';
 
 export default function SnapGuides({ guides, visible }) {
@@ -45,3 +46,11 @@ export default function SnapGuides({ guides, visible }) {
     </div>
   );
 }
+
+SnapGuides.propTypes = {
+  guides: PropTypes.shape({
+    vertical: PropTypes.array,
+    horizontal: PropTypes.array
+  }),
+  visible: PropTypes.bool
+};

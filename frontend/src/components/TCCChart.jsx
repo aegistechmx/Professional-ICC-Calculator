@@ -4,10 +4,11 @@
  */
 
 import React, { useMemo, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import './TCCChart.css';
 
-export default function TCCChart({ 
-  curves = [], 
+export default function TCCChart({
+  curves = [],
   faultCurrent = null,
   selectedNode = null,
   width = 600,
@@ -58,7 +59,7 @@ export default function TCCChart({
   // Generar path SVG para una curva
   const generatePath = useCallback((data) => {
     const validPoints = data.filter(p => p.t > 0 && p.t !== Infinity);
-    
+
     if (validPoints.length < 2) return '';
 
     return validPoints
@@ -111,7 +112,7 @@ export default function TCCChart({
   return (
     <div className="tcc-chart-container">
       <h3 className="chart-title">{title}</h3>
-      
+
       <svg width={width} height={height} className="tcc-chart">
         {/* Fondo */}
         <rect
@@ -262,7 +263,7 @@ export default function TCCChart({
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            
+
             {/* Leyenda de la curva */}
             <g transform={`translate(${margin.left + 10}, ${margin.top + 20 + index * 25})`}>
               <rect
@@ -309,12 +310,12 @@ export default function TCCChart({
       <div className="chart-legend">
         <h4>Curvas TCC</h4>
         {curves.map((curve, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className={`legend-item ${curve.id === selectedNode?.id ? 'selected' : ''}`}
           >
-            <div 
-              className="legend-color" 
+            <div
+              className="legend-color"
               style={{ backgroundColor: curve.color || getDefaultColor(index) }}
             />
             <div className="legend-info">
@@ -340,25 +341,25 @@ function OperatingPoint({ curve, faultCurrent, scaleX, scaleY }) {
   // Encontrar punto de operación
   const op = useMemo(() => {
     const data = curve.data;
-    const closest = data.reduce((prev, curr) => 
+    const closest = data.reduce((prev, curr) =>
       Math.abs(curr.I - faultCurrent) < Math.abs(prev.I - faultCurrent) ? curr : prev
     );
-    
+
     // Interpolar
     const next = data.find(p => p.I > closest.I);
     let t = closest.t;
-    
+
     if (next) {
       const logI = Math.log10(faultCurrent);
       const logI1 = Math.log10(closest.I);
       const logI2 = Math.log10(next.I);
       const logT1 = Math.log10(closest.t);
       const logT2 = Math.log10(next.t);
-      
+
       const ratio = (logI - logI1) / (logI2 - logI1);
       t = Math.pow(10, logT1 + ratio * (logT2 - logT1));
     }
-    
+
     return { I: faultCurrent, t };
   }, [curve, faultCurrent]);
 
@@ -394,28 +395,28 @@ function OperatingPoint({ curve, faultCurrent, scaleX, scaleY }) {
 function CoordinationInfo({ curves, faultCurrent }) {
   const analysis = useMemo(() => {
     if (curves.length < 2) return null;
-    
+
     // Ordenar por pickup (downstream primero)
     const sorted = [...curves].sort((a, b) => {
       const aPickup = a.data[0]?.I || 0;
       const bPickup = b.data[0]?.I || 0;
       return aPickup - bPickup;
     });
-    
+
     const downstream = sorted[0];
     const upstream = sorted[1];
-    
+
     // Verificar coordinación a corriente de falla
-    const dPoint = downstream.data.reduce((prev, curr) => 
+    const dPoint = downstream.data.reduce((prev, curr) =>
       Math.abs(curr.I - faultCurrent) < Math.abs(prev.I - faultCurrent) ? curr : prev
     );
-    const uPoint = upstream.data.reduce((prev, curr) => 
+    const uPoint = upstream.data.reduce((prev, curr) =>
       Math.abs(curr.I - faultCurrent) < Math.abs(prev.I - faultCurrent) ? curr : prev
     );
-    
+
     const timeDiff = uPoint.t - dPoint.t;
     const isCoordinated = timeDiff > dPoint.t * 0.2; // 20% margen
-    
+
     return {
       downstream: downstream.name,
       upstream: upstream.name,
@@ -447,8 +448,8 @@ function CoordinationInfo({ curves, faultCurrent }) {
         </div>
       </div>
       <div className="coord-status">
-        {analysis.isCoordinated 
-          ? '✓ Coordinación Satisfactoria' 
+        {analysis.isCoordinated
+          ? '✓ Coordinación Satisfactoria'
           : '✗ Revisar Coordinación - Margen insuficiente'}
       </div>
     </div>
@@ -462,3 +463,12 @@ function getDefaultColor(index) {
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
   return colors[index % colors.length];
 }
+
+TCCChart.propTypes = {
+  curves: PropTypes.array,
+  faultCurrent: PropTypes.number,
+  selectedNode: PropTypes.object,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  title: PropTypes.string
+};

@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import './ProjectSetupModal.css';
 
 // Defaults para México
@@ -66,7 +67,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
 
   const handleChange = (key, value) => {
     setConfig({ ...config, [key]: value });
-    
+
     // Limpiar error del campo
     if (errors[key]) {
       setErrors({ ...errors, [key]: null });
@@ -151,17 +152,17 @@ export default function ProjectSetupModal({ onStart, onClose }) {
     <div className="modal-overlay">
       <div className="modal-content project-setup-modal">
         <div className="modal-header">
-          <h2> 
-            <span className="icon">  
+          <h2>
+            <span className="icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
               </svg>
             </span>
             Configuración Inicial del Proyecto
           </h2>
           <button className="close-btn" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12"/>
+              <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -172,9 +173,9 @@ export default function ProjectSetupModal({ onStart, onClose }) {
             <h3>Configuración Rápida</h3>
             <div className="preset-buttons">
               <button className="preset-btn" onClick={() => handleQuickSetup('residencial')}>
-                <span className="preset-icon">  
+                <span className="preset-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                   </svg>
                 </span>
                 Residencial
@@ -182,7 +183,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
               <button className="preset-btn" onClick={() => handleQuickSetup('comercial')}>
                 <span className="preset-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
                   </svg>
                 </span>
                 Comercial
@@ -190,7 +191,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
               <button className="preset-btn" onClick={() => handleQuickSetup('industrial')}>
                 <span className="preset-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"/>
+                    <path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z" />
                   </svg>
                 </span>
                 Industrial
@@ -198,7 +199,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
               <button className="preset-btn" onClick={() => handleQuickSetup('mt')}>
                 <span className="preset-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M7.5 21.5V4.5L19 12l-11.5 7.5z"/>
+                    <path d="M7.5 21.5V4.5L19 12l-11.5 7.5z" />
                   </svg>
                 </span>
                 Media Tensión
@@ -224,7 +225,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
 
               <div className="form-group">
                 <label>Norma Aplicable</label>
-                <select 
+                <select
                   value={config.norma}
                   onChange={(e) => handleChange('norma', e.target.value)}
                 >
@@ -243,7 +244,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
             <div className="form-grid">
               <div className="form-group">
                 <label>Voltaje Base</label>
-                <select 
+                <select
                   value={config.voltajeBase}
                   onChange={(e) => handleChange('voltajeBase', +e.target.value)}
                   className={errors.voltajeBase ? 'error' : ''}
@@ -259,7 +260,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
 
               <div className="form-group">
                 <label>Tipo de Sistema</label>
-                <select 
+                <select
                   value={config.sistema}
                   onChange={(e) => handleChange('sistema', e.target.value)}
                 >
@@ -272,7 +273,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
 
               <div className="form-group">
                 <label>Frecuencia (Hz)</label>
-                <select 
+                <select
                   value={config.frecuencia}
                   onChange={(e) => handleChange('frecuencia', +e.target.value)}
                 >
@@ -283,7 +284,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
 
               <div className="form-group">
                 <label>Capacidad Transformador (kVA)</label>
-                <select 
+                <select
                   value={config.capacidadTR}
                   onChange={(e) => handleChange('capacidadTR', +e.target.value)}
                   className={errors.capacidadTR ? 'error' : ''}
@@ -305,7 +306,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
             <div className="form-grid">
               <div className="form-group">
                 <label>Material Conductor</label>
-                <select 
+                <select
                   value={config.material}
                   onChange={(e) => handleChange('material', e.target.value)}
                 >
@@ -329,7 +330,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
 
               <div className="form-group">
                 <label>Temperatura Aislamiento (°C)</label>
-                <select 
+                <select
                   value={config.tempAislamiento}
                   onChange={(e) => handleChange('tempAislamiento', +e.target.value)}
                 >
@@ -341,7 +342,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
 
               <div className="form-group">
                 <label>Temperatura Terminal (°C)</label>
-                <select 
+                <select
                   value={config.tempTerminal}
                   onChange={(e) => handleChange('tempTerminal', +e.target.value)}
                 >
@@ -389,7 +390,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
           <button className="btn btn-primary" onClick={handleStart}>
             <span className="btn-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
               </svg>
             </span>
             Crear Proyecto
@@ -399,3 +400,8 @@ export default function ProjectSetupModal({ onStart, onClose }) {
     </div>
   );
 }
+
+ProjectSetupModal.propTypes = {
+  onStart: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
+};

@@ -4,20 +4,21 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useParticleEngine } from '../hooks/useParticleEngine.js';
 import { useGraphStore } from '../store/graphStore.js';
 
 export const ParticleLayer = ({ width = 1200, height = 800 }) => {
   const { graph, results, ui } = useGraphStore();
-  
+
   const getEdgePath = (edge) => {
     const sourceNode = graph.nodes.find(n => n.id === edge.source);
     const targetNode = graph.nodes.find(n => n.id === edge.target);
-    
+
     if (!sourceNode?.position || !targetNode?.position) {
       return [{ x: 0, y: 0 }, { x: 100, y: 100 }];
     }
-    
+
     // Si hay puntos de control (routing), usarlos
     if (edge.points && edge.points.length > 0) {
       return [
@@ -26,7 +27,7 @@ export const ParticleLayer = ({ width = 1200, height = 800 }) => {
         targetNode.position
       ];
     }
-    
+
     // Línea recta por defecto
     return [
       sourceNode.position,
@@ -68,6 +69,11 @@ export const ParticleLayer = ({ width = 1200, height = 800 }) => {
       }}
     />
   );
+};
+
+ParticleLayer.propTypes = {
+  width: PropTypes.number,
+  height: PropTypes.number
 };
 
 export default ParticleLayer;

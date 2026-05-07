@@ -3,7 +3,6 @@
  * Integra el sistema de partículas con React Flow
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
 import useFaultParticleAnimation from '../../hooks/useFaultParticleAnimation.js';
 
@@ -15,14 +14,14 @@ const ParticleCanvas = ({
   options = {},
   style = {}
 }) => {
-  const {
-    canvasRef,
-    particleEngine,
-    isAnimating,
-    startFaultParticleAnimation,
-    stopParticleAnimation,
-    getParticleStats
-  } = useFaultParticleAnimation(graph, onNodeUpdate, onEdgeUpdate);
+  useFaultParticleAnimation({
+    graph,
+    onNodeUpdate,
+    onEdgeUpdate,
+    enabled,
+    options,
+    style
+  });
 };
 
 ParticleCanvas.propTypes = {

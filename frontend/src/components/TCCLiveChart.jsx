@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useGraphStore } from '../store/graphStore.js';
 import { useTCCCurves } from './SimulationEngine.jsx';
 import {
@@ -19,7 +20,7 @@ export const TCCLiveChart = ({ width = 800, height = 600, showGrid = true }) => 
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [selectedBreaker, setSelectedBreaker] = useState(null);
 
-  const { nodes, results, simulation, generateTCCCurves } = useGraphStore();
+  const { nodes, results, generateTCCCurves } = useGraphStore();
   const { curves, isVisible } = useTCCCurves();
 
   // === CONFIGURACIÓN DEL GRÁFICO ===
@@ -88,25 +89,6 @@ export const TCCLiveChart = ({ width = 800, height = 600, showGrid = true }) => 
   }, [chartConfig, width, height]);
 
   // === COORDENADAS INVERSAS ===
-  const getCurrentFromX = useCallback((x) => {
-    const { padding } = chartConfig;
-    const chartWidth = width - padding.left - padding.right;
-    const relativeX = (x - padding.left) / chartWidth;
-
-    const minCurrent = 1;
-    const maxCurrent = 100000;
-    return Math.pow(10, relativeX * (Math.log10(maxCurrent) - Math.log10(minCurrent)) + Math.log10(minCurrent));
-  }, [chartConfig, width]);
-
-  const getTimeFromY = useCallback((y) => {
-    const { padding } = chartConfig;
-    const chartHeight = height - padding.top - padding.bottom;
-    const relativeY = 1 - (y - padding.top) / chartHeight;
-
-    const minTime = 0.01;
-    const maxTime = 10000;
-    return Math.pow(10, relativeY * (Math.log10(maxTime) - Math.log10(minTime)) + Math.log10(minTime));
-  }, [chartConfig, height]);
 
   // === DIBUJAR GRILLA ===
   const drawGrid = useCallback((ctx) => {
@@ -434,6 +416,12 @@ export const TCCLiveChart = ({ width = 800, height = 600, showGrid = true }) => 
       </div>
     </div>
   );
+};
+
+TCCLiveChart.propTypes = {
+  width: PropTypes.number,
+  height: PropTypes.number,
+  showGrid: PropTypes.bool
 };
 
 export default TCCLiveChart;

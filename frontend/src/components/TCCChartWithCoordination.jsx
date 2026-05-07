@@ -4,6 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import TCCChart from './TCCChart';
 import './TCCChartWithCoordination.css';
 
@@ -19,7 +20,7 @@ export default function TCCChartWithCoordination({
   // Extraer cruces del resultado de coordinación
   const crossings = useMemo(() => {
     if (!coordinationResult || !coordinationResult.finalStatus) return [];
-    
+
     // Si hay pares con conflictos, extraer los cruces
     const conflicts = [];
     coordinationResult.finalStatus.pairs?.forEach((pair, index) => {
@@ -34,17 +35,17 @@ export default function TCCChartWithCoordination({
         });
       }
     });
-    
+
     return conflicts;
   }, [coordinationResult]);
 
   // Determinar color de fondo basado en coordinación
   const coordinationStatus = useMemo(() => {
     if (!coordinationResult) return null;
-    
+
     const isCoordinated = coordinationResult.status === 'COORDINATED';
     const quality = coordinationResult.finalStatus?.quality || 0;
-    
+
     return {
       isCoordinated,
       quality,
@@ -57,7 +58,7 @@ export default function TCCChartWithCoordination({
     <div className="tcc-with-coordination">
       {/* Header con estado de coordinación */}
       {coordinationStatus && (
-        <div 
+        <div
           className={`coordination-banner ${coordinationStatus.isCoordinated ? 'success' : 'warning'}`}
           style={{ '--coord-color': coordinationStatus.color }}
         >
@@ -90,7 +91,7 @@ export default function TCCChartWithCoordination({
           selectedNode={selectedNode}
           width={width}
           height={height}
-          title={coordinationStatus 
+          title={coordinationStatus
             ? `Curvas TCC - ${coordinationStatus.isCoordinated ? 'Coordinación Satisfactoria' : 'Revisar Coordinación'}`
             : 'Curvas TCC - Coordinación de Protecciones'
           }
@@ -98,9 +99,9 @@ export default function TCCChartWithCoordination({
 
         {/* Overlay SVG para marcadores de conflicto */}
         {showCrossings && crossings.length > 0 && (
-          <svg 
+          <svg
             className="crossings-overlay"
-            width={width} 
+            width={width}
             height={height}
             style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
           >
@@ -142,7 +143,7 @@ export default function TCCChartWithCoordination({
         <div className="success-message">
           <span className="success-icon">🎉</span>
           <p>
-            Las protecciones están correctamente coordinadas. 
+            Las protecciones están correctamente coordinadas.
             El sistema operará selectivamente ante fallas.
           </p>
         </div>
@@ -157,7 +158,7 @@ export default function TCCChartWithCoordination({
 function CrossingMarker({ crossing, index }) {
   // Calcular posición aproximada (necesitaría las funciones scaleX/scaleY del TCCChart)
   // Por ahora, mostramos un marcador indicativo
-  
+
   return (
     <g className="crossing-marker">
       {/* Círculo pulsante */}
@@ -181,7 +182,7 @@ function CrossingMarker({ crossing, index }) {
           repeatCount="indefinite"
         />
       </circle>
-      
+
       {/* X */}
       <text
         x={100 + index * 50}
@@ -193,7 +194,7 @@ function CrossingMarker({ crossing, index }) {
       >
         ✕
       </text>
-      
+
       {/* Tooltip con info */}
       <g transform={`translate(${120 + index * 50}, ${90 + index * 30})`}>
         <rect
@@ -215,3 +216,13 @@ function CrossingMarker({ crossing, index }) {
     </g>
   );
 }
+
+TCCChartWithCoordination.propTypes = {
+  curves: PropTypes.array,
+  coordinationResult: PropTypes.object,
+  faultCurrent: PropTypes.number,
+  selectedNode: PropTypes.object,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  showCrossings: PropTypes.bool
+};
