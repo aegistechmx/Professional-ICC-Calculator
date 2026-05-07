@@ -5,7 +5,7 @@
 
 // === CÁLCULO TÉRMICO DE CONDUCTOR ===
 
-export function calcularTemperaturaConductor(edge, _results) {
+export function calcularTemperaturaConductor(edge) {
   const I = edge.current || 0;
 
   // Capacidad del conductor (ampacidad) - desde backend o configuración
@@ -44,7 +44,7 @@ export function calcularTemperaturaConductor(edge, _results) {
 
 // === ESTADO TÉRMICO ===
 
-function getThermalStatus(loading, _temperature) {
+function getThermalStatus(loading) {
   if (loading < 0.5) return 'safe';
   if (loading < 0.8) return 'normal';
   if (loading < 1.0) return 'caution';
@@ -55,7 +55,7 @@ function getThermalStatus(loading, _temperature) {
 
 // === MAPEO DE COLOR HEATMAP (REAL) ===
 
-export function getThermalColor(loading, _temperature = null) {
+export function getThermalColor(loading) {
   // Basado en estándares de color térmico industrial
   if (loading < 0.5) return '#00c853';      // Verde - circuito sano
   if (loading < 0.8) return '#ffd600';      // Amarillo - carga media
@@ -195,7 +195,7 @@ export function drawTemperatureIndicator(ctx, x, y, thermal, size = 20) {
 
 // === ACTUALIZACIÓN DE CAPA TÉRMICA ===
 
-export function updateThermalLayer(edges, results, _deltaTime = 0.016) {
+export function updateThermalLayer(edges, results) {
   return edges.map(edge => {
     const thermal = calcularTemperaturaConductor(edge, results);
 

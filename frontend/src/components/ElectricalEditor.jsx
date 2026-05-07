@@ -5,7 +5,6 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import ReactFlow, {
-  addEdge,
   Background,
   Controls,
   MiniMap,
@@ -50,8 +49,8 @@ const componentPalette = [
 ];
 
 export default function ElectricalEditor() {
-  const { config, nodes, edges, results, loading, setGraph, addNode, addEdge, updateNode, updateEdge } = useGraphStore();
-  
+  const { config, nodes, edges, results, loading, addNode, addEdge, updateNode, updateEdge } = useGraphStore();
+
   const [reactFlowNodes, setReactFlowNodes, onNodesChange] = useNodesState([]);
   const [reactFlowEdges, setReactFlowEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -64,11 +63,11 @@ export default function ElectricalEditor() {
   // Sincronizar store con ReactFlow
   React.useEffect(() => {
     setReactFlowNodes(nodes);
-  }, [nodes]);
+  }, [nodes, setReactFlowNodes]);
 
   React.useEffect(() => {
     setReactFlowEdges(edges);
-  }, [edges]);
+  }, [edges, setReactFlowEdges]);
 
   // Manejar conexión de nodos
   const onConnect = useCallback(
@@ -84,7 +83,7 @@ export default function ElectricalEditor() {
           material: config?.material || 'cobre'
         }
       };
-      
+
       addEdge(newEdge);
     },
     [addEdge, config]
@@ -114,7 +113,7 @@ export default function ElectricalEditor() {
 
       const reactFlowBounds = event.target.getBoundingClientRect();
       const type = event.dataTransfer.getData('application/reactflow');
-      
+
       if (!type) return;
 
       const position = reactFlowInstance.project({
@@ -161,7 +160,7 @@ export default function ElectricalEditor() {
 
     return reactFlowNodes.map(node => {
       const nodeResult = results.data.graphAnalysis.nodes.find(n => n.id === node.id);
-      
+
       return {
         ...node,
         data: {
@@ -178,10 +177,10 @@ export default function ElectricalEditor() {
     if (!results?.data?.graphAnalysis?.edges) return reactFlowEdges;
 
     return reactFlowEdges.map(edge => {
-      const edgeResult = results.data.graphAnalysis.edges.find(e => 
+      const edgeResult = results.data.graphAnalysis.edges.find(e =>
         e.from === edge.source && e.to === edge.target
       );
-      
+
       return {
         ...edge,
         data: {
@@ -220,27 +219,27 @@ export default function ElectricalEditor() {
     const icons = {
       source: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
         </svg>
       ),
       load: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
         </svg>
       ),
       transformer: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
         </svg>
       ),
       breaker: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V5h14v14z"/>
+          <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V5h14v14z" />
         </svg>
       ),
       bus: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.31-2.69-6-6-6H10c-3.31 0-6 2.69-6 6v10z"/>
+          <path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.31-2.69-6-6-6H10c-3.31 0-6 2.69-6 6v10z" />
         </svg>
       )
     };
@@ -281,7 +280,7 @@ export default function ElectricalEditor() {
         >
           <Background color="#f0f0f0" gap={20} />
           <Controls />
-          <MiniMap 
+          <MiniMap
             nodeColor={(node) => {
               if (node.data.status === 'calculated') return '#10b981';
               if (node.data.status === 'error') return '#ef4444';
@@ -289,7 +288,7 @@ export default function ElectricalEditor() {
             }}
             maskColor="rgba(255, 255, 255, 0.8)"
           />
-          
+
           {/* Panel de información */}
           <Panel position="top-left" className="info-panel">
             <div className="project-info">
@@ -333,8 +332,8 @@ export default function ElectricalEditor() {
                 type="number"
                 step="0.01"
                 value={selectedEdge.data?.impedance || 0.05}
-                onChange={(e) => updateEdgeData(selectedEdge.id, { 
-                  impedance: parseFloat(e.target.value) 
+                onChange={(e) => updateEdgeData(selectedEdge.id, {
+                  impedance: parseFloat(e.target.value)
                 })}
               />
             </label>
@@ -343,8 +342,8 @@ export default function ElectricalEditor() {
               <input
                 type="number"
                 value={selectedEdge.data?.length || 10}
-                onChange={(e) => updateEdgeData(selectedEdge.id, { 
-                  length: parseFloat(e.target.value) 
+                onChange={(e) => updateEdgeData(selectedEdge.id, {
+                  length: parseFloat(e.target.value)
                 })}
               />
             </label>
@@ -352,8 +351,8 @@ export default function ElectricalEditor() {
               Material:
               <select
                 value={selectedEdge.data?.material || 'cobre'}
-                onChange={(e) => updateEdgeData(selectedEdge.id, { 
-                  material: e.target.value 
+                onChange={(e) => updateEdgeData(selectedEdge.id, {
+                  material: e.target.value
                 })}
               >
                 <option value="cobre">Cobre</option>

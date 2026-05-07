@@ -7,11 +7,11 @@ import { useEffect, useRef, useCallback, useState } from 'react';
  * @returns {Object} { iframeRef, isReady, sendMessage, lastMessage, error }
  */
 export function useIframeCommunication(iframeSrc, options = {}) {
-  const { 
+  const {
     onMessage = null,
     onReady = null,
     onError = null,
-    targetOrigin = '*' 
+    targetOrigin = '*'
   } = options;
 
   const iframeRef = useRef(null);
@@ -92,7 +92,6 @@ export function useIframeCommunication(iframeSrc, options = {}) {
 
     const handleLoad = () => {
       // El iframe cargó, pero necesitamos esperar el mensaje READY
-      console.log('ICC Module iframe loaded');
     };
 
     const handleError = () => {

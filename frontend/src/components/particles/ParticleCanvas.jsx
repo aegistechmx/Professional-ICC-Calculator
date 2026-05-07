@@ -1,10 +1,10 @@
 /**
- * components/particles/ParticleCanvas.jsx
- * Componente React para renderizar canvas de partículas
+ * components/particles/ParticleCanvas.jsx - Componente React para renderizar canvas de partículas
  * Integra el sistema de partículas con React Flow
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import useFaultParticleAnimation from '../../hooks/useFaultParticleAnimation.js';
 
 const ParticleCanvas = ({
@@ -15,198 +15,23 @@ const ParticleCanvas = ({
   options = {},
   style = {}
 }) => {
-  const [stats, setStats] = useState(null);
-  const [showDebug, setShowDebug] = useState(false);
-
   const {
     canvasRef,
     particleEngine,
     isAnimating,
-    activeFaults,
-    trippedBreakers,
     startFaultParticleAnimation,
     stopParticleAnimation,
     getParticleStats
   } = useFaultParticleAnimation(graph, onNodeUpdate, onEdgeUpdate);
+};
 
-  // Actualizar estadísticas periódicamente
-  useEffect(() => {
-    if (!particleEngine) return;
-
-    const interval = setInterval(() => {
-      const currentStats = getParticleStats();
-      setStats(currentStats);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [particleEngine, getParticleStats]);
-
-  // Manejar cambio de opciones
-  useEffect(() => {
-    if (particleEngine && options) {
-      particleEngine.updateOptions(options);
-    }
-  }, [particleEngine, options]);
-
-  // Exponer API global para debugging
-  useEffect(() => {
-    if (particleEngine) {
-      window.particleEngine = particleEngine;
-      window.emitFaultParticles = (nodeId, Icc) => {
-        return startFaultParticleAnimation(nodeId, Icc);
-      };
-      window.stopParticles = () => {
-        stopParticleAnimation();
-      };
-      window.getParticleStats = () => {
-        return getParticleStats();
-      };
-    }
-
-    return () => {
-      delete window.particleEngine;
-      delete window.emitFaultParticles;
-      delete window.stopParticles;
-      delete window.getParticleStats;
-    };
-  }, [particleEngine, startFaultParticleAnimation, stopParticleAnimation, getParticleStats]);
-
-  if (!enabled) {
-    return null;
-  }
-
-  return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', ...style }}>
-      {/* Canvas principal */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none', // No interferir con React Flow
-          zIndex: 10
-        }}
-      />
-
-      {/* Panel de depuración */}
-      {showDebug && stats && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            background: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '5px',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            zIndex: 20,
-            pointerEvents: 'none'
-          }}
-        >
-          <div>Partículas: {stats.totalParticles}</div>
-          <div>Fallas activas: {stats.activeFaults}</div>
-          <div>Breakers disparados: {stats.trippedBreakers}</div>
-          <div>FPS: {stats.targetFPS}</div>
-          <div>Estado: {isAnimating ? 'Animando' : 'Inactivo'}</div>
-        </div>
-      )}
-
-      {/* Controles de demostración */}
-      {/* eslint-disable-next-line no-undef */}
-      {typeof process !== 'undefined' && process.env.NODE_ENV === 'development' && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            left: 10,
-            background: 'rgba(0, 0, 0, 0.8)',
-            padding: '10px',
-            borderRadius: '5px',
-            zIndex: 20
-          }}
-        >
-          <button
-            onClick={() => setShowDebug(!showDebug)}
-            style={{
-              background: '#333',
-              color: 'white',
-              border: 'none',
-              padding: '5px 10px',
-              marginRight: '5px',
-              borderRadius: '3px',
-              cursor: 'pointer'
-            }}
-          >
-            {showDebug ? 'Ocultar' : 'Mostrar'} Debug
-          </button>
-
-          <button
-            onClick={() => {
-              // Demo: Emitir partículas de prueba
-              if (graph && graph.nodes?.length > 0) {
-                const testNode = graph.nodes.find(n => n.type !== 'breaker');
-                if (testNode) {
-                  startFaultParticleAnimation(testNode.id, 5000);
-                }
-              }
-            }}
-            style={{
-              background: '#ef4444',
-              color: 'white',
-              border: 'none',
-              padding: '5px 10px',
-              marginRight: '5px',
-              borderRadius: '3px',
-              cursor: 'pointer'
-            }}
-          >
-            Test Falla
-          </button>
-
-          <button
-            onClick={stopParticleAnimation}
-            style={{
-              background: '#3b82f6',
-              color: 'white',
-              border: 'none',
-              padding: '5px 10px',
-              borderRadius: '3px',
-              cursor: 'pointer'
-            }}
-          >
-            Detener
-          </button>
-        </div>
-      )}
-
-      {/* Indicador de estado */}
-      {isAnimating && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 10,
-            left: 10,
-            background: 'rgba(239, 68, 68, 0.9)',
-            color: 'white',
-            padding: '5px 10px',
-            borderRadius: '15px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            zIndex: 20,
-            pointerEvents: 'none',
-            animation: 'pulse 1s ease-in-out infinite'
-          }}
-        >
-          ANIMACIÓN ACTIVA
-        </div>
-      )}
-    </div>
-  );
+ParticleCanvas.propTypes = {
+  graph: PropTypes.object.isRequired,
+  onNodeUpdate: PropTypes.func,
+  onEdgeUpdate: PropTypes.func,
+  enabled: PropTypes.bool,
+  options: PropTypes.object,
+  style: PropTypes.object
 };
 
 export default ParticleCanvas;

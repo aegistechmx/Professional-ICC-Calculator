@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">29.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/71</span>
+                <span class='fraction'>21/71</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">15.62% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/64</span>
+                <span class='fraction'>10/64</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">23.8% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/21</span>
+                <span class='fraction'>5/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">27.94% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/68</span>
+                <span class='fraction'>19/68</span>
             </div>
         
             
@@ -328,29 +328,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -466,14 +466,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -556,7 +556,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -578,30 +578,30 @@
  * @param {Object} fault - Fault specification
  * @returns {Object} Modified system with fault
  */
-function <span class="fstat-no" title="function not covered" >createThreePhaseFault(</span>system, fault) {
-  const modified = <span class="cstat-no" title="statement not covered" >JSON.parse(JSON.stringify(system))</span>
+function createThreePhaseFault(system, fault) {
+  const modified = JSON.parse(JSON.stringify(system))
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (fault.type === 'three_phase') {</span>
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (fault.type === 'three_phase') {
     // Apply fault at specified bus
-    const faultedBus = <span class="cstat-no" title="statement not covered" >modified.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span></span>
-<span class="cstat-no" title="statement not covered" >    if (faultedBus) {</span>
+    const faultedBus = modified.buses.find(b =&gt; b.id === fault.bus)
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (faultedBus) {
       // Set bus voltage to zero for fault
-<span class="cstat-no" title="statement not covered" >      faultedBus.voltage = { magnitude: 0, angle: 0 }</span>
-<span class="cstat-no" title="statement not covered" >      faultedBus.faulted = true</span>
+      faultedBus.voltage = { magnitude: 0, angle: 0 } // voltage (V)
+      faultedBus.faulted = true
     }
 &nbsp;
     // Modify impedance of connected lines
-<span class="cstat-no" title="statement not covered" >    modified.branches.forEach(<span class="fstat-no" title="function not covered" >(b</span>ranch, _i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      if (branch.from === fault.bus || branch.to === fault.bus) {</span>
+    modified.branches.forEach((branch, _i) =&gt; {
+      if (branch.from === fault.bus || branch.to === fault.bus) {
         // Add fault impedance
-<span class="cstat-no" title="statement not covered" >        branch.R += fault.R || 0.001</span>
-<span class="cstat-no" title="statement not covered" >        branch.X += fault.X || 0.01</span>
-<span class="cstat-no" title="statement not covered" >        branch.faulted = true</span>
+        branch.R += fault.R || <span class="branch-1 cbranch-no" title="branch not covered" >0.001</span>
+        branch.X += fault.X || <span class="branch-1 cbranch-no" title="branch not covered" >0.01</span>
+        branch.faulted = true
       }
     })
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return modified</span>
+  return modified
 }
 &nbsp;
 /**
@@ -616,7 +616,7 @@ function <span class="fstat-no" title="function not covered" >clearFault(</span>
   // Restore bus voltage
   const faultedBus = <span class="cstat-no" title="statement not covered" >modified.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span></span>
 <span class="cstat-no" title="statement not covered" >  if (faultedBus) {</span>
-<span class="cstat-no" title="statement not covered" >    faultedBus.voltage = { magnitude: 1.0, angle: 0 }</span>
+<span class="cstat-no" title="statement not covered" >    faultedBus.voltage = { magnitude: 1.0, angle: 0 } </span>// voltage (V)
 <span class="cstat-no" title="statement not covered" >    delete faultedBus.faulted</span>
   }
 &nbsp;
@@ -716,15 +716,15 @@ function <span class="fstat-no" title="function not covered" >applyFaultAtTime(<
  * @param {Object} fault - Fault specification
  * @returns {number} Fault current (pu)
  */
-function <span class="fstat-no" title="function not covered" >calculateFaultCurrent(</span>system, fault) {
-<span class="cstat-no" title="statement not covered" >  if (fault.type === 'three_phase') {</span>
-    const faultedBus = <span class="cstat-no" title="statement not covered" >system.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === fault.bus)</span></span>
-<span class="cstat-no" title="statement not covered" >    if (faultedBus) {</span>
+function calculateFaultCurrent(system, fault) {
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (fault.type === 'three_phase') {
+    const faultedBus = system.buses.find(b =&gt; b.id === fault.bus)
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (faultedBus) {
       // Simplified fault current calculation
-      const Zfault = <span class="cstat-no" title="statement not covered" >Math.sqrt(fault.R * fault.R + fault.X * fault.X)</span>
-      const Ifault = <span class="cstat-no" title="statement not covered" >1.0 / Zfault </span>// Assuming 1.0 pu voltage
+      const Zfault = Math.sqrt(fault.R * fault.R + fault.X * fault.X)
+      const Ifault = 1.0 / Zfault // Assuming 1.0 pu voltage
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      return Ifault</span>
+      return Ifault
     }
   }
 &nbsp;
@@ -807,7 +807,7 @@ function <span class="fstat-no" title="function not covered" >generateCriticalFa
 <span class="cstat-no" title="statement not covered" >  return scenarios</span>
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = {</span>
+module.exports = {
   createThreePhaseFault,
   clearFault,
   generateFaultScenarios,
@@ -823,7 +823,7 @@ function <span class="fstat-no" title="function not covered" >generateCriticalFa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T08:24:13.946Z
+                at 2026-05-07T00:07:00.711Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

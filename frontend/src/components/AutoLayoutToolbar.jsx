@@ -48,7 +48,7 @@ const LAYOUT_OPTIONS = [
 ];
 
 export default function AutoLayoutToolbar() {
-  const { nodes, edges, setGraph, config } = useGraphStore();
+  const { nodes, edges, setGraph } = useGraphStore();
   const { saveState } = useHistoryStore();
   const [isOpen, setIsOpen] = useState(false);
   const [applying, setApplying] = useState(false);
@@ -63,7 +63,7 @@ export default function AutoLayoutToolbar() {
     }
 
     setApplying(true);
-    
+
     try {
       // Guardar estado antes del layout
       saveState();
@@ -77,15 +77,13 @@ export default function AutoLayoutToolbar() {
       });
 
       const newNodes = engine.layout(nodes, edges, strategy);
-      
+
       // Aplicar nuevas posiciones
       setGraph(newNodes, edges);
-      
+
       showNotification(`✅ Layout ${strategy} aplicado`);
-      console.log(`[LAYOUT] Aplicado: ${strategy}`);
 
     } catch (error) {
-      console.error('[LAYOUT] Error:', error);
       showNotification('❌ Error al aplicar layout');
     } finally {
       setApplying(false);

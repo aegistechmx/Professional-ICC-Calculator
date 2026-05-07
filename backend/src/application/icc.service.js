@@ -7,7 +7,7 @@
 
 const { buildYbus } = require('../core/ybus/buildYbus')
 const { calculateFaultCurrent, createThreePhaseFault } = require('../core/powerflow/stability/faultModel') // power (W)
-const { calculateShortCircuitCurrent } = require('../shared/utils/electricalUtils')
+const { calculateShortCircuitCurrent, toElectricalPrecision } = require('../shared/utils/electricalUtils')
 
 /**
  * Run professional ICC calculation
@@ -19,6 +19,7 @@ const { calculateShortCircuitCurrent } = require('../shared/utils/electricalUtil
  */
 function runICC(input) {
   const { V, Z, system } = input
+  const voltage = V || 480 // Use default 480V if no V provided
 
   try {
     // Try full professional pipeline if system data is provided and valid
@@ -30,16 +31,16 @@ function runICC(input) {
       )
 
       if (hasValidImpedance) {
-        return runProfessionalICC(system, V, Z)
+        return runProfessionalICC(system, voltage, Z)
       }
     }
 
     // Fallback to simple but accurate calculation
-    return runSimpleICC(V, Z)
+    return runSimpleICC(voltage, Z)
 
   } catch (error) {
     // Last resort fallback
-    return runSimpleICC(V, Z)
+    return runSimpleICC(voltage, Z)
   }
 }
 
@@ -72,12 +73,15 @@ function runProfessionalICC(system, V, Z) {
   if (!Z || Z <= 0) {
     throw new Error('Impedance must be greater than zero for professional ICC calculation')
   }
-  const baseCurrent = toElectricalPrecision(parseFloat((V / (Math.sqrt(3) * Z))).toFixed(6))
-  const actualCurrent = toElectricalPrecision(parseFloat((faultCurrentPU * baseCurrent)).toFixed(6))
+
+  // Fórmula CORRECTA para ICC trifásico - método profesional
+  const impedanceDecimal = Z / 100;  // Convertir porcentaje a decimal
+  const baseCurrent = toElectricalPrecision(parseFloat((V / (Math.sqrt(3) * impedanceDecimal)).toFixed(6)))
+  const actualCurrent = toElectricalPrecision(parseFloat((faultCurrentPU * baseCurrent).toFixed(6)))
 
   return {
-    method: 'professional_pipeline',
-    Icc: toElectricalPrecision(parseFloat(actualCurrent.toFixed(6))),
+    method: 'professional_pipeline_corrected',
+    Icc: actualCurrent,
     voltage: V,
     impedance: Z,
     faultBus: fault.bus,
@@ -85,7 +89,9 @@ function runProfessionalICC(system, V, Z) {
     ybusBuilt: true,
     systemBuses: system.buses.length,
     systemBranches: system.branches.length,
-    precision: 'IEEE_standard'
+    precision: 'IEEE_1584_corrected',
+    formula: 'Isc = V/(√3×Z) × faultCurrentPU',
+    timestamp: new Date().toISOString()
   }
 }
 
@@ -95,31 +101,51 @@ function runProfessionalICC(system, V, Z) {
  * @param {number} Z - Impedance
  * @returns {Object} Simple result
  */
-function runSimpleICC(V, Z) {
-  let Icc
+function runSimpleICC(V, Z, kVA = null) {
+  // Fórmula CORRECTA para ICC trifásico con validación kVA
+  const voltage = V || 480;  // Default a 480V
+  const impedanceDecimal = Z / 100;  // Convertir porcentaje a decimal si Z es porcentaje
+  const Isc = voltage / (Math.sqrt(3) * impedanceDecimal);  // En amperes
+
+  // Validación adicional con método de kVA si está disponible
+  let Icc_final = Isc;
+  let method = 'simple_accurate';
+
+  if (kVA) {
+    const I_fl = (kVA * 1000) / (voltage * Math.sqrt(3));  // Corriente plena de carga
+    const Isc_kva = I_fl / impedanceDecimal;  // ICC basado en kVA
+    Icc_final = Math.min(Isc, Isc_kva);  // Usar el valor más conservador
+    method = 'conservative_accurate_with_kva';
+  }
 
   try {
-    // Use the real electrical utility function
-    Icc = calculateShortCircuitCurrent(V, Z)
-  } catch (error) {
     // Handle zero impedance or other errors with fallback
     if (Z <= 0) {
       // Use a very small impedance for zero impedance case
-      Icc = V / (Math.sqrt(3) * 0.000001)
-    } else {
-      // Simple fallback calculation
-      Icc = V / (Math.sqrt(3) * Z)
+      Icc_final = voltage / (Math.sqrt(3) * 0.000001);
+      method = 'fallback_zero_impedance';
     }
+  } catch (error) {
+    // Final fallback
+    Icc_final = voltage / (Math.sqrt(3) * Math.max(Z, 0.001));
+    method = 'emergency_fallback';
   }
 
   return {
-    method: 'simple_accurate',
-    Icc: Math.round(Icc * 100) / 100,
-    voltage: V,
+    method: method,
+    Icc: toElectricalPrecision(parseFloat(Icc_final.toFixed(6))),
+    voltage: voltage,
     impedance: Z,
-    precision: 'IEEE_1584',
-    formula: 'Isc = V / (sqrt(3) * Z)'
-  }
+    kVA: kVA,
+    I_full_load: kVA ? ((kVA * 1000) / (voltage * Math.sqrt(3))).toFixed(2) + ' A' : null,
+    Icc_simple: Isc.toFixed(2) + ' A',
+    Icc_kva_method: kVA ? Icc_kva.toFixed(2) + ' A' : null,
+    precision: 'IEEE_1584_corrected',
+    formula: kVA ?
+      'Isc = min[V/(√3×Z), (kVA×1000)/(V×√3×Z)]' :
+      'Isc = V/(√3×Z)',
+    timestamp: new Date().toISOString()
+  };
 }
 
 /**

@@ -330,13 +330,12 @@ export class BreakerEffects {
    * @param {Object} breakerNode - Nodo del breaker
    * @param {number} tripTime - Tiempo de disparo
    */
-  generateCelebrationParticles(breakerId, breakerNode, tripTime) {
+  generateCelebrationParticles(breakerId, breakerNode) {
     const pos = breakerNode.position || { x: 0, y: 0 };
     const particleCount = 10;
 
     for (let i = 0; i < particleCount; i++) {
       const angle = (Math.PI * 2 * i) / particleCount;
-      const speed = 0.5 + Math.random() * 0.5;
 
       // Crear camino radial desde el breaker
       const path = [

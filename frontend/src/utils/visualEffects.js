@@ -329,7 +329,7 @@ export function createExplosionParticles(x, y, intensity = 1) {
 
 // === ACTUALIZACIÓN DE PARTÍCULAS ===
 
-export function updateParticles(particles, _deltaTime = 0.016) {
+export const updateParticles = (particles) => {
   return particles.filter(particle => {
     particle.life--;
 

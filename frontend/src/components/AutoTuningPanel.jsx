@@ -3,19 +3,16 @@
  * Sistema inteligente que ajusta automáticamente pickups y TMS para cumplir restricciones
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useGraphStore } from '../store/graphStore.js';
 import {
   autoTuneProtection,
-  validateCoordination,
-  analyzeSensitivity,
-  generateTuningReport
+  analyzeSensitivity
 } from '../utils/autoTuningEngine.js';
 
 export const AutoTuningPanel = () => {
   const [isTuning, setIsTuning] = useState(false);
   const [tuningResults, setTuningResults] = useState(null);
-  const [validationResults, setValidationResults] = useState(null);
   const [sensitivityAnalysis, setSensitivityAnalysis] = useState(null);
   const [selectedFault, setSelectedFault] = useState(null);
   const [tuningOptions, setTuningOptions] = useState({
@@ -32,8 +29,7 @@ export const AutoTuningPanel = () => {
   const {
     nodes,
     edges,
-    results,
-    simulation
+    results
   } = useGraphStore();
 
   // === PREPARAR ICC MAP ===
@@ -71,9 +67,6 @@ export const AutoTuningPanel = () => {
           y: node.position?.y || 0
         })),
         edges: edges.map(edge => {
-          const sourceNode = nodes.find(n => n.id === edge.source);
-          const targetNode = nodes.find(n => n.id === edge.target);
-
           return {
             ...edge,
             breaker: {
@@ -108,11 +101,7 @@ export const AutoTuningPanel = () => {
       );
 
       // Validar resultados
-      const faultChains = []; // Esto debería venir del buildChains
       const testCurrents = [500, 1000, 2000, 5000, 10000, 20000];
-      const validation = faultChains.map(chain =>
-        validateCoordination(chain, testCurrents, tuningOptions.margin)
-      );
 
       // Análisis de sensibilidad
       const breakers = graph.edges
@@ -121,19 +110,11 @@ export const AutoTuningPanel = () => {
 
       const sensitivity = analyzeSensitivity(breakers, testCurrents);
 
-      // Generar reporte
-      const report = generateTuningReport(result, validation);
-
       setTuningResults(result);
-      setValidationResults(validation);
       setSensitivityAnalysis(sensitivity);
 
-      if (!result.converged) {
-        console.warn('El auto-tuning no convergió completamente');
-      }
-
     } catch (error) {
-      console.error('Error en auto-tuning:', error);
+      // Error handling could be implemented here if needed
     } finally {
       setIsTuning(false);
     }

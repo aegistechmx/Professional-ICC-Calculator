@@ -15,7 +15,6 @@ export function edgeToPath(edge, nodes, options = {}) {
   const to = nodes.find(n => n.id === edge.target);
 
   if (!from || !to) {
-    console.warn(`Nodes not found for edge ${edge.id}: ${edge.source} -> ${edge.target}`);
     return [];
   }
 

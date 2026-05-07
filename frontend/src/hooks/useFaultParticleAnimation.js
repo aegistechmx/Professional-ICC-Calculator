@@ -107,7 +107,7 @@ export default function useFaultParticleAnimation(graph, onNodeUpdate, onEdgeUpd
     });
 
     return faultId;
-  }, [graph, onNodeUpdate]);
+  }, [graph, onNodeUpdate, handleBreakerTrip]);
 
   /**
    * Manejar disparo de breaker

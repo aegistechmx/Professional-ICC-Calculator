@@ -69,7 +69,6 @@ export default function TransformerFields({ node, updateNode }) {
       }
     })
 
-    console.log(`🔌 Propagada tensión ${secondaryVoltage}V a ${connectedEquipment.length} equipos conectados`)
   }
 
   return (

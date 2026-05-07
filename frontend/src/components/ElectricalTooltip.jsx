@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import './ElectricalTooltip.css';
 
 export default function ElectricalTooltip({ node, visible }) {
@@ -27,7 +28,7 @@ export default function ElectricalTooltip({ node, visible }) {
           { label: 'Isc', value: format(results?.shortCircuitCurrent, 'kA'), color: 'red' },
           { label: 'Potencia', value: format(results?.availablePower, 'kW'), color: 'green' }
         ];
-      
+
       case 'transformer':
         return [
           { label: 'kVA', value: format(data?.kva, 'kVA', 1), color: 'purple' },
@@ -35,14 +36,14 @@ export default function ElectricalTooltip({ node, visible }) {
           { label: 'Secundario', value: format(data?.secundario, 'V', 0), color: 'blue' },
           { label: 'Impedancia', value: format(data?.Z, '%'), color: 'orange' }
         ];
-      
+
       case 'breaker':
         return [
           { label: 'In', value: format(data?.In, 'A', 0), color: 'green' },
           { label: 'Icu', value: format(data?.Icu, 'kA', 1), color: 'red' },
           { label: 'Tipo', value: data?.tipo || 'Termomagnético', color: 'gray' }
         ];
-      
+
       case 'load':
       case 'motor':
         return [
@@ -50,14 +51,14 @@ export default function ElectricalTooltip({ node, visible }) {
           { label: 'Longitud', value: format(data?.longitud, 'm', 0), color: 'gray' },
           { label: 'Caída', value: format(results?.voltageDrop, '%'), color: 'orange' }
         ];
-      
+
       case 'panel':
         return [
           { label: 'Voltaje', value: format(data?.tension, 'V', 0), color: 'blue' },
           { label: 'Fases', value: data?.fases || 3, color: 'yellow' },
           { label: 'Carga total', value: format(results?.totalLoad, 'A'), color: 'green' }
         ];
-      
+
       default:
         return [];
     }
@@ -83,7 +84,7 @@ export default function ElectricalTooltip({ node, visible }) {
         <span className="tooltip-type">{type?.toUpperCase()}</span>
         <span className="tooltip-label">{label || type}</span>
       </div>
-      
+
       <div className="tooltip-body">
         {specificData.length > 0 && (
           <div className="tooltip-section">
@@ -154,3 +155,8 @@ export default function ElectricalTooltip({ node, visible }) {
     </div>
   );
 }
+
+ElectricalTooltip.propTypes = {
+  node: PropTypes.object,
+  visible: PropTypes.bool
+};

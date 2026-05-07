@@ -302,7 +302,7 @@ export class ParticleSystem {
    * @param {string} _edgeId - ID del edge
    * @returns {Array} Partículas en ese edge
    */
-  getParticlesByEdge(_edgeId) {
+  getParticlesByEdge() {
     // Esto requeriría tracking adicional de partículas por edge
     // Por ahora, retornar todas las partículas
     return this.particles;

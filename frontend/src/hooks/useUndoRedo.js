@@ -94,15 +94,15 @@ export function useUndoRedo() {
     if (nodes.length > 0 || edges.length > 0) {
       saveState({ nodes, edges });
     }
-  }, []); // Solo al montar
+  }, [nodes, edges]); // Solo al montar
 
   // Guardar cambios cuando termina un drag
-  const onNodeDragStop = useCallback((e, node) => {
+  const onNodeDragStop = useCallback(() => {
     const { saveState } = useHistoryStore.getState();
-    const { nodes: currentNodes } = useGraphStore.getState();
+    const { nodes: currentNodes, edges } = useGraphStore.getState();
     saveState({ nodes: currentNodes, edges });
     console.log('[UNDO] Checkpoint guardado después de drag');
-  }, [edges]);
+  }, []);
 
   // Información del historial
   const historyInfo = getHistoryInfo();
@@ -246,7 +246,6 @@ function showNotification(message) {
 
 // Hook para sincronizar stores
 export function useHistorySync() {
-  const history = useHistoryStore();
   const { setGraph } = useGraphStore();
 
   useEffect(() => {

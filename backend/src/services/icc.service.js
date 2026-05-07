@@ -54,16 +54,35 @@ class ICCService {
         throw new Error('V (voltage) and Z (impedance) are required for ICC calculation');
       }
 
-      // Simple ICC calculation: I = V / (sqrt(3) * Z)
-      const Icc = input.V / (Math.sqrt(3) * input.Z);
+      // Fórmula CORRECTA para ICC trifásico con validación kVA
+      const V = input.V || input.voltage || 480;  // Default a 480V
+      const Z = input.Z / 100;  // Convertir porcentaje a decimal
+      const Icc_simple = V / (Math.sqrt(3) * Z);  // En amperes
+
+      // Validación adicional con método de kVA si está disponible
+      let Icc_final = Icc_simple;
+      let method = 'simple_icc';
+
+      if (input.kVA) {
+        const I_fl = (input.kVA * 1000) / (V * Math.sqrt(3));  // Corriente plena de carga
+        const Icc_kva = I_fl / Z;  // ICC basado en kVA
+        Icc_final = Math.min(Icc_simple, Icc_kva);  // Usar el valor más conservador
+        method = 'conservative_icc_with_kva_validation';
+      }
 
       const result = {
-        method: 'simple_icc',
-        Icc: Math.round(Icc * 100) / 100,
+        method: method,
+        Icc: Math.round(Icc_final * 100) / 100,  // Convertir a centésimas
         voltage: input.V,
         impedance: input.Z,
-        precision: 'IEEE_1584',
-        formula: 'Isc = V / (sqrt(3) * Z)',
+        kVA: input.kVA,
+        I_full_load: input.kVA ? ((input.kVA * 1000) / (V * Math.sqrt(3))).toFixed(2) + ' A' : null,
+        Icc_simple: Icc_simple.toFixed(2) + ' A',
+        Icc_kva_method: input.kVA ? Icc_kva.toFixed(2) + ' A' : null,
+        precision: 'IEEE_1584_corrected',
+        formula: input.kVA ?
+          'Isc = min[V/(√3×Z), (kVA×1000)/(V×√3×Z)]' :
+          'Isc = V/(√3×Z)',
         timestamp: new Date().toISOString()
       };
 

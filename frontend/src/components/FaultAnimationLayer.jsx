@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useRef, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useGraphStore } from '../store/graphStore.js';
-import { useParticleEngine } from '../hooks/useParticleEngine.js';
 import { getFaultSeverity, getFaultColor, simulateFaultPropagation } from '../utils/simulationEngine.js';
 
 export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
@@ -17,10 +17,7 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
     nodes,
     edges,
     results,
-    simulation,
-    triggerFault,
-    clearFault,
-    tripBreaker
+    simulation
   } = useGraphStore();
 
   // === CONFIGURACIÓN DE ANIMACIÓN DE FALLA ===
@@ -33,17 +30,6 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
     glowIntensity: 0.8
   }), []);
 
-  // === OBTENER PATH DE EDGE ===
-  const getEdgePath = useCallback((edge) => {
-    const sourceNode = nodes.find(n => n.id === edge.source);
-    const targetNode = nodes.find(n => n.id === edge.target);
-
-    if (!sourceNode?.position || !targetNode?.position) {
-      return [{ x: 0, y: 0 }, { x: 100, y: 100 }];
-    }
-
-    return [sourceNode.position, targetNode.position];
-  }, [nodes]);
 
   // === INICIALIZAR EFECTOS DE FALLA ===
   const initFaultEffects = useCallback((faultNodeId) => {
@@ -222,25 +208,12 @@ export const FaultAnimationLayer = ({ width = 1200, height = 800 }) => {
 export const FaultControlPanel = () => {
   const {
     nodes,
+    edges,
     simulation,
     triggerFault,
     clearFault,
     tripBreaker
   } = useGraphStore();
-
-  const handleTriggerFault = (nodeId) => {
-    triggerFault(nodeId);
-
-    // Simular trips de breakers afectados
-    const affectedBreakers = nodes
-      .filter(node => node.type === 'breaker')
-      .filter(breaker => isUpstreamBreaker(breaker.id, nodeId));
-
-    affectedBreakers.forEach((breaker, index) => {
-      const delay = index * 0.1; // Trip secuencial
-      tripBreaker(breaker.id, delay);
-    });
-  };
 
   const isUpstreamBreaker = useCallback((breakerId, nodeId) => {
     // Lógica simplificada para determinar si un breaker está upstream
@@ -261,6 +234,20 @@ export const FaultControlPanel = () => {
 
     return false;
   }, [edges]);
+
+  const handleTriggerFault = (nodeId) => {
+    triggerFault(nodeId);
+
+    // Simular trips de breakers afectados
+    const affectedBreakers = nodes
+      .filter(node => node.type === 'breaker')
+      .filter(breaker => isUpstreamBreaker(breaker.id, nodeId));
+
+    affectedBreakers.forEach((breaker, index) => {
+      const delay = index * 0.1; // Trip secuencial
+      tripBreaker(breaker.id, delay);
+    });
+  };
 
   const loadNodes = nodes.filter(node => node.type === 'load');
   const breakerNodes = nodes.filter(node => node.type === 'breaker');
@@ -385,9 +372,7 @@ export const FaultControlPanel = () => {
 // === INDICADOR VISUAL DE FALLA ===
 export const FaultIndicator = ({ nodeId }) => {
   const { simulation } = useGraphStore();
-  const { nodes } = useGraphStore();
 
-  const node = nodes.find(n => n.id === nodeId);
   const isFaulted = simulation.fault === nodeId;
   const isAffected = simulation.propagation.some(p => p.to === nodeId);
 
@@ -404,6 +389,15 @@ export const FaultIndicator = ({ nodeId }) => {
       }}
     />
   );
+};
+
+FaultAnimationLayer.propTypes = {
+  width: PropTypes.number,
+  height: PropTypes.number
+};
+
+FaultIndicator.propTypes = {
+  nodeId: PropTypes.string
 };
 
 export default FaultAnimationLayer;

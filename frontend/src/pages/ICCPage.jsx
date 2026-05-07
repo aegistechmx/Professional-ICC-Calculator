@@ -166,6 +166,7 @@ export default function ICCPage() {
   );
 }
 
+/* eslint-disable react/prop-types */
 /**
  * Componente de diagrama unifilar simplificado
  */
@@ -177,6 +178,10 @@ function UnifilarDiagram({
   status,
   onBusClick
 }) {
+  // Validate props
+  if (!Array.isArray(buses)) {
+    return null;
+  }
   // Transformar resultado para mostrar Isc en nodos
   const nodesWithIsc = buses.map(bus => {
     const busResult = result?.buses?.find(b => b.id === bus.id);

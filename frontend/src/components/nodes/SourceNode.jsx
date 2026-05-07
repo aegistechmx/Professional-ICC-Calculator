@@ -4,12 +4,13 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Handle, Position } from 'reactflow';
 import './SourceNode.css';
 
 export default function SourceNode({ data, selected }) {
   const { results, status } = data || {};
-  
+
   // Determinar clase de estado
   const getStatusClass = () => {
     if (status === 'calculated') return 'calculated';
@@ -32,14 +33,14 @@ export default function SourceNode({ data, selected }) {
         position={Position.Right}
         className="source-handle"
       />
-      
+
       {/* Contenido del nodo */}
       <div className="node-content">
         {/* Header del nodo */}
         <div className="node-header">
           <div className="node-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
             </svg>
           </div>
           <div className="node-title">
@@ -56,7 +57,7 @@ export default function SourceNode({ data, selected }) {
               {formatValue(data?.voltaje || results?.voltage, 'V')}
             </span>
           </div>
-          
+
           {results?.availablePower && (
             <div className="parameter">
               <span className="param-label">P:</span>
@@ -78,7 +79,7 @@ export default function SourceNode({ data, selected }) {
                 {status === 'pending' && '...'}
               </span>
             </div>
-            
+
             <div className="results-grid">
               {results.shortCircuitCurrent && (
                 <div className="result-item">
@@ -88,7 +89,7 @@ export default function SourceNode({ data, selected }) {
                   </span>
                 </div>
               )}
-              
+
               {results.impedance && (
                 <div className="result-item">
                   <span className="result-label">Z:</span>
@@ -97,7 +98,7 @@ export default function SourceNode({ data, selected }) {
                   </span>
                 </div>
               )}
-              
+
               {results.powerFactor && (
                 <div className="result-item">
                   <span className="result-label">FP:</span>
@@ -125,3 +126,8 @@ export default function SourceNode({ data, selected }) {
     </div>
   );
 }
+
+SourceNode.propTypes = {
+  data: PropTypes.object,
+  selected: PropTypes.bool
+};

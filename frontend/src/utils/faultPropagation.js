@@ -174,7 +174,7 @@ export function checkBreakerTrip(edge, simulation) {
 }
 
 // === ACTUALIZACIÓN DE PARTÍCULAS ===
-export function updateParticles(particles, _deltaTime = 0.016) {
+export function updateParticles(particles) {
   return particles.filter(particle => {
     particle.life--;
 

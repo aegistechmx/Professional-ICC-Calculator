@@ -213,7 +213,7 @@ export class FaultParticleEngine {
    * @param {number} faultCurrent - Corriente de falla
    * @param {Object} tccEvaluation - Evaluación TCC
    */
-  handleBreakerTrip(breakerId, breakerData, graph, faultCurrent, tccEvaluation) {
+  handleBreakerTrip(breakerId, breakerData, graph, faultCurrent) {
     // Agregar a lista de breakers disparados
     this.trippedBreakers.add(breakerId);
 
@@ -272,7 +272,6 @@ export class FaultParticleEngine {
    */
   endFault(faultId) {
     if (this.activeFaults.has(faultId)) {
-      const fault = this.activeFaults.get(faultId);
       this.particleSystem.clearFault(faultId);
       this.activeFaults.delete(faultId);
 

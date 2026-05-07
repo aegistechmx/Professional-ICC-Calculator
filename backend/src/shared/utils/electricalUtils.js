@@ -46,8 +46,8 @@ function calculateVoltageDrop(current, resistance, reactance, length = 5) { // c
     imag: current * reactance * length,
   }
 
-  const magnitude = toElectricalPrecision(parseFloat(Math.sqrt(voltageDrop.real ** 2 + voltageDrop.imag ** 2)).toFixed(6)) // voltage (V)
-  const angle = toElectricalPrecision(parseFloat(Math.atan2(voltageDrop.imag, voltageDrop.real)).toFixed(6)) // voltage (V)
+  const magnitude = toElectricalPrecision(Math.sqrt(voltageDrop.real ** 2 + voltageDrop.imag ** 2), 'voltage') // voltage (V)
+  const angle = toElectricalPrecision(Math.atan2(voltageDrop.imag, voltageDrop.real), 'angle') // voltage (V)
 
   return {
     magnitude: toElectricalPrecision(magnitude),
@@ -70,8 +70,8 @@ function calculatePowerLoss(current, resistance) {
     throw new Error('Resistance must be a valid number')
   }
 
-  const powerLoss = toElectricalPrecision(parseFloat((current ** 2 * resistance)).toFixed(6)); // current (A)
-  return toElectricalPrecision(powerLoss)
+  const powerLoss = toElectricalPrecision(current ** 2 * resistance, 'power'); // current (A)
+  return powerLoss
 }
 
 /**
@@ -89,8 +89,8 @@ function calculateShortCircuitCurrent(voltage, impedance) {
     if (impedance === 0) { // impedance (Ω)
       throw new Error('Impedance cannot be zero for short circuit calculation')
     }
-    const isc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3) * impedance))).toFixed(6)) // voltage (V)
-    return toElectricalPrecision(isc)
+    const isc = toElectricalPrecision(voltage / (Math.sqrt(3) * impedance), 'current') // voltage (V)
+    return isc
   }
 
   if (!impedance || typeof impedance !== 'object') { // impedance (Ω)
@@ -105,13 +105,13 @@ function calculateShortCircuitCurrent(voltage, impedance) {
     throw new Error('Impedance components must be valid numbers')
   }
 
-  const z = toElectricalPrecision(parseFloat((Math.sqrt(impedance.real ** 2 + impedance.imag ** 2))).toFixed(6)); // impedance (Ω)
+  const z = toElectricalPrecision(Math.sqrt(impedance.real ** 2 + impedance.imag ** 2), 'impedance'); // impedance (Ω)
   if (z === 0) {
     throw new Error('Impedance cannot be zero for short circuit calculation')
   }
 
-  const isc = toElectricalPrecision(parseFloat((voltage / (Math.sqrt(3) * z))).toFixed(6)) // voltage (V)
-  return toElectricalPrecision(isc)
+  const isc = toElectricalPrecision(voltage / (Math.sqrt(3) * z), 'current') // voltage (V)
+  return isc
 }
 
 /**
@@ -130,7 +130,7 @@ function calculatePowerFactor(realPower, apparentPower) {
   if (apparentPower === 0) {
     return 0 // Power factor is 0 when apparent power is 0
   }
-  return toElectricalPrecision(realPower / apparentPower);
+  return toElectricalPrecision(realPower / apparentPower, 'coordination');
 }
 
 /**
@@ -150,7 +150,7 @@ function calculateApparentPower(voltage, current) {
   // Apparent Power = V × I × √3, then convert to kVA
   const apparentPowerVA = voltage * current * Math.sqrt(3)
   const apparentPowerKVA = apparentPowerVA / 1000
-  return toElectricalPrecision(apparentPowerKVA)
+  return toElectricalPrecision(apparentPowerKVA, 'power')
 }
 
 /**
@@ -191,8 +191,8 @@ function convertPowerUnits(power, fromUnit, toUnit) {
   const fromMultiplier = units[fromUnit]
   const toMultiplier = units[toUnit]
 
-  const powerInWatts = toElectricalPrecision(parseFloat((power * fromMultiplier)).toFixed(6)); // power (W)
-  return toElectricalPrecision(powerInWatts / toMultiplier)
+  const powerInWatts = toElectricalPrecision(power * fromMultiplier, 'power'); // power (W)
+  return toElectricalPrecision(powerInWatts / toMultiplier, 'power')
 }
 
 /**
@@ -234,7 +234,7 @@ function validateElectricalParams(params) {
 
   // Validate power
   if (params.power !== undefined) { // power (W)
-    if (toElectricalPrecision(parseFloat(Math.abs(params.power)).toFixed(6)) > 10000) {
+    if (toElectricalPrecision(Math.abs(params.power), 'power') > 10000) {
       errors.push('Power magnitude should not exceed 10 MW')
     }
   }
@@ -254,14 +254,14 @@ function validateElectricalParams(params) {
  */
 function calculateThreePhasePower(voltage, current, powerFactor = 1) { // voltage (V)
   const apparentPower = calculateApparentPower(voltage, current) // voltage (V)
-  const realPower = toElectricalPrecision(parseFloat((apparentPower * powerFactor)).toFixed(6)); // power (W)
-  const reactivePower = toElectricalPrecision(parseFloat((Math.sqrt(apparentPower ** 2 - realPower ** 2))).toFixed(6));
+  const realPower = toElectricalPrecision(apparentPower * powerFactor, 'power'); // power (W)
+  const reactivePower = toElectricalPrecision(Math.sqrt(apparentPower ** 2 - realPower ** 2), 'power');
 
   return {
-    real: toElectricalPrecision(realPower),
-    reactive: toElectricalPrecision(reactivePower),
-    apparent: toElectricalPrecision(apparentPower),
-    powerFactor: toElectricalPrecision(powerFactor),
+    real: toElectricalPrecision(realPower, 'power'),
+    reactive: toElectricalPrecision(reactivePower, 'power'),
+    apparent: toElectricalPrecision(apparentPower, 'power'),
+    powerFactor: toElectricalPrecision(powerFactor, 'coordination'),
   }
 }
 

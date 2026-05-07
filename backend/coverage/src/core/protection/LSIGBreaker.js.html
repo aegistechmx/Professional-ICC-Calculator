@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/142</span>
+                <span class='fraction'>0/143</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/139</span>
+                <span class='fraction'>0/140</span>
             </div>
         
             
@@ -744,7 +744,9 @@
 <a name='L679'></a><a href='#L679'>679</a>
 <a name='L680'></a><a href='#L680'>680</a>
 <a name='L681'></a><a href='#L681'>681</a>
-<a name='L682'></a><a href='#L682'>682</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L682'></a><a href='#L682'>682</a>
+<a name='L683'></a><a href='#L683'>683</a>
+<a name='L684'></a><a href='#L684'>684</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -772,6 +774,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -856,6 +859,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1425,7 +1429,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { toElectricalPrecision, formatElectricalValue } = <span class="cstat-no" title="statement not covered" >require('../../utils/electricalUtils');</span>
+/**
  * LSIGBreaker - Real Breaker Protection (Long, Short, Instant, Ground)
  *
  * This module implements realistic circuit breaker protection with:
@@ -1536,10 +1541,11 @@ class LSIGBreaker {
    * @returns {number} Operating time (s)
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateInverseTime(current, pickup, curve, timeDelay) {
-<span class="cstat-no" title="statement not covered" >    if (current &lt;= pickup) <span class="cstat-no" title="statement not covered" >return Infinity</span></span>
+<span class="cstat-no" title="statement not covered" >    if (current &lt;= pickup) <span class="cstat-no" title="statement not covered" >return Infinity </span></span>// current (A)
     // current (A)
 &nbsp;
-    const M = <span class="cstat-no" title="statement not covered" >current / pickup </span>// Multiple of pickup
+    // Multiple of pickup
+    const M = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((current / pickup).toFixed(6)));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    switch (curve) {</span>
       case 'standard_inverse':
@@ -1567,7 +1573,7 @@ class LSIGBreaker {
 <span class="cstat-no" title="statement not covered" >      return { trip: false, reason: 'Long time disabled' }</span>
     }
 &nbsp;
-    const current_pu = <span class="cstat-no" title="statement not covered" >current / this.ratedCurrent</span>
+    const current_pu = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((current / this.ratedCurrent)).toFixed(6));</span> // current (A)
     // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (current_pu &lt; this.longTime.pickup) {</span>
@@ -1605,7 +1611,7 @@ class LSIGBreaker {
 <span class="cstat-no" title="statement not covered" >      return { trip: false, reason: 'Short time disabled' }</span>
     }
 &nbsp;
-    const current_pu = <span class="cstat-no" title="statement not covered" >current / this.ratedCurrent</span>
+    const current_pu = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((current / this.ratedCurrent)).toFixed(6));</span> // current (A)
     // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (current_pu &lt; this.shortTime.pickup) {</span>
@@ -1643,7 +1649,7 @@ class LSIGBreaker {
 <span class="cstat-no" title="statement not covered" >      return { trip: false, reason: 'Instantaneous disabled' }</span>
     }
 &nbsp;
-    const current_pu = <span class="cstat-no" title="statement not covered" >current / this.ratedCurrent</span>
+    const current_pu = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((current / this.ratedCurrent)).toFixed(6));</span> // current (A)
     // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (current_pu &lt; this.instantaneous.pickup) {</span>
@@ -1673,7 +1679,7 @@ class LSIGBreaker {
 <span class="cstat-no" title="statement not covered" >      return { trip: false, reason: 'Ground protection disabled' }</span>
     }
 &nbsp;
-    const current_pu = <span class="cstat-no" title="statement not covered" >groundCurrent / this.ratedCurrent</span>
+    const current_pu = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((groundCurrent / this.ratedCurrent)).toFixed(6));</span> // current (A)
     // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (current_pu &lt; this.ground.pickup) {</span>
@@ -1709,12 +1715,12 @@ class LSIGBreaker {
    * @param {number} currentTime - Current simulation time (s)
    * @returns {Object} Complete LSIG evaluation result
    */
-<span class="fstat-no" title="function not covered" >  ev</span>aluate(measurement, currentTime = <span class="branch-0 cbranch-no" title="branch not covered" >0)</span> {
+<span class="fstat-no" title="function not covered" >  ev</span>aluate(measurement, currentTime = <span class="branch-0 cbranch-no" title="branch not covered" >0)</span> { // current (A)
     // current (A)
     const { I, Ig } = <span class="cstat-no" title="statement not covered" >measurement</span>
 &nbsp;
     // Update state
-<span class="cstat-no" title="statement not covered" >    this.state.current = I</span>
+<span class="cstat-no" title="statement not covered" >    this.state.current = I </span>// current (A)
     // current (A)
 <span class="cstat-no" title="statement not covered" >    this.state.groundCurrent = Ig</span>
 &nbsp;
@@ -1794,7 +1800,7 @@ class LSIGBreaker {
     // Update temporal state (NEW)
 <span class="cstat-no" title="statement not covered" >    if (overallTrip &amp;&amp; !this.state.overallTrip) {</span>
       // Fault just detected
-<span class="cstat-no" title="statement not covered" >      this.state.faultDetectedAt = currentTime</span>
+<span class="cstat-no" title="statement not covered" >      this.state.faultDetectedAt = currentTime </span>// current (A)
       // current (A)
 <span class="cstat-no" title="statement not covered" >      this.state.relayPickupAt =</span>
         currentTime + this.temporalDelays.relayPickupDelay
@@ -1843,7 +1849,7 @@ class LSIGBreaker {
    */
 <span class="fstat-no" title="function not covered" >  sh</span>ouldTrip(currentTime) {
 <span class="cstat-no" title="statement not covered" >    if (!this.state.tripTime) <span class="cstat-no" title="statement not covered" >return false</span></span>
-<span class="cstat-no" title="statement not covered" >    return currentTime &gt;= this.state.tripTime</span>
+<span class="cstat-no" title="statement not covered" >    return currentTime &gt;= this.state.tripTime </span>// current (A)
     // current (A)
   }
 &nbsp;
@@ -2113,7 +2119,7 @@ class LSIGBreakerCoordination extends LSIGBreaker {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T08:24:14.160Z
+                at 2026-05-07T00:07:01.082Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -4,15 +4,14 @@
  */
 
 import React, { useEffect, useRef, useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useGraphStore } from '../store/graphStore.js';
 import {
-  calcularTemperaturaConductor,
   drawThermalEdge,
   drawTemperatureIndicator,
   updateThermalLayer,
   analyzeThermalSystem,
-  checkThermalAlerts,
-  thermalPulse
+  checkThermalAlerts
 } from '../utils/thermalEngine.js';
 
 export const ThermalHeatmapLayer = ({ width = 1200, height = 800 }) => {
@@ -26,9 +25,7 @@ export const ThermalHeatmapLayer = ({ width = 1200, height = 800 }) => {
   const {
     nodes,
     edges,
-    results,
-    ui,
-    toggleFlows
+    results
   } = useGraphStore();
 
   // === LOOP DE ANIMACIÓN TÉRMICA ===
@@ -303,6 +300,11 @@ export const ThermalHeatmapLayer = ({ width = 1200, height = 800 }) => {
       </div>
     </div>
   );
+};
+
+ThermalHeatmapLayer.propTypes = {
+  width: PropTypes.number,
+  height: PropTypes.number
 };
 
 export default ThermalHeatmapLayer;

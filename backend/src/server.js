@@ -158,7 +158,7 @@ const server = http.createServer((req, res) => {
 
         // Calculate ICC per node using proper electrical formulas
         const nodeResults = {}
-        const systemVoltage = 220 // V (typical industrial voltage)
+        const systemVoltage = 480 // V (typical industrial voltage)
 
         nodes.forEach(node => {
           const nodeType = node.type || 'unknown'
@@ -288,7 +288,7 @@ const server = http.createServer((req, res) => {
           }
         } else {
           // Legacy ICC calculation (voltage/impedance)
-          const V = params.voltage || params.V || 220 // voltage (V)
+          const V = params.voltage || params.V || 480 // voltage (V)
           const Z = params.impedance || params.Z || 0.05 // impedance (Ω)
 
           if (Z <= 0) {

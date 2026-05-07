@@ -4,6 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import './TCCPanel.css';
 
 export default function TCCPanel({ selectedNode, results, onClose }) {
@@ -11,12 +12,12 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
   const generateBreakerCurve = (protection) => {
     if (!protection) return [];
 
-    const { In, Icu, tipo = 'termomagnético' } = protection;
+    const { In, tipo = 'termomagnético' } = protection;
     const curve = [];
 
     // Puntos típicos de curva TCC (log-log scale)
     const currentPoints = [0.1, 0.5, 1, 2, 5, 10, 20, 50, 100];
-    
+
     currentPoints.forEach(multiplier => {
       const current = In * multiplier;
       let time;
@@ -63,7 +64,7 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
 
     // Puntos de curva de carga
     const currentPoints = [0.5, 1, 2, 3, 4, 5, 6, 8, 10];
-    
+
     currentPoints.forEach(multiplier => {
       const current = I_carga * multiplier;
       let time;
@@ -165,7 +166,7 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
     if (curve.length === 0) return '';
 
     const points = curve.map(p => scalePoint(p.current, p.time, width, height));
-    
+
     return points
       .map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`))
       .join(' ');
@@ -197,7 +198,7 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
           {/* Grid */}
           <g className="chart-grid">
             {/* Líneas verticales (corriente) */}
-            {[0.1, 1, 10, 100, 1000].map((current, i) => {
+            {[0.1, 1, 10, 100, 1000].map((current) => {
               const { x } = scalePoint(current, 1, 400, 300);
               return (
                 <line
@@ -211,9 +212,9 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
                 />
               );
             })}
-            
+
             {/* Líneas horizontales (tiempo) */}
-            {[0.01, 0.1, 1, 10, 100, 1000, 10000].map((time, i) => {
+            {[0.01, 0.1, 1, 10, 100, 1000, 10000].map((time) => {
               const { y } = scalePoint(1, time, 400, 300);
               return (
                 <line
@@ -233,7 +234,7 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
           <g className="chart-axes">
             <line x1="0" y1="300" x2="400" y2="300" stroke="#374151" strokeWidth="1" />
             <line x1="0" y1="0" x2="0" y2="300" stroke="#374151" strokeWidth="1" />
-            
+
             {/* Etiquetas de corriente */}
             {[0.1, 1, 10, 100, 1000].map((current) => {
               const { x } = scalePoint(current, 1, 400, 300);
@@ -250,7 +251,7 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
                 </text>
               );
             })}
-            
+
             {/* Etiquetas de tiempo */}
             {[0.01, 0.1, 1, 10, 100, 1000, 10000].map((time) => {
               const { y } = scalePoint(1, time, 400, 300);
@@ -336,3 +337,21 @@ export default function TCCPanel({ selectedNode, results, onClose }) {
     </div>
   );
 }
+
+TCCPanel.propTypes = {
+  selectedNode: PropTypes.shape({
+    id: PropTypes.string,
+    type: PropTypes.string,
+    data: PropTypes.shape({
+      label: PropTypes.string,
+      protection: PropTypes.shape({
+        tipo: PropTypes.string,
+        In: PropTypes.number,
+        Icu: PropTypes.number,
+        I_carga: PropTypes.number
+      })
+    })
+  }),
+  results: PropTypes.object,
+  onClose: PropTypes.func
+};

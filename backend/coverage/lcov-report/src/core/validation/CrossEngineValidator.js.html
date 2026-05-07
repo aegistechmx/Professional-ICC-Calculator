@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/111</span>
+                <span class='fraction'>0/112</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/102</span>
+                <span class='fraction'>0/103</span>
             </div>
         
             
@@ -536,7 +536,12 @@
 <a name='L471'></a><a href='#L471'>471</a>
 <a name='L472'></a><a href='#L472'>472</a>
 <a name='L473'></a><a href='#L473'>473</a>
-<a name='L474'></a><a href='#L474'>474</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -553,6 +558,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -916,11 +922,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1009,12 +1019,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { toElectricalPrecision, formatElectricalValue } = <span class="cstat-no" title="statement not covered" >require('../../utils/electricalUtils');</span>
+/**
  * CrossEngineValidator - Cross-Engine Validation
  *
  * This module validates that different solvers produce consistent results:
  * - NR === OPF (Newton-Raphson vs Optimal Power Flow)
- * - ICC === Zbus (Fault current vs Impedance bus calculation)
+ * - ICC === Zbus (Fault current vs Impedance bus calculation) // current (A)
  // current (A)
  * - Dynamics inicia en NR (Dynamic simulation starts from power flow)
  *
@@ -1112,7 +1123,7 @@ class CrossEngineValidator {
       const opfResult = <span class="cstat-no" title="statement not covered" >opfEngine.run ? opfEngine.run(system) : nrResult</span>
 &nbsp;
       // Compare voltages
-      const voltageDiff = <span class="cstat-no" title="statement not covered" >this.compareVoltages(</span>
+      const voltageDiff = <span class="cstat-no" title="statement not covered" >this.compareVoltages( // voltage (V)</span>
         // voltage (V)
         nrResult.voltages,
         opfResult.voltages
@@ -1122,15 +1133,15 @@ class CrossEngineValidator {
       const angleDiff = <span class="cstat-no" title="statement not covered" >this.compareAngles(nrResult.angles, opfResult.angles)</span>
 &nbsp;
       // Compare power flows
-      const powerDiff = <span class="cstat-no" title="statement not covered" >this.comparePowerFlows(nrResult.P, opfResult.P)</span>
+      const powerDiff = <span class="cstat-no" title="statement not covered" >this.comparePowerFlows(nrResult.P, opfResult.P) </span>// power (W)
       // power (W)
 &nbsp;
       // Check if within tolerance
       const tolerance = <span class="cstat-no" title="statement not covered" >this.options.tolerance</span>
-      const voltageOK = <span class="cstat-no" title="statement not covered" >voltageDiff &lt; tolerance</span>
+      const voltageOK = <span class="cstat-no" title="statement not covered" >voltageDiff &lt; tolerance </span>// voltage (V)
       // voltage (V)
       const angleOK = <span class="cstat-no" title="statement not covered" >angleDiff &lt; tolerance</span>
-      const powerOK = <span class="cstat-no" title="statement not covered" >powerDiff &lt; tolerance</span>
+      const powerOK = <span class="cstat-no" title="statement not covered" >powerDiff &lt; tolerance </span>// power (W)
       // power (W)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (voltageOK &amp;&amp; angleOK &amp;&amp; powerOK) {</span>
@@ -1208,7 +1219,7 @@ class CrossEngineValidator {
       const iccFromZbus = <span class="cstat-no" title="statement not covered" >this.calculateICCFromZbus(zbusResult.Zbus, system)</span>
 &nbsp;
       // Compare fault currents
-      const currentDiff = <span class="cstat-no" title="statement not covered" >this.compareFaultCurrents(</span>
+      const currentDiff = <span class="cstat-no" title="statement not covered" >this.compareFaultCurrents( // current (A)</span>
         // current (A)
         iccResult.currents,
         iccFromZbus
@@ -1216,7 +1227,7 @@ class CrossEngineValidator {
 &nbsp;
       // Check if within tolerance
       const tolerance = <span class="cstat-no" title="statement not covered" >this.options.tolerance</span>
-      const currentOK = <span class="cstat-no" title="statement not covered" >currentDiff &lt; tolerance</span>
+      const currentOK = <span class="cstat-no" title="statement not covered" >currentDiff &lt; tolerance </span>// current (A)
       // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (currentOK) {</span>
@@ -1278,9 +1289,9 @@ class CrossEngineValidator {
         : dynamicsEngine
 &nbsp;
       // Check if initial dynamics voltages match NR
-      const initialVoltages = <span class="cstat-no" title="statement not covered" >dynamicsResult.voltages[0]</span>
+      const initialVoltages = <span class="cstat-no" title="statement not covered" >dynamicsResult.voltages[0] </span>// voltage (V)
       // voltage (V)
-      const voltageDiff = <span class="cstat-no" title="statement not covered" >this.compareVoltages(</span>
+      const voltageDiff = <span class="cstat-no" title="statement not covered" >this.compareVoltages( // voltage (V)</span>
         // voltage (V)
         nrResult.voltages,
         initialVoltages
@@ -1296,7 +1307,7 @@ class CrossEngineValidator {
 &nbsp;
       // Check if within tolerance
       const tolerance = <span class="cstat-no" title="statement not covered" >this.options.tolerance</span>
-      const voltageOK = <span class="cstat-no" title="statement not covered" >voltageDiff &lt; tolerance</span>
+      const voltageOK = <span class="cstat-no" title="statement not covered" >voltageDiff &lt; tolerance </span>// voltage (V)
       // voltage (V)
       const angleOK = <span class="cstat-no" title="statement not covered" >angleDiff &lt; tolerance</span>
 &nbsp;
@@ -1355,7 +1366,7 @@ class CrossEngineValidator {
    * @returns {Array} ICC currents
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateICCFromZbus(Zbus, system) {
-    const currents = <span class="cstat-no" title="statement not covered" >[]</span>
+    const currents = <span class="cstat-no" title="statement not covered" >[] </span>// current (A)
     // current (A)
 &nbsp;
     // Calculate fault currents using Zbus
@@ -1383,23 +1394,27 @@ class CrossEngineValidator {
 <span class="cstat-no" title="statement not covered" >    if (!voltagesA || !voltagesB) <span class="cstat-no" title="statement not covered" >return Infinity</span></span>
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
-    const minLen = <span class="cstat-no" title="statement not covered" >Math.min(voltagesA.length, voltagesB.length)</span>
+    const minLen = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((Math.min(voltagesA.length, voltagesB.length))).toFixed(6));</span> // voltage (V)
     // voltage (V)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
       const valA =
-<span class="cstat-no" title="statement not covered" >        typeof voltagesA[i] === 'object'</span>
+<span class="cstat-no" title="statement not covered" >        typeof voltagesA[i] === 'object' // voltage (V)</span>
           ? // voltage (V)
-            Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2)
-          : voltagesA[i]
+            parseFloat(
+              Math.sqrt(voltagesA[i].re ** 2 + voltagesA[i].im ** 2).toFixed(6)
+            )
+          : toElectricalPrecision(parseFloat(voltagesA[i].toFixed(6)))
       const valB =
-<span class="cstat-no" title="statement not covered" >        typeof voltagesB[i] === 'object'</span>
+<span class="cstat-no" title="statement not covered" >        typeof voltagesB[i] === 'object' // voltage (V)</span>
           ? // voltage (V)
-            Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2)
-          : voltagesB[i]
+            parseFloat(
+              Math.sqrt(voltagesB[i].re ** 2 + voltagesB[i].im ** 2).toFixed(6)
+            )
+          : toElectricalPrecision(parseFloat(voltagesB[i].toFixed(6)))
 &nbsp;
-      const diff = <span class="cstat-no" title="statement not covered" >Math.abs(valA - valB)</span>
-<span class="cstat-no" title="statement not covered" >      maxDiff = Math.max(maxDiff, diff)</span>
+      const diff = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat(Math.abs(valA - valB)).toFixed(6))</span>
+<span class="cstat-no" title="statement not covered" >      maxDiff = toElectricalPrecision(parseFloat(Math.max(maxDiff, diff)).toFixed(6))</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return maxDiff</span>
@@ -1435,11 +1450,11 @@ class CrossEngineValidator {
 <span class="cstat-no" title="statement not covered" >    if (!powerA || !powerB) <span class="cstat-no" title="statement not covered" >return Infinity</span></span>
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
-    const minLen = <span class="cstat-no" title="statement not covered" >Math.min(powerA.length, powerB.length)</span>
+    const minLen = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((Math.min(powerA.length, powerB.length))).toFixed(6));</span> // power (W)
     // power (W)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
-      const diff = <span class="cstat-no" title="statement not covered" >Math.abs(powerA[i] - powerB[i])</span>
+      const diff = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((Math.abs(powerA[i] - powerB[i]))).toFixed(6));</span> // power (W)
       // power (W)
 <span class="cstat-no" title="statement not covered" >      maxDiff = Math.max(maxDiff, diff)</span>
     }
@@ -1457,11 +1472,11 @@ class CrossEngineValidator {
 <span class="cstat-no" title="statement not covered" >    if (!currentsA || !currentsB) <span class="cstat-no" title="statement not covered" >return Infinity</span></span>
 &nbsp;
     let maxDiff = <span class="cstat-no" title="statement not covered" >0</span>
-    const minLen = <span class="cstat-no" title="statement not covered" >Math.min(currentsA.length, currentsB.length)</span>
+    const minLen = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((Math.min(currentsA.length, currentsB.length))).toFixed(6));</span> // current (A)
     // current (A)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; minLen; i++) {</span>
-      const diff = <span class="cstat-no" title="statement not covered" >Math.abs(currentsA[i] - currentsB[i])</span>
+      const diff = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((Math.abs(currentsA[i] - currentsB[i]))).toFixed(6));</span> // current (A)
       // current (A)
 <span class="cstat-no" title="statement not covered" >      maxDiff = Math.max(maxDiff, diff)</span>
     }
@@ -1489,7 +1504,7 @@ class CrossEngineValidator {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T08:24:13.946Z
+                at 2026-05-07T00:07:00.711Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

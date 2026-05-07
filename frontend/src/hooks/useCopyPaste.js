@@ -11,8 +11,7 @@ import {
   pasteSelection,
   duplicateSelection,
   deleteSelection,
-  selectConnected,
-  resetPasteCount
+  selectConnected
 } from '../utils/graphCopyPaste';
 
 export function useCopyPaste(reactFlowInstance) {
@@ -20,12 +19,7 @@ export function useCopyPaste(reactFlowInstance) {
     nodes,
     edges,
     setGraph,
-    addNode,
-    addEdge,
-    removeNode,
-    removeEdge,
-    selectedNode,
-    selectedEdge
+    selectedNode
   } = useGraphStore();
 
   const [clipboard, setClipboard] = useState(null);

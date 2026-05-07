@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/26</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -125,37 +125,14 @@
 <a name='L60'></a><a href='#L60'>60</a>
 <a name='L61'></a><a href='#L61'>61</a>
 <a name='L62'></a><a href='#L62'>62</a>
-<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -169,6 +146,31 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -187,8 +189,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
- * lineSearch.js - Line search with backtracking for NR stability
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { toElectricalPrecision } = <span class="cstat-no" title="statement not covered" >require('../../shared/utils/electricalUtils');</span>
+/**
+ * core/powerflow/lineSearch.js - Line search with backtracking for NR stability
  *
  * Responsibility: Reduce step size if mismatch increases
  * NO Express, NO axios, NO UI logic
@@ -234,13 +237,13 @@ function <span class="fstat-no" title="function not covered" >applyUpdate(</span
   // Apply angle corrections
 <span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; V.length; i++) {</span>
 <span class="cstat-no" title="statement not covered" >    if (correctionIndex &lt; delta.length) {</span>
-      const dTheta = <span class="cstat-no" title="statement not covered" >parseFloat((delta[correctionIndex] * alpha).toFixed(6))</span>
-      const currentMag = <span class="cstat-no" title="statement not covered" >parseFloat(Math.hypot(V[i].re, V[i].im).toFixed(6))</span>
-      const currentAng = <span class="cstat-no" title="statement not covered" >parseFloat(Math.atan2(V[i].im, V[i].re).toFixed(6))</span>
-      const newAng = <span class="cstat-no" title="statement not covered" >parseFloat((currentAng + dTheta).toFixed(6))</span>
+      const dTheta = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(delta[correctionIndex] * alpha)</span>
+      const currentMag = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(Math.hypot(V[i].re, V[i].im)) </span>// current (A)
+      const currentAng = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(Math.atan2(V[i].im, V[i].re)) </span>// current (A)
+      const newAng = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(currentAng + dTheta) </span>// current (A)
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      newV[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))</span>
-<span class="cstat-no" title="statement not covered" >      newV[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))</span>
+<span class="cstat-no" title="statement not covered" >      newV[i].re = toElectricalPrecision(currentMag * Math.cos(newAng)) </span>// current (A)
+<span class="cstat-no" title="statement not covered" >      newV[i].im = toElectricalPrecision(currentMag * Math.sin(newAng)) </span>// current (A)
 <span class="cstat-no" title="statement not covered" >      correctionIndex++</span>
     }
   }
@@ -256,7 +259,7 @@ function <span class="fstat-no" title="function not covered" >applyUpdate(</span
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T08:24:14.160Z
+                at 2026-05-07T00:07:01.082Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

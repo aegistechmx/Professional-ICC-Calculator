@@ -1,4 +1,4 @@
-const { toElectricalPrecision, formatElectricalValue } = require('../../utils/electricalUtils');
+const { toElectricalPrecision } = require('../../utils/electricalUtils');
 /**
  * backend/src/domain/services/faultSimulation.domain.js
  * Motor de Simulación de Fallas Dinámica
@@ -82,7 +82,7 @@ class FaultSimulationEngine {
       id: node.id,
       type: node.type,
       I_base: node.data?.I_carga || 100, // Corriente nominal
-      V_base: node.data?.voltaje || 220,
+      V_base: node.data?.voltaje || 480,
       Z: node.data?.impedancia || 0.1,
       activo: true,
       protegido: false,

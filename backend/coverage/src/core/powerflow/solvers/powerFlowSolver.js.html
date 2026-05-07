@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">1.14% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/87</span>
+                <span class='fraction'>0/88</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">1.2% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/83</span>
+                <span class='fraction'>0/84</span>
             </div>
         
             
@@ -308,7 +308,8 @@
 <a name='L243'></a><a href='#L243'>243</a>
 <a name='L244'></a><a href='#L244'>244</a>
 <a name='L245'></a><a href='#L245'>245</a>
-<a name='L246'></a><a href='#L246'>246</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -316,6 +317,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -552,8 +554,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { toElectricalPrecision, formatElectricalValue } = <span class="cstat-no" title="statement not covered" >require('../../utils/electricalUtils');</span>
+/**
  * core/powerflow/solvers/powerFlowSolver.js - Base power flow solver
  *
  * Responsibility: Base implementation for power flow calculations
@@ -573,7 +576,7 @@ class PowerFlowSolver {
 <span class="cstat-no" title="statement not covered" >    this.validateSystem(system)</span>
 &nbsp;
     // Initialize voltages
-    const voltages = <span class="cstat-no" title="statement not covered" >this.initializeVoltages(system)</span>
+    const voltages = <span class="cstat-no" title="statement not covered" >this.initializeVoltages(system) </span>// voltage (V)
 &nbsp;
     // Simple iterative solver for demonstration
     let iteration = <span class="cstat-no" title="statement not covered" >0</span>
@@ -582,7 +585,7 @@ class PowerFlowSolver {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    while (iteration &lt; config.maxIterations &amp;&amp; !converged) {</span>
       // Calculate mismatches
-      const mismatches = <span class="cstat-no" title="statement not covered" >this.calculateMismatches(voltages, system)</span>
+      const mismatches = <span class="cstat-no" title="statement not covered" >this.calculateMismatches(voltages, system) </span>// voltage (V)
 &nbsp;
       // Check convergence
 <span class="cstat-no" title="statement not covered" >      maxMismatch = Math.max(...mismatches.map(<span class="fstat-no" title="function not covered" >m </span>=&gt; <span class="cstat-no" title="statement not covered" >Math.abs(m))</span>)</span>
@@ -614,7 +617,7 @@ class PowerFlowSolver {
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  so</span>lveOPF(system, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
-    const powerflowResult = <span class="cstat-no" title="statement not covered" >this.solve(system, options)</span>
+    const powerflowResult = <span class="cstat-no" title="statement not covered" >this.solve(system, options) </span>// power (W)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (!powerflowResult.converged) {</span>
 <span class="cstat-no" title="statement not covered" >      return powerflowResult</span>
@@ -656,7 +659,7 @@ class PowerFlowSolver {
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  in</span>itializeVoltages(system) {
-    const voltages = <span class="cstat-no" title="statement not covered" >[]</span>
+    const voltages = <span class="cstat-no" title="statement not covered" >[] </span>// voltage (V)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    system.buses.forEach(<span class="fstat-no" title="function not covered" >bu</span>s =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (bus.type === 'slack') {</span>
@@ -685,14 +688,14 @@ class PowerFlowSolver {
     let index = <span class="cstat-no" title="statement not covered" >0</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    system.buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>us, i) =&gt; {</span>
-      const V = <span class="cstat-no" title="statement not covered" >voltages[i]</span>
+      const V = <span class="cstat-no" title="statement not covered" >voltages[i] </span>// voltage (V)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (bus.type === 'pq') {</span>
-<span class="cstat-no" title="statement not covered" >        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system)</span>
+<span class="cstat-no" title="statement not covered" >        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system) </span>// power (W)
 <span class="cstat-no" title="statement not covered" >        mismatches[index++] =</span>
           bus.reactive - this.calculateReactivePower(V, i, system)
       } else <span class="cstat-no" title="statement not covered" >if (bus.type === 'pv') {</span>
-<span class="cstat-no" title="statement not covered" >        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system)</span>
+<span class="cstat-no" title="statement not covered" >        mismatches[index++] = bus.power - this.calculateRealPower(V, i, system) </span>// power (W)
       }
     })
 &nbsp;
@@ -701,7 +704,7 @@ class PowerFlowSolver {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  ca</span>lculateRealPower(voltage, busIndex, system) {
     // Simplified real power calculation
-    let power = <span class="cstat-no" title="statement not covered" >0</span>
+    let power = <span class="cstat-no" title="statement not covered" >0 </span>// Unit: W (Watts)
 <span class="cstat-no" title="statement not covered" >    system.branches.forEach(<span class="fstat-no" title="function not covered" >br</span>anch =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (branch.from - 1 === busIndex || branch.to - 1 === busIndex) {</span>
 <span class="cstat-no" title="statement not covered" >        power += voltage.magnitude * 0.1 </span>// Placeholder
@@ -712,7 +715,7 @@ class PowerFlowSolver {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  ca</span>lculateReactivePower(voltage, busIndex, system) {
     // Simplified reactive power calculation
-    let power = <span class="cstat-no" title="statement not covered" >0</span>
+    let power = <span class="cstat-no" title="statement not covered" >0 </span>// Unit: W (Watts)
 <span class="cstat-no" title="statement not covered" >    system.branches.forEach(<span class="fstat-no" title="function not covered" >br</span>anch =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (branch.from - 1 === busIndex || branch.to - 1 === busIndex) {</span>
 <span class="cstat-no" title="statement not covered" >        power += voltage.magnitude * 0.05 </span>// Placeholder
@@ -726,16 +729,16 @@ class PowerFlowSolver {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    system.buses.forEach(<span class="fstat-no" title="function not covered" >(b</span>us, i) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (bus.type === 'pq') {</span>
-<span class="cstat-no" title="statement not covered" >        voltages[i].angle += mismatches[index++] * 0.01</span>
-<span class="cstat-no" title="statement not covered" >        voltages[i].magnitude += mismatches[index++] * 0.01</span>
+<span class="cstat-no" title="statement not covered" >        voltages[i].angle += mismatches[index++] * 0.01 </span>// voltage (V)
+<span class="cstat-no" title="statement not covered" >        voltages[i].magnitude += mismatches[index++] * 0.01 </span>// voltage (V)
       } else <span class="cstat-no" title="statement not covered" >if (bus.type === 'pv') {</span>
-<span class="cstat-no" title="statement not covered" >        voltages[i].angle += mismatches[index++] * 0.01</span>
+<span class="cstat-no" title="statement not covered" >        voltages[i].angle += mismatches[index++] * 0.01 </span>// voltage (V)
       }
     })
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  fo</span>rmatVoltages(voltages) {
-<span class="cstat-no" title="statement not covered" >    return voltages.map(<span class="fstat-no" title="function not covered" >(v</span>, i) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+<span class="cstat-no" title="statement not covered" >    return voltages.map(<span class="fstat-no" title="function not covered" >(v</span>, i) =&gt; (<span class="cstat-no" title="statement not covered" >{ // voltage (V)</span></span>
       bus: i + 1,
       magnitude: v.magnitude,
       angle: v.angle,
@@ -792,12 +795,12 @@ class PowerFlowSolver {
 <span class="fstat-no" title="function not covered" >  ca</span>lculateTotalCost(dispatch, costs) {
 <span class="cstat-no" title="statement not covered" >    return dispatch.reduce(<span class="fstat-no" title="function not covered" >(t</span>otal, gen) =&gt; {</span>
       const cost = <span class="cstat-no" title="statement not covered" >costs[gen.bus]</span>
-<span class="cstat-no" title="statement not covered" >      return total + gen.power * (cost?.b || 20)</span>
+<span class="cstat-no" title="statement not covered" >      return toElectricalPrecision(parseFloat((total + gen.power * (cost?.b || 20))).toFixed(6));</span>
     }, 0)
   }
 }
 &nbsp;
-module.exports = PowerFlowSolver
+<span class="cstat-no" title="statement not covered" >module.exports = PowerFlowSolver</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -805,7 +808,7 @@ module.exports = PowerFlowSolver
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T08:24:14.160Z
+                at 2026-05-07T00:07:01.082Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

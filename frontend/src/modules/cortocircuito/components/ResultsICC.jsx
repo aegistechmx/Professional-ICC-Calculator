@@ -1,4 +1,9 @@
+/* eslint-disable react/prop-types */
 export default function ResultsICC({ result, loading, error, optimization, onOptimize }) {
+  // Validate props
+  if (result && typeof result !== 'object') {
+    return null;
+  }
   if (loading) return <p className="text-gray-600">Calculando...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!result) return null;

@@ -7,6 +7,9 @@ const logger = require('../../utils/logger');
 const iccService = require('../../services/icc.service');
 const { validateSchema, iccCalculationSchema } = require('../../validation/electrical.schemas');
 
+// Cambia el voltaje por defecto de 220V a 480V
+const DEFAULT_VOLTAGE = 480;
+
 /**
  * Calculate ICC (short circuit current) only
  * @param {Object} req - Express request
@@ -19,9 +22,13 @@ async function calculateICC(req, res) {
   try {
     const input = req.validatedBody || req.body;
 
+    // Usar voltaje por defecto corregido (480V en lugar de 220V)
+    const voltage = input.V || input.voltage || DEFAULT_VOLTAGE;
+    const impedance = input.Z || input.impedance || 0.058;
+
     logger.info('ICC calculation request', {
-      voltage: input.V,
-      impedance: input.Z,
+      voltage: voltage,
+      impedance: impedance,
       hasSystem: !!input.system
     });
 

@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback, useRef } from 'react';
+import PropTypes from 'prop-types';
 import ReactFlow, { Background, Controls, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
 import ParticleCanvas from './ParticleCanvas.jsx';
@@ -44,25 +45,6 @@ const FaultAnimationExample = ({ initialNodes = [], initialEdges = [] }) => {
   }, []);
 
   /**
-   * Manejar clic en nodo para iniciar falla
-   */
-  const onNodeClick = useCallback((event, node) => {
-    if (node.type === 'breaker') return; // No iniciar falla en breakers
-
-    setSelectedNode(node);
-
-    // Simular corriente de falla basada en tipo de nodo
-    const Icc = simulateFaultCurrent(node);
-
-    if (isParticleMode) {
-      startFaultParticleAnimation(node.id, Icc);
-    } else {
-      // Usar sistema original de animación (stroke animated)
-      startOriginalAnimation(node.id, Icc);
-    }
-  }, [isParticleMode, startFaultParticleAnimation]);
-
-  /**
    * Simular corriente de cortocircuito
    */
   const simulateFaultCurrent = (node) => {
@@ -78,34 +60,40 @@ const FaultAnimationExample = ({ initialNodes = [], initialEdges = [] }) => {
   };
 
   /**
-   * Iniciar animación original (fallback)
+   * Manejar clic en nodo para iniciar falla
    */
-  const startOriginalAnimation = (nodeId, Icc) => {
-    // Implementación simplificada del sistema original
-    const upstreamPath = getUpstreamPath({ nodes, edges }, nodeId);
+  const onNodeClick = useCallback((event, node) => {
+    triggerFaultAnimation(node);
+  }, [triggerFaultAnimation]);
 
-    upstreamPath.forEach((edge, index) => {
-      setTimeout(() => {
-        handleEdgeUpdate(edge.id, {
-          style: {
-            stroke: '#ef4444',
-            strokeWidth: Math.min(5, Math.log10(Icc) * 0.5),
-            animation: 'pulse 0.5s ease-in-out infinite'
-          },
-          animated: true
-        });
-      }, index * 300);
-    });
+  const triggerFaultAnimation = useCallback((node) => {
+    if (node.type === 'breaker') return; // No iniciar falla en breakers
 
-    handleNodeUpdate(nodeId, {
-      style: {
-        background: '#fee2e2',
-        border: '3px solid #ef4444',
-        boxShadow: '0 0 20px rgba(239, 68, 68, 0.5)'
-      },
-      data: { status: 'FAULT', Icc }
-    });
-  };
+    setSelectedNode(node);
+
+    // Simular corriente de falla basada en tipo de nodo
+    const Icc = simulateFaultCurrent(node);
+
+    if (isParticleMode) {
+      startFaultParticleAnimation(node.id, Icc);
+    } else {
+      // Implementación simplificada del sistema original
+      const upstreamPath = getUpstreamPath({ nodes, edges }, node.id);
+
+      upstreamPath.forEach((edge, index) => {
+        setTimeout(() => {
+          handleEdgeUpdate(edge.id, {
+            style: {
+              stroke: '#ef4444',
+              strokeWidth: Math.min(5, Math.log10(Icc) * 0.5),
+              animation: 'pulse 0.5s ease-in-out infinite'
+            }
+          });
+        }, index * 100);
+      });
+    }
+  }, [isParticleMode, startFaultParticleAnimation, nodes, edges, handleEdgeUpdate]);
+
 
   /**
    * Detener todas las animaciones
@@ -346,5 +334,10 @@ function getUpstreamPath(graph, startNodeId) {
 
   return path;
 }
+
+FaultAnimationExample.propTypes = {
+  initialNodes: PropTypes.array,
+  initialEdges: PropTypes.array
+};
 
 export default FaultAnimationExample;

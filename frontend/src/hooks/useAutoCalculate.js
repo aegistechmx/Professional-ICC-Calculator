@@ -29,7 +29,6 @@ export function useAutoCalculate(options = {}) {
     calculating,
     calculateSystem,
     calculateSystemRealtime,
-    getRealtimeResult,
     clearResults
   } = useGraphStore();
 

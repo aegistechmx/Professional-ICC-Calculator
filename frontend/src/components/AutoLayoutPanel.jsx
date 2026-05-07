@@ -5,20 +5,19 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import { useGraphStore } from '../store/graphStore.js';
-import { calculateElectricalLayout } from '../utils/simulationEngine.js';
 
 export const AutoLayoutPanel = () => {
   const [layoutStyle, setLayoutStyle] = useState('hierarchical'); // 'hierarchical', 'radial', 'grid'
   const [spacing, setSpacing] = useState({ x: 200, y: 150 });
   const [isLayouting, setIsLayouting] = useState(false);
   const [layoutStats, setLayoutStats] = useState(null);
-  
-  const { 
-    nodes, 
-    edges, 
+
+  const {
+    nodes,
+    edges,
     setGraph,
     ui,
-    toggleAutoLayout 
+    toggleAutoLayout
   } = useGraphStore();
 
   // === NIVELES ELÉCTRICOS ===
@@ -75,11 +74,11 @@ export const AutoLayoutPanel = () => {
     edges.forEach(edge => {
       const sourceNode = nodes.find(n => n.id === edge.source);
       const targetNode = nodes.find(n => n.id === edge.target);
-      
+
       if (sourceNode && targetNode) {
         const sourceLevel = electricalLevels[sourceNode.type] || 999;
         const targetLevel = electricalLevels[targetNode.type] || 999;
-        
+
         const connectionKey = `${sourceLevel}-${targetLevel}`;
         if (!topology.connections[connectionKey]) {
           topology.connections[connectionKey] = [];
@@ -94,7 +93,7 @@ export const AutoLayoutPanel = () => {
   // === LAYOUT JERÁRQUICO ===
   const applyHierarchicalLayout = useCallback(() => {
     setIsLayouting(true);
-    
+
     const topology = analyzeTopology();
     const positionedNodes = [];
     const levelKeys = Object.keys(topology.levels)
@@ -104,10 +103,10 @@ export const AutoLayoutPanel = () => {
     levelKeys.forEach((level, levelIndex) => {
       const nodesInLevel = topology.levels[level];
       const y = levelIndex * spacing.y + 100;
-      
+
       nodesInLevel.forEach((node, nodeIndex) => {
         const x = (nodeIndex - nodesInLevel.length / 2) * spacing.x + 400;
-        
+
         positionedNodes.push({
           ...node,
           position: { x, y }
@@ -117,7 +116,7 @@ export const AutoLayoutPanel = () => {
 
     // Actualizar grafo
     setGraph(positionedNodes, edges);
-    
+
     // Generar estadísticas
     setLayoutStats({
       style: 'hierarchical',
@@ -134,15 +133,15 @@ export const AutoLayoutPanel = () => {
   // === LAYOUT RADIAL ===
   const applyRadialLayout = useCallback(() => {
     setIsLayouting(true);
-    
+
     const topology = analyzeTopology();
     const positionedNodes = [];
     const centerX = 400;
     const centerY = 300;
-    
+
     // Colocar fuente en el centro
     if (topology.sources.length > 0) {
-      topology.sources.forEach((source, index) => {
+      topology.sources.forEach((source) => {
         positionedNodes.push({
           ...source,
           position: { x: centerX, y: centerY }
@@ -159,12 +158,12 @@ export const AutoLayoutPanel = () => {
     levelKeys.forEach((level, levelIndex) => {
       const nodesInLevel = topology.levels[level];
       const radius = (levelIndex + 1) * spacing.y;
-      
+
       nodesInLevel.forEach((node, nodeIndex) => {
         const angle = (nodeIndex / nodesInLevel.length) * 2 * Math.PI;
         const x = centerX + Math.cos(angle) * radius;
         const y = centerY + Math.sin(angle) * radius;
-        
+
         positionedNodes.push({
           ...node,
           position: { x, y }
@@ -173,7 +172,7 @@ export const AutoLayoutPanel = () => {
     });
 
     setGraph(positionedNodes, edges);
-    
+
     setLayoutStats({
       style: 'radial',
       levels: levelKeys.length,
@@ -190,25 +189,24 @@ export const AutoLayoutPanel = () => {
   // === LAYOUT GRID ===
   const applyGridLayout = useCallback(() => {
     setIsLayouting(true);
-    
+
     const topology = analyzeTopology();
     const positionedNodes = [];
-    
+
     // Calcular dimensiones del grid
     const maxNodesPerLevel = Math.max(...Object.values(topology.levels).map(level => level.length));
     const cols = Math.max(3, maxNodesPerLevel);
     const rows = Object.keys(topology.levels).length;
-    
-    Object.entries(topology.levels).forEach(([levelStr, nodesInLevel], levelIndex) => {
-      const level = parseInt(levelStr);
-      
+
+    Object.entries(topology.levels).forEach(([, nodesInLevel], levelIndex) => {
+
       nodesInLevel.forEach((node, nodeIndex) => {
         const col = nodeIndex % cols;
         const row = levelIndex;
-        
+
         const x = col * spacing.x + 100;
         const y = row * spacing.y + 100;
-        
+
         positionedNodes.push({
           ...node,
           position: { x, y }
@@ -217,7 +215,7 @@ export const AutoLayoutPanel = () => {
     });
 
     setGraph(positionedNodes, edges);
-    
+
     setLayoutStats({
       style: 'grid',
       levels: rows,
@@ -235,12 +233,12 @@ export const AutoLayoutPanel = () => {
   // === LAYOUT BASADO EN FLUJO ===
   const applyFlowBasedLayout = useCallback(() => {
     setIsLayouting(true);
-    
+
     // BFS para determinar niveles basados en distancia desde fuentes
     const levels = {};
     const visited = new Set();
     const queue = [];
-    
+
     // Iniciar con fuentes
     const sources = nodes.filter(n => n.type === 'source');
     sources.forEach(source => {
@@ -248,18 +246,18 @@ export const AutoLayoutPanel = () => {
       queue.push(source);
       visited.add(source.id);
     });
-    
+
     // BFS
     while (queue.length > 0) {
       const current = queue.shift();
       const currentLevel = levels[current.id];
-      
+
       // Encontrar nodos conectados downstream
       const downstreamEdges = edges.filter(e => e.source === current.id);
-      
+
       downstreamEdges.forEach(edge => {
         const targetNode = nodes.find(n => n.id === edge.target);
-        
+
         if (targetNode && !visited.has(targetNode.id)) {
           levels[targetNode.id] = currentLevel + 1;
           queue.push(targetNode);
@@ -267,7 +265,7 @@ export const AutoLayoutPanel = () => {
         }
       });
     }
-    
+
     // Agrupar nodos por nivel calculado
     const nodesByLevel = {};
     Object.entries(levels).forEach(([nodeId, level]) => {
@@ -279,20 +277,20 @@ export const AutoLayoutPanel = () => {
         nodesByLevel[level].push(node);
       }
     });
-    
+
     // Posicionar nodos
     const positionedNodes = [];
     const levelKeys = Object.keys(nodesByLevel)
       .map(key => parseInt(key))
       .sort((a, b) => a - b);
-    
+
     levelKeys.forEach((level, levelIndex) => {
       const nodesInLevel = nodesByLevel[level];
       const y = levelIndex * spacing.y + 100;
-      
+
       nodesInLevel.forEach((node, nodeIndex) => {
         const x = (nodeIndex - nodesInLevel.length / 2) * spacing.x + 400;
-        
+
         positionedNodes.push({
           ...node,
           position: { x, y }
@@ -301,7 +299,7 @@ export const AutoLayoutPanel = () => {
     });
 
     setGraph(positionedNodes, edges);
-    
+
     setLayoutStats({
       style: 'flow-based',
       levels: levelKeys.length,
@@ -336,12 +334,12 @@ export const AutoLayoutPanel = () => {
   // === OPTIMIZAR ESPACIAMIENTO ===
   const optimizeSpacing = useCallback(() => {
     const topology = analyzeTopology();
-    
+
     // Calcular espaciado óptimo basado en número de nodos
     const maxNodesPerLevel = Math.max(...Object.values(topology.levels).map(level => level.length));
     const optimalX = Math.max(150, 800 / maxNodesPerLevel);
     const optimalY = Math.max(100, 400 / Object.keys(topology.levels).length);
-    
+
     setSpacing({ x: optimalX, y: optimalY });
   }, [analyzeTopology]);
 
@@ -353,11 +351,10 @@ export const AutoLayoutPanel = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={toggleAutoLayout}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              ui.autoLayout 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${ui.autoLayout
+              ? 'bg-blue-500 text-white hover:bg-blue-600'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
           >
             {ui.autoLayout ? 'Activado' : 'Desactivado'}
           </button>
@@ -384,11 +381,10 @@ export const AutoLayoutPanel = () => {
             <button
               key={style.value}
               onClick={() => setLayoutStyle(style.value)}
-              className={`p-2 rounded border text-sm font-medium transition-colors ${
-                layoutStyle === style.value 
-                  ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-              }`}
+              className={`p-2 rounded border text-sm font-medium transition-colors ${layoutStyle === style.value
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                }`}
             >
               {style.label}
             </button>
@@ -457,7 +453,7 @@ export const AutoLayoutPanel = () => {
               </span>
             </div>
           </div>
-          
+
           {/* Nodos por nivel */}
           <div className="mt-3">
             <span className="text-xs text-gray-500">Nodos por nivel:</span>
@@ -549,9 +545,5 @@ export const AutoLayoutPanel = () => {
   );
 };
 
-// Helper function para max en objetos
-const maxObjectValues = (obj) => {
-  return Math.max(...Object.values(obj));
-};
 
 export default AutoLayoutPanel;

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/132</span>
+                <span class='fraction'>0/133</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/112</span>
+                <span class='fraction'>0/113</span>
             </div>
         
             
@@ -333,7 +333,16 @@
 <a name='L268'></a><a href='#L268'>268</a>
 <a name='L269'></a><a href='#L269'>269</a>
 <a name='L270'></a><a href='#L270'>270</a>
-<a name='L271'></a><a href='#L271'>271</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L271'></a><a href='#L271'>271</a>
+<a name='L272'></a><a href='#L272'>272</a>
+<a name='L273'></a><a href='#L273'>273</a>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -351,6 +360,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -425,7 +435,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -434,7 +446,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -491,7 +505,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -621,6 +639,7 @@ const { buildJacobian } = <span class="cstat-no" title="statement not covered" >
 const { enforcePVLimits } = <span class="cstat-no" title="statement not covered" >require('./pvControl')</span>
 const { lineSearch } = <span class="cstat-no" title="statement not covered" >require('./lineSearch')</span>
 const { applyTrustRegion } = <span class="cstat-no" title="statement not covered" >require('./trustRegion')</span>
+const { toElectricalPrecision } = <span class="cstat-no" title="statement not covered" >require('../../shared/utils/electricalUtils')</span>
 &nbsp;
 /**
  * Solve linear system J * x = b using Gaussian elimination
@@ -692,22 +711,26 @@ function <span class="fstat-no" title="function not covered" >solveLinearSystem(
 function <span class="fstat-no" title="function not covered" >initializeVoltages(</span>buses) {
 <span class="cstat-no" title="statement not covered" >  return buses.map(<span class="fstat-no" title="function not covered" >bu</span>s =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (bus.type === 'Slack') {</span>
-      const mag = <span class="cstat-no" title="statement not covered" >parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))</span>
+      const mag = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(bus.voltage?.magnitude || 1.0) </span>// voltage (V)
       // voltage (V)
-      const ang = <span class="cstat-no" title="statement not covered" >parseFloat(((bus.voltage?.angle || 0) * Math.PI / 180).toFixed(6))</span>
+      const ang = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(</span>
+        ((bus.voltage?.angle || 0) * Math.PI) / 180
+      )
       // voltage (V)
 <span class="cstat-no" title="statement not covered" >      return {</span>
-        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
-        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
+        re: toElectricalPrecision(mag * Math.cos(ang)),
+        im: toElectricalPrecision(mag * Math.sin(ang)),
       }
     } else <span class="cstat-no" title="statement not covered" >if (bus.type === 'PV') {</span>
-      const mag = <span class="cstat-no" title="statement not covered" >parseFloat((bus.voltage?.magnitude || 1.0).toFixed(6))</span>
+      const mag = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(bus.voltage?.magnitude || 1.0, 'voltage') </span>// voltage (V)
       // voltage (V)
-      const ang = <span class="cstat-no" title="statement not covered" >parseFloat(((bus.voltage?.angle || 0) * Math.PI / 180).toFixed(6))</span>
+      const ang = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(</span>
+        ((bus.voltage?.angle || 0) * Math.PI) / 180, 'angle'
+      )
       // voltage (V)
 <span class="cstat-no" title="statement not covered" >      return {</span>
-        re: parseFloat((mag * Math.cos(ang)).toFixed(6)),
-        im: parseFloat((mag * Math.sin(ang)).toFixed(6)),
+        re: toElectricalPrecision(mag * Math.cos(ang), 'voltage'),
+        im: toElectricalPrecision(mag * Math.sin(ang), 'voltage'),
       }
     } else {
       // PQ: flat start at 1.0∠0°
@@ -745,13 +768,13 @@ function <span class="fstat-no" title="function not covered" >applyCorrections(<
 <span class="cstat-no" title="statement not covered" >    if (i === slackIndex) <span class="cstat-no" title="statement not covered" >continue</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (correctionIndex &lt; corrections.length) {</span>
-      const dTheta = <span class="cstat-no" title="statement not covered" >parseFloat(corrections[correctionIndex].toFixed(6))</span>
-      const currentMag = <span class="cstat-no" title="statement not covered" >parseFloat(Math.hypot(V[i].re, V[i].im).toFixed(6))</span>
-      const currentAng = <span class="cstat-no" title="statement not covered" >parseFloat(Math.atan2(V[i].im, V[i].re).toFixed(6))</span>
-      const newAng = <span class="cstat-no" title="statement not covered" >parseFloat((currentAng + dTheta).toFixed(6))</span>
+      const dTheta = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(corrections[correctionIndex], 'angle')</span>
+      const currentMag = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(Math.hypot(V[i].re, V[i].im), 'voltage') </span>// current (A)
+      const currentAng = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(Math.atan2(V[i].im, V[i].re), 'angle') </span>// current (A)
+      const newAng = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(currentAng + dTheta, 'angle') </span>// current (A)
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      newV[i].re = parseFloat((currentMag * Math.cos(newAng)).toFixed(6))</span>
-<span class="cstat-no" title="statement not covered" >      newV[i].im = parseFloat((currentMag * Math.sin(newAng)).toFixed(6))</span>
+<span class="cstat-no" title="statement not covered" >      newV[i].re = toElectricalPrecision(currentMag * Math.cos(newAng), 'voltage') </span>// current (A)
+<span class="cstat-no" title="statement not covered" >      newV[i].im = toElectricalPrecision(currentMag * Math.sin(newAng), 'voltage') </span>// current (A)
 <span class="cstat-no" title="statement not covered" >      correctionIndex++</span>
     }
   }
@@ -759,13 +782,17 @@ function <span class="fstat-no" title="function not covered" >applyCorrections(<
   // Apply magnitude corrections (only PQ buses)
 <span class="cstat-no" title="statement not covered" >  pq.forEach(<span class="fstat-no" title="function not covered" >i </span>=&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (correctionIndex &lt; corrections.length) {</span>
-      const dV = <span class="cstat-no" title="statement not covered" >corrections[correctionIndex]</span>
-      const currentMag = <span class="cstat-no" title="statement not covered" >Math.hypot(newV[i].re, newV[i].im)</span>
-      const currentAng = <span class="cstat-no" title="statement not covered" >Math.atan2(newV[i].im, newV[i].re)</span>
-      const newMag = <span class="cstat-no" title="statement not covered" >currentMag + dV </span>// No clamping
+      const dV = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(corrections[correctionIndex], 'voltage')</span>
+      const currentMag = <span class="cstat-no" title="statement not covered" >toElectricalPrecision( // current (A)</span>
+        Math.hypot(newV[i].re, newV[i].im), 'voltage'
+      )
+      const currentAng = <span class="cstat-no" title="statement not covered" >toElectricalPrecision( // current (A)</span>
+        Math.atan2(newV[i].im, newV[i].re), 'angle'
+      )
+      const newMag = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(currentMag + dV, 'voltage') </span>// No clamping
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      newV[i].re = newMag * Math.cos(currentAng)</span>
-<span class="cstat-no" title="statement not covered" >      newV[i].im = newMag * Math.sin(currentAng)</span>
+<span class="cstat-no" title="statement not covered" >      newV[i].re = toElectricalPrecision(newMag * Math.cos(currentAng), 'voltage') </span>// current (A)
+<span class="cstat-no" title="statement not covered" >      newV[i].im = toElectricalPrecision(newMag * Math.sin(currentAng), 'voltage') </span>// current (A)
 <span class="cstat-no" title="statement not covered" >      correctionIndex++</span>
     }
   })
@@ -880,7 +907,7 @@ function <span class="fstat-no" title="function not covered" >solve(</span>syste
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T08:24:14.160Z
+                at 2026-05-07T00:07:01.082Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

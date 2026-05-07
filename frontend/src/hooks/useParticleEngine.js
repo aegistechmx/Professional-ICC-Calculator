@@ -12,7 +12,7 @@ export function useParticleEngine({ graph, results, getEdgePath, options = {} })
   const lastUpdateRef = useRef(Date.now());
 
   // === CONFIGURACIÓN GLOBAL ===
-  const CONFIG = {
+  const CONFIG = useMemo(() => ({
     maxParticlesPerEdge: options.maxParticlesPerEdge || 20,
     speedFactor: options.speedFactor || 0.002,
     baseSize: options.baseSize || 2,
@@ -22,7 +22,17 @@ export function useParticleEngine({ graph, results, getEdgePath, options = {} })
     enableDirection: options.enableDirection !== false, // Dirección de flujo
     zoomScale: options.zoomScale || 1,
     panOffset: options.panOffset || { x: 0, y: 0 }
-  };
+  }), [
+    options.maxParticlesPerEdge,
+    options.speedFactor,
+    options.baseSize,
+    options.minCurrentForParticles,
+    options.particleSpacing,
+    options.enableGlow,
+    options.enableDirection,
+    options.zoomScale,
+    options.panOffset
+  ]);
 
   // === OBTENER CORRIENTE DEL EDGE ===
   const getEdgeCurrent = useCallback((edge) => {
@@ -451,7 +461,7 @@ export function getParticleColorPro(edge, current) {
 
   const absCurrent = Math.abs(current);
 
-  for (const [key, config] of Object.entries(colors)) {
+  for (const [, config] of Object.entries(colors)) {
     if (absCurrent >= config.current) {
       return config.color;
     }

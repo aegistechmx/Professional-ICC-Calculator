@@ -4,7 +4,8 @@
  */
 
 import React, { useMemo } from 'react';
-import { BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
+import { BaseEdge, EdgeLabelRenderer } from 'reactflow';
+import PropTypes from 'prop-types';
 import './OrthogonalEdge.css';
 
 export default function OrthogonalEdge({
@@ -13,8 +14,6 @@ export default function OrthogonalEdge({
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
   data,
   selected,
   animated = false
@@ -24,7 +23,7 @@ export default function OrthogonalEdge({
     if (data?.points && data.points.length >= 2) {
       return data.points;
     }
-    
+
     // Fallback: línea recta simplificada
     return [{ x: sourceX, y: sourceY }, { x: targetX, y: targetY }];
   }, [data?.points, sourceX, sourceY, targetX, targetY]);
@@ -32,7 +31,7 @@ export default function OrthogonalEdge({
   // Construir path SVG
   const path = useMemo(() => {
     if (pathPoints.length < 2) return '';
-    
+
     return pathPoints
       .map((point, index) => {
         const command = index === 0 ? 'M' : 'L';
@@ -66,7 +65,7 @@ export default function OrthogonalEdge({
     const length = data?.length ? `${data.length}m` : '';
     const impedance = data?.impedance ? `${data.impedance}Ω` : '';
     const current = data?.current ? `${data.current}A` : '';
-    
+
     return { length, impedance, current };
   }, [data]);
 
@@ -84,7 +83,7 @@ export default function OrthogonalEdge({
         className={`orthogonal-edge ${getAnimationClass()}`}
         markerEnd={data?.fault ? 'url(#arrow-fault)' : 'url(#arrow)'}
       />
-      
+
       {/* Marcadores SVG */}
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
         <defs>
@@ -112,7 +111,7 @@ export default function OrthogonalEdge({
           </marker>
         </defs>
       </svg>
-      
+
       {/* Label del cable */}
       {(cableInfo.length || cableInfo.impedance || cableInfo.current || selected) && (
         <EdgeLabelRenderer>
@@ -150,7 +149,7 @@ export default function OrthogonalEdge({
           </div>
         </EdgeLabelRenderer>
       )}
-      
+
       {/* Indicadores de flujo (puntos animados) */}
       {(animated || data?.animated) && !data?.fault && (
         <EdgeLabelRenderer>
@@ -186,4 +185,15 @@ export default function OrthogonalEdge({
       )}
     </>
   );
-}
+};
+
+OrthogonalEdge.propTypes = {
+  id: PropTypes.string.isRequired,
+  sourceX: PropTypes.number.isRequired,
+  sourceY: PropTypes.number.isRequired,
+  targetX: PropTypes.number.isRequired,
+  targetY: PropTypes.number.isRequired,
+  data: PropTypes.object,
+  selected: PropTypes.bool,
+  animated: PropTypes.bool
+};

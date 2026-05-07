@@ -22,13 +22,11 @@ export function useSmartSnap(nodes, options = {}) {
     gridSize = GRID_SIZE,
     mode = SNAP_MODES.SMART,
     nodeWidth = 150,
-    nodeHeight = 100,
-    enableAngles = false // para futuro: snap a ángulos
+    nodeHeight = 100
   } = options;
 
   const [guides, setGuides] = useState({ vertical: [], horizontal: [] });
   const [isSnapping, setIsSnapping] = useState(false);
-  const snapCache = useRef(new Map());
 
   /**
    * Calcular posición con snap inteligente
@@ -276,7 +274,7 @@ export function useSmartSnap(nodes, options = {}) {
   /**
    * Configurar modo de snap
    */
-  const setSnapMode = useCallback((newMode) => {
+  const setSnapMode = useCallback(() => {
     // Implementar si se necesita cambio dinámico de modo
   }, []);
 

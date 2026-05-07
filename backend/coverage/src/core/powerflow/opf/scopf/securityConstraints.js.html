@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/91</span>
+                <span class='fraction'>0/92</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/86</span>
+                <span class='fraction'>0/87</span>
             </div>
         
             
@@ -423,13 +423,15 @@
 <a name='L358'></a><a href='#L358'>358</a>
 <a name='L359'></a><a href='#L359'>359</a>
 <a name='L360'></a><a href='#L360'>360</a>
-<a name='L361'></a><a href='#L361'>361</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -783,7 +785,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { toElectricalPrecision, formatElectricalValue } = <span class="cstat-no" title="statement not covered" >require('../../utils/electricalUtils');</span>
+/**
  * securityConstraints.js - Security constraints for SCOPF
  *
  * Responsibility: Evaluate security constraints for contingency analysis
@@ -808,8 +811,8 @@ function <span class="fstat-no" title="function not covered" >evaluateSecurityCo
   options = <span class="branch-0 cbranch-no" title="branch not covered" >{}</span>
 ) {
   const {
-    voltageMin = <span class="branch-0 cbranch-no" title="branch not covered" >0.9,</span>
-    voltageMax = <span class="branch-0 cbranch-no" title="branch not covered" >1.1,</span>
+    voltageMin = <span class="branch-0 cbranch-no" title="branch not covered" >0.9,</span> // voltage (V)
+    voltageMax = <span class="branch-0 cbranch-no" title="branch not covered" >1.1,</span> // voltage (V)
     lineLimitFactor = <span class="branch-0 cbranch-no" title="branch not covered" >1.0,</span>
     tolerance = <span class="branch-0 cbranch-no" title="branch not covered" >1e-6,</span>
     maxIterations = <span class="branch-0 cbranch-no" title="branch not covered" >30,</span>
@@ -864,13 +867,13 @@ function <span class="fstat-no" title="function not covered" >evaluateContingenc
   const pfResult =
 <span class="cstat-no" title="statement not covered" >    options.method === 'FDLF'</span>
       ? solveFDLF(contingencySystem, {
-        tolerance: options.tolerance,
-        maxIterations: options.maxIterations,
-      })
+          tolerance: options.tolerance,
+          maxIterations: options.maxIterations,
+        })
       : solve(contingencySystem, {
-        tolerance: options.tolerance,
-        maxIterations: options.maxIterations,
-      })
+          tolerance: options.tolerance,
+          maxIterations: options.maxIterations,
+        })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (!pfResult.converged) {</span>
 <span class="cstat-no" title="statement not covered" >    return {</span>
@@ -883,7 +886,7 @@ function <span class="fstat-no" title="function not covered" >evaluateContingenc
   }
 &nbsp;
   // Check voltage violations
-  const voltageViolations = <span class="cstat-no" title="statement not covered" >checkVoltageViolations(pfResult.voltages, options)</span>
+  const voltageViolations = <span class="cstat-no" title="statement not covered" >checkVoltageViolations(pfResult.voltages, options) </span>// voltage (V)
 &nbsp;
   // Check line flow violations
   const flowViolations = <span class="cstat-no" title="statement not covered" >checkLineFlowViolations(</span>
@@ -965,7 +968,7 @@ function <span class="fstat-no" title="function not covered" >updateSystemGenera
 function <span class="fstat-no" title="function not covered" >checkVoltageViolations(</span>voltages, options) {
   const violations = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  voltages.forEach(<span class="fstat-no" title="function not covered" >(V</span>, i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  voltages.forEach(<span class="fstat-no" title="function not covered" >(V</span>, i) =&gt; { // voltage (V)</span>
     const magnitude = <span class="cstat-no" title="statement not covered" >Math.sqrt(V.re * V.re + V.im * V.im)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (magnitude &lt; options.voltageMin) {</span>
@@ -1006,13 +1009,13 @@ function <span class="fstat-no" title="function not covered" >checkLineFlowViola
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  if (!pfResult.flows) {</span>
     // Calculate flows if not provided
-<span class="cstat-no" title="statement not covered" >    pfResult.flows = calculateLineFlows(system, pfResult.voltages)</span>
+<span class="cstat-no" title="statement not covered" >    pfResult.flows = calculateLineFlows(system, pfResult.voltages) </span>// voltage (V)
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  pfResult.flows.forEach(<span class="fstat-no" title="function not covered" >(f</span>low, _i) =&gt; {</span>
     const branch = <span class="cstat-no" title="statement not covered" >system.branches.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === flow.id)</span></span>
 <span class="cstat-no" title="statement not covered" >    if (branch &amp;&amp; branch.limit) {</span>
-      const loading = <span class="cstat-no" title="statement not covered" >Math.abs(flow.power) / branch.limit</span>
+      const loading = <span class="cstat-no" title="statement not covered" >toElectricalPrecision(parseFloat((Math.abs(flow.power)) / branch.limit).toFixed(6));</span> // power (W)
       const limit = <span class="cstat-no" title="statement not covered" >branch.limit * limitFactor</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (Math.abs(flow.power) &gt; limit) {</span>
@@ -1078,8 +1081,8 @@ function <span class="fstat-no" title="function not covered" >calculateLineFlows
   const flows = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  system.branches.forEach(<span class="fstat-no" title="function not covered" >br</span>anch =&gt; {</span>
-    const Vfrom = <span class="cstat-no" title="statement not covered" >voltages[branch.from]</span>
-    const Vto = <span class="cstat-no" title="statement not covered" >voltages[branch.to]</span>
+    const Vfrom = <span class="cstat-no" title="statement not covered" >voltages[branch.from] </span>// voltage (V)
+    const Vto = <span class="cstat-no" title="statement not covered" >voltages[branch.to] </span>// voltage (V)
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (Vfrom &amp;&amp; Vto) {</span>
       const VfromMag = <span class="cstat-no" title="statement not covered" >Math.sqrt(Vfrom.re * Vfrom.re + Vfrom.im * Vfrom.im)</span>
@@ -1095,10 +1098,10 @@ function <span class="fstat-no" title="function not covered" >calculateLineFlows
           VfromMag * Math.cos(thetaFrom) - VtoMag * Math.cos(thetaTo),
           2
         ) +
-        Math.pow(
-          VfromMag * Math.sin(thetaFrom) - VtoMag * Math.sin(thetaTo),
-          2
-        )
+          Math.pow(
+            VfromMag * Math.sin(thetaFrom) - VtoMag * Math.sin(thetaTo),
+            2
+          )
       )
 &nbsp;
       const I = <span class="cstat-no" title="statement not covered" >VdiffMag / Z</span>
@@ -1150,7 +1153,7 @@ function <span class="fstat-no" title="function not covered" >determineSeverity(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T08:24:14.160Z
+                at 2026-05-07T00:07:01.082Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

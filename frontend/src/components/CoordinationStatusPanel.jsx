@@ -4,9 +4,10 @@
  */
 
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import './CoordinationStatusPanel.css';
 
-export default function CoordinationStatusPanel({ 
+export default function CoordinationStatusPanel({
   coordinationResult,
   onApplyChanges,
   onReset,
@@ -36,14 +37,14 @@ export default function CoordinationStatusPanel({
     );
   }
 
-  const { 
-    status, 
-    breakers, 
-    originalBreakers, 
-    iterations, 
-    history, 
+  const {
+    status,
+    breakers,
+    originalBreakers,
+    iterations,
+    history,
     finalStatus,
-    message 
+    message
   } = coordinationResult;
 
   const isCoordinated = status === 'COORDINATED';
@@ -53,7 +54,7 @@ export default function CoordinationStatusPanel({
   const changes = breakers.map((b, i) => {
     const orig = originalBreakers[i];
     const changes = [];
-    
+
     if (b.TMS !== orig.TMS) {
       changes.push({
         param: 'TMS',
@@ -78,7 +79,7 @@ export default function CoordinationStatusPanel({
         percent: ((b.instantaneous / orig.instantaneous - 1) * 100).toFixed(1)
       });
     }
-    
+
     return { breaker: b, changes };
   }).filter(c => c.changes.length > 0);
 
@@ -108,7 +109,7 @@ export default function CoordinationStatusPanel({
       <div className="pairs-section">
         <h4>Pares de Protección</h4>
         {finalStatus?.pairs?.map((pair, index) => (
-          <div 
+          <div
             key={index}
             className={`pair-card ${pair.status.toLowerCase()} ${selectedPair === index ? 'selected' : ''}`}
             onClick={() => setSelectedPair(selectedPair === index ? null : index)}
@@ -162,7 +163,7 @@ export default function CoordinationStatusPanel({
       {/* Historial de iteraciones */}
       {history && history.length > 0 && (
         <div className="history-section">
-          <button 
+          <button
             className="toggle-btn"
             onClick={() => setShowHistory(!showHistory)}
           >
@@ -191,7 +192,7 @@ export default function CoordinationStatusPanel({
       {/* Sugerencias */}
       {!isCoordinated && (
         <div className="suggestions-section">
-          <button 
+          <button
             className="toggle-btn warning"
             onClick={() => setShowSuggestions(!showSuggestions)}
           >
@@ -221,14 +222,14 @@ export default function CoordinationStatusPanel({
 
       {/* Acciones */}
       <div className="panel-actions">
-        <button 
+        <button
           className="btn-apply"
           onClick={() => onApplyChanges?.(breakers)}
           disabled={isLoading || changes.length === 0}
         >
           {isLoading ? 'Aplicando...' : 'Aplicar Cambios'}
         </button>
-        <button 
+        <button
           className="btn-reset"
           onClick={onReset}
           disabled={isLoading}
@@ -239,3 +240,10 @@ export default function CoordinationStatusPanel({
     </div>
   );
 }
+
+CoordinationStatusPanel.propTypes = {
+  coordinationResult: PropTypes.object,
+  onApplyChanges: PropTypes.func,
+  onReset: PropTypes.func,
+  isLoading: PropTypes.bool
+};

@@ -4,6 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { BaseEdge, EdgeLabelRenderer } from 'reactflow';
 import './FlowEdge.css';
 
@@ -39,7 +40,7 @@ export default function FlowEdge({
   const getAnimationDuration = () => {
     const { current } = data || {};
     if (!current) return '2s';
-    
+
     // Mayor corriente = animación más rápida
     const speed = Math.max(0.5, 2 - (current / 100));
     return `${speed}s`;
@@ -49,7 +50,7 @@ export default function FlowEdge({
   const getParticleCount = () => {
     const { current } = data || {};
     if (!current) return 3;
-    
+
     // Mayor corriente = más partículas
     return Math.min(8, Math.ceil(current / 20) + 2);
   };
@@ -64,7 +65,7 @@ export default function FlowEdge({
         })
         .join(' ');
     }
-    
+
     // Fallback: línea recta
     return `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
   }, [data?.points, sourceX, sourceY, targetX, targetY]);
@@ -180,3 +181,23 @@ export default function FlowEdge({
     </>
   );
 }
+
+FlowEdge.propTypes = {
+  id: PropTypes.string.isRequired,
+  sourceX: PropTypes.number.isRequired,
+  sourceY: PropTypes.number.isRequired,
+  targetX: PropTypes.number.isRequired,
+  targetY: PropTypes.number.isRequired,
+  data: PropTypes.shape({
+    points: PropTypes.arrayOf(PropTypes.shape({
+      x: PropTypes.number,
+      y: PropTypes.number
+    })),
+    current: PropTypes.number,
+    capacity: PropTypes.number,
+    animated: PropTypes.bool,
+    fault: PropTypes.bool,
+    tripped: PropTypes.bool
+  }),
+  selected: PropTypes.bool
+};

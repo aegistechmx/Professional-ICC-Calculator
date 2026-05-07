@@ -8,7 +8,6 @@ import { useGraphStore } from '../store/graphStore.js';
 import { useTCCCurves } from './SimulationEngine.jsx';
 import {
   calculateCoordinationMargin,
-  adjustCurveForCoordination,
   curvesOverlap,
   interpolateTripTime
 } from '../utils/simulationEngine.js';
@@ -23,7 +22,6 @@ export const AutoCoordinationPanel = () => {
     nodes,
     edges,
     results,
-    simulation,
     generateTCCCurves,
     autoCoordinateBreakers
   } = useGraphStore();
@@ -234,7 +232,7 @@ export const AutoCoordinationPanel = () => {
     if (Object.keys(curves).length > 0) {
       analyzeCoordination();
     }
-  }, [curves]);
+  }, [curves, analyzeCoordination]);
 
   // === MODO AUTOMÁTICO ===
   useEffect(() => {
@@ -288,7 +286,7 @@ export const AutoCoordinationPanel = () => {
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">Score de Coordinación:</span>
             <span className={`text-lg font-bold ${coordinationResults.overallScore > 80 ? 'text-green-600' :
-                coordinationResults.overallScore > 60 ? 'text-yellow-600' : 'text-red-600'
+              coordinationResults.overallScore > 60 ? 'text-yellow-600' : 'text-red-600'
               }`}>
               {coordinationResults.overallScore.toFixed(1)}%
             </span>
@@ -303,7 +301,7 @@ export const AutoCoordinationPanel = () => {
           <div className="space-y-2">
             {coordinationResults.issues.map((issue, index) => (
               <div key={index} className={`p-2 rounded border ${issue.severity === 'critical' ? 'bg-red-50 border-red-200' :
-                  'bg-yellow-50 border-yellow-200'
+                'bg-yellow-50 border-yellow-200'
                 }`}>
                 <div className="flex items-center justify-between">
                   <span className={`text-sm font-medium ${issue.severity === 'critical' ? 'text-red-700' : 'text-yellow-700'
