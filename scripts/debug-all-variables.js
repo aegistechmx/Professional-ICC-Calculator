@@ -20,7 +20,7 @@ function analyzeVariables(filePath, category) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     const lines = content.split('\n');
-    
+
     let variables = {
       declared: [],
       used: [],
@@ -28,19 +28,19 @@ function analyzeVariables(filePath, category) {
       imports: [],
       exports: []
     };
-    
+
     let inComment = false;
     let lineNumber = 0;
-    
+
     lines.forEach(line => {
       lineNumber++;
       const trimmedLine = line.trim();
-      
+
       // Skip comments
       if (trimmedLine.startsWith('/*')) inComment = true;
       if (trimmedLine.endsWith('*/')) inComment = false;
       if (inComment || trimmedLine.startsWith('//')) return;
-      
+
       // Find variable declarations
       const varDeclarations = line.match(/(?:const|let|var)\s+(\w+)/g);
       if (varDeclarations) {
@@ -49,7 +49,7 @@ function analyzeVariables(filePath, category) {
           variables.declared.push({ name: varName, line: lineNumber, type: decl.split(' ')[0] });
         });
       }
-      
+
       // Find destructured variables
       const destructuring = line.match(/(?:const|let|var)\s+\{([^}]+)\}/);
       if (destructuring) {
@@ -60,7 +60,7 @@ function analyzeVariables(filePath, category) {
           }
         });
       }
-      
+
       // Find imports
       const imports = line.match(/import.*\{([^}]+)\}/);
       if (imports) {
@@ -69,14 +69,14 @@ function analyzeVariables(filePath, category) {
           variables.imports.push({ name: varName, line: lineNumber });
         });
       }
-      
+
       // Find exports
       const exports = line.match(/export\s+(?:const|let|var)\s+(\w+)/);
       if (exports) {
         variables.exports.push({ name: exports[1], line: lineNumber });
       }
     });
-    
+
     return variables;
   } catch (error) {
     console.error(`Error analyzing ${filePath}:`, error.message);
@@ -106,21 +106,22 @@ console.log('------------------------------');
 keyComponents.forEach(component => {
   const filePath = path.join(frontendDir, component);
   if (fs.existsSync(filePath)) {
+    const content = fs.readFileSync(filePath, 'utf8');
     const analysis = analyzeVariables(filePath, 'frontend');
     if (analysis) {
       console.log(`\n🔧 ${component}:`);
       console.log(`   Declared: ${analysis.declared.length}`);
       console.log(`   Imports: ${analysis.imports.length}`);
       console.log(`   Exports: ${analysis.exports.length}`);
-      
+
       // Show potential issues
-      const unusedImports = analysis.imports.filter(imp => 
+      const unusedImports = analysis.imports.filter(imp =>
         !analysis.declared.some(dec => dec.name === imp.name) &&
         !content.includes(imp.name + '(') &&
         !content.includes(imp.name + '.') &&
         !content.includes('<' + imp.name)
       );
-      
+
       if (unusedImports.length > 0) {
         console.log(`   ⚠️  Unused imports: ${unusedImports.map(u => u.name).join(', ')}`);
       }
@@ -168,7 +169,7 @@ const iccFormulaPath = path.join(backendDir, 'domain/calculations/iccFormula.js'
 if (fs.existsSync(iccFormulaPath)) {
   const content = fs.readFileSync(iccFormulaPath, 'utf8');
   const criticalVars = ['V', 'Z', 'kVA', 'Isc', 'method', 'precision'];
-  
+
   console.log('\n⚡ ICC Formula Variables:');
   criticalVars.forEach(varName => {
     const regex = new RegExp(`\\b${varName}\\b`, 'g');
@@ -185,7 +186,7 @@ keyComponents.forEach(component => {
     const content = fs.readFileSync(filePath, 'utf8');
     const useStateMatches = content.match(/useState\([^)]+\)/g) || [];
     const useReducerMatches = content.match(/useReducer\([^)]+\)/g) || [];
-    
+
     if (useStateMatches.length > 0 || useReducerMatches.length > 0) {
       console.log(`   ${component}:`);
       console.log(`     useState: ${useStateMatches.length}`);
@@ -201,15 +202,15 @@ console.log('-------------------------');
 const storePath = path.join(frontendDir, 'store/graphStore.js');
 if (fs.existsSync(storePath)) {
   const content = fs.readFileSync(storePath, 'utf8');
-  
+
   // Find store state variables
   const stateMatches = content.match(/(?:const|let|var)\s+(\w+)\s*=/g) || [];
   const functionMatches = content.match(/(?:const|function)\s+(\w+)\s*\(/g) || [];
-  
+
   console.log('\n📊 Graph Store Analysis:');
   console.log(`   State variables: ${stateMatches.length}`);
   console.log(`   Functions: ${functionMatches.length}`);
-  
+
   // Show key store variables
   const keyStoreVars = ['nodes', 'edges', 'results', 'simulation', 'loading'];
   keyStoreVars.forEach(varName => {
@@ -227,7 +228,7 @@ keyComponents.forEach(component => {
   const filePath = path.join(frontendDir, component);
   if (fs.existsSync(filePath)) {
     const content = fs.readFileSync(filePath, 'utf8');
-    
+
     // Check for potential memory leaks
     const addEventListener = content.match(/addEventListener/g) || [];
     const setInterval = content.match(/setInterval/g) || [];
@@ -235,10 +236,10 @@ keyComponents.forEach(component => {
     const removeEventListener = content.match(/removeEventListener/g) || [];
     const clearInterval = content.match(/clearInterval/g) || [];
     const clearTimeout = content.match(/clearTimeout/g) || [];
-    
-    if (addEventListener.length > removeEventListener.length || 
-        setInterval.length > clearInterval.length ||
-        setTimeout.length > clearTimeout.length) {
+
+    if (addEventListener.length > removeEventListener.length ||
+      setInterval.length > clearInterval.length ||
+      setTimeout.length > clearTimeout.length) {
       console.log(`\n⚠️  Potential memory leaks in ${component}:`);
       console.log(`   addEventListener: ${addEventListener.length}, removeEventListener: ${removeEventListener.length}`);
       console.log(`   setInterval: ${setInterval.length}, clearInterval: ${clearInterval.length}`);
@@ -255,17 +256,17 @@ keyComponents.forEach(component => {
   const filePath = path.join(frontendDir, component);
   if (fs.existsSync(filePath)) {
     const content = fs.readFileSync(filePath, 'utf8');
-    
+
     // Check for global variables
     const globalVars = content.match(/(?:window|global)\.(\w+)/g) || [];
-    
+
     // Check for var declarations (function scope)
     const varDeclarations = content.match(/\bvar\s+(\w+)/g) || [];
-    
+
     // Check for let/const (block scope)
     const letDeclarations = content.match(/\blet\s+(\w+)/g) || [];
     const constDeclarations = content.match(/\bconst\s+(\w+)/g) || [];
-    
+
     if (globalVars.length > 0 || varDeclarations.length > 0) {
       console.log(`\n🔍 ${component} scope analysis:`);
       console.log(`   Global variables: ${globalVars.length}`);
