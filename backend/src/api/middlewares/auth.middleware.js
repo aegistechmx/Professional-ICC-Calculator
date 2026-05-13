@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const { getJwtSecret } = require('../../shared/utils/jwt')
 
 module.exports = function authenticateToken(req, res, next) {
   const authHeader = req.headers.authorization || ''
@@ -11,10 +12,7 @@ module.exports = function authenticateToken(req, res, next) {
   }
 
   try {
-    const payload = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'development-secret'
-    )
+    const payload = jwt.verify(token, getJwtSecret())
     req.user = {
       id: payload.sub,
       email: payload.email,

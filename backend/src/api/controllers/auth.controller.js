@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const jwt = require('jsonwebtoken')
 const Security = require('../../shared/utils/security')
+const { getJwtSecret } = require('../../shared/utils/jwt')
 const { defaultLogger } = require('../../debug/logger')
 
 const prisma = new PrismaClient()
@@ -44,7 +45,6 @@ exports.register = async (req, res) => {
     logger.error('Error al registrar usuario', { error: error.message })
     res.status(500).json({
       error: 'Error interno del servidor al registrar usuario.',
-      details: { message: error.message },
     })
   }
 }
@@ -75,7 +75,7 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign(
       { sub: user.id, email: user.email },
-      process.env.JWT_SECRET || 'development-secret',
+      getJwtSecret(),
       { expiresIn: '8h' }
     )
 
@@ -93,7 +93,6 @@ exports.login = async (req, res) => {
     logger.error('Error al iniciar sesión', { error: error.message })
     res.status(500).json({
       error: 'Error interno del servidor al iniciar sesión.',
-      details: { message: error.message },
     })
   }
 }
