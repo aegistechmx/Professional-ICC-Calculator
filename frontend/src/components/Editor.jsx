@@ -79,11 +79,19 @@ const Editor = React.memo(function Editor() {
     const message = `¿Eliminar ${selectedNodes.length} nodo(s)${nodeNames ? ': ' + nodeNames : ''} y ${selectedEdges.length} conexión(es)?\n\nEsta acción no se puede deshacer.`
     if (!confirm(message)) return
 
-    // Eliminar nodos seleccionados
-    setReactFlowNodes(nodes => nodes.filter(node => !node.selected))
+    const selectedNodeIds = new Set(selectedNodes.map(node => node.id))
+    const nextNodes = getNodes().filter(node => !node.selected)
+    const nextEdges = getEdges().filter(
+      edge =>
+        !edge.selected &&
+        !selectedNodeIds.has(edge.source) &&
+        !selectedNodeIds.has(edge.target)
+    )
 
-    // Eliminar edges seleccionados
-    setReactFlowEdges(edges => edges.filter(edge => !edge.selected))
+    setReactFlowNodes(nextNodes)
+    setReactFlowEdges(nextEdges)
+    setNodesStore(nextNodes)
+    setEdgesStore(nextEdges)
 
     // Limpiar selecciones
     setSelectedNode(null)
@@ -93,6 +101,8 @@ const Editor = React.memo(function Editor() {
     getEdges,
     setReactFlowNodes,
     setReactFlowEdges,
+    setNodesStore,
+    setEdgesStore,
     setSelectedNode,
     setSelectedEdge,
   ])
@@ -107,7 +117,11 @@ const Editor = React.memo(function Editor() {
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('icc-delete-selected', deleteSelected)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('icc-delete-selected', deleteSelected)
+    }
   }, [deleteSelected])
 
   // Keep Zustand store in sync with real React Flow state

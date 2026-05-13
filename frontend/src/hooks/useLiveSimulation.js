@@ -65,8 +65,7 @@ export default function useLiveSimulation(delay = 300) {
       const currentRequestId = ++requestIdRef.current
       isSimulatingRef.current = true
       try {
-        const API_BASE =
-          import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+        const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 
         // Strip simulation results before sending to API
         const cleanNodes = nodes.map(n => ({
@@ -103,7 +102,7 @@ export default function useLiveSimulation(delay = 300) {
           ...n,
           data: {
             ...n.data,
-            results: data.resultsByNodeId?.[n.id] || null,
+            results: data.data?.nodeResults?.[n.id] || data.resultsByNodeId?.[n.id] || null,
           },
         }))
 

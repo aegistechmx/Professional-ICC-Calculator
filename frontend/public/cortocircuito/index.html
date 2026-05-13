@@ -1352,6 +1352,7 @@
 
             // Ejecutar cálculo ICC
             window.calcularICC = function (params) {
+                params = params || {};
                 console.log('ICC Module: Calculating', params);
 
                 var results = null;
@@ -1524,7 +1525,8 @@
 
                 switch (message.type) {
                     case 'LOAD_MODEL':
-                        // Cargar modelo del sistema desde React
+                    case 'LOAD_CONFIG':
+                        // Cargar modelo/configuración del sistema desde React
                         if (message.data && window.loadSystemModel) {
                             window.loadSystemModel(message.data);
                         }
@@ -1541,6 +1543,12 @@
                         // Enviar resultados actuales
                         var results = window.ultimosResultados || null;
                         sendResults(results);
+                        break;
+
+                    case 'RESET':
+                        if (window.refreshModule) {
+                            window.refreshModule();
+                        }
                         break;
 
                     case 'SET_FAULT':

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { useState } from 'react'
 
-const API_BASE_URL = 'http://localhost:3000'
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 
 export const useSimulation = () => {
   const [loading, setLoading] = useState(false)

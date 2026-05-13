@@ -199,6 +199,45 @@ function App() {
     }
   }
 
+
+  const handleDeleteSelected = useCallback(() => {
+    const state = useStore.getState()
+    if (state.selectedNode) {
+      if (confirm(`¿Eliminar ${state.selectedNode.type || 'nodo'} seleccionado?`)) {
+        state.removeNode(state.selectedNode.id)
+      }
+      return
+    }
+
+    if (state.selectedEdge) {
+      if (confirm('¿Eliminar conexión seleccionada?')) {
+        state.removeEdge(state.selectedEdge.id)
+      }
+      return
+    }
+
+    window.dispatchEvent(new CustomEvent('icc-delete-selected'))
+  }, [])
+
+  const handleCalculateICC = useCallback(async () => {
+    try {
+      const result = await calculateICC()
+      const icc = result?.data?.Icc
+      alert(`✅ Cálculo ICC completado${icc ? `: ${Number(icc).toLocaleString()} A` : ''}`)
+    } catch (error) {
+      alert(error.message || 'Error al calcular ICC')
+    }
+  }, [calculateICC])
+
+  const handleGeneratePDF = useCallback(async () => {
+    try {
+      await generatePDF()
+      alert('✅ Reporte PDF generado')
+    } catch (error) {
+      alert(error.message || 'Error al generar PDF')
+    }
+  }, [generatePDF])
+
   return (
     <div className="flex h-screen w-screen">
       {/* Sidebar con componentes arrastrables */}
@@ -262,13 +301,7 @@ function App() {
             </div>
 
             <div className="flex gap-2">
-              <button type="button" onClick={() => {
-                  // Esta función se implementará en el componente Editor
-                  // Por ahora, mostrar mensaje
-                  alert(
-                    'Selecciona elementos y presiona DELETE para eliminar, o usa el botón en el panel de propiedades.'
-                  )
-                }}
+              <button type="button" onClick={handleDeleteSelected}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
                 title="Eliminar elementos seleccionados (o presiona DELETE)"
               >
@@ -298,13 +331,13 @@ function App() {
                   >
                     Módulo ICC (iframe)
                   </button>
-                  <button type="button" onClick={calculateICC} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                  <button type="button" onClick={handleCalculateICC} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                     Calcular ICC
                   </button>
                   <button type="button" onClick={handleCortocircuito} className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition">
                     Cortocircuito
                   </button>
-                  <button type="button" onClick={generatePDF} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                  <button type="button" onClick={handleGeneratePDF} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
                     Generar PDF
                   </button>
                 </>

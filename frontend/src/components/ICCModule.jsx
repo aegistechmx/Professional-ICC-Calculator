@@ -14,6 +14,7 @@ const ICCModule = forwardRef(function ICCModuleInternal(
 ) {
   const iframeRef = useRef(null)
   const isReadyRef = useRef(false)
+  const pendingCommandsRef = useRef([])
 
   // Origen seguro para postMessage
   const TARGET_ORIGIN = import.meta.env.PROD ? window.location.origin : '*' // En desarrollo permitir todos los orígenes
@@ -49,7 +50,9 @@ const ICCModule = forwardRef(function ICCModuleInternal(
       switch (type) {
         case 'ICC_READY':
           logDebug('ICC Module ready:', data)
+          isReadyRef.current = true
           onReady?.(data)
+          flushPendingCommands()
           break
 
         case 'RESULTS':
@@ -99,14 +102,32 @@ const ICCModule = forwardRef(function ICCModuleInternal(
     return () => {
       window.removeEventListener('message', handleMessage)
     }
-  }, [onReady, onResults, onRefresh, onExport])
+  }, [onReady, onResults, onRefresh, onExport, flushPendingCommands])
+
+  const flushPendingCommands = useCallback(() => {
+    if (!iframeRef.current || !isReadyRef.current) return
+
+    const queuedCommands = pendingCommandsRef.current.splice(0)
+    queuedCommands.forEach(({ command, data }) => {
+      iframeRef.current.contentWindow?.postMessage(
+        { type: command, data },
+        TARGET_ORIGIN
+      )
+    })
+  }, [TARGET_ORIGIN])
 
   // Función para enviar comandos manualmente
   const sendCommand = useCallback(
     (command, data) => {
-      if (!iframeRef.current || !isReadyRef.current) {
-        logWarn('ICC Module not ready')
-        return
+      if (!iframeRef.current) {
+        logWarn('ICC Module iframe not mounted')
+        return false
+      }
+
+      if (!isReadyRef.current) {
+        pendingCommandsRef.current.push({ command, data })
+        logWarn(`ICC Module not ready; queued command: ${command}`)
+        return true
       }
 
       iframeRef.current.contentWindow?.postMessage(
@@ -116,6 +137,7 @@ const ICCModule = forwardRef(function ICCModuleInternal(
         },
         TARGET_ORIGIN
       )
+      return true
     },
     [TARGET_ORIGIN]
   )
@@ -147,6 +169,8 @@ const ICCModule = forwardRef(function ICCModuleInternal(
         onLoad={() => {
           logDebug('ICC Module iframe loaded')
           isReadyRef.current = true
+          onReady?.({ source: 'iframe-onload', timestamp: new Date().toISOString() })
+          flushPendingCommands()
         }}
       />
     </div>

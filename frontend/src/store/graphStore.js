@@ -14,7 +14,7 @@ import {
   curvesOverlap,
 } from '../utils/simulationEngine.js'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 
 // Almacenamiento para timeouts activos
 const activeTimeouts = new Set()
@@ -218,7 +218,7 @@ export const useGraphStore = create(
             mode: options.mode || 'engineering',
           })
 
-          const response = await fetch(`${API_BASE}/api/system`, {
+          const response = await fetch(`${API_BASE}/system`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -267,7 +267,7 @@ export const useGraphStore = create(
         try {
           const payload = get().buildGraphPayload()
 
-          const response = await fetch(`${API_BASE}/api/system/realtime`, {
+          const response = await fetch(`${API_BASE}/system/realtime`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -293,7 +293,7 @@ export const useGraphStore = create(
       getRealtimeResult: async graphHash => {
         try {
           const response = await fetch(
-            `${API_BASE}/api/system/realtime/${graphHash}`
+            `${API_BASE}/system/realtime/${graphHash}`
           )
           const data = await response.json()
 

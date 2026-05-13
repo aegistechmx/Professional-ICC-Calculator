@@ -7,7 +7,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useGraphStore } from '../store/graphStore'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 const DEBOUNCE_MS = 500 // 500ms debounce
 const MIN_NODES = 2 // Mínimo de nodos para calcular
 const MIN_EDGES = 1 // Mínimo de edges para calcular
@@ -105,7 +105,7 @@ export function useAutoCalculate(options = {}) {
 
     // Crear conexión SSE
     const eventSource = new EventSource(
-      `${API_BASE}/api/system/realtime/stream`
+      `${API_BASE}/system/realtime/stream`
     )
     eventSourceRef.current = eventSource
 

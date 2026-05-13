@@ -193,8 +193,29 @@ export default function ICCCalculator() {
 
   // Enviar comando de cálculo
   const handleCalculate = useCallback(() => {
-    iccModuleRef.current?.calculate?.()
-  }, [])
+    const moduleApi = iccModuleRef.current
+    if (!moduleApi?.calculate) {
+      handleError('El módulo ICC todavía no está listo. Intenta nuevamente en unos segundos.')
+      return
+    }
+
+    const sent = moduleApi.calculate({
+      voltage: equipmentConfig.tension || equipmentConfig.trafoVs || 480,
+      impedance: equipmentConfig.trafoZ || 5.75,
+      ...equipmentConfig,
+    })
+
+    if (!sent) {
+      handleError('No se pudo enviar el cálculo al módulo ICC.')
+      return
+    }
+
+    setTimeout(() => {
+      if (!results) {
+        handleError('El cálculo se envió, pero el módulo no devolvió resultados. Revisa los datos del modelo o la consola del navegador.')
+      }
+    }, 3000)
+  }, [equipmentConfig, handleError, results])
 
   // Resetear sistema
   const handleReset = useCallback(() => {
@@ -786,6 +807,8 @@ export default function ICCCalculator() {
                       'LOAD_CONFIG',
                       equipmentConfig
                     )
+                    setSystemModel({ ...equipmentConfig })
+                    alert('✅ Configuración aplicada al módulo ICC')
                   }}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >

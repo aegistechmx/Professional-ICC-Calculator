@@ -18,7 +18,7 @@ import {
 import { calculateICCPerNode } from '../utils/calculateNodeICC'
 import { calculateFaultCurrentWithMotors } from '../utils/motorContribution'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 
 // Load from localStorage helper with validation
 const loadFromStorage = (key, defaultValue) => {
@@ -691,19 +691,45 @@ export const useStore = create((set, get) => ({
     }
   },
 
-  // Calcular ICC usando el endpoint /api/icc (simple y directo)
+
+  buildSimpleICCPayload: (nodes = [], edges = []) => {
+    const sourceNode = nodes.find(n => ['source', 'transformer', 'generator'].includes(n.type)) || nodes[0]
+    const params = sourceNode?.data?.parameters || {}
+    const voltage =
+      Number(params.secundario) ||
+      Number(params.voltaje) ||
+      Number(params.tension) ||
+      Number(params.voltage) ||
+      480
+
+    const totalCableLength = edges.reduce((sum, edge) => {
+      const length = Number(edge.data?.longitud ?? edge.data?.length ?? 0)
+      return sum + (Number.isFinite(length) ? length : 0)
+    }, 0)
+
+    const transformerZPercent = Number(params.Z)
+    const baseImpedance = Number.isFinite(transformerZPercent) && transformerZPercent > 0
+      ? transformerZPercent / 100
+      : 0.05
+
+    // Pequeña aproximación conservadora para que el botón no mande valores quemados:
+    // aumenta Z cuando existen más metros de cable modelados en la interfaz.
+    const cableImpedance = totalCableLength > 0 ? totalCableLength * 0.00012 : 0
+    const impedance = Math.max(0.001, baseImpedance + cableImpedance)
+
+    return { voltage, impedance }
+  },
+
+  // Calcular ICC usando el endpoint /api/icc con datos del grafo
   calculateICC: async () => {
     try {
       const { nodes, edges, setNodes, setEdges } = get()
 
       // Usar el endpoint simple del backend
-      const response = await fetch('/api/icc', {
+      const response = await fetch(`${API_BASE}/icc`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          voltage: 220,
-          impedance: 0.05,
-        }),
+        body: JSON.stringify(get().buildSimpleICCPayload(nodes, edges)),
       })
 
       const data = await response.json()

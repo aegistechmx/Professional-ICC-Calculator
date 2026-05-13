@@ -28,7 +28,7 @@ const logger = {
  * Configuración única para todas las llamadas al backend
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
 
 // Crear instancia axios con configuración base
 export const api = axios.create({
