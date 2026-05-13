@@ -35,6 +35,7 @@ const cortocircuitoDir = path.join(rootDir, 'icc-core', 'cortocircuito');
 const staticServerScript = path.join(rootDir, 'scripts', 'static-server.js');
 const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const NODE_CMD = process.execPath;
+const USE_SHELL = process.platform === 'win32';
 
 const processes = [];
 
@@ -86,10 +87,14 @@ function isPortAvailable(port) {
 async function startProcess(name, cwd, command, args, expectedPort) {
     log(`🚀 Iniciando ${name}...`, 'yellow');
 
-    const proc = spawn(command, args, {
+    const spawnCommand = USE_SHELL ? [command, ...args].join(' ') : command;
+    const spawnArgs = USE_SHELL ? [] : args;
+
+    const proc = spawn(spawnCommand, spawnArgs, {
         cwd,
         stdio: 'pipe',
-        shell: true
+        shell: USE_SHELL,
+        env: { ...process.env, PORT: expectedPort ? String(expectedPort) : process.env.PORT }
     });
 
     proc.stdout.on('data', data => {

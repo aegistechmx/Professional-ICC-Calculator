@@ -27,7 +27,7 @@ var CoreNOM = (function() {
         
         for (var i = 0; i < sistema.puntos.length; i++) {
             var punto = sistema.puntos[i];
-            var nodo = sistema.estado.nodos[i];
+            var nodo = (sistema.estado.nodos || []).find(function(n) { return n.id === punto.id; }) || sistema.estado.nodos[i];
             
             if (!nodo) continue;
             
@@ -214,14 +214,14 @@ var CoreNOM = (function() {
         // Capacidad interruptiva
         if (punto.isc && nodo.equip.cap) {
             var Icu = nodo.equip.cap || 0;
-            var Isc = punto.isc * 1000;
+            var Isc = punto.isc || 0;
             
             if (Icu < Isc) {
                 errores.push({
                     codigo: "NOM_240",
                     tipo: "CAPACIDAD_INTERRUPTIVA",
                     severidad: "CRITICO",
-                    mensaje: "CAPACIDAD INTERRUPTIVA INSUFICIENTE: Icu=" + Icu + "kA < Isc=" + (Isc / 1000).toFixed(2) + "kA",
+                    mensaje: "CAPACIDAD INTERRUPTIVA INSUFICIENTE: Icu=" + Icu + "kA < Isc=" + Isc.toFixed(2) + "kA",
                     nodo: punto.id,
                     solucion: "Usar breaker con mayor capacidad interruptiva"
                 });

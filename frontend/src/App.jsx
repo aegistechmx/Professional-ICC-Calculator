@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Editor from './components/Editor';
 import ICCModule from './components/ICCModule';
 import Sidebar from './components/Sidebar';
@@ -8,6 +8,10 @@ import { useStore } from './store/useStore';
 function App() {
   const [currentView, setCurrentView] = useState('editor')
   const [syncFilename, setSyncFilename] = useState('Sin sincronizar')
+  const [standaloneModel, setStandaloneModel] = useState(null)
+  const [pendingStandaloneCalculation, setPendingStandaloneCalculation] =
+    useState(false)
+  const iccModuleRef = useRef(null)
   // Use individual selectors to prevent re-renders from unrelated store changes
   const calculateICC = useStore(state => state.calculateICC)
   const generatePDF = useStore(state => state.generatePDF)
@@ -35,6 +39,7 @@ function App() {
   const edges = useStore(state => state.edges)
   const setNodes = useStore(state => state.setNodes)
   const setEdges = useStore(state => state.setEdges)
+  const buildStandaloneModel = useStore(state => state.buildStandaloneModel)
 
   // Sincronización bidireccional con módulo cortocircuito (solo manual)
   useEffect(() => {
@@ -172,28 +177,19 @@ function App() {
       // Forzar guardado inmediato en localStorage
       localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes))
       localStorage.setItem('icc-sync-edges', JSON.stringify(edges))
-      localStorage.setItem('icc-sync-filename', filename)
+      const model = buildStandaloneModel()
+      localStorage.setItem('icc-sync-model', JSON.stringify(model))
+      localStorage.setItem('icc-sync-filename', String(filename))
+      localStorage.setItem(
+        'icc-sync-filename',
+        String(localStorage.getItem('icc-sync-filename'))
+      )
       localStorage.setItem('icc-sync-timestamp', new Date().toISOString())
 
       // Actualizar estado local
       setSyncFilename(filename)
+      setStandaloneModel(model)
 
-      // Disparar evento storage manualmente para notificar al módulo
-      window.dispatchEvent(
-        new StorageEvent('storage', {
-          key: 'icc-sync-nodes',
-          newValue: JSON.stringify(nodes),
-          oldValue: null,
-        })
-      )
-
-      window.dispatchEvent(
-        new StorageEvent('storage', {
-          key: 'icc-sync-filename',
-          newValue: filename,
-          oldValue: null,
-        })
-      )
     } catch (error) {
       alert('Error en sincronización: ' + error.message)
     }
@@ -221,13 +217,33 @@ function App() {
 
   const handleCalculateICC = useCallback(async () => {
     try {
+      const model = buildStandaloneModel()
+      setStandaloneModel(model)
+      localStorage.setItem('icc-sync-model', JSON.stringify(model))
+      localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes))
+      localStorage.setItem('icc-sync-edges', JSON.stringify(edges))
+      localStorage.setItem('icc-sync-timestamp', new Date().toISOString())
+
       const result = await calculateICC()
       const icc = result?.data?.Icc
+      const moduleApi = iccModuleRef.current
+      if (moduleApi?.calculate) {
+        moduleApi.calculate(model)
+      } else {
+        setPendingStandaloneCalculation(true)
+        setCurrentView('icc-iframe')
+      }
       alert(`✅ Cálculo ICC completado${icc ? `: ${Number(icc).toLocaleString()} A` : ''}`)
     } catch (error) {
       alert(error.message || 'Error al calcular ICC')
     }
-  }, [calculateICC])
+  }, [buildStandaloneModel, calculateICC, edges, nodes])
+
+  const handleICCReady = useCallback(() => {
+    if (!pendingStandaloneCalculation || !standaloneModel) return
+    iccModuleRef.current?.calculate?.(standaloneModel)
+    setPendingStandaloneCalculation(false)
+  }, [pendingStandaloneCalculation, standaloneModel])
 
   const handleGeneratePDF = useCallback(async () => {
     try {
@@ -472,7 +488,7 @@ function App() {
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={handleCortocircuito} className="px-4 py-2 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition">
+              <button type="button" onClick={handleCalculateICC} className="px-4 py-2 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition">
                 Calcular ICC
               </button>
               <button type="button" onClick={() => setCurrentView('editor')}
@@ -483,7 +499,13 @@ function App() {
             </div>
           </div>
           <div className="flex-1 p-4">
-            <ICCModule onResults={handleICCResults} className="h-full" />
+            <ICCModule
+              ref={iccModuleRef}
+              systemModel={standaloneModel}
+              onReady={handleICCReady}
+              onResults={handleICCResults}
+              className="h-full"
+            />
           </div>
         </div>
       )}

@@ -53,8 +53,11 @@ var Motor = (function() {
         
         return {
             tipo: 'mccb',
+            modelo: 'MCCB ' + frame + 'A',
             nombre: 'MCCB ' + frame + 'A',
-            cap: frame / 1000, // kA
+            cap: frame >= 600 ? 65 : (frame >= 300 ? 25 : 10),
+            iNominal: frame,
+            amp: frame,
             iDisparo: frame * 10, // 10x In default
             serie: 'mccb_generico'
         };
@@ -300,9 +303,9 @@ var Motor = (function() {
             if (!nodo.parentId) continue; // Skip root node (already added)
             
             var zAcum = Impedancias.impedanciaAcumuladaNodo(nodo.id, App.estado.nodos);
-            R_acc = zAcum.R;
-            X_acc = zAcum.X;
-            Z_acc = zAcum.Z;
+            R_acc = fuente.R + zAcum.R;
+            X_acc = fuente.X + zAcum.X;
+            Z_acc = Impedancias.magnitud(R_acc, X_acc);
             isc = Impedancias.corrienteIsc(V, Z_acc, factor);
             xr = X_acc > 1e-6 ? X_acc / R_acc : 999;
             ipeak = Impedancias.corrientePico(isc, xr);
@@ -312,6 +315,9 @@ var Motor = (function() {
             puntos.push({
                 id: nodo.id,
                 nombre: nodo.nombre || nodo.id,
+                parentId: nodo.parentId || null,
+                feeder: nodo.feeder || null,
+                sourceType: nodo.sourceType || '',
                 R: R_acc, X: X_acc, Z: Z_acc,
                 isc: isc / 1000, ipeak: ipeak / 1000, xr: xr,
                 equip: nodo.equip || { tipo: '', nombre: '', cap: 0, iDisparo: 0 }
@@ -330,7 +336,13 @@ var Motor = (function() {
             // Buscar el nodo correspondiente por ID para asegurar consistencia
             var nodoBase = App.estado.nodos.find(function(n) { return n.id === puntoActual.id; });
             
-            if (!nodoBase.equip || !nodoBase.equip.modelo || nodoBase.equip.cap <= 0) {
+            if (!nodoBase) {
+                puntoActual.equip = puntoActual.equip || { tipo: '', nombre: '', cap: 0, iDisparo: 0 };
+                continue;
+            }
+
+            nodoBase.equip = nodoBase.equip || { tipo: '', modelo: '', nombre: '', cap: 0, iDisparo: 0 };
+            if (!nodoBase.equip.modelo || nodoBase.equip.cap <= 0) {
                 nodoBase.equip = seleccionarBreakerDefault(nodoBase);
                 puntoActual.equip = nodoBase.equip;
             }
@@ -414,7 +426,7 @@ var Motor = (function() {
         };
 
         for (var i = 0; i < puntos.length; i++) {
-            var nodo = App.estado.nodos[i];
+            var nodo = App.estado.nodos.find(function(n) { return n.id === puntos[i].id; });
             if (!nodo || !nodo.feeder) continue;
 
             var f = nodo.feeder;
@@ -464,7 +476,7 @@ var Motor = (function() {
             // Agregar resultados CDT (derived state) al punto
             puntos[i].CDT = {
                 I_corregida: sugerencia.ampacidadCorregida || 0,
-                I_limite_terminal: sugerencia.ampacidadLimiteTerminal || 0,
+                I_limite_terminal: sugerencia.ampacidadTerminal || 0,
                 I_final: sugerencia.ampacidadFinal || 0,
                 I_diseño: sugerencia.I_diseño,
                 I_tabla: sugerencia.I_tabla,
@@ -602,9 +614,28 @@ var Motor = (function() {
             });
         }
 
+        var puntosProteccion = puntos.filter(function(punto) {
+            var nodoProteccion = App.estado.nodos.find(function(n) { return n.id === punto.id; });
+            return nodoProteccion && nodoProteccion.equip &&
+                (nodoProteccion.equip.tipo || nodoProteccion.equip.modelo || nodoProteccion.equip.cap > 0 || nodoProteccion.equip.iDisparo > 0);
+        }).map(function(punto) {
+            var nodoProteccion = App.estado.nodos.find(function(n) { return n.id === punto.id; });
+            var copia = Object.assign({}, punto);
+            copia.parentId = nodoProteccion.parentId || null;
+            copia.feeder = nodoProteccion.feeder || copia.feeder || null;
+            copia.equip = nodoProteccion.equip || copia.equip;
+            return copia;
+        });
+        var idsProteccion = puntosProteccion.map(function(punto) { return punto.id; });
+        puntosProteccion.forEach(function(punto) {
+            if (punto.parentId && idsProteccion.indexOf(punto.parentId) === -1) {
+                punto.parentId = null;
+            }
+        });
+
         // [MotorDiseno] Ejecutar motor de diseño automático para coordinación de breakers
         if (typeof MotorDisenoAutomatico !== 'undefined') {
-            var resultadoDiseno = MotorDisenoAutomatico.ejecutarDiseno(puntos, {});
+            var resultadoDiseno = MotorDisenoAutomatico.ejecutarDiseno(puntosProteccion, {});
 
             // Adjuntar resultado del diseño al sistema
             puntos.disenoAutomatico = resultadoDiseno;
@@ -639,7 +670,7 @@ var Motor = (function() {
 
         // Ejecutar motor de coordinación real con catálogo de equipos
         if (typeof MotorCoordinacionReal !== 'undefined' && typeof CatalogoEquiposReal !== 'undefined') {
-            var resultadoCoordinacionReal = MotorCoordinacionReal.autocorregirSistema(puntos, {
+            var resultadoCoordinacionReal = MotorCoordinacionReal.autocorregirSistema(puntosProteccion, {
                 Isc: 20000, // kA por defecto
                 criterios: {
                     marca_preferida: null,
@@ -806,12 +837,12 @@ var Motor = (function() {
             // PRIORIDAD 3: CAPACIDAD INTERRUPTIVA
             if (punto.isc && nodo.equip && nodo.equip.cap) {
                 var Icu = nodo.equip.cap || 0;
-                var Isc = punto.isc * 1000;
+                var Isc = punto.isc || 0;
                 
                 if (Icu < Isc) {
                     resultado.estadoGlobal = "FAIL";
                     resultado.severidad = Math.max(resultado.severidad, 5);
-                    resultado.errores.push("CAPACIDAD INTERRUPTIVA INSUFICIENTE: Icu=" + Icu + "kA < Isc=" + (Isc / 1000).toFixed(2) + "kA");
+                    resultado.errores.push("CAPACIDAD INTERRUPTIVA INSUFICIENTE: Icu=" + Icu + "kA < Isc=" + Isc.toFixed(2) + "kA");
                 }
             }
         }
@@ -911,7 +942,7 @@ var Motor = (function() {
         };
 
         // [Sync] Si el feeder tiene tempAmbiente definido, usarlo (prioridad sobre input)
-        var nodoActual = App.estado.nodos && App.estado.nodos[0];
+        var nodoActual = nodo || (App.estado.nodos && App.estado.nodos[0]);
         if (nodoActual && nodoActual.feeder && nodoActual.feeder.tempAmbiente) {
             cableConfig.temperaturaAmbiente = nodoActual.feeder.tempAmbiente;
         }

@@ -105,7 +105,9 @@ var MotorDisenoAutomatico = (function() {
         var nodosProcesar = Impedancias.ordenarPorNivel(nodos).reverse();
 
         nodosProcesar.forEach(function(nodo, i) {
-            var breakerActual = (nodo.equip && nodo.equip.cap) ? nodo.equip.cap * 1000 : 0; // kA a A
+            var breakerActual = nodo.equip ?
+                (nodo.equip.iNominal || nodo.equip.amp || (nodo.equip.iDisparo ? nodo.equip.iDisparo / 10 : 0) || 0) :
+                0;
             var I_diseño = nodo.CDT ? nodo.CDT.I_diseño : (nodo.feeder ? nodo.feeder.cargaA * 1.25 : 0);
             var breakerNuevo;
 

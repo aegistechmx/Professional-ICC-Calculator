@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { useStore } from '../../store/useStore'
+
 export default function TransformerFields({ node, updateNode }) {
   const [localParams, setLocalParams] = useState(node.data.parameters || {})
 
@@ -41,8 +43,6 @@ export default function TransformerFields({ node, updateNode }) {
 
   // Función para propagar la tensión secundaria a equipos conectados
   const propagateSecondaryVoltage = secondaryVoltage => {
-    // Importar el store para obtener todos los nodos
-    const { useStore } = require('../store/useStore')
     const { nodes, edges } = useStore.getState()
 
     // Encontrar todos los equipos conectados a este transformador

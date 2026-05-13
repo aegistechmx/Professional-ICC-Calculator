@@ -1159,6 +1159,11 @@
 
             // 🛡️ Verificación de Sesión Activa
             if (!activeSessionToken || token !== activeSessionToken) {
+                const publicReactTypes = ['LOAD_MODEL', 'LOAD_CONFIG', 'CALCULATE', 'GET_RESULTS', 'RESET'];
+                if (publicReactTypes.includes(type) && event.source === window.parent) {
+                    return;
+                }
+
                 if (type !== 'HANDSHAKE_ACK') { // Evitar recursión
                     console.warn(`❌ Bloqueado: Intento de comunicación ${type} sin token de sesión válido o token incorrecto.`);
                 }
@@ -1424,6 +1429,7 @@
 
         console.log('SYNC DEBUG: Sincronización activa en módulo HTML');
     </script>
+    <script src="js/react-sync-bridge.js?v=1"></script>
 </body>
 
 </html>

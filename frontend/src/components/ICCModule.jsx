@@ -17,7 +17,25 @@ const ICCModule = forwardRef(function ICCModuleInternal(
   const pendingCommandsRef = useRef([])
 
   // Origen seguro para postMessage
-  const TARGET_ORIGIN = import.meta.env.PROD ? window.location.origin : '*' // En desarrollo permitir todos los orígenes
+  const moduleUrl =
+    import.meta.env.VITE_ICC_STANDALONE_URL ||
+    (import.meta.env.PROD ? '/cortocircuito/index.html' : 'http://localhost:3002')
+  const targetOrigin = moduleUrl.startsWith('http')
+    ? new URL(moduleUrl).origin
+    : window.location.origin
+  const postMessageOrigin = import.meta.env.PROD ? targetOrigin : '*'
+
+  const flushPendingCommands = useCallback(() => {
+    if (!iframeRef.current || !isReadyRef.current) return
+
+    const queuedCommands = pendingCommandsRef.current.splice(0)
+    queuedCommands.forEach(({ command, data }) => {
+      iframeRef.current.contentWindow?.postMessage(
+        { type: command, data },
+        postMessageOrigin
+      )
+    })
+  }, [postMessageOrigin])
 
   // Enviar datos al iframe cuando esté listo
   useEffect(() => {
@@ -28,15 +46,17 @@ const ICCModule = forwardRef(function ICCModuleInternal(
         type: 'LOAD_MODEL',
         data: systemModel,
       },
-      TARGET_ORIGIN
+      postMessageOrigin
     )
-  }, [systemModel, TARGET_ORIGIN])
+  }, [systemModel, postMessageOrigin])
 
   // Escuchar mensajes del iframe
   useEffect(() => {
     const handleMessage = event => {
       // Validar origen
-      if (event.origin !== window.location.origin) return
+      if (event.origin !== window.location.origin && event.origin !== targetOrigin) {
+        return
+      }
 
       // Ignorar mensajes sin datos
       if (!event.data || typeof event.data !== 'object') return
@@ -102,19 +122,14 @@ const ICCModule = forwardRef(function ICCModuleInternal(
     return () => {
       window.removeEventListener('message', handleMessage)
     }
-  }, [onReady, onResults, onRefresh, onExport, flushPendingCommands])
-
-  const flushPendingCommands = useCallback(() => {
-    if (!iframeRef.current || !isReadyRef.current) return
-
-    const queuedCommands = pendingCommandsRef.current.splice(0)
-    queuedCommands.forEach(({ command, data }) => {
-      iframeRef.current.contentWindow?.postMessage(
-        { type: command, data },
-        TARGET_ORIGIN
-      )
-    })
-  }, [TARGET_ORIGIN])
+  }, [
+    onReady,
+    onResults,
+    onRefresh,
+    onExport,
+    flushPendingCommands,
+    targetOrigin,
+  ])
 
   // Función para enviar comandos manualmente
   const sendCommand = useCallback(
@@ -135,11 +150,11 @@ const ICCModule = forwardRef(function ICCModuleInternal(
           type: command,
           data: data,
         },
-        TARGET_ORIGIN
+        postMessageOrigin
       )
       return true
     },
-    [TARGET_ORIGIN]
+    [postMessageOrigin]
   )
 
   // Exponer métodos al componente padre
@@ -148,7 +163,7 @@ const ICCModule = forwardRef(function ICCModuleInternal(
     () => ({
       sendCommand,
       refresh: () => sendCommand('RESET'),
-      calculate: () => sendCommand('CALCULATE'),
+      calculate: data => sendCommand('CALCULATE', data),
       isReady: () => isReadyRef.current,
     }),
     [sendCommand]
@@ -158,7 +173,7 @@ const ICCModule = forwardRef(function ICCModuleInternal(
     <div className={`icc-module-container ${className}`}>
       <iframe
         ref={iframeRef}
-        src="/cortocircuito/index.html"
+        src={moduleUrl}
         title="ICC Calculation Module"
         style={{
           width: '100%',

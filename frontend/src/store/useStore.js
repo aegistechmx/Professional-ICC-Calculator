@@ -206,6 +206,32 @@ function validateValue(key, value, limits = LIMITS) {
   return { valid: true, value: numValue }
 }
 
+function normalizeBackendMaterial(material) {
+  const normalized = String(material || '').trim().toLowerCase()
+  if (['al', 'aluminio', 'aluminum'].includes(normalized)) return 'Al'
+  return 'Cu'
+}
+
+function inferInterruptingCapacityKA(value, breakerCurrent) {
+  const parsed = Number(value)
+  const fallback = breakerCurrent >= 600 ? 65 : breakerCurrent >= 300 ? 25 : 10
+
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback
+  if (parsed >= 1000) return parsed / 1000
+  if (parsed >= 5 && parsed <= 200) return parsed
+  return fallback
+}
+
+function isProtectiveNode(type, params) {
+  return (
+    type === 'breaker' ||
+    Boolean(params.tipo) ||
+    Boolean(params.modelo) ||
+    Number(params.In) > 0 ||
+    Number(params.iDisparo) > 0
+  )
+}
+
 // Función para sanitizar el grafo antes de enviar al backend
 function sanitizeGraph(graph) {
   const sanitized = { ...graph }
@@ -285,13 +311,13 @@ function sanitizeGraph(graph) {
     return {
       ...edge,
       data: {
-        material: edgeData.material || 'Cu',
+        ...edgeData,
+        material: normalizeBackendMaterial(edgeData.material),
         calibre: edgeData.calibre || '350',
         longitud: edgeData.longitud || 10,
         paralelo: edgeData.paralelo || 1,
         temp: edgeData.temp || 30,
         numConductores: edgeData.numConductores || 3,
-        ...edgeData,
       },
     }
   })
@@ -670,6 +696,116 @@ export const useStore = create((set, get) => ({
       sistema: {
         tension: 480,
         tipo: 'trifasico',
+      },
+    }
+  },
+
+  buildStandaloneModel: () => {
+    const { nodes, edges, systemMode } = get()
+    const nodesArray = Array.isArray(nodes) ? nodes : []
+    const edgesArray = Array.isArray(edges) ? edges : []
+    const firstTransformer = nodesArray.find(node => node.type === 'transformer')
+    const transformerParams = firstTransformer?.data?.parameters || {}
+    const voltage =
+      Number(transformerParams.secundario) ||
+      Number(transformerParams.voltaje) ||
+      Number(transformerParams.tension) ||
+      480
+
+    const incomingByTarget = edgesArray.reduce((acc, edge) => {
+      if (!acc[edge.target]) acc[edge.target] = []
+      acc[edge.target].push(edge)
+      return acc
+    }, {})
+
+    const nodos = nodesArray.map((node, index) => {
+      const params = node.data?.parameters || {}
+      const incomingEdge = incomingByTarget[node.id]?.[0]
+      const edgeParams = incomingEdge?.data || {}
+      const parentId = incomingEdge?.source || null
+      const isRootNode = !parentId
+      const loadCurrent =
+        Number(params.cargaA) ||
+        Number(params.In) ||
+        Number(params.corriente) ||
+        Number(params.current) ||
+        (node.type === 'load' ? Number(params.potencia_kW || 0) * 1000 / voltage : 200)
+      const breakerCurrent = Number(params.In) || Number(params.iDisparo) || loadCurrent
+      const isProtection = isProtectiveNode(node.type, params)
+      const interruptingCapacityKA = inferInterruptingCapacityKA(
+        params.Icu ?? params.capacidadInterruptiva ?? params.cap,
+        breakerCurrent
+      )
+
+      return {
+        id: node.id || `P${index}`,
+        parentId,
+        nombre: node.data?.label || node.id || `Punto ${index}`,
+        sourceType: node.type,
+        feeder: {
+          calibre: params.calibre || edgeParams.calibre || '4/0',
+          material: params.material || edgeParams.material || 'cobre',
+          canalizacion: params.canalizacion || edgeParams.canalizacion || 'acero',
+          longitud: isRootNode
+            ? 0
+            : Number(edgeParams.longitud || edgeParams.length || params.longitud || 30),
+          paralelo: Number(params.paralelo || edgeParams.paralelo || 1),
+          cargaA: isRootNode
+            ? 0
+            : Number.isFinite(loadCurrent) && loadCurrent > 0 ? loadCurrent : 200,
+          cargaFP: Number(params.fp || params.cargaFP || 0.9),
+        },
+        equip: isProtection
+          ? {
+              tipo: params.tipo || 'mccb',
+              modelo: params.modelo || `React ${Math.round(breakerCurrent)}A`,
+              cap: interruptingCapacityKA,
+              iDisparo: Number(params.iDisparo) || breakerCurrent * 10,
+              iNominal: breakerCurrent,
+              amp: breakerCurrent,
+              nombre: node.data?.label || params.nombre || '',
+            }
+          : null,
+        tcc: {
+          long: {
+            pickup: breakerCurrent,
+            delay: Number(params.longDelay || params.longDelayTime || 6),
+          },
+          short: {
+            pickup: Number(params.shortPickup || breakerCurrent * 4),
+            delay: Number(params.shortDelay || 0.3),
+          },
+          inst: {
+            pickup: Number(params.instantaneous || params.inst || breakerCurrent * 10),
+          },
+        },
+      }
+    })
+
+    return {
+      source: 'react-editor',
+      timestamp: new Date().toISOString(),
+      nodes: nodesArray,
+      edges: edgesArray,
+      estado: {
+        modo: firstTransformer ? 'completo' : 'conocido',
+        tipoSistema: '3f',
+        tension: voltage,
+        trafoKva: Number(transformerParams.kVA || transformerParams.kva || 500),
+        trafoVp: Number(transformerParams.primario || transformerParams.vp || 23000),
+        trafoVs: voltage,
+        trafoZ: Number(transformerParams.Z || transformerParams.z || 5.75),
+        systemMode,
+        nodos,
+        motores: nodesArray
+          .filter(node => node.type === 'motor')
+          .map(node => ({
+            hp: Number(node.data?.parameters?.hp || 100),
+            tipo: node.data?.parameters?.tipo || 'induccion',
+            xdpp: Number(node.data?.parameters?.xdpp || 0),
+            eficiencia: Number(node.data?.parameters?.eficiencia || 0),
+            punto: node.id,
+          })),
       },
     }
   },
