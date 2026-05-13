@@ -5,6 +5,43 @@
  */
 
 class BreakerSelector {
+  /**
+   * @openapi
+   * components:
+   *   schemas:
+   *     Breaker:
+   *       type: object
+   *       properties:
+   *         code:
+   *           type: string
+   *           description: Código de catálogo Schneider
+   *         rating:
+   *           type: number
+   *           description: Corriente nominal (In) en Amperios
+   *         family:
+   *           type: string
+   *           enum: [NQ, NF, ILINE]
+   *         interruptCapacity:
+   *           type: number
+   *           description: Capacidad interruptiva (Icu) en Amperios
+   *     SelectionResult:
+   *       type: object
+   *       properties:
+   *         ok:
+   *           type: boolean
+   *         breaker:
+   *           $ref: '#/components/schemas/Breaker'
+   *         validation:
+   *           type: object
+   *           properties:
+   *             ok:
+   *               type: boolean
+   *             ic:
+   *               type: number
+   *             margin:
+   *               type: string
+   *               description: Margen de seguridad porcentual
+   */
   constructor() {
     // Tabla de capacidades interruptivas I-Line Schneider
     this.interruptCapacity = {
@@ -473,6 +510,7 @@ class BreakerSelector {
       Icc,
       voltage,
       validation,
+      cableSuggestion: this.suggestCables(I_design),
       alternatives: candidates.slice(1, 3), // 2 alternativas
       message: 'Breaker seleccionado correctamente',
       criteria: {
@@ -483,6 +521,19 @@ class BreakerSelector {
         family,
       },
     }
+  }
+
+  /**
+   * Sugiere configuración de cables según corriente de diseño (NOM-001)
+   */
+  suggestCables(I_design) {
+    if (I_design <= 100) return "1 set de cables (AWG #2 o menor)";
+    if (I_design <= 225) return "1 set de cables (AWG #4/0)";
+    if (I_design <= 400) return "1 set de cables (500 kcmil)";
+    
+    // Sugerir paralelo para > 400A por manejabilidad
+    const sets = Math.ceil(I_design / 300);
+    return `${sets} conductores en paralelo por fase (sugerido 500 kcmil o 350 kcmil)`;
   }
 
   /**

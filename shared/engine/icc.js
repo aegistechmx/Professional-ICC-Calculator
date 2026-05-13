@@ -4,7 +4,7 @@
  */
 
 // Importar funciones básicas del motor principal
-import { calcICC, calcAmpacity, calcTripTime, checkCoordination, calcVoltageDrop, validateFeeder } from './index.js';
+import { calcAmpacity, calcICC, calcTripTime, calcVoltageDrop, checkCoordination, validateFeeder } from './index.js';
 
 // Constantes eléctricas
 export const CONSTANTES = {
@@ -32,6 +32,41 @@ export const CONSTANTES = {
   TEMP_AMBIENTE_DEFAULT: 30
 };
 
+/**
+ * Valida que los parámetros de entrada sean físicamente posibles y estén dentro de rangos seguros.
+ * @param {Object} params - Parámetros del sistema o componente
+ * @returns {Object} { isValid: boolean, errors: string[] }
+ */
+export function validarEntradasElectricas(params) {
+  const errors = [];
+  const { V, kVA, longitud, cargaA, fp } = params;
+
+  if (V !== undefined && (V < 110 || V > 500000)) {
+    errors.push(`Voltaje fuera de rango: ${V}V. Rango aceptable: 110V - 500kV.`);
+  }
+  
+  if (kVA !== undefined && (kVA <= 0 || kVA > 100000)) {
+    errors.push('La potencia (kVA) debe ser un valor positivo menor a 100MVA.');
+  }
+
+  if (longitud !== undefined && (longitud < 0 || longitud > 10000)) {
+    errors.push('La longitud del alimentador debe estar entre 0 y 10,000 metros.');
+  }
+
+  if (cargaA !== undefined && cargaA < 0) {
+    errors.push('La corriente de carga no puede ser negativa.');
+  }
+
+  if (fp !== undefined && (fp < 0.1 || fp > 1.0)) {
+    errors.push('El factor de potencia debe estar entre 0.1 y 1.0.');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
 // Cálculo de impedancias
 export function calcularImpedancias({
   V,
@@ -40,6 +75,12 @@ export function calcularImpedancias({
   X_R = CONSTANTES.XR_DEFAULT,
   tipoSistema = '3f'
 }) {
+  const validacion = validarEntradasElectricas({ V, kVA });
+  if (!validacion.isValid) {
+    console.warn('Advertencia de precisión:', validacion.errors.join(', '));
+    // Continuamos pero con log de advertencia para no romper el flujo
+  }
+
   const Z_base = (V * V) / (kVA * 1000); // Impedancia base en ohmios
   const Z_pu = Z_pct / 100; // Impedancia en por unidad
   const Z = Z_base * Z_pu; // Impedancia real en ohmios
@@ -158,7 +199,7 @@ export function validarConductor({
 }
 
 // Obtener resistencia del conductor
-function obtenerResistenciaConductor(material, calibre, longitud) {
+function obtenerResistenciaConductor(material, calibre, longitud, n_conductores = 1) {
   // Resistividad a 75°C (Ohm/km)
   const resistividad = {
     cobre: 0.0216,
@@ -175,13 +216,14 @@ function obtenerResistenciaConductor(material, calibre, longitud) {
   };
   
   const area = areas[calibre] || areas['4/0'];
-  const R = (resistividad[material] || resistividad.cobre) * longitud / 1000 / area;
+  // R_total = (resistividad * L) / (area * n_conductores)
+  const R = ((resistividad[material] || resistividad.cobre) * longitud / 1000 / area) / n_conductores;
   
   return parseFloat(R.toFixed(6));
 }
 
 // Obtener reactancia del conductor
-function obtenerReactanciaConductor(material, calibre, longitud) {
+function obtenerReactanciaConductor(material, calibre, longitud, n_conductores = 1) {
   // Reactancia típica por fase (Ohm/km)
   const reactancia = {
     cobre: 0.08,
@@ -189,7 +231,8 @@ function obtenerReactanciaConductor(material, calibre, longitud) {
     acero: 0.12
   };
   
-  const X = (reactancia[material] || reactancia.cobre) * longitud / 1000;
+  // X_total = X_unitario / n_conductores
+  const X = ((reactancia[material] || reactancia.cobre) * longitud / 1000) / n_conductores;
   
   return parseFloat(X.toFixed(6));
 }

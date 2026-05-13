@@ -7,6 +7,10 @@ echo  DIAGNÓSTICO COMPLETO - PROFESSIONAL ICC CALCULATOR
 echo ====================================================
 echo.
 
+REM Configuración de puertos (pueden ser sobrescritos por variables de entorno)
+set "BACKEND_PORT=3001"
+set "FRONTEND_PORT=5173"
+
 REM Paso 1: Verificar Node.js
 echo [PASO 1] Verificando instalación de Node.js...
 node --version >nul 2>&1
@@ -149,43 +153,43 @@ REM Paso 6: Verificar puertos en uso
 echo.
 echo [PASO 6] Verificando puertos en uso...
 
-echo [CHECK] Verificando puerto 3001 (Backend)...
-netstat -an | findstr ":3001" >nul 2>&1
+echo [CHECK] Verificando puerto %BACKEND_PORT% (Backend)...
+netstat -an | findstr ":%BACKEND_PORT%" >nul 2>&1
 if not errorlevel 1 (
-    echo [WARNING] Puerto 3001 está en uso
+    echo [WARNING] Puerto %BACKEND_PORT% está en uso
     echo.
-    echo PROCESOS USANDO PUERTO 3001:
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3001"') do (
+    echo PROCESOS USANDO PUERTO %BACKEND_PORT%:
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":%BACKEND_PORT%"') do (
         tasklist /FI "PID eq %%a" 2>nul | findstr /I "node.exe"
     )
     echo.
     echo SOLUCIÓN:
-    echo 1. Cerrar otros procesos Node.js: taskkill /F /IM node.exe
+    echo 1. Cerrar otros procesos Node.js (puede ser agresivo, cerrar manualmente si es posible): taskkill /F /IM node.exe
     echo 2. O cambiar el puerto en la configuración del backend
     echo.
     set PUERTO_BACKEND_OCUPADO=1
 ) else (
-    echo [OK] Puerto 3001 disponible
+    echo [OK] Puerto %BACKEND_PORT% disponible
     set PUERTO_BACKEND_OCUPADO=0
 )
 
-echo [CHECK] Verificando puerto 5173 (Frontend)...
-netstat -an | findstr ":5173" >nul 2>&1
+echo [CHECK] Verificando puerto %FRONTEND_PORT% (Frontend)...
+netstat -an | findstr ":%FRONTEND_PORT%" >nul 2>&1
 if not errorlevel 1 (
-    echo [WARNING] Puerto 5173 está en uso
+    echo [WARNING] Puerto %FRONTEND_PORT% está en uso
     echo.
-    echo PROCESOS USANDO PUERTO 5173:
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":5173"') do (
+    echo PROCESOS USANDO PUERTO %FRONTEND_PORT%:
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":%FRONTEND_PORT%"') do (
         tasklist /FI "PID eq %%a" 2>nul | findstr /I "node.exe"
     )
     echo.
     echo SOLUCIÓN:
-    echo 1. Cerrar otros procesos Node.js: taskkill /F /IM node.exe
+    echo 1. Cerrar otros procesos Node.js (puede ser agresivo, cerrar manualmente si es posible): taskkill /F /IM node.exe
     echo 2. O cambiar el puerto en la configuración del frontend
     echo.
     set PUERTO_FRONTEND_OCUPADO=1
 ) else (
-    echo [OK] Puerto 5173 disponible
+    echo [OK] Puerto %FRONTEND_PORT% disponible
     set PUERTO_FRONTEND_OCUPADO=0
 )
 
@@ -245,7 +249,7 @@ cd /d "%~dp0"
 timeout /t 10 /nobreak >nul
 
 echo [TEST] Verificando Backend...
-curl -s -I http://localhost:3001 >nul 2>&1
+curl -s -I http://localhost:%BACKEND_PORT% >nul 2>&1
 if errorlevel 1 (
     echo [FAIL] Backend no responde después de 10 segundos
     echo.
@@ -274,7 +278,7 @@ cd /d "%~dp0"
 timeout /t 15 /nobreak >nul
 
 echo [TEST] Verificando Frontend...
-curl -s -I http://localhost:5173 >nul 2>&1
+curl -s -I http://localhost:%FRONTEND_PORT% >nul 2>&1
 if errorlevel 1 (
     echo [FAIL] Frontend no responde después de 15 segundos
     echo.
@@ -297,7 +301,8 @@ if errorlevel 1 (
 
 REM Limpieza de procesos de prueba
 echo.
-echo [CLEANUP] Deteniendo procesos de prueba...
+echo [CLEANUP] Intentando detener procesos de prueba (nota: 'taskkill /F /IM node.exe' es una terminación general y puede afectar otros procesos de Node.js).
+REM Para una terminación más precisa, se necesitaría capturar los PIDs de los procesos iniciados.
 taskkill /F /IM node.exe >nul 2>&1
 
 echo.

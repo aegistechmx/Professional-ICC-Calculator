@@ -2,8 +2,8 @@
  * start-server.js - Server startup script
  */
 
-const http = require('http')
-const app = require('./src/app')
+const http = require('http');
+const app = require('./src/app'); // Ahora importa desde src/app.js
 
 const PORT = process.env.PORT || 3001
 

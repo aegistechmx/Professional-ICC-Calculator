@@ -148,6 +148,39 @@ function calculatePowerFactor(realPower, apparentPower) {
 }
 
 /**
+ * Validate common electrical calculation parameters
+ * @param {Object} params - Parameters to validate
+ * @returns {Object} Validation result
+ */
+function validateElectricalParams(params = {}) {
+  const errors = []
+  const { voltage, current, power } = params
+
+  if (voltage !== undefined) {
+    if (typeof voltage !== 'number' || isNaN(voltage) || voltage < 0) {
+      errors.push('Voltage must be a non-negative number')
+    }
+  }
+
+  if (current !== undefined) {
+    if (typeof current !== 'number' || isNaN(current) || current < 0) {
+      errors.push('Current must be a non-negative number')
+    }
+  }
+
+  if (power !== undefined) {
+    if (typeof power !== 'number' || isNaN(power)) {
+      errors.push('Power must be a valid number')
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
+/**
  * Calculate apparent power
  * @param {number} voltage - Voltage in volts
  * @param {number} current - Current in amperes
@@ -212,61 +245,6 @@ function convertPowerUnits(power, fromUnit, toUnit) {
 
   const powerInWatts = parseFloat((power * fromMultiplier).toFixed(6))
   return parseFloat((powerInWatts / toMultiplier).toFixed(6))
-}
-
-/**
- * Validate electrical parameters
- * @param {Object} params - Electrical parameters to validate
- * @returns {Object} Validation result { valid, errors }
- */
-function validateElectricalParams(params) {
-  const errors = []
-
-  // Validate voltage levels
-  if (params.voltage !== undefined) {
-    // voltage (V)
-    if (params.voltage <= 0 || params.voltage > 1000000) {
-      // voltage (V)
-      errors.push('Voltage must be between 0 and 1,000,000 V')
-    }
-  }
-
-  // Validate current
-  if (params.current !== undefined) {
-    // current (A)
-    if (params.current < 0 || params.current > 100000) {
-      errors.push('Current must be between 0 and 100,000 A')
-    }
-  }
-
-  // Validate impedance - allow negative reactance (capacitive)
-  if (params.impedance !== undefined) {
-    // impedance (Ω)
-    if (params.impedance.real < 0) {
-      errors.push('Resistance must be non-negative')
-    }
-    if (
-      typeof params.impedance.imag !== 'number' || // impedance (Ω)
-      isNaN(params.impedance.imag)
-    ) {
-      errors.push(
-        'Reactance must be a valid number (can be negative for capacitive)'
-      )
-    }
-  }
-
-  // Validate power
-  if (params.power !== undefined) {
-    // power (W)
-    if (toElectricalPrecision(Math.abs(params.power)) > 10000) {
-      errors.push('Power magnitude should not exceed 10 MW')
-    }
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  }
 }
 
 /**
@@ -510,7 +488,6 @@ module.exports = {
   calculateApparentPower,
   convertPowerUnits,
   validateElectricalParams,
-  calculateThreePhasePower,
   calculatePerUnit,
   convertPerUnitToActual,
   formatElectricalValue,
@@ -518,6 +495,7 @@ module.exports = {
   convertCurrent,
   convertPower,
   convertImpedance,
+  calculateThreePhasePower,
   calculateReactivePower,
   validateElectricalValue,
 }

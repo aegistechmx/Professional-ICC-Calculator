@@ -7,12 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum TemplateCategory {
+  TRANSFORMER
+  BREAKER
+  PANEL
+  MOTOR
+  LOAD
+  OTHER
+}
+
+enum SimulationJobType {
+  ICC_CALCULATION
+  TCC_ANALYSIS
+  PDF_REPORT
+  OTHER
+}
+
+enum SimulationJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String
+  passwordHash String // Almacena el hash (bcrypt/argon2), nunca la contraseña plana.
   nombre    String?
-  plan      String   @default("free") // free, pro, enterprise
+  plan      UserPlan @default(FREE)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   proyectos Proyecto[]
@@ -22,6 +52,8 @@ model Proyecto {
   id          Int      @id @default(autoincrement())
   nombre      String
   descripcion String?
+  // SUGERENCIA: Para bases de datos que soporten JSON nativo (ej. PostgreSQL), considerar usar `Json` en lugar de `String`.
+  // Para SQLite, `String` es la opción correcta para almacenar JSON.
   nodes       String   // Store ReactFlow nodes as JSON string
   edges       String   // Store ReactFlow edges as JSON string
   metadata    String?  // Additional project metadata as JSON string
@@ -40,7 +72,9 @@ model Template {
   id          Int      @id @default(autoincrement())
   nombre      String   @unique
   descripcion String?
-  categoria   String   // substation, panel, industrial, etc.
+  categoria   TemplateCategory @default(OTHER) // substation, panel, industrial, etc.
+  // SUGERENCIA: Para bases de datos que soporten JSON nativo (ej. PostgreSQL), considerar usar `Json` en lugar de `String`.
+  // Para SQLite, `String` es la opción correcta para almacenar JSON.
   nodes       String   // Template nodes as JSON string
   edges       String   // Template edges as JSON string
   thumbnail   String?  // URL to thumbnail image
@@ -54,8 +88,10 @@ model Template {
 model SimulationJob {
   id          Int      @id @default(autoincrement())
   projectId   Int
-  type        String   // icc, tcc, coordination
-  status      String   @default("pending") // pending, processing, completed, failed
+  type        SimulationJobType @default(ICC_CALCULATION) // icc, tcc, coordination
+  status      SimulationJobStatus @default(PENDING) // pending, processing, completed, failed
+  // SUGERENCIA: Para bases de datos que soporten JSON nativo (ej. PostgreSQL), considerar usar `Json` en lugar de `String`.
+  // Para SQLite, `String` es la opción correcta para almacenar JSON.
   result      String?  // Result as JSON string
   error       String?
   createdAt   DateTime @default(now())

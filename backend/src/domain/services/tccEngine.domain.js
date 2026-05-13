@@ -6,6 +6,41 @@ const { toElectricalPrecision } = require('../../shared/utils/electricalUtils')
  */
 
 class TCCEngine {
+  /**
+   * @openapi
+   * components:
+   *   schemas:
+   *     TCCPoint:
+   *       type: object
+   *       properties:
+   *         I:
+   *           type: number
+   *           description: Corriente en Amperios
+   *         t:
+   *           type: number
+   *           description: Tiempo de disparo en segundos
+   *     BreakerConfig:
+   *       type: object
+   *       required:
+   *         - pickup
+   *       properties:
+   *         pickup:
+   *           type: number
+   *           description: Corriente de ajuste (Ir)
+   *         TMS:
+   *           type: number
+   *           description: Time Multiplier Setting (IEC)
+   *         curve:
+   *           type: string
+   *           enum: [standard, very, extreme, long]
+   *         standard:
+   *           type: string
+   *           enum: [IEC, IEEE]
+   *         instantaneous:
+   *           type: number
+   *           nullable: true
+   *           description: Ajuste instantáneo (Ii)
+   */
   constructor() {
     // Curvas IEC 60255
     this.iecCurves = {
@@ -94,6 +129,29 @@ class TCCEngine {
   /**
    * Generar curva TCC completa para graficar
    * @param {Object} breaker - Configuración del breaker
+   * @openapi
+   * /api/tcc/generate:
+   *   post:
+   *     summary: Genera los puntos de una curva Tiempo-Corriente
+   *     tags: [TCC]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               breaker:
+   *                 $ref: '#/components/schemas/BreakerConfig'
+   *     responses:
+   *       200:
+   *         description: Lista de puntos para graficar
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/TCCPoint'
    * @returns {Array} Array de puntos {I, t}
    */
   generateTCCCurve(breaker) {
