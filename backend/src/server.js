@@ -149,7 +149,7 @@ app.get('/', (req, res) => {
   `);
 });
 
-app.post('/api/analyze', validateJSONBody, (req, res) => {
+app.post('/api/analyze', validateJSONBody, async (req, res) => {
   try {
     const systemModel = req.body
     const normalized = JSON.stringify(systemModel, Object.keys(systemModel).sort())
@@ -158,7 +158,7 @@ app.post('/api/analyze', validateJSONBody, (req, res) => {
     const cached = getCached(key)
     if (cached) return sendResponse(res, true, { ...cached, cached: true })
 
-    const result = runFullAnalysis(systemModel)
+    const result = await runFullAnalysis(systemModel)
     setCached(key, result)
     sendResponse(res, true, { ...result, cached: false })
   } catch (error) {
