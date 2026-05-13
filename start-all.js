@@ -9,6 +9,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const net = require('net');
+const http = require('http');
 
 const colors = {
     reset: '\x1b[0m', bright: '\x1b[1m',
@@ -31,6 +32,9 @@ const rootDir = __dirname;
 const frontendDir = path.join(rootDir, 'frontend');
 const backendDir = path.join(rootDir, 'backend');
 const cortocircuitoDir = path.join(rootDir, 'icc-core', 'cortocircuito');
+const staticServerScript = path.join(rootDir, 'scripts', 'static-server.js');
+const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const NODE_CMD = process.execPath;
 
 const processes = [];
 
@@ -42,6 +46,29 @@ if (!fs.existsSync(frontendDir)) {
 if (!fs.existsSync(backendDir)) {
     log('❌ Directorio "backend" no encontrado', 'red');
     process.exit(1);
+}
+
+/**
+ * Verifica si una URL responde con un estado exitoso (200-399)
+ * Implementa un sistema de reintentos para dar tiempo a que los servidores se inicialicen completamente.
+ */
+async function checkUrl(url, retries = 15, interval = 1000) {
+    for (let i = 0; i < retries; i++) {
+        const online = await new Promise((resolve) => {
+            const req = http.get(url, (res) => {
+                resolve(res.statusCode >= 200 && res.statusCode < 400);
+            });
+            req.on('error', () => resolve(false));
+            req.on('timeout', () => {
+                req.destroy();
+                resolve(false);
+            });
+            req.setTimeout(1500);
+        });
+        if (online) return true;
+        if (i < retries - 1) await new Promise(r => setTimeout(r, interval));
+    }
+    return false;
 }
 
 function isPortAvailable(port) {
@@ -106,17 +133,29 @@ async function main() {
 
     try {
         // Backend primero
-        await startProcess('BACKEND', backendDir, 'npm', ['run', 'dev'], ports.backend);
-
-        // Espera breve para que el backend inicie
-        await new Promise(r => setTimeout(r, 3000));
+        await startProcess('BACKEND', backendDir, NPM_CMD, ['run', 'dev'], ports.backend);
 
         // Frontend
-        await startProcess('FRONTEND', frontendDir, 'npm', ['run', 'dev'], ports.frontend);
+        await startProcess('FRONTEND', frontendDir, NPM_CMD, ['run', 'dev'], ports.frontend);
 
-        // Standalone Cortocircuito (opcional)
-        if (fs.existsSync(cortocircuitoDir)) {
-            await startProcess('STANDALONE', cortocircuitoDir, 'npm', ['run', 'dev'], ports.standalone);
+        // Iniciar el servidor estático para el módulo standalone
+        await startProcess('STANDALONE', rootDir, NPM_CMD, ['run', 'standalone'], ports.standalone);
+
+        log('\n🔍 Realizando Health Checks (con reintentos)...', 'yellow');
+        const checks = [
+            { name: 'Backend API', url: `http://localhost:${ports.backend}/api/health` },
+            { name: 'Frontend App', url: `http://localhost:${ports.frontend}` },
+            { name: 'Standalone Calc', url: `http://localhost:${ports.standalone}` },
+            { name: 'Módulo Integrado', url: `http://localhost:${ports.frontend}/cortocircuito/index.html` }
+        ];
+
+        for (const check of checks) {
+            const online = await checkUrl(check.url);
+            if (online) {
+                log(`   [OK] ${check.name} respondiendo correctamente`, 'green');
+            } else {
+                log(`   [FAIL] ${check.name} no responde en ${check.url}`, 'red');
+            }
         }
 
         logSection('✅ SISTEMA INICIADO CORRECTAMENTE');

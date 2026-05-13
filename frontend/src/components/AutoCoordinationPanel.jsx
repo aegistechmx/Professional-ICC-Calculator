@@ -282,11 +282,7 @@ export const AutoCoordinationPanel = () => {
             />
             <span className="text-sm text-gray-600">Modo Auto</span>
           </label>
-          <button
-            onClick={analyzeCoordination}
-            disabled={isAnalyzing}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-          >
+          <button onClick={analyzeCoordination} disabled={isAnalyzing} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50">
             {isAnalyzing ? 'Analizando...' : 'Analizar'}
           </button>
         </div>
@@ -340,8 +336,7 @@ export const AutoCoordinationPanel = () => {
                   >
                     {issue.description}
                   </span>
-                  <button
-                    onClick={() =>
+                  <button onClick={() =>
                       applyManualAdjustment(issue.upstream, {
                         action:
                           issue.type === 'overlap'
@@ -403,8 +398,7 @@ export const AutoCoordinationPanel = () => {
                       </span>
                     </td>
                     <td className="px-2 py-1 text-center">
-                      <button
-                        onClick={() => setSelectedBreaker(pair)}
+                      <button onClick={() => setSelectedBreaker(pair)}
                         className="text-blue-500 hover:text-blue-700"
                       >
                         Detalles
@@ -462,8 +456,7 @@ export const AutoCoordinationPanel = () => {
                   {breakerNodes.find(b => b.id === rec.breakerId)?.data
                     ?.label || rec.breakerId}
                 </span>
-                <button
-                  onClick={() => applyManualAdjustment(rec.breakerId, rec)}
+                <button onClick={() => applyManualAdjustment(rec.breakerId, rec)}
                   className="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                   Aplicar

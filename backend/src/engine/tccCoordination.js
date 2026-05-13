@@ -21,9 +21,9 @@ function logInterpolate(p1, p2, I) {
 
   const x = Math.log10(I)
 
-  const y = y1 + ((y2 - y1) * (x - x1)) / (x2 - x1)
+  const y = parseFloat((y1 + ((y2 - y1) * (x - x1)) / (x2 - x1)).toFixed(10))
 
-  return Math.pow(10, y)
+  return parseFloat(Math.pow(10, y).toFixed(6))
 }
 
 /**
@@ -50,7 +50,7 @@ function calcTripTime({ I, pickup, tms = 0.1 }) {
 
   const t = (k * tms) / (Math.pow(ratio, alpha) - 1)
 
-  return t
+  return parseFloat(t.toFixed(6))
 }
 
 /**
@@ -128,7 +128,7 @@ function checkCoordinationReal({ upstream, downstream, I_fault }) {
   const t_up = getTripTimeReal(upstream, I_fault)
   const t_down = getTripTimeReal(downstream, I_fault)
 
-  const margin = t_up - t_down
+  const margin = parseFloat((t_up - t_down).toFixed(6))
   const coordinated = margin > 0.2 // 200 ms típico para coordinación
 
   return {

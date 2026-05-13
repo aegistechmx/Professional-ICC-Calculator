@@ -113,15 +113,11 @@ export default function ICCIframeDemo() {
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Controles</h2>
             <div className="space-y-3">
-              <button
-                onClick={loadExampleModel}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              >
+              <button onClick={loadExampleModel} className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                 📦 Cargar Modelo de Ejemplo
               </button>
 
-              <button
-                onClick={() => {
+              <button onClick={() => {
                   setSystemModel(null)
                   setResults(null)
                   addLog('Modelo limpiado', 'info')

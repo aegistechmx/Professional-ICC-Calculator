@@ -401,10 +401,7 @@ export const ProfessionalTCCPanel = () => {
           </div>
 
           <div className="flex items-end">
-            <button
-              onClick={simulateFault}
-              className="w-full px-3 py-1 bg-red-500 text-white rounded text-sm font-medium hover:bg-red-600"
-            >
+            <button onClick={simulateFault} className="w-full px-3 py-1 bg-red-500 text-white rounded text-sm font-medium hover:bg-red-600">
               Simular Falla
             </button>
           </div>
@@ -454,10 +451,7 @@ export const ProfessionalTCCPanel = () => {
           <h4 className="text-sm font-medium text-gray-700">
             Coordinación Automática
           </h4>
-          <button
-            onClick={runCoordination}
-            className="px-3 py-1 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600"
-          >
+          <button onClick={runCoordination} className="px-3 py-1 bg-blue-500 text-white rounded text-sm font-medium hover:bg-blue-600">
             Ejecutar
           </button>
         </div>
@@ -519,8 +513,7 @@ export const ProfessionalTCCPanel = () => {
         <span className="text-sm font-medium text-gray-700">
           Mostrar bandas:
         </span>
-        <button
-          onClick={() => setShowBands(!showBands)}
+        <button onClick={() => setShowBands(!showBands)}
           className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
             showBands
               ? 'bg-blue-500 text-white hover:bg-blue-600'

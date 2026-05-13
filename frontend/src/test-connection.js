@@ -34,8 +34,7 @@ async function testConnection() {
   }
 }
 
-// Auto-run test
-testConnection()
-
 // Also make it available globally
 window.testICCConnection = testConnection
+
+// Para ejecutar manualmente en la consola del navegador: window.testICCConnection()

@@ -42,34 +42,43 @@ const { assertPositive } = require('./guards.js')
  * @throws {Error} Si los parámetros son inválidos
  */
 function validateFeeder(input) {
-  const {
-    material = 'Cu',
-    size,
-    ambientC = 30,
-    nConductors = 3,
-    parallels = 1,
-    terminalTempC = 75,
-    I_base,
-    Fcc = 1.25,
-    Icu_kA,
-    Isc_kA,
-    voltageDrop: vdParams,
-    coordination: coordParams,
-  } = input
+  // Sanatización y Normalización de entradas del UI (Maneja unidades y nombres descriptivos)
+  const materialInput = input.material || 'Cu';
+  const material = (materialInput.includes('Al') || materialInput.toLowerCase().includes('aluminio')) ? 'Al' : 'Cu';
+  
+  // Limpiar calibre de sufijos como " AWG" o " kcmil"
+  const size = typeof input.size === 'string' ? input.size.replace(/\s*(awg|kcmil)/gi, '') : input.size;
+  
+  // Convertir a número y limpiar unidades (°C, A, kA)
+  const ambientC = parseFloat(String(input.ambientC || 30).replace(/°C/gi, ''));
+  const nConductors = parseInt(input.nConductors) || 3;
+  const parallels = parseInt(input.parallels) || 1;
+  
+  // Manejar "75°C" -> 75
+  let terminalTempC = input.terminalTempC || 75;
+  if (typeof terminalTempC === 'string') {
+    terminalTempC = parseInt(terminalTempC.replace(/°C/gi, ''));
+  }
+
+  const insulationTempC = parseInt(input.insulationTempC) || 90;
+
+  const I_base = parseFloat(String(input.I_base).replace(/A/gi, ''));
+  const Fcc = parseFloat(input.Fcc) || 1.25;
+  const Icu_kA = parseFloat(String(input.Icu_kA).replace(/kA/gi, ''));
+  const Isc_kA = parseFloat(String(input.Isc_kA).replace(/kA/gi, ''));
+  
+  const vdParams = input.voltageDrop;
+  const coordParams = input.coordination;
 
   // Guards clave
   assertPositive('I_base', I_base)
-  assertPositive('Icu_kA', Icu_kA)
-  assertPositive('Isc_kA', Isc_kA)
+  if (isNaN(Icu_kA)) throw new Error('Capacidad Interruptiva (Icu) es requerida y debe ser numérica');
+  if (isNaN(Isc_kA)) throw new Error('Corriente de Falla (Isc) es requerida y debe ser numérica');
 
-  // Validar unidades (asumimos kA por defecto, pero permitimos especificar A)
   const Isc_unit = input.Isc_unit || 'kA' // 'kA' | 'A'
-  if (Isc_unit !== 'kA' && Isc_unit !== 'A') {
-    throw new Error(`Isc_unit debe ser 'kA' o 'A', recibido: ${Isc_unit}`)
-  }
 
   // 1) Ampacidad
-  const amp = calcAmpacity({ material, size, ambientC, nConductors, parallels })
+  const amp = calcAmpacity({ material, size, ambientC, insulationTempC, nConductors, parallels })
 
   // 2) Terminal
   const term = calcTerminalLimit({ material, size, terminalTempC })
@@ -92,7 +101,11 @@ function validateFeeder(input) {
   if (vdParams) {
     const vdCalc = calcVoltageDrop({
       I: I_base,
-      ...vdParams,
+      V: parseFloat(String(vdParams.V || 480).replace(/V/gi, '')),
+      L: parseFloat(String(vdParams.L || 1).replace(/m/gi, '')),
+      R: parseFloat(String(vdParams.R || 0).replace(/[^\d.]/g, '')) / parallels,
+      X: parseFloat(String(vdParams.X || 0).replace(/[^\d.]/g, '')) / parallels,
+      fp: parseFloat(String(vdParams.fp || 0.9))
     })
     const vdCheck = checkVoltageDrop(vdCalc.percent)
     voltageDropResult = {

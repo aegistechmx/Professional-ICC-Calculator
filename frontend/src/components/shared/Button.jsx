@@ -1,5 +1,5 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
+import React from 'react';
 
 /**
  * Reusable Button component with variants
@@ -16,6 +16,7 @@ export default function Button({
   size = 'md',
   disabled = false,
   loading = false,
+  type = 'button',
   children,
   onClick,
   className = '',
@@ -40,12 +41,7 @@ export default function Button({
   }
 
   return (
-    <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
-      disabled={disabled || loading}
-      onClick={onClick}
-      {...props}
-    >
+    <button type={type} className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} disabled={disabled || loading} onClick={onClick} {...props}>
       {loading && (
         <svg
           className="animate-spin h-4 w-4"
@@ -82,6 +78,7 @@ Button.propTypes = {
     'outline',
   ]),
   size: PropTypes.oneOf(['sm', 'md', 'lg']),
+  type: PropTypes.oneOf(['button', 'submit', 'reset']),
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
   children: PropTypes.node,

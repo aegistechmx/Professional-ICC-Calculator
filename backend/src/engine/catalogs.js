@@ -68,6 +68,25 @@ const AMPACITY = {
     },
   },
   Al: {
+    60: {
+      12: 20,
+      10: 25,
+      8: 30,
+      6: 40,
+      4: 55,
+      3: 65,
+      2: 75,
+      1: 85,
+      '1/0': 100,
+      '2/0': 115,
+      '3/0': 130,
+      '4/0': 155,
+      250: 170,
+      300: 190,
+      350: 210,
+      400: 225,
+      500: 260,
+    },
     75: {
       12: 20,
       10: 30,
@@ -86,6 +105,25 @@ const AMPACITY = {
       350: 250,
       400: 270,
       500: 310,
+    },
+    90: {
+      12: 25,
+      10: 35,
+      8: 45,
+      6: 60,
+      4: 75,
+      3: 85,
+      2: 100,
+      1: 115,
+      '1/0': 135,
+      '2/0': 150,
+      '3/0': 175,
+      '4/0': 205,
+      250: 230,
+      300: 255,
+      350: 280,
+      400: 305,
+      500: 350,
     },
   },
 }
@@ -106,12 +144,42 @@ const TEMP_CORRECTION_90C = {
 }
 
 /**
- * Factor de corrección de temperatura (interpolado para 90°C)
+ * Factor de corrección de temperatura para 60°C (NOM-001-SEDE-2012)
  * @param {number} ambientC - Temperatura ambiente en °C
  * @returns {number} Factor de corrección
  */
-const TEMP_FACTOR_90C = ambientC => {
-  const table = TEMP_CORRECTION_90C
+const TEMP_CORRECTION_60C = {
+  21: 1.08,
+  26: 1.0,
+  31: 0.91,
+  36: 0.82,
+  41: 0.71,
+  46: 0.58,
+  51: 0.41,
+}
+
+/**
+ * Factor de corrección de temperatura para 75°C (NOM-001-SEDE-2012)
+ * @param {number} ambientC - Temperatura ambiente en °C
+ * @returns {number} Factor de corrección
+ */
+const TEMP_CORRECTION_75C = {
+  21: 1.05,
+  26: 1.0,
+  31: 0.94,
+  36: 0.88,
+  41: 0.82,
+  46: 0.75,
+  51: 0.67,
+}
+
+/**
+ * Factor de corrección de temperatura (interpolador genérico)
+ * @param {number} ambientC - Temperatura ambiente en °C
+ * @param {Object} table - Tabla de corrección a usar
+ * @returns {number} Factor de corrección
+ */
+const getTempFactor = (ambientC, table) => {
   const temps = Object.keys(table)
     .map(Number)
     .sort((a, b) => a - b)
@@ -130,8 +198,23 @@ const TEMP_FACTOR_90C = ambientC => {
     }
   }
 
-  return 0.82 // fallback
+  return table[temps[temps.length - 1]] // fallback
 }
+
+/**
+ * Factor de corrección de temperatura (interpolado para 90°C)
+ */
+const TEMP_FACTOR_90C = ambientC => getTempFactor(ambientC, TEMP_CORRECTION_90C)
+
+/**
+ * Factor de corrección de temperatura (interpolado para 60°C)
+ */
+const TEMP_FACTOR_60C = ambientC => getTempFactor(ambientC, TEMP_CORRECTION_60C)
+
+/**
+ * Factor de corrección de temperatura (interpolado para 75°C)
+ */
+const TEMP_FACTOR_75C = ambientC => getTempFactor(ambientC, TEMP_CORRECTION_75C)
 
 /**
  * Factor de agrupamiento (NOM-001-SEDE-2012)
@@ -154,16 +237,32 @@ const GROUPING_FACTOR = nConductors => {
  * @throws {Error} Si el calibre no existe en la tabla
  */
 function getAmpacity(material, tempC, size) {
-  if (!AMPACITY[material]) {
-    throw new Error(`Material no encontrado: ${material}`)
+  // Normalización de material (Maneja "Cu", "Cobre (Cu)", "Al", "Aluminio (Al)")
+  let mat = material;
+  if (typeof material === 'string') {
+    if (material.includes('Cu') || material.toLowerCase().includes('cobre')) mat = 'Cu';
+    if (material.includes('Al') || material.toLowerCase().includes('aluminio')) mat = 'Al';
   }
-  if (!AMPACITY[material][tempC]) {
-    throw new Error(`Temperatura no encontrada para ${material}: ${tempC}°C`)
+
+  // Normalización de calibre (limpiar sufijos kcmil, AWG, MCM)
+  const cleanSize = typeof size === 'string' ? size.replace(/\s*(awg|kcmil|mcm)/gi, '') : size;
+
+  if (!AMPACITY[mat]) {
+    throw new Error(`Material no encontrado: ${mat}`)
   }
-  const val = AMPACITY[material][tempC][size]
+
+  // Asegurar que tempC sea número para indexar
+  const temp = parseInt(tempC);
+  if (!AMPACITY[mat][temp]) {
+    throw new Error(`Temperatura no encontrada para ${mat}: ${temp}°C`)
+  }
+
+  // Buscar el valor del calibre
+  const val = AMPACITY[mat][temp][cleanSize]
+
   if (!val) {
     throw new Error(
-      `Calibre no encontrado en tabla ${tempC}°C: ${material} ${size}`
+      `Calibre no encontrado en tabla ${temp}°C: ${mat} ${cleanSize}`
     )
   }
   return val
@@ -171,20 +270,19 @@ function getAmpacity(material, tempC, size) {
 
 /**
  * Obtiene ampacidad base de tabla 75°C (legacy)
- * @param {string} material - 'Cu' | 'Al'
- * @param {string|number} size - Calibre (300, 350, '1/0', etc.)
- * @returns {number} Ampacidad en amperes
- * @throws {Error} Si el calibre no existe en la tabla
+ * @param {string} material - Material
+ * @param {string|number} size - Calibre
+ * @returns {number} Ampacidad a 75°C
  */
-function getAmpacity75C(material, size) {
+function getAmpacity75(material, size) {
   return getAmpacity(material, 75, size)
 }
 
 module.exports = {
-  AMPACITY,
-  TEMP_CORRECTION_90C,
-  TEMP_FACTOR_90C,
-  GROUPING_FACTOR,
   getAmpacity,
-  getAmpacity75C,
+  getAmpacity75,
+  TEMP_FACTOR_90C,
+  TEMP_FACTOR_60C,
+  TEMP_FACTOR_75C,
+  GROUPING_FACTOR,
 }

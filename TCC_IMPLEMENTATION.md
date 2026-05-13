@@ -59,6 +59,10 @@ if (I >= I_instantaneous) {
 - `frontend/src/components/TCCChart.jsx` - Visualización log-log
 - `frontend/src/components/TCCChart.css` - Estilos
 
+### **Precisión de Cálculo**
+- **IEEE 1584 Compliance**: 6 decimales de precisión para todos los puntos de la curva (corriente y tiempo).
+- **Implementación**: Se aplica `toFixed(6)` a los valores numéricos en `tccEngine.domain.js` antes de retornar los resultados.
+
 ---
 
 ## 📡 **API Endpoints**

@@ -66,9 +66,7 @@ export default function AlignmentToolbar() {
       <div className="toolbar-section">
         <span className="section-title">Alinear</span>
         <div className="toolbar-buttons">
-          <button
-            className="toolbar-btn"
-            onClick={() => handleAlign(alignLeft, 'izquierda')}
+          <button className="toolbar-btn" onClick={() => handleAlign(alignLeft, 'izquierda')}
             disabled={!canAlign}
             title="Alinear a la izquierda (Ctrl+Shift+←)"
           >
@@ -78,9 +76,7 @@ export default function AlignmentToolbar() {
             Izquierda
           </button>
 
-          <button
-            className="toolbar-btn"
-            onClick={() => handleAlign(alignCenterH, 'centro H')}
+          <button className="toolbar-btn" onClick={() => handleAlign(alignCenterH, 'centro H')}
             disabled={!canAlign}
             title="Alinear al centro horizontal"
           >
@@ -90,9 +86,7 @@ export default function AlignmentToolbar() {
             Centro H
           </button>
 
-          <button
-            className="toolbar-btn"
-            onClick={() => handleAlign(alignRight, 'derecha')}
+          <button className="toolbar-btn" onClick={() => handleAlign(alignRight, 'derecha')}
             disabled={!canAlign}
             title="Alinear a la derecha (Ctrl+Shift+→)"
           >
@@ -104,9 +98,7 @@ export default function AlignmentToolbar() {
         </div>
 
         <div className="toolbar-buttons">
-          <button
-            className="toolbar-btn"
-            onClick={() => handleAlign(alignTop, 'arriba')}
+          <button className="toolbar-btn" onClick={() => handleAlign(alignTop, 'arriba')}
             disabled={!canAlign}
             title="Alinear arriba (Ctrl+Shift+↑)"
           >
@@ -116,9 +108,7 @@ export default function AlignmentToolbar() {
             Arriba
           </button>
 
-          <button
-            className="toolbar-btn"
-            onClick={() => handleAlign(alignCenterV, 'centro V')}
+          <button className="toolbar-btn" onClick={() => handleAlign(alignCenterV, 'centro V')}
             disabled={!canAlign}
             title="Alinear al centro vertical"
           >
@@ -128,9 +118,7 @@ export default function AlignmentToolbar() {
             Centro V
           </button>
 
-          <button
-            className="toolbar-btn"
-            onClick={() => handleAlign(alignBottom, 'abajo')}
+          <button className="toolbar-btn" onClick={() => handleAlign(alignBottom, 'abajo')}
             disabled={!canAlign}
             title="Alinear abajo (Ctrl+Shift+↓)"
           >
@@ -147,9 +135,7 @@ export default function AlignmentToolbar() {
       <div className="toolbar-section">
         <span className="section-title">Distribuir</span>
         <div className="toolbar-buttons">
-          <button
-            className="toolbar-btn"
-            onClick={() => handleDistribute(distributeHorizontal, 'horizontal')}
+          <button className="toolbar-btn" onClick={() => handleDistribute(distributeHorizontal, 'horizontal')}
             disabled={!canDistribute}
             title="Distribuir horizontalmente"
           >
@@ -159,9 +145,7 @@ export default function AlignmentToolbar() {
             Horizontal
           </button>
 
-          <button
-            className="toolbar-btn"
-            onClick={() => handleDistribute(distributeVertical, 'vertical')}
+          <button className="toolbar-btn" onClick={() => handleDistribute(distributeVertical, 'vertical')}
             disabled={!canDistribute}
             title="Distribuir verticalmente"
           >
@@ -171,9 +155,7 @@ export default function AlignmentToolbar() {
             Vertical
           </button>
 
-          <button
-            className="toolbar-btn"
-            onClick={() => handleDistribute(distributeGrid, 'grid')}
+          <button className="toolbar-btn" onClick={() => handleDistribute(distributeGrid, 'grid')}
             disabled={!canDistribute}
             title="Distribuir en grid"
           >

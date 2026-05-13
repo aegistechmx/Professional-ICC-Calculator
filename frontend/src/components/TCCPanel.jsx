@@ -3,9 +3,9 @@
  * Muestra curvas tiempo-corriente para coordinación de protecciones
  */
 
-import React, { useMemo } from 'react'
-import PropTypes from 'prop-types'
-import './TCCPanel.css'
+import PropTypes from 'prop-types';
+import { useMemo } from 'react';
+import './TCCPanel.css';
 
 export default function TCCPanel({ selectedNode, results, onClose }) {
   // Generar curva TCC para un breaker/protección
@@ -370,14 +370,14 @@ TCCPanel.propTypes = {
     type: PropTypes.string,
     data: PropTypes.shape({
       label: PropTypes.string,
-      In: PropTypes.number,
-      Icu: PropTypes.number,
-      I_carga: PropTypes.number,
+      In: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      Icu: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      I_carga: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       protection: PropTypes.shape({
         tipo: PropTypes.string,
-        In: PropTypes.number,
-        Icu: PropTypes.number,
-        I_carga: PropTypes.number,
+        In: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        Icu: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+        I_carga: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       }),
     }),
   }),

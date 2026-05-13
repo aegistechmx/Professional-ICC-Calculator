@@ -1,510 +1,177 @@
 // Initialize module aliases for @ imports
 require('module-alias/register')
 
-const http = require('http')
-const fs = require('fs')
-const path = require('path')
-
-// Import professional ICC service
-const { runICC } = require('./application/icc.service')
-// Import new validation engine
-const { validateFeeder } = require('./engine/validator')
-// Import optimizer
-const { optimizeBreakers } = require('./engine/optimizer')
-// Import cache and full analysis
-const { getCached, setCached } = require('./cache')
-const { runFullAnalysis } = require('./engine/fullAnalysis')
-const {
-  validateICCInput,
-  _validateFeederInput,
-  validateGraphInput,
-  validateOptimizerInput,
-  validateJSONBody,
-} = require('./middleware/validation')
+const express = require('express')
+const cors = require('cors')
+const _fs = require('fs')
+const _path = require('path')
 const crypto = require('crypto')
 
-// Allowed origins from environment or defaults
+/**
+ * Safe Import System
+ * Evita que el servidor colapse si hay errores de sintaxis en el motor de cálculo
+ */
+let runICC, validateFeeder, _optimizeBreakers, getCached, setCached, runFullAnalysis;
+try {
+    runICC = require('./application/services/icc.service').runICC;
+    validateFeeder = require('./core/shortcircuit/protection/validator').validateFeeder;
+    _optimizeBreakers = require('./core/shortcircuit/protection/optimizer').optimizeBreakers; // Corregido
+    const cache = require('./infrastructure/persistence/cache');
+    getCached = cache.getCached;
+    setCached = cache.setCached;
+    runFullAnalysis = require('./application/services/fullAnalysis').runFullAnalysis;
+} catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('❌ CRITICAL: Error cargando módulos del motor:', e.message);
+}
+
+const {
+  validateICCInput,
+  validateGraphInput,
+  validateJSONBody,
+  validateOptimizerInput: _validateOptimizerInput, // Corregido
+} = require('./middleware/validation')
+
+const app = express()
+const PORT = process.env.PORT || 3001
+
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174']
 
-// Standardized ICC API Server
-const server = http.createServer((req, res) => {
-  // Enable CORS for specific origins only
-  const origin = req.headers.origin
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin)
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS, GET')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  res.setHeader('Access-Control-Allow-Credentials', 'true')
+// Middleware
+app.use(cors({
+  origin: ALLOWED_ORIGINS,
+  credentials: true
+}))
+app.use(express.json({ limit: '1mb' }))
 
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200)
-    res.end()
-    return
-  }
+// Helper for responses
+const sendResponse = (res, success, data = null, error = null) => {
+  res.json({ success, data, error })
+}
 
-  // Standard response helper
-  const sendResponse = (success, data = null, error = null) => {
-    const response = { success }
-    if (success && data) {
-      response.data = data
-    }
-    if (!success && error) {
-      response.error = error
-    }
+// Routes
+app.get('/api/health', (req, res) => {
+  sendResponse(res, true, {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.0.0'
+  })
+})
 
-    res.writeHead(200, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify(response))
-  }
+app.post('/api/cortocircuito/calculate', validateGraphInput, (req, res) => {
+  try {
+    const { nodes = [], systemMode = 'normal' } = req.body
+    const nodeResults = {}
+    const systemVoltage = 480
 
-  // HEALTH CHECK ENDPOINT: GET /api/health
-  if (req.method === 'GET' && req.url === '/api/health') {
-    sendResponse(true, {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      version: '1.0.0',
-      service: 'ICC Professional API',
-    })
+    nodes.forEach(node => {
+      const nodeType = node.type || 'unknown'
+      let isc = 0
+      let impedance = 0.1
 
-    // ROOT ENDPOINT: GET / - Serve HTML UI
-  } else if (req.method === 'GET' && req.url === '/') {
-    try {
-      const htmlPath = path.join(__dirname, 'server-ui.html')
-      const htmlContent = fs.readFileSync(htmlPath, 'utf8')
+      switch (nodeType) {
+        case 'transformer':
+          impedance = 0.05
+          isc = systemVoltage / (Math.sqrt(3) * impedance)
+          break
+        case 'generator':
+          impedance = 0.08
+          isc = systemVoltage / (Math.sqrt(3) * impedance)
+          break
+        default:
+          impedance = 0.12
+          isc = systemVoltage / (Math.sqrt(3) * impedance)
+      }
 
-      res.writeHead(200, {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Access-Control-Allow-Origin': '*',
-      })
-      res.end(htmlContent)
-    } catch (error) {
-      // Fallback to JSON if HTML file not found
-      sendResponse(true, {
-        name: 'ICC Calculator Professional API',
-        version: '1.0.0',
-        description:
-          'Professional Power System Calculation API with IEEE 1584 Standards',
-        endpoints: {
-          health: 'GET /api/health',
-          calculate: 'POST /api/icc',
-          info: 'GET /api/',
-          root: 'GET /',
-          legacy: 'GET /icc',
-        },
-        standards: ['IEEE 1584', 'IEC 60909'],
-        precision: '6 decimal places internal, 2 decimal places output',
-        message:
-          'Welcome to ICC Professional API - Use POST /api/icc for calculations',
-      })
-    }
+      // Precision and safety limits
+      isc = Math.min(Math.max(isc, 1000), 100000)
 
-    // API INFO ENDPOINT: GET /api/
-  } else if (req.method === 'GET' && req.url === '/api/') {
-    sendResponse(true, {
-      name: 'ICC Calculator Professional API',
-      version: '1.0.0',
-      description:
-        'Professional Power System Calculation API with IEEE 1584 Standards',
-      endpoints: {
-        health: 'GET /api/health',
-        calculate: 'POST /api/icc',
-        cortocircuito: 'POST /api/cortocircuito/calculate',
-        analyze: 'POST /api/analyze',
-        optimize: 'POST /api/optimize',
-        info: 'GET /api/',
-        root: 'GET /',
-        legacy: 'GET /icc',
-      },
-      standards: ['IEEE 1584', 'IEC 60909'],
-      precision: '6 decimal places internal, 2 decimal places output',
-    })
-
-    // CORTOCIRCUITO ENDPOINT: POST /api/cortocircuito/calculate
-  } else if (
-    req.method === 'POST' &&
-    req.url === '/api/cortocircuito/calculate'
-  ) {
-    let body = ''
-
-    req.on('data', chunk => {
-      body += chunk.toString()
-    })
-
-    req.on('end', () => {
-      try {
-        // Basic sanitization - limit body size and remove dangerous patterns
-        if (body.length > 1000000) {
-          // 1MB limit
-          return sendResponse(false, null, 'Request body too large')
-        }
-
-        // Remove potential prototype pollution patterns
-        const sanitizedBody = body
-          .replace(/\b__proto__\b/g, '')
-          .replace(/\bconstructor\b/g, '')
-          .replace(/\bprototype\b/g, '')
-
-        const data = JSON.parse(sanitizedBody)
-
-        // Apply input validation
-        const mockReq = { body: data }
-        const mockRes = {
-          status: () => ({ json: response => response }),
-        }
-        let validationResult = { error: null }
-        const next = error => {
-          validationResult = error || { error: null }
-        }
-
-        validateGraphInput(mockReq, mockRes, next)
-        if (validationResult.error) {
-          return sendResponse(false, null, validationResult.error)
-        }
-        const nodes = data.nodes || []
-        const edges = data.edges || []
-        const systemMode = data.systemMode || 'normal'
-
-        // Calculate ICC per node using proper electrical formulas
-        const nodeResults = {}
-        const systemVoltage = 480 // V (typical industrial voltage)
-
-        nodes.forEach(node => {
-          const nodeType = node.type || 'unknown'
-          let isc = 0
-          let impedance = 0.1 // Default impedance
-
-          // Find edges connected to this node
-          const connectedEdges = edges.filter(
-            e => e.source === node.id || e.target === node.id
-          )
-
-          // Calculate impedance based on node type and connections
-          switch (nodeType) {
-            case 'transformer':
-              // Transformer impedance: typically 5-6% of rating
-              impedance = parseFloat((0.05).toFixed(6)) // 5% impedance
-              isc = parseFloat(
-                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
-              )
-              break
-            case 'generator':
-              // Generator subtransient reactance: typically 15-25%
-              impedance = parseFloat((0.08).toFixed(6)) // 8% subtransient reactance
-              isc = parseFloat(
-                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
-              )
-              break
-            case 'breaker':
-              // Breaker inherits ICC from upstream source
-              const sourceEdge = edges.find(e => e.target === node.id)
-              if (sourceEdge) {
-                const sourceNode = nodes.find(n => n.id === sourceEdge.source)
-                const sourceResult = nodeResults[sourceNode?.id]
-                if (sourceResult) {
-                  isc = parseFloat((sourceResult.isc_3f * 0.95).toFixed(6)) // 5% voltage drop through breaker
-                } else {
-                  impedance = parseFloat((0.06).toFixed(6))
-                  isc = parseFloat(
-                    (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
-                  )
-                }
-              } else {
-                impedance = parseFloat((0.06).toFixed(6))
-                isc = parseFloat(
-                  (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
-                )
-              }
-              break
-            case 'panel':
-              // Panel impedance: includes conductors and protective devices
-              impedance = parseFloat((0.12).toFixed(6)) // Higher impedance due to distribution
-              isc = parseFloat(
-                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
-              )
-              break
-            case 'generator_ats':
-              // Automatic Transfer Switch: depends on system mode
-              if (systemMode === 'emergency') {
-                impedance = parseFloat((0.08).toFixed(6))
-                isc = parseFloat(
-                  (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
-                )
-              } else {
-                isc = 0 // No contribution in normal mode
-              }
-              break
-            default:
-              impedance = parseFloat((0.15).toFixed(6))
-              isc = parseFloat(
-                (systemVoltage / (Math.sqrt(3) * impedance)).toFixed(6)
-              )
-          }
-
-          // Apply safety factor and convert to reasonable range
-          isc = Math.min(Math.max(isc, 1000), 10000) // Limit between 1000-10000
-
-          nodeResults[node.id] = {
-            isc_3f: Math.round(isc),
-            isc_1f: Math.round(isc * 0.577), // 1/√3 for single line-to-ground
-            isc_3f_ka: Math.round(isc / 10) / 1000, // 2 decimal places in kA
-            isc_1f_ka: Math.round((isc * 0.577) / 10) / 1000,
-            nodeType,
-            connectedEdges: connectedEdges.length,
-            impedance: Math.round(impedance * 1000) / 1000, // 3 decimal places
-            voltage: systemVoltage,
-            timestamp: new Date().toISOString(),
-          }
-        })
-
-        const result = {
-          success: true,
-          data: {
-            nodeResults,
-            summary: {
-              totalNodes: nodes.length,
-              totalEdges: edges.length,
-              systemMode,
-              maxIcc: Math.max(
-                ...Object.values(nodeResults).map(r => r.isc_3f_ka || 0)
-              ),
-              minIcc: Math.min(
-                ...Object.values(nodeResults)
-                  .filter(r => r.isc_3f_ka > 0)
-                  .map(r => r.isc_3f_ka || Infinity)
-              ),
-            },
-          },
-        }
-
-        sendResponse(true, result.data)
-      } catch (error) {
-        sendResponse(
-          false,
-          null,
-          'Error en cálculo de cortocircuito: ' + error.message
-        )
+      nodeResults[node.id] = {
+        isc_3f: Math.round(isc),
+        isc_3f_ka: parseFloat((isc / 1000).toFixed(6)),
+        impedance: parseFloat(impedance.toFixed(6)),
+        voltage: systemVoltage,
+        timestamp: new Date().toISOString()
       }
     })
 
-    // MAIN ENDPOINT: POST /api/icc
-  } else if (req.method === 'POST' && req.url === '/api/icc') {
-    let body = ''
-
-    req.on('data', chunk => {
-      body += chunk.toString()
-    })
-
-    req.on('end', () => {
-      try {
-        const params = JSON.parse(body)
-
-        // Apply input validation
-        const mockReq = { body: params }
-        const mockRes = {
-          status: () => ({ json: response => response }),
-        }
-        let validationResult = { error: null }
-        const next = error => {
-          validationResult = error || { error: null }
-        }
-
-        validateICCInput(mockReq, mockRes, next)
-        if (validationResult.error) {
-          return sendResponse(false, null, validationResult.error)
-        }
-
-        // Check if it's a feeder validation request (new engine)
-        if (params.material && params.size && params.I_base) {
-          try {
-            const result = validateFeeder(params)
-            sendResponse(true, result)
-          } catch (error) {
-            sendResponse(false, null, error.message)
-          }
-        } else {
-          // Legacy ICC calculation (voltage/impedance)
-          const V = params.voltage || params.V || 480 // voltage (V)
-          const Z = params.impedance || params.Z || 0.05 // impedance (Ω)
-
-          if (Z <= 0) {
-            return sendResponse(
-              false,
-              null,
-              'La impedancia debe ser mayor a cero'
-            )
-          }
-
-          const result = runICC({ V, Z })
-          sendResponse(true, result)
-        }
-      } catch (error) {
-        sendResponse(false, null, 'Error en formato de datos')
-      }
-    })
-
-    // OPTIMIZER ENDPOINT: POST /api/optimize
-  } else if (req.method === 'POST' && req.url === '/api/optimize') {
-    let body = ''
-
-    req.on('data', chunk => {
-      body += chunk.toString()
-    })
-
-    req.on('end', () => {
-      try {
-        const params = JSON.parse(body)
-
-        // Apply input validation
-        const mockReq = { body: params }
-        const mockRes = {
-          status: () => ({ json: response => response }),
-        }
-        let validationResult = { error: null }
-        const next = error => {
-          validationResult = error || { error: null }
-        }
-
-        validateOptimizerInput(mockReq, mockRes, next)
-        if (validationResult.error) {
-          return sendResponse(false, null, validationResult.error)
-        }
-        const { breakers, faults, iterations = 100 } = params
-
-        if (!breakers || !faults) {
-          return sendResponse(false, null, 'Se requieren breakers y faults')
-        }
-
-        const result = optimizeBreakers({
-          breakers,
-          faults,
-          iterations,
-          temperature: 1.0,
-        })
-
-        sendResponse(true, result)
-      } catch (error) {
-        sendResponse(false, null, error.message)
-      }
-    })
-
-    // FULL ANALYSIS ENDPOINT: POST /api/analyze (with cache)
-  } else if (req.method === 'POST' && req.url === '/api/analyze') {
-    let body = ''
-
-    req.on('data', chunk => {
-      body += chunk.toString()
-    })
-
-    req.on('end', () => {
-      try {
-        // Basic sanitization - limit body size and remove dangerous patterns
-        if (body.length > 1000000) {
-          // 1MB limit
-          return sendResponse(false, null, 'Request body too large')
-        }
-
-        // Remove potential prototype pollution patterns
-        const sanitizedBody = body
-          .replace(/\b__proto__\b/g, '')
-          .replace(/\bconstructor\b/g, '')
-          .replace(/\bprototype\b/g, '')
-
-        const systemModel = JSON.parse(sanitizedBody)
-
-        // Apply input validation
-        const mockReq = { body: systemModel, method: 'POST' }
-        const mockRes = {
-          status: () => ({ json: response => response }),
-        }
-        let validationResult = { error: null }
-        const next = error => {
-          validationResult = error || { error: null }
-        }
-
-        validateJSONBody(mockReq, mockRes, next)
-        if (validationResult.error) {
-          return sendResponse(false, null, validationResult.error)
-        }
-
-        // Generate cache key from system model hash (normalized for stable key)
-        const normalized = JSON.stringify(
-          systemModel,
-          Object.keys(systemModel).sort()
-        )
-        const key = crypto.createHash('md5').update(normalized).digest('hex')
-
-        // Check cache
-        const cached = getCached(key)
-        if (cached) {
-          return sendResponse(true, { ...cached, cached: true })
-        }
-
-        // Run full analysis
-        const result = runFullAnalysis(systemModel)
-
-        // Store in cache
-        setCached(key, result)
-
-        sendResponse(true, { ...result, cached: false })
-      } catch (error) {
-        sendResponse(false, null, error.message)
-      }
-    })
-
-    // TEMPORARY ALIASES (legacy support)
-  } else if (
-    req.url === '/icc' ||
-    req.url === '/cortocircuito/calculate' ||
-    req.url === '/api/cortocircuito/calculate'
-  ) {
-    try {
-      const V = 220
-      const Z = 0.05
-
-      // Use professional ICC service for legacy endpoints too
-      const result = runICC({ V, Z })
-      result.method = 'legacy_professional'
-
-      // Validate result before sending
-      if (!result || typeof result !== 'object') {
-        throw new Error('Invalid result from ICC calculation')
-      }
-
-      // Ensure result is serializable
-      try {
-        const _jsonString = JSON.stringify(result)
-      } catch (serializeError) {
-        // Send fallback result
-        const fallbackResult = {
-          method: 'legacy_fallback',
-          Icc: Math.round((V / (Math.sqrt(3) * Z)) * 100) / 100,
-          voltage: V,
-          impedance: Z,
-          precision: 'IEEE_1584',
-          formula: 'Isc = V / (sqrt(3) * Z)',
-          error: 'Serialization error, using fallback',
-        }
-        sendResponse(true, fallbackResult)
-        return
-      }
-
-      // Send the validated result
-      sendResponse(true, result)
-    } catch (error) {
-      sendResponse(false, null, `ICC calculation error: ${error.message}`)
-    }
-
-    // DEFAULT: Not found
-  } else {
-    sendResponse(false, null, 'Endpoint no encontrado. Use POST /api/icc')
+    sendResponse(res, true, { nodeResults, systemMode })
+  } catch (error) {
+    sendResponse(res, false, null, error.message)
   }
 })
 
-server.listen(3001, () => {
+app.post('/api/icc', validateICCInput, (req, res) => {
+  try {
+    const params = req.body
+    if (params.material && params.size && params.I_base) {
+      const result = validateFeeder(params)
+      return sendResponse(res, true, result)
+    }
+    const V = params.voltage || params.V || 480
+    const Z = params.impedance || params.Z || 0.05
+    const result = runICC({ V, Z })
+    sendResponse(res, true, result)
+  } catch (error) {
+    sendResponse(res, false, null, error.message)
+  }
+})
+
+// Ruta raíz - Página de estado del servicio (HTML)
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>ICORE-ICC Backend - API Service</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #0f172a; color: #f1f5f9; }
+            .card { background: #1e293b; padding: 2.5rem; border-radius: 16px; border: 1px solid #334155; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-width: 400px; }
+            h1 { color: #3b82f6; margin-top: 0; font-size: 1.5rem; letter-spacing: -0.025em; }
+            .status { display: inline-flex; align-items: center; gap: 8px; padding: 0.5rem 1rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 0.875rem; font-weight: 600; }
+            .dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+                p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin: 1rem 0; }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>ICORE-ICC API</h1>
+            <div class="status"><span class="dot"></span> SERVICIO ACTIVO</div>
+            <p>El motor de cálculo profesional está operando correctamente en el puerto ${PORT}.</p>
+                <p style="font-size: 0.75rem; margin-top: 2rem; border-top: 1px solid #334155; padding-top: 1rem;">Utilice los endpoints <code>/api/*</code> para integración.</p>
+        </div>
+    </body>
+    </html>
+  `);
+});
+
+app.post('/api/analyze', validateJSONBody, (req, res) => {
+  try {
+    const systemModel = req.body
+    const normalized = JSON.stringify(systemModel, Object.keys(systemModel).sort())
+    const key = crypto.createHash('md5').update(normalized).digest('hex')
+
+    const cached = getCached(key)
+    if (cached) return sendResponse(res, true, { ...cached, cached: true })
+
+    const result = runFullAnalysis(systemModel)
+    setCached(key, result)
+    sendResponse(res, true, { ...result, cached: false })
+  } catch (error) {
+    sendResponse(res, false, null, error.message)
+  }
+})
+
+// Manejador de rutas no encontradas (Evita errores de parseo HTML en el frontend)
+app.use((req, res) => {
+  res.status(404).json({ success: false, error: `Endpoint ${req.url} no encontrado` })
+})
+
+app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log('✅ Servidor ICC en puerto 3001')
+  console.log(`✅ Servidor Express ICC en puerto ${PORT}`)
 })

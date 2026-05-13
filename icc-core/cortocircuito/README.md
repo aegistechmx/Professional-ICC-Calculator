@@ -38,7 +38,7 @@ Una aplicación web standalone para el cálculo de corriente de cortocircuito se
 
 ### Opción 2: Integración con Backend
 
-La aplicación requiere un backend corriendo en `http://localhost:3002` para realizar los cálculos.
+La aplicación requiere un backend corriendo en `http://localhost:5000` para realizar los cálculos.
 
 ## 📊 Parámetros de Entrada
 
@@ -52,6 +52,7 @@ La aplicación requiere un backend corriendo en `http://localhost:3002` para rea
 - **Calibre**: Sección transversal del conductor
   - 350 kcmil, 4/0 AWG, 3/0 AWG, 2/0 AWG, 1/0 AWG, 12 AWG
 - **Temperatura (°C)**: Temperatura ambiente (-40 - 100°C)
+- **Aislamiento (°C)**: Temperatura de aislamiento del conductor (60, 75, 90°C)
 
 ## 📈 Resultados del Cálculo
 

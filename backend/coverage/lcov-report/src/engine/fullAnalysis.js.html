@@ -264,10 +264,7 @@
 <a name='L199'></a><a href='#L199'>199</a>
 <a name='L200'></a><a href='#L200'>200</a>
 <a name='L201'></a><a href='#L201'>201</a>
-<a name='L202'></a><a href='#L202'>202</a>
-<a name='L203'></a><a href='#L203'>203</a>
-<a name='L204'></a><a href='#L204'>204</a>
-<a name='L205'></a><a href='#L205'>205</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -450,9 +447,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -477,8 +471,8 @@
  * Pipeline unificado para el live engine
  */
 &nbsp;
-const { validateFeeder } = <span class="cstat-no" title="statement not covered" >require('./validator.js');</span>
-const { generateCurve, checkCoordinationReal } = <span class="cstat-no" title="statement not covered" >require('./tccCoordination.js');</span>
+const { validateFeeder } = <span class="cstat-no" title="statement not covered" >require('./validator.js')</span>
+const { generateCurve, checkCoordinationReal } = <span class="cstat-no" title="statement not covered" >require('./tccCoordination.js')</span>
 &nbsp;
 /**
  * Ejecuta análisis completo del sistema
@@ -491,7 +485,7 @@ const { generateCurve, checkCoordinationReal } = <span class="cstat-no" title="s
  * @returns {Object} Resultado completo del análisis
  */
 function <span class="fstat-no" title="function not covered" >runFullAnalysis(</span>systemModel) {
-  const { buses, branches, breakers, loads, settings } = <span class="cstat-no" title="statement not covered" >systemModel;</span>
+  const { buses, branches, breakers, _loads, settings } = <span class="cstat-no" title="statement not covered" >systemModel</span>
 &nbsp;
   const results = <span class="cstat-no" title="statement not covered" >{</span>
     // Resultados por barra
@@ -509,22 +503,22 @@ function <span class="fstat-no" title="function not covered" >runFullAnalysis(</
 &nbsp;
     // Estado global
     status: 'ok',
-    warnings: []
-  };
+    warnings: [],
+  }
 &nbsp;
   // 1) Calcular ICC en cada barra
 <span class="cstat-no" title="statement not covered" >  if (buses &amp;&amp; buses.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >    for (const bus of buses) {</span>
       // Simulación de cálculo ICC (en implementación real usarías impedancias)
-      const isc = <span class="cstat-no" title="statement not covered" >calculateBusICC(bus, branches, settings);</span>
+      const isc = <span class="cstat-no" title="statement not covered" >calculateBusICC(bus, branches, settings)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      results.buses.push({</span>
         id: bus.id,
         name: bus.name,
         voltage: bus.voltage,
         Isc: isc, // kA
-        position: bus.position
-      });
+        position: bus.position,
+      })
     }
   }
 &nbsp;
@@ -543,17 +537,17 @@ function <span class="fstat-no" title="function not covered" >runFullAnalysis(</
           I_base: branch.current || 300,
           Fcc: 1.25,
           Icu_kA: branch.Icu || 35,
-          Isc_kA: getBranchISC(branch, results.buses)
-        });
+          Isc_kA: getBranchISC(branch, results.buses),
+        })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        results.branches.push({</span>
           id: branch.id,
           from: branch.from,
           to: branch.to,
-          ampacity: ampResult
-        });
+          ampacity: ampResult,
+        })
       } catch (e) {
-<span class="cstat-no" title="statement not covered" >        results.warnings.push(`Error en rama ${branch.id}: ${e.message}`);</span>
+<span class="cstat-no" title="statement not covered" >        results.warnings.push(`Error en rama ${branch.id}: ${e.message}`)</span>
       }
     }
   }
@@ -562,46 +556,46 @@ function <span class="fstat-no" title="function not covered" >runFullAnalysis(</
 <span class="cstat-no" title="statement not covered" >  if (breakers &amp;&amp; breakers.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >    for (const breaker of breakers) {</span>
 <span class="cstat-no" title="statement not covered" >      if (breaker.thermal &amp;&amp; breaker.magnetic) {</span>
-        const curve = <span class="cstat-no" title="statement not covered" >generateCurve(breaker, 100);</span>
+        const curve = <span class="cstat-no" title="statement not covered" >generateCurve(breaker, 100)</span>
 <span class="cstat-no" title="statement not covered" >        results.tcc.push({</span>
           label: breaker.model || breaker.id,
           breaker,
-          points: curve
-        });
+          points: curve,
+        })
       }
     }
   }
 &nbsp;
   // 4) Verificar coordinación si hay falla configurada
 <span class="cstat-no" title="statement not covered" >  if (settings?.faultBus &amp;&amp; breakers &amp;&amp; breakers.length &gt;= 2) {</span>
-    const faultBus = <span class="cstat-no" title="statement not covered" >results.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === settings.faultBus)</span>;</span>
+    const faultBus = <span class="cstat-no" title="statement not covered" >results.buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === settings.faultBus)</span></span>
 <span class="cstat-no" title="statement not covered" >    if (faultBus) {</span>
-      const I_fault = <span class="cstat-no" title="statement not covered" >faultBus.Isc * 1000;</span> // A
+      const I_fault = <span class="cstat-no" title="statement not covered" >faultBus.Isc * 1000 </span>// A
 &nbsp;
       // Ordenar breakers por posición lógica (upstream → downstream)
-      const sortedBreakers = <span class="cstat-no" title="statement not covered" >sortBreakersByHierarchy(breakers, branches);</span>
+      const sortedBreakers = <span class="cstat-no" title="statement not covered" >sortBreakersByHierarchy(breakers, branches)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (sortedBreakers.length &gt;= 2) {</span>
-        const upstream = <span class="cstat-no" title="statement not covered" >sortedBreakers[0];</span>
-        const downstream = <span class="cstat-no" title="statement not covered" >sortedBreakers[1];</span>
+        const upstream = <span class="cstat-no" title="statement not covered" >sortedBreakers[0]</span>
+        const downstream = <span class="cstat-no" title="statement not covered" >sortedBreakers[1]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        results.coordination = checkCoordinationReal({</span>
           upstream,
           downstream,
-          I_fault
-        });
+          I_fault,
+        })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        results.fault = {</span>
           busId: settings.faultBus,
           Isc: faultBus.Isc,
           tripTime: results.coordination.t_down,
-          clearingDevice: downstream.id
-        };
+          clearingDevice: downstream.id,
+        }
       }
     }
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return results;</span>
+<span class="cstat-no" title="statement not covered" >  return results</span>
 }
 &nbsp;
 /**
@@ -615,31 +609,31 @@ function <span class="fstat-no" title="function not covered" >calculateBusICC(</
   // Cálculo simplificado: Isc = V / Z_total
   // En implementación real usarías matriz de impedancias Ybus
 &nbsp;
-  const baseVoltage = <span class="cstat-no" title="statement not covered" >bus.voltage || 480;</span> // V
-  const basePower = <span class="cstat-no" title="statement not covered" >settings?.baseMVA || 10;</span> // MVA
+  const baseVoltage = <span class="cstat-no" title="statement not covered" >bus.voltage || 480 </span>// V
+  const basePower = <span class="cstat-no" title="statement not covered" >settings?.baseMVA || 10 </span>// MVA
 &nbsp;
   // Impedancia base
-  const Z_base = <span class="cstat-no" title="statement not covered" >Math.pow(baseVoltage, 2) / (basePower * 1000000);</span>
+  const _Z_base = <span class="cstat-no" title="statement not covered" >Math.pow(baseVoltage, 2) / (basePower * 1000000)</span>
 &nbsp;
   // Impedancia de fuente (simplificada)
-  const Z_source = <span class="cstat-no" title="statement not covered" >0.05;</span> // pu (5%)
+  const Z_source = <span class="cstat-no" title="statement not covered" >0.05 </span>// pu (5%)
 &nbsp;
   // Impedancia de ramas conectadas
-  let Z_branches = <span class="cstat-no" title="statement not covered" >0;</span>
+  let Z_branches = <span class="cstat-no" title="statement not covered" >0</span>
 <span class="cstat-no" title="statement not covered" >  if (branches) {</span>
     const connectedBranches = <span class="cstat-no" title="statement not covered" >branches.filter(</span>
 <span class="fstat-no" title="function not covered" >      b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.from === bus.id || b.to === bus.id</span>
-    );
+    )
 <span class="cstat-no" title="statement not covered" >    for (const branch of connectedBranches) {</span>
-<span class="cstat-no" title="statement not covered" >      Z_branches += (branch.impedance || 0.02); </span>// pu
+<span class="cstat-no" title="statement not covered" >      Z_branches += branch.impedance || 0.02 </span>// pu
     }
   }
 &nbsp;
-  const Z_total = <span class="cstat-no" title="statement not covered" >Z_source + Z_branches;</span>
-  const I_base = <span class="cstat-no" title="statement not covered" >(basePower * 1000000) / (Math.sqrt(3) * baseVoltage);</span>
-  const Isc = <span class="cstat-no" title="statement not covered" >I_base / Z_total / 1000;</span> // kA
+  const Z_total = <span class="cstat-no" title="statement not covered" >Z_source + Z_branches</span>
+  const I_base = <span class="cstat-no" title="statement not covered" >(basePower * 1000000) / (Math.sqrt(3) * baseVoltage)</span>
+  const Isc = <span class="cstat-no" title="statement not covered" >I_base / Z_total / 1000 </span>// kA
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return Math.max(1, Isc); </span>// Mínimo 1kA
+<span class="cstat-no" title="statement not covered" >  return Math.max(1, Isc) </span>// Mínimo 1kA
 }
 &nbsp;
 /**
@@ -649,16 +643,13 @@ function <span class="fstat-no" title="function not covered" >calculateBusICC(</
  * @returns {number} Corriente de cortocircuito en kA
  */
 function <span class="fstat-no" title="function not covered" >getBranchISC(</span>branch, buses) {
-  const fromBus = <span class="cstat-no" title="statement not covered" >buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === branch.from)</span>;</span>
-  const toBus = <span class="cstat-no" title="statement not covered" >buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === branch.to)</span>;</span>
+  const fromBus = <span class="cstat-no" title="statement not covered" >buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === branch.from)</span></span>
+  const toBus = <span class="cstat-no" title="statement not covered" >buses.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === branch.to)</span></span>
 &nbsp;
   // Tomar el mayor de las dos barras
-  const isc = <span class="cstat-no" title="statement not covered" >Math.max(</span>
-    fromBus?.Isc || 5,
-    toBus?.Isc || 5
-  );
+  const isc = <span class="cstat-no" title="statement not covered" >Math.max(fromBus?.Isc || 5, toBus?.Isc || 5)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return isc;</span>
+<span class="cstat-no" title="statement not covered" >  return isc</span>
 }
 &nbsp;
 /**
@@ -667,14 +658,14 @@ function <span class="fstat-no" title="function not covered" >getBranchISC(</spa
  * @param {Array} branches - Ramas para determinar topología
  * @returns {Array} Breakers ordenados
  */
-function <span class="fstat-no" title="function not covered" >sortBreakersByHierarchy(</span>breakers, branches) {
+function <span class="fstat-no" title="function not covered" >sortBreakersByHierarchy(</span>breakers, _branches) {
   // Simplificación: ordenar por In descendente (mayor upstream)
-<span class="cstat-no" title="statement not covered" >  return [...breakers].sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >(b.In || 0) - (a.In || 0))</span>;</span>
+<span class="cstat-no" title="statement not covered" >  return [...breakers].sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >(b.In || 0) - (a.In || 0))</span></span>
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >module.exports = {</span>
-  runFullAnalysis
-};
+  runFullAnalysis,
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -682,7 +673,7 @@ function <span class="fstat-no" title="function not covered" >sortBreakersByHier
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-07T00:07:00.711Z
+                at 2026-05-07T22:38:56.537Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

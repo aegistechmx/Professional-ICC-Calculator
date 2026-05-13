@@ -10,14 +10,16 @@ const path = require('path');
 const http = require('http');
 
 const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const args = process.argv.slice(2);
 
 // Configuration
 const CONFIG = {
-  AUTO_FIX: false,              // Disable automatic lint fix (can break things)
+  AUTO_FIX: args.includes('--auto-fix'),
   KILL_PORTS_AGGRESSIVE: false, // Don't kill backend ports
   TIMEOUT: 180000,              // 3 minutes for simulation projects
   API_CHECK_TIMEOUT: 5000       // 5 seconds for API health check
 };
+const KILL_PORTS_ONLY = args.includes('--kill-ports-only');
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -189,7 +191,7 @@ async function runFrontendTests() {
   log('\n🧪 Running Frontend Tests...', 'cyan');
   
   const frontendPath = path.join(__dirname, '..', 'frontend');
-  const result = await runCommand(NPM_CMD, ['run', 'test:run'], frontendPath);
+  const result = await runCommand(`${NPM_CMD} run test:run`, frontendPath);
   
   if (!result.success) {
     log('❌ Frontend tests failed', 'red');
@@ -214,7 +216,7 @@ async function runBackendTests() {
   log('\n🧪 Running Backend Tests...', 'cyan');
   
   const backendPath = path.join(__dirname, '..', 'backend');
-  const result = await runCommand(NPM_CMD, ['test'], backendPath);
+  const result = await runCommand(`${NPM_CMD} test`, backendPath);
   
   if (!result.success) {
     log('❌ Backend tests failed', 'red');
@@ -238,13 +240,13 @@ async function runLinting() {
   log('\n🔍 Running Linting...', 'cyan');
   
   // Frontend linting
-  const frontendResult = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'frontend'));
+  const frontendResult = await runCommand(`${NPM_CMD} run lint`, path.join(__dirname, '..', 'frontend'));
   if (!frontendResult.success) {
     if (CONFIG.AUTO_FIX) {
       log('⚠️  Frontend lint errors found, attempting auto-fix...', 'yellow');
-      await runCommand(NPM_CMD, ['run', 'lint:fix'], path.join(__dirname, '..', 'frontend'));
+      await runCommand(`${NPM_CMD} run lint:fix`, path.join(__dirname, '..', 'frontend'));
       
-      const recheck = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'frontend'));
+      const recheck = await runCommand(`${NPM_CMD} run lint`, path.join(__dirname, '..', 'frontend'));
       if (!recheck.success) {
         log('   ❌ Some frontend lint errors require manual fixing', 'red');
       } else {
@@ -259,13 +261,13 @@ async function runLinting() {
   }
   
   // Backend linting
-  const backendResult = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'backend'));
+  const backendResult = await runCommand(`${NPM_CMD} run lint`, path.join(__dirname, '..', 'backend'));
   if (!backendResult.success) {
     if (CONFIG.AUTO_FIX) {
       log('⚠️  Backend lint errors found, attempting auto-fix...', 'yellow');
-      await runCommand(NPM_CMD, ['run', 'lint:fix'], path.join(__dirname, '..', 'backend'));
+      await runCommand(`${NPM_CMD} run lint:fix`, path.join(__dirname, '..', 'backend'));
       
-      const recheck = await runCommand(NPM_CMD, ['run', 'lint'], path.join(__dirname, '..', 'backend'));
+      const recheck = await runCommand(`${NPM_CMD} run lint`, path.join(__dirname, '..', 'backend'));
       if (!recheck.success) {
         log('   ❌ Some backend lint errors require manual fixing', 'red');
       } else {
@@ -299,6 +301,11 @@ async function main() {
     const killed = cleanupFrontendPorts();
     if (killed > 0) {
       log(`   📝 Killed ${killed} frontend process(es)`, 'gray');
+    }
+
+    if (KILL_PORTS_ONLY) {
+      log('\n✅ Port cleanup complete (kill-ports-only mode)', 'green');
+      process.exit(0);
     }
     
     // Step 2: Ensure backend is running

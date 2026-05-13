@@ -745,8 +745,10 @@
         <div class="print-module">
             <div class="print-header"></div>
             <section class="card">
-                <div class="card-title"><i class="fas fa-project-diagram"></i> Diagrama Unifilar</div>
-                <div id="diagram-container"><canvas id="diagram"></canvas></div>
+                <div class="card-title mb-3"><i class="fas fa-project-diagram"></i> Diagrama Unifilar</div>
+                <div id="diagram-container" class="w-full h-[500px] border border-[--border] rounded-lg bg-[--surface]">
+                    <canvas id="diagram"></canvas>
+                </div>
             </section>
         </div>
 
@@ -1111,49 +1113,201 @@
 
         // Variable para almacenar el nombre del archivo actual
         var currentSyncFilename = 'Sin sincronizar';
+        var activeSessionToken = null;
+        var lastReceivedMessageId = null; // Para rastrear el último messageId recibido
 
-        // Escuchar cambios desde la app React
-        window.addEventListener('storage', function (e) {
-            console.log('SYNC DEBUG: Cambio en storage detectado en HTML:', e.key, e.newValue);
+        // Función de utilidad para calcular checksum (copia del frontend)
+        function calculateChecksum(data) {
+            if (data === undefined || data === null) return '0';
+            const str = typeof data === 'string' ? data : JSON.stringify(data);
+            let hash = 0; for (let i = 0; i < str.length; i++) { const char = str.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash = hash | 0; } return Math.abs(hash).toString(16);
+        }
 
-            if (e.key === 'icc-sync-nodes' && e.newValue) {
+        // Medida defensiva: Asegurar que window.UIToast exista para evitar TypeErrors
+        if (typeof window.UIToast === 'undefined') {
+            window.UIToast = { mostrar: (msg, type) => console.log(`[Toast ${type.toUpperCase()}] ${msg}`) };
+            console.warn('UIToast no encontrado, usando un mock defensivo.');
+        }
+
+        // Bridge Listener robusto con soporte de postMessage
+        window.addEventListener('message', function (event) {
+            // 🛡️ Validación inicial del mensaje para ignorar ruido (Vite, extensiones, etc.) y asegurar que sea un objeto
+            if (!event.data || typeof event.data !== 'object') return;
+            const { type, data, checksum, timestamp, ttl, messageId, token } = event.data;
+
+            // Añadir tipos para simular clicks de botones
+            const bridgeTypes = ['HANDSHAKE_INIT', 'LOAD_MODEL', 'LOAD_EDGES', 'CALCULATE', 'RESET', 'GET_STATE', 'CHECKSUM_ERROR', 'SIMULATE_BUTTON_CLICK'];
+            if (!type || !bridgeTypes.includes(type)) return; // Ignorar silenciosamente si no es un tipo reconocido
+
+            // Validación de TTL y Checksum (Seguridad)
+            if (timestamp && ttl && (Date.now() - timestamp > ttl)) {
+                console.warn(`[Module] Mensaje ${type} (ID: ${messageId}) ignorado: Expirado (TTL: ${ttl}ms).`);
+                return;
+            }
+
+            // Lógica de Handshake
+            if (type === 'HANDSHAKE_INIT') {
+                activeSessionToken = token;
+                console.log('🤝 Handshake recibido. Registrando token de sesión.');
+                event.source.postMessage({
+                    type: 'HANDSHAKE_ACK',
+                    token: activeSessionToken,
+                    timestamp: Date.now()
+                }, event.origin);
+                return;
+            }
+
+            // 🛡️ Verificación de Sesión Activa
+            if (!activeSessionToken || token !== activeSessionToken) {
+                if (type !== 'HANDSHAKE_ACK') { // Evitar recursión
+                    console.warn(`❌ Bloqueado: Intento de comunicación ${type} sin token de sesión válido o token incorrecto.`);
+                }
+                return;
+            }
+
+            // Manejar simulación de clicks de botones (Para pruebas automatizadas de interfaz)
+            if (type === 'SIMULATE_BUTTON_CLICK' && data && data.buttonId) {
+                let actionTaken = false;
+                let resultMessage = '';
                 try {
-                    var newNodes = JSON.parse(e.newValue);
-                    console.log('SYNC DEBUG: Nodes recibidos en HTML:', newNodes.length);
-
-                    // Actualizar nombre de archivo si viene en el storage
-                    if (e.key === 'icc-sync-filename') {
-                        currentSyncFilename = e.newValue || 'Proyecto sincronizado';
-                        updateSyncFilenameDisplay();
-                        return;
+                    switch (data.buttonId) {
+                        case 'calculate':
+                            if (window.App && window.App.calculate) window.App.calculate();
+                            actionTaken = true; resultMessage = 'App.calculate() invocado.';
+                            break;
+                        case 'saveProfile':
+                            if (window.App && window.App.saveProfile) window.App.saveProfile();
+                            actionTaken = true; resultMessage = 'App.saveProfile() invocado.';
+                            break;
+                        case 'resetProfile':
+                            if (window.App && window.App.resetProfile) window.App.resetProfile();
+                            actionTaken = true; resultMessage = 'App.resetProfile() invocado.';
+                            break;
+                        case 'imprimirModulos':
+                            if (window.App && window.App.imprimirModulos) window.App.imprimirModulos();
+                            actionTaken = true; resultMessage = 'App.imprimirModulos() invocado.';
+                            break;
+                        case 'setModeCompleto':
+                            const btnCompleto = document.getElementById('btn-completo');
+                            if (btnCompleto) btnCompleto.click();
+                            actionTaken = !!btnCompleto; resultMessage = actionTaken ? 'Modo Completo activado.' : 'Botón no encontrado.';
+                            break;
+                        case 'setModeConocido':
+                            const btnConocido = document.getElementById('btn-conocido');
+                            if (btnConocido) btnConocido.click();
+                            actionTaken = !!btnConocido; resultMessage = actionTaken ? 'Modo Conocido activado.' : 'Botón no encontrado.';
+                            break;
+                        case 'setTipo1f':
+                            const btn1f = document.getElementById('btn-1f');
+                            if (btn1f) btn1f.click();
+                            actionTaken = !!btn1f; resultMessage = actionTaken ? 'Sistema 1F activado.' : 'Botón no encontrado.';
+                            break;
+                        case 'setVoltage480':
+                            const btn480 = Array.from(document.querySelectorAll('.voltage-btn')).find(b => b.textContent.trim() === '480');
+                            if (btn480) btn480.click();
+                            actionTaken = !!btn480; resultMessage = actionTaken ? 'Voltaje 480V seleccionado.' : 'Botón no encontrado.';
+                            break;
+                        case 'syncManualFromHTML':
+                            syncManualFromHTML();
+                            actionTaken = true; resultMessage = 'syncManualFromHTML() invocado.';
+                            break;
+                        default:
+                            resultMessage = `ID de botón desconocido: ${data.buttonId}`;
                     }
+                } catch (e) {
+                    resultMessage = `Error simulando clic: ${e.message}`;
+                }
+                event.source.postMessage({ type: 'BUTTON_ACTION_ACK', originalButtonId: data.buttonId, success: actionTaken, message: resultMessage }, event.origin);
+                return;
+            }
 
-                    // Transformar estructura React a formato ICC
-                    var transformedNodes = newNodes.map(function (node, index) {
-                        var transformed = {
-                            id: 'P' + index,
+            // Manejar simulación de clicks de botones (Para pruebas automatizadas de interfaz)
+            if (type === 'SIMULATE_BUTTON_CLICK' && data && data.buttonId) {
+                let actionTaken = false;
+                let resultMessage = '';
+                try {
+                    switch (data.buttonId) {
+                        case 'calculate':
+                            if (window.App && window.App.calculate) window.App.calculate();
+                            actionTaken = true; resultMessage = 'App.calculate() invocado.';
+                            break;
+                        case 'saveProfile':
+                            if (window.App && window.App.saveProfile) window.App.saveProfile();
+                            actionTaken = true; resultMessage = 'App.saveProfile() invocado.';
+                            break;
+                        case 'resetProfile':
+                            if (window.App && window.App.resetProfile) window.App.resetProfile();
+                            actionTaken = true; resultMessage = 'App.resetProfile() invocado.';
+                            break;
+                        case 'imprimirModulos':
+                            if (window.App && window.App.imprimirModulos) window.App.imprimirModulos();
+                            actionTaken = true; resultMessage = 'App.imprimirModulos() invocado.';
+                            break;
+                        case 'setModeCompleto':
+                            const btnCompleto = document.getElementById('btn-completo');
+                            if (btnCompleto) btnCompleto.click();
+                            actionTaken = !!btnCompleto; resultMessage = actionTaken ? 'Modo Completo activado.' : 'Botón no encontrado.';
+                            break;
+                        case 'setModeConocido':
+                            const btnConocido = document.getElementById('btn-conocido');
+                            if (btnConocido) btnConocido.click();
+                            actionTaken = !!btnConocido; resultMessage = actionTaken ? 'Modo Conocido activado.' : 'Botón no encontrado.';
+                            break;
+                        case 'setTipo1f':
+                            const btn1f = document.getElementById('btn-1f');
+                            if (btn1f) btn1f.click();
+                            actionTaken = !!btn1f; resultMessage = actionTaken ? 'Sistema 1F activado.' : 'Botón no encontrado.';
+                            break;
+                        case 'setVoltage480':
+                            const btn480 = Array.from(document.querySelectorAll('.voltage-btn')).find(b => b.textContent.trim() === '480');
+                            if (btn480) btn480.click();
+                            actionTaken = !!btn480; resultMessage = actionTaken ? 'Voltaje 480V seleccionado.' : 'Botón no encontrado.';
+                            break;
+                        case 'syncManualFromHTML':
+                            syncManualFromHTML();
+                            actionTaken = true; resultMessage = 'syncManualFromHTML() invocado.';
+                            break;
+                        default:
+                            resultMessage = `ID de botón desconocido: ${data.buttonId}`;
+                    }
+                } catch (e) {
+                    resultMessage = `Error simulando clic: ${e.message}`;
+                }
+                event.source.postMessage({ type: 'BUTTON_ACTION_ACK', originalButtonId: data.buttonId, success: actionTaken, message: resultMessage }, event.origin);
+                return;
+            }
+
+            // 🛡️ Validación de Integridad (Checksum)
+            if (checksum) {
+                const expectedChecksum = calculateChecksum(data);
+                if (checksum !== expectedChecksum) {
+                    console.error(`❌ Error de Integridad: Checksum inválido para el mensaje ${type} (ID: ${messageId}). Recibido: ${checksum}, Esperado: ${expectedChecksum}`);
+                    if (event.source) {
+                        event.source.postMessage({ type: 'CHECKSUM_ERROR', originalType: type, messageId: messageId }, event.origin);
+                    }
+                    return;
+                }
+            }
+            lastReceivedMessageId = messageId;
+
+            if (type === 'LOAD_MODEL' && data) {
+                try {
+                    console.log('SYNC DEBUG: Datos recibidos vía postMessage');
+                    const nodes = data.nodes || [];
+
+                    var transformedNodes = nodes.map(function (node, index) {
+                        return {
+                            id: node.id || 'P' + index,
                             type: node.type,
-                            modelo: node.data.label || node.type,
-                            x: node.position.x,
-                            y: node.position.y
+                            data: node.data || {} // Pasar todos los datos del nodo
                         };
-
-                        // Copiar parámetros eléctricos
-                        if (node.data.parameters) {
-                            Object.keys(node.data.parameters).forEach(function (key) {
-                                transformed[key] = node.data.parameters[key];
-                            });
-                        }
-
-                        console.log('SYNC DEBUG: Nodo transformado:', transformed);
-                        return transformed;
                     });
 
                     console.log('SYNC DEBUG: Todos los nodos transformados:', transformedNodes);
 
                     // Actualizar el sistema con los nodos transformados
                     if (window.MotorICC && window.MotorICC.cargarDatosDesdeReact) {
-                        window.MotorICC.cargarDatosDesdeReact(transformedNodes, []);
+                        window.MotorICC.cargarDatosDesdeReact(transformedNodes, data.edges || [], messageId); // Pasar edges también
                     }
 
                     // Actualizar display del nombre de archivo
@@ -1162,17 +1316,12 @@
                 } catch (error) {
                     console.error('SYNC ERROR: Error parsing nodes en HTML:', error);
                 }
-            } else if (e.key === 'icc-sync-edges' && e.newValue) {
+            } else if (type === 'LOAD_EDGES' && data) {
                 try {
-                    var newEdges = JSON.parse(e.newValue);
-                    console.log('SYNC DEBUG: Edges recibidos en HTML:', newEdges.length);
+                    console.log('SYNC DEBUG: Edges recibidos vía postMessage:', data.length);
                 } catch (error) {
-                    console.error('SYNC ERROR: Error parsing edges en HTML:', error);
+                    console.error('SYNC ERROR: Error procesando edges en HTML:', error);
                 }
-            } else if (e.key === 'icc-sync-filename' && e.newValue) {
-                currentSyncFilename = e.newValue;
-                updateSyncFilenameDisplay();
-                console.log('SYNC DEBUG: Nombre de archivo actualizado:', currentSyncFilename);
             }
         });
 
@@ -1207,11 +1356,19 @@
             }
 
             try {
-                // Guardar datos en localStorage
-                localStorage.setItem('icc-sync-nodes', JSON.stringify(currentData.nodes || []));
-                localStorage.setItem('icc-sync-edges', JSON.stringify(currentData.edges || []));
-                localStorage.setItem('icc-sync-filename', projectName);
-                localStorage.setItem('icc-sync-timestamp', new Date().toISOString());
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'SYNC_FROM_MODULE',
+                        data: {
+                            nodes: currentData.nodes || [],
+                            edges: currentData.edges || [],
+                            filename: projectName
+                        },
+                        token: activeSessionToken,
+                        checksum: calculateChecksum(currentData),
+                        ttl: 5000, // 5 segundos de TTL
+                    }, '*');
+                }
 
                 // Actualizar display
                 currentSyncFilename = projectName;
@@ -1219,14 +1376,14 @@
 
                 // Mostrar notificación
                 if (window.UIToast) {
-                    window.UIToast.success('Sincronizado con React: ' + projectName);
+                    window.UIToast.mostrar('Sincronizado con React: ' + projectName, 'success');
                 }
 
                 console.log('SYNC DEBUG: Sincronización manual completada:', projectName);
             } catch (error) {
                 console.error('SYNC ERROR: Error en sincronización manual:', error);
                 if (window.UIToast) {
-                    window.UIToast.error('Error al sincronizar');
+                    window.UIToast.mostrar('Error al sincronizar', 'error');
                 }
             }
         }
@@ -1242,11 +1399,21 @@
             }
 
             try {
-                localStorage.setItem('icc-sync-nodes', JSON.stringify(currentData.nodes || []));
-                localStorage.setItem('icc-sync-edges', JSON.stringify(currentData.edges || []));
-                console.log('SYNC DEBUG: Datos guardados en localStorage desde HTML');
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'AUTO_SYNC_FROM_MODULE',
+                        data: {
+                            nodes: currentData.nodes || [],
+                            edges: currentData.edges || [], // Incluir edges en auto-sync
+                            filename: currentSyncFilename // Incluir filename en auto-sync
+                        },
+                        token: activeSessionToken,
+                        checksum: calculateChecksum({ nodes: currentData.nodes || [], edges: currentData.edges || [], filename: currentSyncFilename }), // Recalcular checksum
+                        ttl: 5000
+                    }, '*');
+                }
             } catch (error) {
-                console.error('SYNC ERROR: Error guardando en localStorage desde HTML:', error);
+                console.error('SYNC ERROR: Error en auto-sincronización desde HTML:', error);
             }
         };
 

@@ -423,7 +423,16 @@
 <a name='L358'></a><a href='#L358'>358</a>
 <a name='L359'></a><a href='#L359'>359</a>
 <a name='L360'></a><a href='#L360'>360</a>
-<a name='L361'></a><a href='#L361'>361</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -676,16 +685,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -783,7 +801,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { toElectricalPrecision, formatElectricalValue } = <span class="cstat-no" title="statement not covered" >require('../../utils/electricalUtils');</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { toElectricalPrecision } = <span class="cstat-no" title="statement not covered" >require('../../shared/utils/electricalUtils')</span>
 /**
  * backend/src/domain/services/tccEngine.domain.js
  * Motor de Curvas TCC (Time-Current Coordination)
@@ -797,15 +815,15 @@ class TCCEngine {
       standard: { k: 0.14, alpha: 0.02, name: 'Standard Inverse' },
       very: { k: 13.5, alpha: 1, name: 'Very Inverse' },
       extreme: { k: 80, alpha: 2, name: 'Extremely Inverse' },
-      long: { k: 120, alpha: 1, name: 'Long Time Inverse' }
-    };
+      long: { k: 120, alpha: 1, name: 'Long Time Inverse' },
+    }
 &nbsp;
     // Curvas IEEE C37.112 (Moderately Inverse)
 <span class="cstat-no" title="statement not covered" >    this.ieeeCurves = {</span>
       moderate: { A: 0.0515, B: 0.02, p: 0.02, name: 'Moderately Inverse' },
       very: { A: 19.61, B: 2, p: 2, name: 'Very Inverse' },
-      extreme: { A: 28.2, B: 2, p: 2, name: 'Extremely Inverse' }
-    };
+      extreme: { A: 28.2, B: 2, p: 2, name: 'Extremely Inverse' },
+    }
   }
 &nbsp;
   /**
@@ -817,23 +835,23 @@ class TCCEngine {
    * @returns {number} Tiempo de disparo en segundos
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateIEC(I, Is, TMS, curveType = <span class="branch-0 cbranch-no" title="branch not covered" >'standard')</span> {
-    const curve = <span class="cstat-no" title="statement not covered" >this.iecCurves[curveType];</span>
+    const curve = <span class="cstat-no" title="statement not covered" >this.iecCurves[curveType]</span>
 <span class="cstat-no" title="statement not covered" >    if (!curve) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error(`Curva IEC no válida: ${curveType}`);</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error(`Curva IEC no válida: ${curveType}`)</span>
     }
 &nbsp;
     // Si la corriente es menor o igual al pickup, no dispara
 <span class="cstat-no" title="statement not covered" >    if (I &lt;= Is) {</span>
-<span class="cstat-no" title="statement not covered" >      return Infinity;</span>
+<span class="cstat-no" title="statement not covered" >      return Infinity</span>
     }
 &nbsp;
-    const { k, alpha } = <span class="cstat-no" title="statement not covered" >curve;</span>
-    
+    const { k, alpha } = <span class="cstat-no" title="statement not covered" >curve</span>
+&nbsp;
     // Fórmula IEC: t = (k * TMS) / ((I/Is)^alpha - 1)
-    const ratio = <span class="cstat-no" title="statement not covered" >I / Is;</span>
-    const time = <span class="cstat-no" title="statement not covered" >(k * TMS) / (Math.pow(ratio, alpha) - 1);</span>
-    
-<span class="cstat-no" title="statement not covered" >    return Math.max(time, 0.02); </span>// Mínimo 20ms (tiempo mecánico)
+    const ratio = <span class="cstat-no" title="statement not covered" >I / Is</span>
+    const time = <span class="cstat-no" title="statement not covered" >(k * TMS) / (Math.pow(ratio, alpha) - 1)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return Math.max(time, 0.02) </span>// Mínimo 20ms (tiempo mecánico)
   }
 &nbsp;
   /**
@@ -845,22 +863,22 @@ class TCCEngine {
    * @returns {number} Tiempo de disparo en segundos
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateIEEE(I, Ip, curveType = <span class="branch-0 cbranch-no" title="branch not covered" >'moderate',</span> TD = <span class="branch-0 cbranch-no" title="branch not covered" >1)</span> {
-    const curve = <span class="cstat-no" title="statement not covered" >this.ieeeCurves[curveType];</span>
+    const curve = <span class="cstat-no" title="statement not covered" >this.ieeeCurves[curveType]</span>
 <span class="cstat-no" title="statement not covered" >    if (!curve) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error(`Curva IEEE no válida: ${curveType}`);</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error(`Curva IEEE no válida: ${curveType}`)</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (I &lt;= Ip) {</span>
-<span class="cstat-no" title="statement not covered" >      return Infinity;</span>
+<span class="cstat-no" title="statement not covered" >      return Infinity</span>
     }
 &nbsp;
-    const { A, B } = <span class="cstat-no" title="statement not covered" >curve;</span>
-    const ratio = <span class="cstat-no" title="statement not covered" >I / Ip;</span>
-    
+    const { A, B } = <span class="cstat-no" title="statement not covered" >curve</span>
+    const ratio = <span class="cstat-no" title="statement not covered" >I / Ip</span>
+&nbsp;
     // Fórmula IEEE: t = (TD * A) / ((I/Ip)^B - 1)
-    const time = <span class="cstat-no" title="statement not covered" >(TD * A) / (Math.pow(ratio, B) - 1);</span>
-    
-<span class="cstat-no" title="statement not covered" >    return Math.max(time, 0.02);</span>
+    const time = <span class="cstat-no" title="statement not covered" >(TD * A) / (Math.pow(ratio, B) - 1)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return Math.max(time, 0.02)</span>
   }
 &nbsp;
   /**
@@ -871,9 +889,9 @@ class TCCEngine {
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateInstantaneous(I, Ii) {
 <span class="cstat-no" title="statement not covered" >    if (I &gt;= Ii) {</span>
-<span class="cstat-no" title="statement not covered" >      return 0.02; </span>// 20ms típico para disparo instantáneo
+<span class="cstat-no" title="statement not covered" >      return 0.02 </span>// 20ms típico para disparo instantáneo
     }
-<span class="cstat-no" title="statement not covered" >    return null;</span>
+<span class="cstat-no" title="statement not covered" >    return null</span>
   }
 &nbsp;
   /**
@@ -889,42 +907,42 @@ class TCCEngine {
       standard = <span class="branch-0 cbranch-no" title="branch not covered" >'IEC',</span>
       instantaneous = <span class="branch-0 cbranch-no" title="branch not covered" >null,</span>
       Imax = <span class="branch-0 cbranch-no" title="branch not covered" >10000,</span>
-      TD = <span class="branch-0 cbranch-no" title="branch not covered" >1</span>
-    } = <span class="cstat-no" title="statement not covered" >breaker;</span>
+      TD = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span>
+    } = <span class="cstat-no" title="statement not covered" >breaker</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (!pickup) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error('Se requiere pickup (corriente de ajuste)');</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Se requiere pickup (corriente de ajuste)')</span>
     }
 &nbsp;
-    const data = <span class="cstat-no" title="statement not covered" >[];</span>
-    
+    const data = <span class="cstat-no" title="statement not covered" >[]</span>
+&nbsp;
     // Generar puntos desde 1.1x pickup hasta Imax
     // Usar escala logarítmica para los puntos
-    const startMultiplier = <span class="cstat-no" title="statement not covered" >1.1;</span>
-    const endMultiplier = <span class="cstat-no" title="statement not covered" >Imax / pickup;</span>
-    const steps = <span class="cstat-no" title="statement not covered" >50;</span>
-    const logStart = <span class="cstat-no" title="statement not covered" >Math.log10(startMultiplier);</span>
-    const logEnd = <span class="cstat-no" title="statement not covered" >Math.log10(endMultiplier);</span>
-    const logStep = <span class="cstat-no" title="statement not covered" >(logEnd - logStart) / steps;</span>
+    const startMultiplier = <span class="cstat-no" title="statement not covered" >1.1</span>
+    const endMultiplier = <span class="cstat-no" title="statement not covered" >Imax / pickup</span>
+    const steps = <span class="cstat-no" title="statement not covered" >50</span>
+    const logStart = <span class="cstat-no" title="statement not covered" >Math.log10(startMultiplier)</span>
+    const logEnd = <span class="cstat-no" title="statement not covered" >Math.log10(endMultiplier)</span>
+    const logStep = <span class="cstat-no" title="statement not covered" >(logEnd - logStart) / steps</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt;= steps; i++) {</span>
-      const multiplier = <span class="cstat-no" title="statement not covered" >Math.pow(10, logStart + (logStep * i));</span>
-      const I = <span class="cstat-no" title="statement not covered" >pickup * multiplier;</span>
-      
-      let t;
-      
+      const multiplier = <span class="cstat-no" title="statement not covered" >Math.pow(10, logStart + logStep * i)</span>
+      const I = <span class="cstat-no" title="statement not covered" >pickup * multiplier</span>
+&nbsp;
+      let t
+&nbsp;
 <span class="cstat-no" title="statement not covered" >      if (standard === 'IEC') {</span>
-<span class="cstat-no" title="statement not covered" >        t = this.calculateIEC(I, pickup, TMS, curve);</span>
+<span class="cstat-no" title="statement not covered" >        t = this.calculateIEC(I, pickup, TMS, curve)</span>
       } else {
-<span class="cstat-no" title="statement not covered" >        t = this.calculateIEEE(I, pickup, curve, TD);</span>
+<span class="cstat-no" title="statement not covered" >        t = this.calculateIEEE(I, pickup, curve, TD)</span>
       }
 &nbsp;
       // Solo incluir tiempos válidos (0.02s a 1000s)
 <span class="cstat-no" title="statement not covered" >      if (t &gt;= 0.02 &amp;&amp; t &lt;= 1000) {</span>
 <span class="cstat-no" title="statement not covered" >        data.push({</span>
           I: toElectricalPrecision(parseFloat(I.toFixed(2))),
-          t: toElectricalPrecision(parseFloat(t.toFixed(4)))
-        });
+          t: toElectricalPrecision(parseFloat(t.toFixed(4))),
+        })
       }
     }
 &nbsp;
@@ -932,17 +950,17 @@ class TCCEngine {
 <span class="cstat-no" title="statement not covered" >    if (instantaneous &amp;&amp; instantaneous &gt; pickup) {</span>
 <span class="cstat-no" title="statement not covered" >      data.push({</span>
         I: instantaneous,
-        t: 0.02
-      });
-      
+        t: 0.02,
+      })
+&nbsp;
       // Punto final de la curva instantánea
 <span class="cstat-no" title="statement not covered" >      data.push({</span>
         I: Imax,
-        t: 0.02
-      });
+        t: 0.02,
+      })
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return data.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.I - b.I)</span>;</span>
+<span class="cstat-no" title="statement not covered" >    return data.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.I - b.I)</span></span>
   }
 &nbsp;
   /**
@@ -954,30 +972,30 @@ class TCCEngine {
     const {
       In, // Corriente nominal
       Iarranque = <span class="branch-0 cbranch-no" title="branch not covered" >6 * In,</span> // Corriente de arranque típica
-      tiempoArranque = <span class="branch-0 cbranch-no" title="branch not covered" >10 </span>// Tiempo de arranque típico
-    } = <span class="cstat-no" title="statement not covered" >load;</span>
+      tiempoArranque = <span class="branch-0 cbranch-no" title="branch not covered" >10,</span> // Tiempo de arranque típico
+    } = <span class="cstat-no" title="statement not covered" >load</span>
 &nbsp;
-    const data = <span class="cstat-no" title="statement not covered" >[];</span>
+    const data = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
     // Punto de operación normal
 <span class="cstat-no" title="statement not covered" >    data.push({</span>
       I: In,
-      t: Infinity
-    });
+      t: Infinity,
+    })
 &nbsp;
     // Zona de arranque permitida
 <span class="cstat-no" title="statement not covered" >    data.push({</span>
       I: Iarranque,
-      t: tiempoArranque
-    });
+      t: tiempoArranque,
+    })
 &nbsp;
     // Sobrecarga
 <span class="cstat-no" title="statement not covered" >    data.push({</span>
       I: Iarranque * 1.5,
-      t: 1
-    });
+      t: 1,
+    })
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return data;</span>
+<span class="cstat-no" title="statement not covered" >    return data</span>
   }
 &nbsp;
   /**
@@ -988,42 +1006,42 @@ class TCCEngine {
    * @returns {Object} Resultado de coordinación
    */
 <span class="fstat-no" title="function not covered" >  ch</span>eckCoordination(curveDownstream, curveUpstream, margin = <span class="branch-0 cbranch-no" title="branch not covered" >0.2)</span> {
-    const conflicts = <span class="cstat-no" title="statement not covered" >[];</span>
-    let minTimeDifference = <span class="cstat-no" title="statement not covered" >Infinity;</span>
+    const conflicts = <span class="cstat-no" title="statement not covered" >[]</span>
+    let minTimeDifference = <span class="cstat-no" title="statement not covered" >Infinity</span>
 &nbsp;
     // Para cada punto en la curva aguas abajo
 <span class="cstat-no" title="statement not covered" >    curveDownstream.forEach(<span class="fstat-no" title="function not covered" >p1</span> =&gt; {</span>
       // Encontrar punto correspondiente en curva aguas arriba
-      const p2 = <span class="cstat-no" title="statement not covered" >curveUpstream.find(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >Math.abs(p.I - p1.I) &lt; p1.I * 0.01)</span>;</span>
-      
+      const p2 = <span class="cstat-no" title="statement not covered" >curveUpstream.find(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >Math.abs(p.I - p1.I) &lt; p1.I * 0.01)</span></span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >      if (p2) {</span>
         // Verificar que aguas arriba tarde más que aguas abajo
-        const timeDifference = <span class="cstat-no" title="statement not covered" >p2.t - p1.t;</span>
-        const requiredMargin = <span class="cstat-no" title="statement not covered" >p1.t * margin;</span>
-        
+        const timeDifference = <span class="cstat-no" title="statement not covered" >p2.t - p1.t</span>
+        const requiredMargin = <span class="cstat-no" title="statement not covered" >p1.t * margin</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >        if (timeDifference &lt; requiredMargin) {</span>
 <span class="cstat-no" title="statement not covered" >          conflicts.push({</span>
             I: p1.I,
             tDownstream: p1.t,
             tUpstream: p2.t,
             difference: timeDifference,
-            required: requiredMargin
-          });
+            required: requiredMargin,
+          })
         }
-        
+&nbsp;
 <span class="cstat-no" title="statement not covered" >        if (timeDifference &lt; minTimeDifference) {</span>
-<span class="cstat-no" title="statement not covered" >          minTimeDifference = timeDifference;</span>
+<span class="cstat-no" title="statement not covered" >          minTimeDifference = timeDifference</span>
         }
       }
-    });
+    })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       isCoordinated: conflicts.length === 0,
       conflicts,
       minTimeDifference,
       margin,
-      recommendations: this._generateRecommendations(conflicts)
-    };
+      recommendations: this._generateRecommendations(conflicts),
+    }
   }
 &nbsp;
   /**
@@ -1031,23 +1049,32 @@ class TCCEngine {
    */
 <span class="fstat-no" title="function not covered" >  _g</span>enerateRecommendations(conflicts) {
 <span class="cstat-no" title="statement not covered" >    if (conflicts.length === 0) {</span>
-<span class="cstat-no" title="statement not covered" >      return ['Coordinación satisfactoria entre protecciones.'];</span>
+<span class="cstat-no" title="statement not covered" >      return ['Coordinación satisfactoria entre protecciones.']</span>
     }
 &nbsp;
-    const recommendations = <span class="cstat-no" title="statement not covered" >[];</span>
-    
-    const avgCurrent = <span class="cstat-no" title="statement not covered" >conflicts.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, c) =&gt; <span class="cstat-no" title="statement not covered" >sum + c.I,</span> 0) / conflicts.length;</span>
-    
+    const recommendations = <span class="cstat-no" title="statement not covered" >[]</span>
+&nbsp;
+    const avgCurrent =
+<span class="cstat-no" title="statement not covered" >      conflicts.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, c) =&gt; <span class="cstat-no" title="statement not covered" >sum + c.I,</span> 0) / conflicts.length</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    if (avgCurrent &lt; 1000) {</span>
-<span class="cstat-no" title="statement not covered" >      recommendations.push('Considerar aumentar TMS de la protección aguas arriba.');</span>
+<span class="cstat-no" title="statement not covered" >      recommendations.push(</span>
+        'Considerar aumentar TMS de la protección aguas arriba.'
+      )
     } else {
-<span class="cstat-no" title="statement not covered" >      recommendations.push('Verificar si se requiere protección de respaldo adicional.');</span>
+<span class="cstat-no" title="statement not covered" >      recommendations.push(</span>
+        'Verificar si se requiere protección de respaldo adicional.'
+      )
     }
-    
-<span class="cstat-no" title="statement not covered" >    recommendations.push('Revisar curvas TCC en zona de sobrecarga (1.5x - 10x In).');</span>
-<span class="cstat-no" title="statement not covered" >    recommendations.push('Considerar curvas de diferente tipo si persisten conflictos.');</span>
-    
-<span class="cstat-no" title="statement not covered" >    return recommendations;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    recommendations.push(</span>
+      'Revisar curvas TCC en zona de sobrecarga (1.5x - 10x In).'
+    )
+<span class="cstat-no" title="statement not covered" >    recommendations.push(</span>
+      'Considerar curvas de diferente tipo si persisten conflictos.'
+    )
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return recommendations</span>
   }
 &nbsp;
   /**
@@ -1059,32 +1086,32 @@ class TCCEngine {
 <span class="fstat-no" title="function not covered" >  ca</span>lculateOperatingPoint(curve, Ifault) {
     // Encontrar el punto más cercano a Ifault
     const closest = <span class="cstat-no" title="statement not covered" >curve.reduce(<span class="fstat-no" title="function not covered" >(p</span>rev, curr) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      return Math.abs(curr.I - Ifault) &lt; Math.abs(prev.I - Ifault) ? curr : prev;</span>
-    });
+<span class="cstat-no" title="statement not covered" >      return Math.abs(curr.I - Ifault) &lt; Math.abs(prev.I - Ifault) ? curr : prev</span>
+    })
 &nbsp;
     // Interpolar si es necesario
-    const next = <span class="cstat-no" title="statement not covered" >curve.find(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >p.I &gt; closest.I)</span>;</span>
-    let t;
-    
+    const next = <span class="cstat-no" title="statement not covered" >curve.find(<span class="fstat-no" title="function not covered" >p </span>=&gt; <span class="cstat-no" title="statement not covered" >p.I &gt; closest.I)</span></span>
+    let t
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    if (next) {</span>
       // Interpolación logarítmica
-      const logI = <span class="cstat-no" title="statement not covered" >Math.log10(Ifault);</span>
-      const logI1 = <span class="cstat-no" title="statement not covered" >Math.log10(closest.I);</span>
-      const logI2 = <span class="cstat-no" title="statement not covered" >Math.log10(next.I);</span>
-      const logT1 = <span class="cstat-no" title="statement not covered" >Math.log10(closest.t);</span>
-      const logT2 = <span class="cstat-no" title="statement not covered" >Math.log10(next.t);</span>
-      
-      const ratio = <span class="cstat-no" title="statement not covered" >(logI - logI1) / (logI2 - logI1);</span>
-<span class="cstat-no" title="statement not covered" >      t = Math.pow(10, logT1 + ratio * (logT2 - logT1));</span>
+      const logI = <span class="cstat-no" title="statement not covered" >Math.log10(Ifault)</span>
+      const logI1 = <span class="cstat-no" title="statement not covered" >Math.log10(closest.I)</span>
+      const logI2 = <span class="cstat-no" title="statement not covered" >Math.log10(next.I)</span>
+      const logT1 = <span class="cstat-no" title="statement not covered" >Math.log10(closest.t)</span>
+      const logT2 = <span class="cstat-no" title="statement not covered" >Math.log10(next.t)</span>
+&nbsp;
+      const ratio = <span class="cstat-no" title="statement not covered" >(logI - logI1) / (logI2 - logI1)</span>
+<span class="cstat-no" title="statement not covered" >      t = Math.pow(10, logT1 + ratio * (logT2 - logT1))</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      t = closest.t;</span>
+<span class="cstat-no" title="statement not covered" >      t = closest.t</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       I: Ifault,
       t: toElectricalPrecision(parseFloat(t.toFixed(4))),
-      withinCurve: closest.I &lt;= Ifault
-    };
+      withinCurve: closest.I &lt;= Ifault,
+    }
   }
 &nbsp;
   /**
@@ -1093,34 +1120,34 @@ class TCCEngine {
    * @returns {Object} Validación con errores/warnings
    */
 <span class="fstat-no" title="function not covered" >  va</span>lidateProtection(breaker) {
-    const errors = <span class="cstat-no" title="statement not covered" >[];</span>
-    const warnings = <span class="cstat-no" title="statement not covered" >[];</span>
+    const errors = <span class="cstat-no" title="statement not covered" >[]</span>
+    const warnings = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (!breaker.pickup || breaker.pickup &lt;= 0) {</span>
-<span class="cstat-no" title="statement not covered" >      errors.push('Pickup debe ser mayor que cero.');</span>
+<span class="cstat-no" title="statement not covered" >      errors.push('Pickup debe ser mayor que cero.')</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (breaker.TMS !== undefined &amp;&amp; (breaker.TMS &lt; 0.1 || breaker.TMS &gt; 1.0)) {</span>
-<span class="cstat-no" title="statement not covered" >      errors.push('TMS debe estar entre 0.1 y 1.0 para IEC.');</span>
+<span class="cstat-no" title="statement not covered" >      errors.push('TMS debe estar entre 0.1 y 1.0 para IEC.')</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (breaker.TD !== undefined &amp;&amp; (breaker.TD &lt; 1 || breaker.TD &gt; 10)) {</span>
-<span class="cstat-no" title="statement not covered" >      errors.push('TD debe estar entre 1 y 10 para IEEE.');</span>
+<span class="cstat-no" title="statement not covered" >      errors.push('TD debe estar entre 1 y 10 para IEEE.')</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (breaker.instantaneous &amp;&amp; breaker.instantaneous &lt; breaker.pickup) {</span>
-<span class="cstat-no" title="statement not covered" >      warnings.push('Disparo instantáneo debería ser mayor que pickup.');</span>
+<span class="cstat-no" title="statement not covered" >      warnings.push('Disparo instantáneo debería ser mayor que pickup.')</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (!this.iecCurves[breaker.curve] &amp;&amp; !this.ieeeCurves[breaker.curve]) {</span>
-<span class="cstat-no" title="statement not covered" >      errors.push(`Tipo de curva no soportado: ${breaker.curve}`);</span>
+<span class="cstat-no" title="statement not covered" >      errors.push(`Tipo de curva no soportado: ${breaker.curve}`)</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       valid: errors.length === 0,
       errors,
-      warnings
-    };
+      warnings,
+    }
   }
 &nbsp;
   /**
@@ -1131,18 +1158,18 @@ class TCCEngine {
       IEC: Object.entries(this.iecCurves).map(<span class="fstat-no" title="function not covered" >([</span>key, value]) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
         key,
         name: value.name,
-        params: { k: value.k, alpha: value.alpha }
+        params: { k: value.k, alpha: value.alpha },
       })),
       IEEE: Object.entries(this.ieeeCurves).map(<span class="fstat-no" title="function not covered" >([</span>key, value]) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
         key,
         name: value.name,
-        params: { A: value.A, B: value.B, p: value.p }
-      }))
-    };
+        params: { A: value.A, B: value.B, p: value.p },
+      })),
+    }
   }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = TCCEngine;</span>
+<span class="cstat-no" title="statement not covered" >module.exports = TCCEngine</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -1150,7 +1177,7 @@ class TCCEngine {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-07T00:07:00.711Z
+                at 2026-05-07T22:38:56.537Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

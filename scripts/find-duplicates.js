@@ -14,11 +14,11 @@ const IGNORE = ['node_modules', '.git', 'dist', 'build', 'coverage', '.vscode'];
 /**
  * Calculate SHA256 hash of file content
  * @param {string} filePath - File path
- * @returns {string} SHA256 hash
+ * @returns {Promise<string>} SHA256 hash
  */
-function hashFile(filePath) {
+async function hashFile(filePath) {
   try {
-    const content = fs.readFileSync(filePath);
+    const content = await fs.promises.readFile(filePath);
     return crypto.createHash('sha256').update(content).digest('hex');
   } catch (err) {
     console.log('⚠️ Error hashing:', filePath);
@@ -27,189 +27,118 @@ function hashFile(filePath) {
 }
 
 /**
- * Walk directory recursively
- * @param {string} dir - Starting directory
- * @param {Array} fileList - Accumulator for files
- * @returns {Array} List of file paths
+ * Find duplicate files by content
+ * @returns {Promise<Array<Array<string>>>} Array of duplicate file paths
  */
-function walk(dir, fileList = []) {
-  try {
-    const files = fs.readdirSync(dir);
+async function findDuplicatesByContent() {
+  const files = await findFiles(ROOT, IGNORE);
+  const fileHashes = {};
 
-    files.forEach(file => {
-      const full = path.join(dir, file);
-
-      if (IGNORE.some(i => full.includes(i))) return;
-
-      if (fs.statSync(full).isDirectory()) {
-        walk(full, fileList);
+  for (const file of files) {
+    const hash = await hashFile(file);
+    if (hash) {
+      if (fileHashes[hash]) {
+        fileHashes[hash].push(file);
       } else {
-        fileList.push(full);
+        fileHashes[hash] = [file];
       }
-    });
-  } catch (err) {
-    // Skip directories we can't access
+    }
   }
 
-  return fileList;
+  const duplicates = Object.keys(fileHashes).reduce((acc, hash) => {
+    if (fileHashes[hash].length > 1) {
+      acc.push(fileHashes[hash]);
+    }
+    return acc;
+  }, []);
+
+  return duplicates;
 }
 
 /**
- * Calculate similarity between two strings (0-1)
- * @param {string} a - First string
- * @param {string} b - Second string
- * @returns {number} Similarity score (0-1)
+ * Find files recursively in a directory
+ * @param {string} dir - Directory path
+ * @param {Array} ignore - Array of directories to ignore
+ * @returns {Promise<Array<string>>} Array of file paths
  */
-function similarity(a, b) {
-  a = a.toLowerCase();
-  b = b.toLowerCase();
+async function findFiles(dir, ignore) {
+  const files = [];
+  const stack = [dir];
 
-  // Levenshtein distance
-  const matrix = [];
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
+  while (stack.length > 0) {
+    const currentDir = stack.pop();
 
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
+    const items = await fs.promises.readdir(currentDir);
+
+    for (const item of items) {
+      const fullPath = path.join(currentDir, item);
+
+      const stats = await fs.promises.stat(fullPath);
+
+      if (stats.isDirectory()) {
+        if (!ignore.includes(item)) {
+          stack.push(fullPath);
+        }
       } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j] + 1
-        );
+        files.push(fullPath);
       }
     }
   }
 
-  const distance = matrix[b.length][a.length];
-  const maxLength = Math.max(a.length, b.length);
-  return maxLength === 0 ? 1 : 1 - distance / maxLength;
+  return files;
 }
 
 /**
- * Main duplicate detection function
+ * Find duplicate files by name similarity
+ * @returns {Promise<Array<Array<string>>>} Array of duplicate file paths
  */
-function findDuplicates() {
-  console.log('🔍 Scanning files for duplicates...\n');
+async function findDuplicatesByName() {
+  const files = await findFiles(ROOT, IGNORE);
+  const duplicates = [];
 
-  const files = walk(path.join(ROOT, 'backend', 'src'));
-  console.log(`📁 Found ${files.length} files to analyze\n`);
+  for (const file of files) {
+    const fileName = path.basename(file);
 
-  const hashMap = {};
-  const sizeMap = {};
-  const nameMap = {};
-  const report = {
-    exactDuplicates: [],
-    sameName: [],
-    similarNames: [],
-    sameSize: [],
-    timestamp: new Date().toISOString()
-  };
+    for (const otherFile of files) {
+      if (file !== otherFile) {
+        const otherName = path.basename(otherFile);
 
-  // === PASS 1: HASH ===
-  console.log('📊 Analyzing file hashes...');
-  files.forEach(file => {
-    try {
-      const hash = hashFile(file);
-      const size = fs.statSync(file).size;
-      const name = path.basename(file);
-
-      if (hash) {
-        // Hash grouping
-        if (!hashMap[hash]) hashMap[hash] = [];
-        hashMap[hash].push(file);
-      }
-
-      // Size grouping
-      if (!sizeMap[size]) sizeMap[size] = [];
-      sizeMap[size].push(file);
-
-      // Name grouping
-      if (!nameMap[name]) nameMap[name] = [];
-      nameMap[name].push(file);
-
-    } catch (err) {
-      // Skip files we can't read
-    }
-  });
-
-  // === EXACT DUPLICATES ===
-  console.log('\n🔥 EXACT DUPLICATES (same content):\n');
-  Object.values(hashMap)
-    .filter(group => group.length > 1)
-    .forEach(group => {
-      console.log('---');
-      group.forEach(f => console.log(f));
-      report.exactDuplicates.push(group);
-    });
-
-  // === SAME NAME ===
-  console.log('\n📛 SAME NAME FILES:\n');
-  Object.entries(nameMap)
-    .filter(([_, group]) => group.length > 1)
-    .forEach(([name, group]) => {
-      console.log(`--- ${name}`);
-      group.forEach(f => console.log(f));
-      report.sameName.push({ name, files: group });
-    });
-
-  // === SIMILAR NAMES ===
-  console.log('\n🧠 SIMILAR FILE NAMES:\n');
-  const fileNames = Object.keys(nameMap);
-
-  for (let i = 0; i < fileNames.length; i++) {
-    for (let j = i + 1; j < fileNames.length; j++) {
-      const sim = similarity(fileNames[i], fileNames[j]);
-
-      if (sim > 0.75 && sim < 1) {
-        console.log(`~ ${fileNames[i]}  <->  ${fileNames[j]}  (${(sim * 100).toFixed(1)}%)`);
-        report.similarNames.push({
-          name1: fileNames[i],
-          name2: fileNames[j],
-          similarity: sim
-        });
+        if (fileName.toLowerCase() === otherName.toLowerCase()) {
+          duplicates.push([file, otherFile]);
+        }
       }
     }
   }
 
-  // === SAME SIZE (suspicious) ===
-  console.log('\n📏 SAME SIZE FILES (possible duplicates):\n');
-  Object.values(sizeMap)
-    .filter(group => group.length > 2)
-    .forEach(group => {
-      console.log('---');
-      group.slice(0, 5).forEach(f => console.log(f));
-      report.sameSize.push(group.slice(0, 5));
-    });
-
-  // === SUMMARY ===
-  console.log('\n📊 SUMMARY:\n');
-  console.log(`Exact duplicates: ${report.exactDuplicates.length} groups`);
-  console.log(`Same name files: ${report.sameName.length} groups`);
-  console.log(`Similar names: ${report.similarNames.length} pairs`);
-  console.log(`Same size files: ${report.sameSize.length} groups`);
-
-  // === SAVE REPORT ===
-  const reportPath = path.join(ROOT, 'duplicates-report.json');
-  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-  console.log(`\n📝 Report saved to: ${reportPath}`);
-
-  console.log('\n✅ Duplicate detection complete');
-  console.log('\n📋 Next steps:');
-  console.log('  1. Review duplicates-report.json');
-  console.log('  2. Decide which files to keep/remove');
-  console.log('  3. Update imports if removing duplicates');
+  return duplicates;
 }
 
-// Run if called directly
-if (require.main === module) {
-  findDuplicates();
+/**
+ * Find duplicate files by size
+ * @returns {Promise<Array<Array<string>>>} Array of duplicate file paths
+ */
+async function findDuplicatesBySize() {
+  const files = await findFiles(ROOT, IGNORE);
+  const duplicates = [];
+
+  for (const file of files) {
+    const fileSize = await fs.promises.stat(file).then((stats) => stats.size);
+
+    for (const otherFile of files) {
+      if (file !== otherFile) {
+        const otherSize = await fs.promises.stat(otherFile).then((stats) => stats.size);
+
+        if (fileSize === otherSize) {
+          duplicates.push([file, otherFile]);
+        }
+      }
+    }
+  }
+
+  return duplicates;
 }
 
-module.exports = { findDuplicates, similarity, hashFile };
+/**
+ * Main function to find duplicate files
+ */
+async function main() {

@@ -249,14 +249,7 @@ export const GridSnapAndRouting = ({
           <span className="text-sm font-medium text-gray-700">
             Snap to Grid
           </span>
-          <button
-            onClick={toggleGridSnap}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              ui.gridSnap
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
+          <button onClick={toggleGridSnap} className={`px-3 py-1 rounded text-sm font-medium transition-colors ${ ui.gridSnap ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }`}>
             {ui.gridSnap ? 'Activado' : 'Desactivado'}
           </button>
         </div>
@@ -282,14 +275,7 @@ export const GridSnapAndRouting = ({
           <span className="text-sm font-medium text-gray-700">
             Auto-Routing
           </span>
-          <button
-            onClick={toggleAutoLayout}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              ui.autoLayout
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
+          <button onClick={toggleAutoLayout} className={`px-3 py-1 rounded text-sm font-medium transition-colors ${ ui.autoLayout ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }`}>
             {ui.autoLayout ? 'Activado' : 'Desactivado'}
           </button>
         </div>
@@ -347,8 +333,7 @@ export const GridSnapAndRouting = ({
           <span className="text-sm font-medium text-gray-700">
             Mostrar Grid
           </span>
-          <button
-            onClick={() => setShowGrid(!showGrid)}
+          <button onClick={() => setShowGrid(!showGrid)}
             className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
               showGrid
                 ? 'bg-blue-500 text-white hover:bg-blue-600'

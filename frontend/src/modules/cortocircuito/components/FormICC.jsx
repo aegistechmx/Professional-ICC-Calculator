@@ -160,10 +160,7 @@ export default function FormICC({ onCalculate }) {
       </div>
 
       <div className="space-y-2">
-        <button
-          type="submit"
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
+        <button type="submit" className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
           Validar Alimentador ⚡
         </button>
       </div>

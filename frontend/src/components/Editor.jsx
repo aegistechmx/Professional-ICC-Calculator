@@ -414,18 +414,7 @@ const Editor = React.memo(function Editor() {
 
       {/* Export button */}
       <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 1000 }}>
-        <button
-          onClick={exportToCalculator}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px',
-          }}
-        >
+        <button onClick={exportToCalculator} style={{ padding: '8px 16px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px', }}>
           Exportar a Calculadora
         </button>
       </div>

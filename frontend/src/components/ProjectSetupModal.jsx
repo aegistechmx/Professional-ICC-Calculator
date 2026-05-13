@@ -187,9 +187,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
           <div className="quick-setup-section">
             <h3>Configuración Rápida</h3>
             <div className="preset-buttons">
-              <button
-                className="preset-btn"
-                onClick={() => handleQuickSetup('residencial')}
+              <button className="preset-btn" onClick={() => handleQuickSetup('residencial')}
               >
                 <span className="preset-icon">
                   <svg
@@ -203,9 +201,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
                 </span>
                 Residencial
               </button>
-              <button
-                className="preset-btn"
-                onClick={() => handleQuickSetup('comercial')}
+              <button className="preset-btn" onClick={() => handleQuickSetup('comercial')}
               >
                 <span className="preset-icon">
                   <svg
@@ -219,9 +215,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
                 </span>
                 Comercial
               </button>
-              <button
-                className="preset-btn"
-                onClick={() => handleQuickSetup('industrial')}
+              <button className="preset-btn" onClick={() => handleQuickSetup('industrial')}
               >
                 <span className="preset-icon">
                   <svg
@@ -235,9 +229,7 @@ export default function ProjectSetupModal({ onStart, onClose }) {
                 </span>
                 Industrial
               </button>
-              <button
-                className="preset-btn"
-                onClick={() => handleQuickSetup('mt')}
+              <button className="preset-btn" onClick={() => handleQuickSetup('mt')}
               >
                 <span className="preset-icon">
                   <svg

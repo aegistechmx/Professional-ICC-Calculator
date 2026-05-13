@@ -3,9 +3,9 @@
  * Integra el módulo cortocircuito HTML dentro de React
  */
 
-import { useState, useCallback, useRef } from 'react'
-import ICCModule from '../components/ICCModule'
-import IcoreLogo from '../components/IcoreLogo'
+import { useCallback, useRef, useState } from 'react';
+import ICCModule from '../components/ICCModule';
+import IcoreLogo from '../components/IcoreLogo';
 
 export default function ICCCalculator() {
   const iccModuleRef = useRef(null)
@@ -401,28 +401,13 @@ export default function ICCCalculator() {
 
           {/* Botones de archivo en sidebar */}
           <div className="space-y-2">
-            <button
-              onClick={openFile}
-              disabled={isFileOperation}
-              className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center"
-              title="Abrir archivo de proyecto"
-            >
+            <button type="button" onClick={openFile} disabled={isFileOperation} className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center" title="Abrir archivo de proyecto">
               {isFileOperation ? 'Abriendo...' : 'Abrir Archivo'}
             </button>
-            <button
-              onClick={saveFile}
-              disabled={isFileOperation}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center"
-              title="Guardar proyecto"
-            >
+            <button type="button" onClick={saveFile} disabled={isFileOperation} className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center" title="Guardar proyecto">
               {isFileOperation ? 'Guardando...' : 'Guardar'}
             </button>
-            <button
-              onClick={saveFileAs}
-              disabled={isFileOperation}
-              className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center"
-              title="Guardar proyecto como"
-            >
+            <button type="button" onClick={saveFileAs} disabled={isFileOperation} className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center" title="Guardar proyecto como">
               {isFileOperation ? 'Guardando...' : 'Guardar Como'}
             </button>
           </div>
@@ -435,25 +420,13 @@ export default function ICCCalculator() {
             Operaciones
           </h2>
           <div className="space-y-2">
-            <button
-              onClick={loadExampleModel}
-              disabled={!isReady}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-            >
+            <button type="button" onClick={loadExampleModel} disabled={!isReady} className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium">
               Cargar Ejemplo
             </button>
-            <button
-              onClick={handleCalculate}
-              disabled={!isReady}
-              className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-            >
+            <button type="button" onClick={handleCalculate} disabled={!isReady} className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium">
               Calcular ICC
             </button>
-            <button
-              onClick={handleReset}
-              disabled={!isReady}
-              className="w-full px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-            >
+            <button type="button" onClick={handleReset} disabled={!isReady} className="w-full px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium">
               Reset
             </button>
           </div>
@@ -490,25 +463,13 @@ export default function ICCCalculator() {
 
               {/* Centro: Botones principales - siempre centrado */}
               <div className="flex justify-center space-x-2">
-                <button
-                  onClick={loadExampleModel}
-                  disabled={false}
-                  className="px-4 py-2 bg-red-500 text-white border border-black rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
-                >
+                <button type="button" onClick={loadExampleModel} disabled={false} className="px-4 py-2 bg-red-500 text-white border border-black rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
                   Cargar Ejemplo
                 </button>
-                <button
-                  onClick={handleCalculate}
-                  disabled={false}
-                  className="px-4 py-2 bg-red-500 text-white border border-black rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
-                >
+                <button type="button" onClick={handleCalculate} disabled={false} className="px-4 py-2 bg-red-500 text-white border border-black rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
                   Calcular ICC
                 </button>
-                <button
-                  onClick={handleReset}
-                  disabled={false}
-                  className="px-4 py-2 bg-red-500 text-white border border-black rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
-                >
+                <button type="button" onClick={handleReset} disabled={false} className="px-4 py-2 bg-red-500 text-white border border-black rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
                   Reset
                 </button>
               </div>
@@ -590,8 +551,7 @@ export default function ICCCalculator() {
                   Modo de Cálculo
                 </label>
                 <div className="flex gap-2">
-                  <button
-                    onClick={() =>
+                  <button onClick={() =>
                       setEquipmentConfig({
                         ...equipmentConfig,
                         modoCalculo: 'conocido',
@@ -605,8 +565,7 @@ export default function ICCCalculator() {
                   >
                     Isc Conocido
                   </button>
-                  <button
-                    onClick={() =>
+                  <button onClick={() =>
                       setEquipmentConfig({
                         ...equipmentConfig,
                         modoCalculo: 'completo',
@@ -821,8 +780,7 @@ export default function ICCCalculator() {
 
               {/* Botones de Acción */}
               <div className="mt-6 flex gap-2">
-                <button
-                  onClick={() => {
+                <button onClick={() => {
                     // Enviar configuración al módulo ICC
                     iccModuleRef.current?.sendCommand?.(
                       'LOAD_CONFIG',
@@ -833,8 +791,7 @@ export default function ICCCalculator() {
                 >
                   Aplicar Configuración
                 </button>
-                <button
-                  onClick={() => {
+                <button onClick={() => {
                     setEquipmentConfig({
                       zonaElectrica: '',
                       trafoKva: 500,

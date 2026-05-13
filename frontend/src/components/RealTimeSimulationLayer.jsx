@@ -3,9 +3,9 @@
  * Sistema completo que combina TCC real, arcos eléctricos, ondas de choque y sonido
  */
 
-import React, { useEffect, useRef, useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
-import { useGraphStore } from '../store/graphStore.js'
+import PropTypes from 'prop-types';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useGraphStore } from '../store/graphStore.js';
 
 // === UTILIDADES ===
 const drawShockwave = (ctx, x, y, time) => {
@@ -22,18 +22,18 @@ const drawShockwave = (ctx, x, y, time) => {
   ctx.restore()
 }
 
-const drawArc = (ctx, sourceX, sourceY, targetX, targetY, edge) => {
-  ctx.strokeStyle = edge.hasArc ? '#ff6b6b' : '#6b7280'
-  ctx.lineWidth = edge.hasArc ? 3 : 2
+const drawArc = (ctx, sourceX, sourceY, targetX, targetY, intensity = 0.5) => {
+  ctx.strokeStyle = '#ff6b6b'
+  ctx.lineWidth = 1 + intensity * 2
+  
+  const midX = (sourceX + targetX) / 2 + (Math.random() - 0.5) * 30 * intensity
+  const midY = (sourceY + targetY) / 2 + (Math.random() - 0.5) * 30 * intensity
+
   ctx.beginPath()
   ctx.moveTo(sourceX, sourceY)
+  ctx.lineTo(midX, midY)
   ctx.lineTo(targetX, targetY)
   ctx.stroke()
-
-  // Arco eléctrico
-  if (edge.hasArc) {
-    drawArc(ctx, sourceX, sourceY, targetX, targetY, edge)
-  }
 }
 
 const createArcParticles = (sourceX, sourceY, targetX, targetY) => {
@@ -132,7 +132,7 @@ export default function RealTimeSimulationLayer({ width = 600, height = 400 }) {
           sourceNode.position.y,
           targetNode.position.x,
           targetNode.position.y,
-          edge
+          Math.min(1, (edge.faultCurrent || 1000) / 1000)
         )
       }
 
@@ -258,9 +258,7 @@ export default function RealTimeSimulationLayer({ width = 600, height = 400 }) {
               .filter(n => n.type === 'breaker')
               .slice(0, 6)
               .map(node => (
-                <button
-                  key={node.id}
-                  onClick={() => handleFaultTrigger(node.id)}
+                <button key={node.id} onClick={() => handleFaultTrigger(node.id)}
                   disabled={simulation.fault === node.id}
                   className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                     simulation.fault === node.id
@@ -291,4 +289,9 @@ export default function RealTimeSimulationLayer({ width = 600, height = 400 }) {
 RealTimeSimulationLayer.propTypes = {
   width: PropTypes.number,
   height: PropTypes.number,
+}
+
+RealTimeSimulationLayer.defaultProps = {
+  width: 600,
+  height: 400,
 }

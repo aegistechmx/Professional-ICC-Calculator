@@ -329,9 +329,7 @@ export const CoordinationPanel = () => {
           </label>
           <div className="grid grid-cols-2 gap-2">
             {loadNodes.slice(0, 6).map(node => (
-              <button
-                key={node.id}
-                onClick={() => handleFaultTrigger(node.id)}
+              <button key={node.id} onClick={() => handleFaultTrigger(node.id)}
                 disabled={simulation.fault === node.id}
                 className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                   simulation.fault === node.id
@@ -346,20 +344,11 @@ export const CoordinationPanel = () => {
         </div>
 
         <div className="flex gap-2">
-          <button
-            onClick={clearFault}
-            disabled={!simulation.fault}
-            className={`flex-1 px-3 py-2 rounded font-medium transition-colors ${
-              !simulation.fault
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
-            }`}
-          >
+          <button onClick={clearFault} disabled={!simulation.fault} className={`flex-1 px-3 py-2 rounded font-medium transition-colors ${ !simulation.fault ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600' }`}>
             Limpiar Falla
           </button>
 
-          <button
-            onClick={() => {
+          <button onClick={() => {
               if (protectionSystem) {
                 protectionSystem.reset()
                 setCoordinationResults(null)
@@ -441,8 +430,7 @@ export const CoordinationPanel = () => {
         <span className="text-sm font-medium text-gray-700">
           Mostrar Detalles:
         </span>
-        <button
-          onClick={() => setShowDetails(!showDetails)}
+        <button onClick={() => setShowDetails(!showDetails)}
           className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
             showDetails
               ? 'bg-blue-500 text-white hover:bg-blue-600'

@@ -3,16 +3,16 @@
  * Sistema de visualización térmica con física realista y efectos profesionales
  */
 
-import React, { useEffect, useRef, useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
-import { useGraphStore } from '../store/graphStore.js'
+import PropTypes from 'prop-types';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useGraphStore } from '../store/graphStore.js';
 import {
-  drawThermalEdge,
-  drawTemperatureIndicator,
-  updateThermalLayer,
-  analyzeThermalSystem,
-  checkThermalAlerts,
-} from '../utils/thermalEngine.js'
+    analyzeThermalSystem,
+    checkThermalAlerts,
+    drawTemperatureIndicator,
+    drawThermalEdge,
+    updateThermalLayer,
+} from '../utils/thermalEngine.js';
 
 export const ThermalHeatmapLayer = ({ width = 1200, height = 800 }) => {
   const canvasRef = useRef(null)
@@ -103,241 +103,6 @@ export const ThermalHeatmapLayer = ({ width = 1200, height = 800 }) => {
     }
   }, [thermalAnimationLoop])
 
-  // === PANEL DE CONTROL TÉRMICO ===
-  const ThermalControlPanel = () => (
-    <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Heatmap Térmico
-      </h3>
-
-      {/* Score de salud térmica */}
-      {thermalAnalysis && (
-        <div className="mb-4 p-3 bg-gray-50 rounded">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
-              Salud Térmica:
-            </span>
-            <span
-              className={`text-lg font-bold ${
-                thermalAnalysis.thermalHealthScore > 80
-                  ? 'text-green-600'
-                  : thermalAnalysis.thermalHealthScore > 60
-                    ? 'text-yellow-600'
-                    : thermalAnalysis.thermalHealthScore > 40
-                      ? 'text-orange-600'
-                      : 'text-red-600'
-              }`}
-            >
-              {thermalAnalysis.thermalHealthScore.toFixed(1)}%
-            </span>
-          </div>
-
-          {/* Barra de progreso */}
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                thermalAnalysis.thermalHealthScore > 80
-                  ? 'bg-green-500'
-                  : thermalAnalysis.thermalHealthScore > 60
-                    ? 'bg-yellow-500'
-                    : thermalAnalysis.thermalHealthScore > 40
-                      ? 'bg-orange-500'
-                      : 'bg-red-500'
-              }`}
-              style={{ width: `${thermalAnalysis.thermalHealthScore}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Estadísticas térmicas */}
-      {thermalAnalysis && (
-        <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
-            Estado del Sistema
-          </h4>
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="text-center p-2 bg-green-50 rounded">
-              <div className="text-green-600 font-bold">
-                {thermalAnalysis.safeEdges}
-              </div>
-              <div className="text-gray-500">Seguro</div>
-            </div>
-            <div className="text-center p-2 bg-yellow-50 rounded">
-              <div className="text-yellow-600 font-bold">
-                {thermalAnalysis.normalEdges + thermalAnalysis.cautionEdges}
-              </div>
-              <div className="text-gray-500">Normal</div>
-            </div>
-            <div className="text-center p-2 bg-red-50 rounded">
-              <div className="text-red-600 font-bold">
-                {thermalAnalysis.warningEdges +
-                  thermalAnalysis.dangerEdges +
-                  thermalAnalysis.criticalEdges}
-              </div>
-              <div className="text-gray-500">Peligro</div>
-            </div>
-          </div>
-
-          <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Carga promedio:</span>
-              <span className="font-medium">
-                {(thermalAnalysis.averageLoading * 100).toFixed(1)}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Temp máxima:</span>
-              <span className="font-medium">
-                {thermalAnalysis.maxTemperature.toFixed(1)}°C
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Alertas térmicas */}
-      {showAlerts && alerts.length > 0 && (
-        <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
-            Alertas Térmicas
-          </h4>
-          <div className="space-y-2 max-h-40 overflow-y-auto">
-            {alerts.slice(0, 5).map((alert, index) => (
-              <div
-                key={index}
-                className={`p-2 rounded border ${
-                  alert.type === 'critical'
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-yellow-50 border-yellow-200'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`text-xs font-medium ${
-                      alert.type === 'critical'
-                        ? 'text-red-700'
-                        : 'text-yellow-700'
-                    }`}
-                  >
-                    {alert.edgeLabel}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {alert.threshold}°/{(alert.threshold * 1.2).toFixed(0)}%
-                  </span>
-                </div>
-                <div className="text-xs text-gray-600 mt-1">
-                  {alert.message}
-                </div>
-              </div>
-            ))}
-            {alerts.length > 5 && (
-              <div className="text-xs text-gray-500 text-center">
-                ... y {alerts.length - 5} más
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Controles */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">
-            Indicadores:
-          </span>
-          <button
-            onClick={() => setShowIndicators(!showIndicators)}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              showIndicators
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            {showIndicators ? 'Visibles' : 'Ocultos'}
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Alertas:</span>
-          <button
-            onClick={() => setShowAlerts(!showAlerts)}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              showAlerts
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            {showAlerts ? 'Activas' : 'Inactivas'}
-          </button>
-        </div>
-      </div>
-
-      {/* Leyenda de colores */}
-      <div className="mt-4">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">
-          Leyenda Térmica
-        </h4>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded"
-              style={{ backgroundColor: '#00c853' }}
-            />
-            <span className="text-xs text-gray-600">
-              Seguro (&lt;50% carga)
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded"
-              style={{ backgroundColor: '#ffd600' }}
-            />
-            <span className="text-xs text-gray-600">Normal (50-80% carga)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded"
-              style={{ backgroundColor: '#ff6d00' }}
-            />
-            <span className="text-xs text-gray-600">
-              Precaución (80-100% carga)
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded"
-              style={{ backgroundColor: '#ff3d00' }}
-            />
-            <span className="text-xs text-gray-600">
-              Peligro (100-120% carga)
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded"
-              style={{ backgroundColor: '#d50000' }}
-            />
-            <span className="text-xs text-gray-600">
-              Crítico (&gt;120% carga)
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Información técnica */}
-      <div className="mt-4 p-3 bg-gray-50 rounded text-xs">
-        <h4 className="font-medium text-gray-700 mb-2">Modelo Térmico</h4>
-        <div className="space-y-1 text-gray-600">
-          <div>Ecuación: T = Tamb + (Tmax - Tamb) × (I/Imax)²</div>
-          <div>Tamb = 30°C, Tmax = 90°C (XLPE)</div>
-          <div>Inercia térmica: 10% suavizado</div>
-          <div>Frecuencia: 60fps real-time</div>
-        </div>
-      </div>
-    </div>
-  )
-
   return (
     <div className="relative">
       <canvas
@@ -355,10 +120,165 @@ export const ThermalHeatmapLayer = ({ width = 1200, height = 800 }) => {
 
       {/* Panel flotante */}
       <div className="absolute top-4 left-4">
-        <ThermalControlPanel />
+        <ThermalControlPanel
+          thermalAnalysis={thermalAnalysis}
+          showAlerts={showAlerts}
+          alerts={alerts}
+          showIndicators={showIndicators}
+          setShowIndicators={setShowIndicators}
+          setShowAlerts={setShowAlerts}
+        />
       </div>
     </div>
   )
+}
+
+const ThermalControlPanel = ({
+  thermalAnalysis,
+  showAlerts,
+  alerts,
+  showIndicators,
+  setShowIndicators,
+  setShowAlerts,
+}) => (
+  <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+    <h3 className="text-lg font-semibold text-gray-800 mb-4">Heatmap Térmico</h3>
+
+    {/* Score de salud térmica */}
+    {thermalAnalysis && (
+      <div className="mb-4 p-3 bg-gray-50 rounded">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700">Salud Térmica:</span>
+          <span
+            className={`text-lg font-bold ${
+              thermalAnalysis.thermalHealthScore > 80
+                ? 'text-green-600'
+                : thermalAnalysis.thermalHealthScore > 60
+                  ? 'text-yellow-600'
+                  : thermalAnalysis.thermalHealthScore > 40
+                    ? 'text-orange-600'
+                    : 'text-red-600'
+            }`}
+          >
+            {thermalAnalysis.thermalHealthScore.toFixed(1)}%
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className={`h-2 rounded-full transition-all duration-300 ${
+              thermalAnalysis.thermalHealthScore > 80
+                ? 'bg-green-500'
+                : thermalAnalysis.thermalHealthScore > 60
+                  ? 'bg-yellow-500'
+                  : thermalAnalysis.thermalHealthScore > 40
+                    ? 'bg-orange-500'
+                    : 'bg-red-500'
+            }`}
+            style={{ width: `${thermalAnalysis.thermalHealthScore}%` }}
+          />
+        </div>
+      </div>
+    )}
+
+    {/* Estadísticas térmicas */}
+    {thermalAnalysis && (
+      <div className="mb-4">
+        <h4 className="text-sm font-medium text-gray-700 mb-2">Estado del Sistema</h4>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-center p-2 bg-green-50 rounded">
+            <div className="text-green-600 font-bold">{thermalAnalysis.safeEdges}</div>
+            <div className="text-gray-500">Seguro</div>
+          </div>
+          <div className="text-center p-2 bg-yellow-50 rounded">
+            <div className="text-yellow-600 font-bold">
+              {thermalAnalysis.normalEdges + thermalAnalysis.cautionEdges}
+            </div>
+            <div className="text-gray-500">Normal</div>
+          </div>
+          <div className="text-center p-2 bg-red-50 rounded">
+            <div className="text-red-600 font-bold">
+              {thermalAnalysis.warningEdges + thermalAnalysis.dangerEdges + thermalAnalysis.criticalEdges}
+            </div>
+            <div className="text-gray-500">Peligro</div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Alertas térmicas */}
+    {showAlerts && alerts.length > 0 && (
+      <div className="mb-4">
+        <h4 className="text-sm font-medium text-gray-700 mb-2">Alertas Térmicas</h4>
+        <div className="space-y-2 max-h-40 overflow-y-auto">
+          {alerts.slice(0, 5).map((alert, index) => (
+            <div
+              key={index}
+              className={`p-2 rounded border ${
+                alert.type === 'critical' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-medium ${alert.type === 'critical' ? 'text-red-700' : 'text-yellow-700'}`}>
+                  {alert.edgeLabel}
+                </span>
+              </div>
+              <div className="text-xs text-gray-600 mt-1">{alert.message}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Controles */}
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">Indicadores:</span>
+        <button onClick={() => setShowIndicators(!showIndicators)}
+          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+            showIndicators ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}
+        >
+          {showIndicators ? 'Visibles' : 'Ocultos'}
+        </button>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">Alertas:</span>
+        <button onClick={() => setShowAlerts(!showAlerts)}
+          className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+            showAlerts ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}
+        >
+          {showAlerts ? 'Activas' : 'Inactivas'}
+        </button>
+      </div>
+    </div>
+  </div>
+)
+
+ThermalControlPanel.propTypes = {
+  thermalAnalysis: PropTypes.shape({
+    thermalHealthScore: PropTypes.number,
+    safeEdges: PropTypes.number,
+    normalEdges: PropTypes.number,
+    cautionEdges: PropTypes.number,
+    warningEdges: PropTypes.number,
+    dangerEdges: PropTypes.number,
+    criticalEdges: PropTypes.number,
+    averageLoading: PropTypes.number,
+    maxTemperature: PropTypes.number,
+  }),
+  showAlerts: PropTypes.bool.isRequired,
+  alerts: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.string,
+      edgeLabel: PropTypes.string,
+      message: PropTypes.string,
+      threshold: PropTypes.number,
+    })
+  ).isRequired,
+  showIndicators: PropTypes.bool.isRequired,
+  setShowIndicators: PropTypes.func.isRequired,
+  setShowAlerts: PropTypes.func.isRequired,
 }
 
 ThermalHeatmapLayer.propTypes = {

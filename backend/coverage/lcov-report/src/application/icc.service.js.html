@@ -246,7 +246,26 @@
 <a name='L181'></a><a href='#L181'>181</a>
 <a name='L182'></a><a href='#L182'>182</a>
 <a name='L183'></a><a href='#L183'>183</a>
-<a name='L184'></a><a href='#L184'>184</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -254,6 +273,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -272,9 +294,18 @@
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -287,7 +318,6 @@
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -323,9 +353,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -380,6 +416,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -437,8 +475,11 @@
  */
 &nbsp;
 const { buildYbus } = require('../core/ybus/buildYbus')
-const { calculateFaultCurrent, createThreePhaseFault } = require('../core/powerflow/stability/faultModel') // power (W)
-const { calculateShortCircuitCurrent, toElectricalPrecision } = require('../shared/utils/electricalUtils')
+const {
+  calculateFaultCurrent,
+  createThreePhaseFault,
+} = require('../core/powerflow/stability/faultModel') // power (W)
+const { toElectricalPrecision } = require('../shared/utils/electricalUtils')
 &nbsp;
 /**
  * Run professional ICC calculation
@@ -454,11 +495,20 @@ function runICC(input) {
 &nbsp;
   try {
     // Try full professional pipeline if system data is provided and valid
-    if (system &amp;&amp; system.buses &amp;&amp; system.branches &amp;&amp; system.buses.length &gt; 0 &amp;&amp; system.branches.length &gt; 0) {
+    if (
+      system &amp;&amp;
+      system.buses &amp;&amp;
+      system.branches &amp;&amp;
+      system.buses.length &gt; 0 &amp;&amp;
+      system.branches.length &gt; 0
+    ) {
       // Check if system has valid impedance data
-      const hasValidImpedance = system.branches.every(branch =&gt;
-        typeof branch.R === 'number' &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >typeof branch.X === 'number' </span>&amp;&amp;
-<span class="branch-2 cbranch-no" title="branch not covered" >        isFinite(branch.R) </span>&amp;&amp; <span class="branch-3 cbranch-no" title="branch not covered" >isFinite(branch.X)</span>
+      const hasValidImpedance = system.branches.every(
+        branch =&gt;
+          typeof branch.R === 'number' &amp;&amp;
+<span class="branch-1 cbranch-no" title="branch not covered" >          typeof branch.X === 'number' </span>&amp;&amp;
+<span class="branch-2 cbranch-no" title="branch not covered" >          isFinite(branch.R) </span>&amp;&amp;
+<span class="branch-3 cbranch-no" title="branch not covered" >          isFinite(branch.X)</span>
       )
 &nbsp;
       <span class="missing-if-branch" title="if path not taken" >I</span>if (hasValidImpedance) {
@@ -468,7 +518,6 @@ function runICC(input) {
 &nbsp;
     // Fallback to simple but accurate calculation
     return runSimpleICC(voltage, Z)
-&nbsp;
   } catch (error) {
     // Last resort fallback
 <span class="cstat-no" title="statement not covered" >    return runSimpleICC(voltage, Z)</span>
@@ -491,7 +540,7 @@ function runProfessionalICC(system, V, Z) {
     type: 'three_phase',
     bus: findWorstFaultBus(system),
     R: Z * 0.1, // 10% of impedance as fault impedance
-    X: Z * 0.9  // 90% as reactance
+    X: Z * 0.9, // 90% as reactance
   }
 &nbsp;
   // Step 3: Apply fault to system
@@ -502,13 +551,19 @@ function runProfessionalICC(system, V, Z) {
 &nbsp;
   // Step 5: Convert to actual amperes with IEEE precision
   <span class="missing-if-branch" title="if path not taken" >I</span>if (!Z || Z &lt;= 0) {
-<span class="cstat-no" title="statement not covered" >    throw new Error('Impedance must be greater than zero for professional ICC calculation')</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(</span>
+      'Impedance must be greater than zero for professional ICC calculation'
+    )
   }
 &nbsp;
   // Fórmula CORRECTA para ICC trifásico - método profesional
-  const impedanceDecimal = Z / 100;  // Convertir porcentaje a decimal
-  const baseCurrent = toElectricalPrecision(parseFloat((V / (Math.sqrt(3) * impedanceDecimal)).toFixed(6)))
-  const actualCurrent = toElectricalPrecision(parseFloat((faultCurrentPU * baseCurrent).toFixed(6)))
+  const impedanceDecimal = Z / 100 // Convertir porcentaje a decimal
+  const baseCurrent = toElectricalPrecision(
+    parseFloat((V / (Math.sqrt(3) * impedanceDecimal)).toFixed(6))
+  )
+  const actualCurrent = toElectricalPrecision(
+    parseFloat((faultCurrentPU * baseCurrent).toFixed(6))
+  )
 &nbsp;
   return {
     method: 'professional_pipeline_corrected',
@@ -522,7 +577,7 @@ function runProfessionalICC(system, V, Z) {
     systemBranches: system.branches.length,
     precision: 'IEEE_1584_corrected',
     formula: 'Isc = V/(√3×Z) × faultCurrentPU',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   }
 }
 &nbsp;
@@ -534,32 +589,32 @@ function runProfessionalICC(system, V, Z) {
  */
 function runSimpleICC(V, Z, kVA = null) {
   // Fórmula CORRECTA para ICC trifásico con validación kVA
-  const voltage = V || <span class="branch-1 cbranch-no" title="branch not covered" >480;</span>  // Default a 480V
-  const impedanceDecimal = Z / 100;  // Convertir porcentaje a decimal si Z es porcentaje
-  const Isc = voltage / (Math.sqrt(3) * impedanceDecimal);  // En amperes
+  const voltage = V || <span class="branch-1 cbranch-no" title="branch not covered" >480 </span>// Default a 480V
+  const impedanceDecimal = Z / 100 // Convertir porcentaje a decimal si Z es porcentaje
+  const Isc = voltage / (Math.sqrt(3) * impedanceDecimal) // En amperes
 &nbsp;
   // Validación adicional con método de kVA si está disponible
-  let Icc_final = Isc;
-  let method = 'simple_accurate';
+  let Icc_final = Isc
+  let method = 'simple_accurate'
 &nbsp;
   <span class="missing-if-branch" title="if path not taken" >I</span>if (kVA) {
-    const I_fl = <span class="cstat-no" title="statement not covered" >(kVA * 1000) / (voltage * Math.sqrt(3));</span>  // Corriente plena de carga
-    const Isc_kva = <span class="cstat-no" title="statement not covered" >I_fl / impedanceDecimal;</span>  // ICC basado en kVA
-<span class="cstat-no" title="statement not covered" >    Icc_final = Math.min(Isc, Isc_kva); </span> // Usar el valor más conservador
-<span class="cstat-no" title="statement not covered" >    method = 'conservative_accurate_with_kva';</span>
+    const I_fl = <span class="cstat-no" title="statement not covered" >(kVA * 1000) / (voltage * Math.sqrt(3)) </span>// Corriente plena de carga
+    const Isc_kva = <span class="cstat-no" title="statement not covered" >I_fl / impedanceDecimal </span>// ICC basado en kVA
+<span class="cstat-no" title="statement not covered" >    Icc_final = Math.min(Isc, Isc_kva) </span>// Usar el valor más conservador
+<span class="cstat-no" title="statement not covered" >    method = 'conservative_accurate_with_kva'</span>
   }
 &nbsp;
   try {
     // Handle zero impedance or other errors with fallback
     if (Z &lt;= 0) {
       // Use a very small impedance for zero impedance case
-      Icc_final = voltage / (Math.sqrt(3) * 0.000001);
-      method = 'fallback_zero_impedance';
+      Icc_final = voltage / (Math.sqrt(3) * 0.000001)
+      method = 'fallback_zero_impedance'
     }
   } catch (error) {
     // Final fallback
-<span class="cstat-no" title="statement not covered" >    Icc_final = voltage / (Math.sqrt(3) * Math.max(Z, 0.001));</span>
-<span class="cstat-no" title="statement not covered" >    method = 'emergency_fallback';</span>
+<span class="cstat-no" title="statement not covered" >    Icc_final = voltage / (Math.sqrt(3) * Math.max(Z, 0.001))</span>
+<span class="cstat-no" title="statement not covered" >    method = 'emergency_fallback'</span>
   }
 &nbsp;
   return {
@@ -568,15 +623,17 @@ function runSimpleICC(V, Z, kVA = null) {
     voltage: voltage,
     impedance: Z,
     kVA: kVA,
-    I_full_load: kVA ? <span class="branch-0 cbranch-no" title="branch not covered" >((kVA * 1000) / (voltage * Math.sqrt(3))).toFixed(2) + ' A' </span>: null,
+    I_full_load: kVA
+      ? <span class="branch-0 cbranch-no" title="branch not covered" >((kVA * 1000) / (voltage * Math.sqrt(3))).toFixed(2) + ' A'</span>
+      : null,
     Icc_simple: Isc.toFixed(2) + ' A',
     Icc_kva_method: kVA ? <span class="branch-0 cbranch-no" title="branch not covered" >Icc_kva.toFixed(2) + ' A' </span>: null,
     precision: 'IEEE_1584_corrected',
-    formula: kVA ?
-<span class="branch-0 cbranch-no" title="branch not covered" >      'Isc = min[V/(√3×Z), (kVA×1000)/(V×√3×Z)]' </span>:
-      'Isc = V/(√3×Z)',
-    timestamp: new Date().toISOString()
-  };
+    formula: kVA
+      ? <span class="branch-0 cbranch-no" title="branch not covered" >'Isc = min[V/(√3×Z), (kVA×1000)/(V×√3×Z)]'</span>
+      : 'Isc = V/(√3×Z)',
+    timestamp: new Date().toISOString(),
+  }
 }
 &nbsp;
 /**
@@ -610,7 +667,7 @@ function findWorstFaultBus(system) {
 module.exports = {
   runICC,
   runProfessionalICC,
-  runSimpleICC
+  runSimpleICC,
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -619,7 +676,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-07T00:07:00.711Z
+                at 2026-05-07T22:38:56.537Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

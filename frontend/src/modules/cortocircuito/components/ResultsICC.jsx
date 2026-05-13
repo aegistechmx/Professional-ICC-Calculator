@@ -135,11 +135,7 @@ export default function ResultsICC({
 
           {/* Botón Auto-Coordinación */}
           {!coordination.coordinated && onOptimize && (
-            <button
-              onClick={onOptimize}
-              disabled={loading}
-              className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
-            >
+            <button onClick={onOptimize} disabled={loading} className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50">
               ⚡ Auto-Coordinación Inteligente
             </button>
           )}

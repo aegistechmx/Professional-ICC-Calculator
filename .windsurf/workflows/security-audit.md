@@ -45,9 +45,9 @@ npm run security:codeql
 node scripts/check-env-security.js
 
 # Check for hardcoded secrets
-grep -r "password\|secret\|api_key\|token" --include="*.js" --include="*.jsx" --exclude-dir=node_modules .
+grep -rEi "password|secret|api_key|token" --include="*.js" --include="*.jsx" --exclude-dir={node_modules,dist,build} .
 
-# Verify .gitignore includes sensitive files
+# Verify .gitignore patterns for sensitive files
 cat .gitignore | grep -E "\.env|\.key|\.pem"
 ```
 

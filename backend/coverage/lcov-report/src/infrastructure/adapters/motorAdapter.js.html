@@ -210,58 +210,58 @@
  * Adaptador limpio para el motor eléctrico original
  */
 &nbsp;
-const MotorElectrico = <span class="cstat-no" title="statement not covered" >require('../../../../icc-core/cortocircuito/js/core/MotorElectrico');</span>
-const MotorAmpacidadNOM = <span class="cstat-no" title="statement not covered" >require('../../../../icc-core/cortocircuito/js/core/MotorAmpacidadNOM');</span>
-const conductoresData = <span class="cstat-no" title="statement not covered" >require('../../../../icc-core/cortocircuito/js/core/data/conductores.nom');</span>
+const MotorElectrico = <span class="cstat-no" title="statement not covered" >require('../../../../icc-core/cortocircuito/js/core/MotorElectrico')</span>
+const MotorAmpacidadNOM = <span class="cstat-no" title="statement not covered" >require('../../../../icc-core/cortocircuito/js/core/MotorAmpacidadNOM')</span>
+const conductoresData = <span class="cstat-no" title="statement not covered" >require('../../../../icc-core/cortocircuito/js/core/data/conductores.nom')</span>
 &nbsp;
 function <span class="fstat-no" title="function not covered" >initMotores(</span>) {
   const context = <span class="cstat-no" title="statement not covered" >{</span>
     MotorAmpacidadNOM,
     CONDUCTORES_NOM: conductoresData.CONDUCTORES_NOM,
     factorTemperatura: conductoresData.factorTemperatura,
-    factorAgrupamiento: conductoresData.factorAgrupamiento
-  };
+    factorAgrupamiento: conductoresData.factorAgrupamiento,
+  }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
-    ejecutar: <span class="fstat-no" title="function not covered" >(i</span>nput) =&gt; {
-      const originalGlobals = <span class="cstat-no" title="statement not covered" >{};</span>
-      
+    ejecutar: <span class="fstat-no" title="function not covered" >in</span>put =&gt; {
+      const originalGlobals = <span class="cstat-no" title="statement not covered" >{}</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >      Object.keys(context).forEach(<span class="fstat-no" title="function not covered" >ke</span>y =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        originalGlobals[key] = global[key];</span>
-<span class="cstat-no" title="statement not covered" >        global[key] = context[key];</span>
-      });
+<span class="cstat-no" title="statement not covered" >        originalGlobals[key] = global[key]</span>
+<span class="cstat-no" title="statement not covered" >        global[key] = context[key]</span>
+      })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      try {</span>
-<span class="cstat-no" title="statement not covered" >        return MotorElectrico.ejecutarMotorElectrico(input);</span>
+<span class="cstat-no" title="statement not covered" >        return MotorElectrico.ejecutarMotorElectrico(input)</span>
       } finally {
 <span class="cstat-no" title="statement not covered" >        Object.keys(originalGlobals).forEach(<span class="fstat-no" title="function not covered" >ke</span>y =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >          if (originalGlobals[key] !== undefined) {</span>
-<span class="cstat-no" title="statement not covered" >            global[key] = originalGlobals[key];</span>
+<span class="cstat-no" title="statement not covered" >            global[key] = originalGlobals[key]</span>
           } else {
-<span class="cstat-no" title="statement not covered" >            delete global[key];</span>
+<span class="cstat-no" title="statement not covered" >            delete global[key]</span>
           }
-        });
+        })
       }
     },
 &nbsp;
-    ejecutarAmpacidad: <span class="fstat-no" title="function not covered" >(i</span>nput) =&gt; {
-      const originalGlobals = <span class="cstat-no" title="statement not covered" >{};</span>
-      
+    ejecutarAmpacidad: <span class="fstat-no" title="function not covered" >in</span>put =&gt; {
+      const originalGlobals = <span class="cstat-no" title="statement not covered" >{}</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >      Object.keys(context).forEach(<span class="fstat-no" title="function not covered" >ke</span>y =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        originalGlobals[key] = global[key];</span>
-<span class="cstat-no" title="statement not covered" >        global[key] = context[key];</span>
-      });
+<span class="cstat-no" title="statement not covered" >        originalGlobals[key] = global[key]</span>
+<span class="cstat-no" title="statement not covered" >        global[key] = context[key]</span>
+      })
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      try {</span>
-<span class="cstat-no" title="statement not covered" >        return MotorAmpacidadNOM.calcularAmpacidadNOM(input);</span>
+<span class="cstat-no" title="statement not covered" >        return MotorAmpacidadNOM.calcularAmpacidadNOM(input)</span>
       } finally {
 <span class="cstat-no" title="statement not covered" >        Object.keys(originalGlobals).forEach(<span class="fstat-no" title="function not covered" >ke</span>y =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >          if (originalGlobals[key] !== undefined) {</span>
-<span class="cstat-no" title="statement not covered" >            global[key] = originalGlobals[key];</span>
+<span class="cstat-no" title="statement not covered" >            global[key] = originalGlobals[key]</span>
           } else {
-<span class="cstat-no" title="statement not covered" >            delete global[key];</span>
+<span class="cstat-no" title="statement not covered" >            delete global[key]</span>
           }
-        });
+        })
       }
     },
 &nbsp;
@@ -270,12 +270,12 @@ function <span class="fstat-no" title="function not covered" >initMotores(</span
       version: '1.0.0',
       dependencies: Object.keys(context),
       controlled: true,
-      noGlobalPollution: true
-    })
-  };
+      noGlobalPollution: true,
+    }),
+  }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = { initMotores };</span>
+<span class="cstat-no" title="statement not covered" >module.exports = { initMotores }</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -283,7 +283,7 @@ function <span class="fstat-no" title="function not covered" >initMotores(</span
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-07T00:07:00.711Z
+                at 2026-05-07T22:38:56.537Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

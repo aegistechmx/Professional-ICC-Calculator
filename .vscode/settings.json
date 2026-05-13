@@ -1,5 +1,68 @@
 {
-    "js/ts.locale": "es",
-    "git.ignoreLimitWarning": true,
-    "testing.automaticallyOpenPeekViewDuringAutoRun": true
-}
+    // =========================
+    // PYTHON CORE ENGINEERING
+    // =========================
+    "python.defaultInterpreterPath": "python",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.inlayHints.variableTypes": true,
+  
+    // =========================
+    // FORMATTER (BLACK)
+    // =========================
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+  
+    // =========================
+    // LINTER (PYLINT ONLY)
+    // =========================
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+  
+    // =========================
+    // JUPYTER (INGENIERÍA)
+    // =========================
+    "jupyter.askForKernelRestart": false,
+    "jupyter.interactiveWindowMode": "perFile",
+  
+    // =========================
+    // VISUAL LIMPIO INGENIERÍA
+    // =========================
+    "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "boundary",
+    "editor.rulers": [80, 120],
+    "editor.tabSize": 4,
+  
+    // =========================
+    // TERMINAL PRO ENGINEERING
+    // =========================
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.cursorBlinking": true,
+  
+    // =========================
+    // GIT (INDUSTRIAL FLOW)
+    // =========================
+    "git.autofetch": true,
+    "git.confirmSync": false,
+  
+    // =========================
+    // FILE HANDLING
+    // =========================
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+  
+    // =========================
+    // INTELLIGENCE / AI
+    // =========================
+    "chatgpt.enabled": true,
+  
+    // =========================
+    // PERFORMANCE MODE
+    // =========================
+    "editor.smoothScrolling": true,
+    "editor.cursorSmoothCaretAnimation": "on"
+  }

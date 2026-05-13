@@ -431,8 +431,7 @@ export const TCCLiveChart = ({
           {chartCurves.map(curve => (
             <div key={curve.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
+                <button onClick={() =>
                     setSelectedBreaker(
                       selectedBreaker === curve.id ? null : curve.id
                     )

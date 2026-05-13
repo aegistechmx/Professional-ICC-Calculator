@@ -3,12 +3,12 @@
  * Sistema inteligente que ajusta automáticamente pickups y TMS para cumplir restricciones
  */
 
-import React, { useState, useCallback } from 'react'
-import { useGraphStore } from '../store/graphStore.js'
+import { useCallback, useState } from 'react';
+import { useGraphStore } from '../store/graphStore.js';
 import {
-  autoTuneProtection,
-  analyzeSensitivity,
-} from '../utils/autoTuningEngine.js'
+    analyzeSensitivity,
+    autoTuneProtection,
+} from '../utils/autoTuningEngine.js';
 
 export const AutoTuningPanel = () => {
   const [isTuning, setIsTuning] = useState(false)
@@ -252,27 +252,11 @@ export const AutoTuningPanel = () => {
 
       {/* Botones de Acción */}
       <div className="flex gap-2 mb-4">
-        <button
-          onClick={executeAutoTuning}
-          disabled={isTuning || !selectedFault}
-          className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
-            isTuning || !selectedFault
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-500 text-white hover:bg-blue-600'
-          }`}
-        >
+        <button onClick={executeAutoTuning} disabled={isTuning || !selectedFault} className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${ isTuning || !selectedFault ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600' }`}>
           {isTuning ? 'Optimizando...' : 'Ejecutar Auto-Tuning'}
         </button>
 
-        <button
-          onClick={applyAdjustments}
-          disabled={!tuningResults}
-          className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
-            !tuningResults
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-              : 'bg-green-500 text-white hover:bg-green-600'
-          }`}
-        >
+        <button onClick={applyAdjustments} disabled={!tuningResults} className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${ !tuningResults ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-500 text-white hover:bg-green-600' }`}>
           Aplicar Ajustes
         </button>
       </div>
@@ -334,16 +318,16 @@ export const AutoTuningPanel = () => {
                 className="p-2 bg-blue-50 border border-blue-200 rounded"
               >
                 <div className="text-sm font-medium text-blue-700">
-                  {adj.upstream} (upstream) & {adj.downstream} (downstream)
+                  {adj.upstream} (upstream) {'&'} {adj.downstream} (downstream)
                 </div>
 
                 <div className="text-xs text-gray-600 mt-1">
                   <div>Icc: {adj.Icc.toFixed(0)}A</div>
                   <div>
-                    Upstream: TMS {adj.beforeUp.TMS} -&gt; {adj.afterUp.TMS}
+                    Upstream: TMS {adj.beforeUp.TMS} {'->'} {adj.afterUp.TMS}
                   </div>
                   <div>
-                    Upstream: Pickup {adj.beforeUp.pickup.toFixed(0)} -&gt;{' '}
+                    Upstream: Pickup {adj.beforeUp.pickup.toFixed(0)} {'->'}{' '}
                     {adj.afterUp.pickup.toFixed(0)}A
                   </div>
                   <div className="text-green-600">
@@ -407,6 +391,10 @@ export const AutoTuningPanel = () => {
       </div>
     </div>
   )
+}
+
+AutoTuningPanel.propTypes = {
+  // Componente autocontenido que consume useGraphStore directamente
 }
 
 export default AutoTuningPanel

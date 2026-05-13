@@ -89,14 +89,12 @@ export default function PropertiesPanel() {
           {error}
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => setError(null)}
+          <button onClick={() => setError(null)}
             className="text-sm text-blue-600 hover:text-blue-800"
           >
             Cerrar error
           </button>
-          <button
-            onClick={() => {
+          <button onClick={() => {
               setError(null)
               // Continue to show properties panel
             }}
@@ -366,8 +364,7 @@ export default function PropertiesPanel() {
 
       {(selectedNode || selectedEdge) && (
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <button
-            onClick={() => {
+          <button onClick={() => {
               if (selectedNode && confirm(`¿Eliminar ${selectedNode.type}?`)) {
                 removeNode(selectedNode.id)
               } else if (selectedEdge && confirm('¿Eliminar conexión?')) {
@@ -382,11 +379,7 @@ export default function PropertiesPanel() {
       )}
 
       <div className="mt-6 pt-4 border-t border-gray-200">
-        <button
-          onClick={handleSimulate}
-          disabled={simulating}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
+        <button onClick={handleSimulate} disabled={simulating} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition disabled:bg-gray-400 disabled:cursor-not-allowed">
           {simulating ? 'Simulando...' : 'Simular ICC'}
         </button>
       </div>

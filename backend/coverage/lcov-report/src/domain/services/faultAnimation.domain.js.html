@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/120</span>
+                <span class='fraction'>0/121</span>
             </div>
         
             
@@ -512,7 +512,12 @@
 <a name='L447'></a><a href='#L447'>447</a>
 <a name='L448'></a><a href='#L448'>448</a>
 <a name='L449'></a><a href='#L449'>449</a>
-<a name='L450'></a><a href='#L450'>450</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -587,9 +592,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -640,6 +647,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -757,6 +765,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -969,9 +979,9 @@
 &nbsp;
 class FaultAnimationEngine {
 <span class="fstat-no" title="function not covered" >  co</span>nstructor() {
-<span class="cstat-no" title="statement not covered" >    this.activeAnimations = new Map();</span>
-<span class="cstat-no" title="statement not covered" >    this.animationSpeed = 300; </span>// ms por segmento
-<span class="cstat-no" title="statement not covered" >    this.faultCounter = 0; </span>// Contador para IDs únicos
+<span class="cstat-no" title="statement not covered" >    this.activeAnimations = new Map()</span>
+<span class="cstat-no" title="statement not covered" >    this.animationSpeed = 300 </span>// ms por segmento
+<span class="cstat-no" title="statement not covered" >    this.faultCounter = 0 </span>// Contador para IDs únicos
   }
 &nbsp;
   /**
@@ -982,8 +992,8 @@ class FaultAnimationEngine {
    */
 <span class="fstat-no" title="function not covered" >  cr</span>eateFaultEvent(nodeId, Icc) {
     // Generar ID único usando contador incremental
-<span class="cstat-no" title="statement not covered" >    this.faultCounter++;</span>
-    const uniqueId = <span class="cstat-no" title="statement not covered" >`fault_${this.faultCounter}_${nodeId}`;</span>
+<span class="cstat-no" title="statement not covered" >    this.faultCounter++</span>
+    const uniqueId = <span class="cstat-no" title="statement not covered" >`fault_${this.faultCounter}_${nodeId}`</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       id: uniqueId,
@@ -993,8 +1003,8 @@ class FaultAnimationEngine {
       path: [],
       active: true,
       startTime: Date.now(),
-      status: 'ACTIVE'
-    };
+      status: 'ACTIVE',
+    }
   }
 &nbsp;
   /**
@@ -1004,28 +1014,28 @@ class FaultAnimationEngine {
    * @returns {Array} Ruta de edges hacia la fuente
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tUpstreamPath(graph, startNodeId) {
-    const path = <span class="cstat-no" title="statement not covered" >[];</span>
-    let current = <span class="cstat-no" title="statement not covered" >startNodeId;</span> // current (A)
-    const visited = <span class="cstat-no" title="statement not covered" >new Set();</span>
+    const path = <span class="cstat-no" title="statement not covered" >[]</span>
+    let current = <span class="cstat-no" title="statement not covered" >startNodeId </span>// current (A)
+    const visited = <span class="cstat-no" title="statement not covered" >new Set()</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    while (true) {</span>
       // Encontrar edge que termina en el nodo actual
-      const edge = <span class="cstat-no" title="statement not covered" >graph.edges.find(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >e.target === current)</span>;</span> // current (A)
+      const edge = <span class="cstat-no" title="statement not covered" >graph.edges.find(<span class="fstat-no" title="function not covered" >e </span>=&gt; <span class="cstat-no" title="statement not covered" >e.target === current)</span> </span>// current (A)
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!edge) <span class="cstat-no" title="statement not covered" >break;</span></span>
+<span class="cstat-no" title="statement not covered" >      if (!edge) <span class="cstat-no" title="statement not covered" >break</span></span>
 &nbsp;
       // Evitar ciclos
-<span class="cstat-no" title="statement not covered" >      if (visited.has(edge.source)) <span class="cstat-no" title="statement not covered" >break;</span></span>
-<span class="cstat-no" title="statement not covered" >      visited.add(edge.source);</span>
+<span class="cstat-no" title="statement not covered" >      if (visited.has(edge.source)) <span class="cstat-no" title="statement not covered" >break</span></span>
+<span class="cstat-no" title="statement not covered" >      visited.add(edge.source)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      path.push(edge);</span>
-<span class="cstat-no" title="statement not covered" >      current = edge.source; </span>// current (A)
+<span class="cstat-no" title="statement not covered" >      path.push(edge)</span>
+<span class="cstat-no" title="statement not covered" >      current = edge.source </span>// current (A)
 &nbsp;
       // Límite de seguridad
-<span class="cstat-no" title="statement not covered" >      if (path.length &gt; 50) <span class="cstat-no" title="statement not covered" >break;</span></span>
+<span class="cstat-no" title="statement not covered" >      if (path.length &gt; 50) <span class="cstat-no" title="statement not covered" >break</span></span>
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return path;</span>
+<span class="cstat-no" title="statement not covered" >    return path</span>
   }
 &nbsp;
   /**
@@ -1035,17 +1045,19 @@ class FaultAnimationEngine {
    * @returns {Array} Breakers con tiempos de disparo
    */
 <span class="fstat-no" title="function not covered" >  ca</span>lculateTripTimes(breakers, Icc) {
-<span class="cstat-no" title="statement not covered" >    return breakers.map(<span class="fstat-no" title="function not covered" >br</span>eaker =&gt; {</span>
-      const tripTime = <span class="cstat-no" title="statement not covered" >this.calculateTripTime(breaker, Icc);</span>
+<span class="cstat-no" title="statement not covered" >    return breakers</span>
+      .map(<span class="fstat-no" title="function not covered" >br</span>eaker =&gt; {
+        const tripTime = <span class="cstat-no" title="statement not covered" >this.calculateTripTime(breaker, Icc)</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      return {</span>
-        id: breaker.id,
-        rating: breaker.rating,
-        tripTime,
-        willTrip: tripTime !== Infinity,
-        position: breaker.position || 'unknown'
-      };
-    }).sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.tripTime - b.tripTime)</span>;
+<span class="cstat-no" title="statement not covered" >        return {</span>
+          id: breaker.id,
+          rating: breaker.rating,
+          tripTime,
+          willTrip: tripTime !== Infinity,
+          position: breaker.position || 'unknown',
+        }
+      })
+      .sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.tripTime - b.tripTime)</span>
   }
 &nbsp;
   /**
@@ -1057,21 +1069,21 @@ class FaultAnimationEngine {
 <span class="fstat-no" title="function not covered" >  ca</span>lculateTripTime(breaker, Icc) {
     // Instantáneo
 <span class="cstat-no" title="statement not covered" >    if (breaker.instantaneous &amp;&amp; Icc &gt;= breaker.instantaneous.min) {</span>
-<span class="cstat-no" title="statement not covered" >      return breaker.instantaneous.t || 0.02;</span>
+<span class="cstat-no" title="statement not covered" >      return breaker.instantaneous.t || 0.02</span>
     }
 &nbsp;
     // Curva TCC (simplificada)
 <span class="cstat-no" title="statement not covered" >    if (breaker.curve) {</span>
-      const t = <span class="cstat-no" title="statement not covered" >this.interpolateCurve(breaker.curve, Icc);</span>
-<span class="cstat-no" title="statement not covered" >      return t !== null ? t : Infinity;</span>
+      const t = <span class="cstat-no" title="statement not covered" >this.interpolateCurve(breaker.curve, Icc)</span>
+<span class="cstat-no" title="statement not covered" >      return t !== null ? t : Infinity</span>
     }
 &nbsp;
     // Fórmula típica si no hay curva
-    const pickup = <span class="cstat-no" title="statement not covered" >breaker.pickup || breaker.rating;</span>
-<span class="cstat-no" title="statement not covered" >    if (Icc &lt;= pickup) <span class="cstat-no" title="statement not covered" >return Infinity;</span></span>
+    const pickup = <span class="cstat-no" title="statement not covered" >breaker.pickup || breaker.rating</span>
+<span class="cstat-no" title="statement not covered" >    if (Icc &lt;= pickup) <span class="cstat-no" title="statement not covered" >return Infinity</span></span>
 &nbsp;
     // Curva inversa típica
-<span class="cstat-no" title="statement not covered" >    return 10 / Math.pow(Icc / pickup - 1, 2);</span>
+<span class="cstat-no" title="statement not covered" >    return 10 / Math.pow(Icc / pickup - 1, 2)</span>
   }
 &nbsp;
   /**
@@ -1079,22 +1091,23 @@ class FaultAnimationEngine {
    */
 <span class="fstat-no" title="function not covered" >  in</span>terpolateCurve(curve, I) {
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; curve.length - 1; i++) {</span>
-      const p1 = <span class="cstat-no" title="statement not covered" >curve[i];</span>
-      const p2 = <span class="cstat-no" title="statement not covered" >curve[i + 1];</span>
+      const p1 = <span class="cstat-no" title="statement not covered" >curve[i]</span>
+      const p2 = <span class="cstat-no" title="statement not covered" >curve[i + 1]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (I &gt;= p1.I &amp;&amp; I &lt;= p2.I) {</span>
-        const logI = <span class="cstat-no" title="statement not covered" >Math.log10(I);</span>
-        const logI1 = <span class="cstat-no" title="statement not covered" >Math.log10(p1.I);</span>
-        const logI2 = <span class="cstat-no" title="statement not covered" >Math.log10(p2.I);</span>
-        const logT1 = <span class="cstat-no" title="statement not covered" >Math.log10(p1.t);</span>
-        const logT2 = <span class="cstat-no" title="statement not covered" >Math.log10(p2.t);</span>
+        const logI = <span class="cstat-no" title="statement not covered" >Math.log10(I)</span>
+        const logI1 = <span class="cstat-no" title="statement not covered" >Math.log10(p1.I)</span>
+        const logI2 = <span class="cstat-no" title="statement not covered" >Math.log10(p2.I)</span>
+        const logT1 = <span class="cstat-no" title="statement not covered" >Math.log10(p1.t)</span>
+        const logT2 = <span class="cstat-no" title="statement not covered" >Math.log10(p2.t)</span>
 &nbsp;
-        const logT = <span class="cstat-no" title="statement not covered" >logT1 + ((logI - logI1) * (logT2 - logT1)) / (logI2 - logI1);</span>
-<span class="cstat-no" title="statement not covered" >        return Math.pow(10, logT);</span>
+        const logT =
+<span class="cstat-no" title="statement not covered" >          logT1 + ((logI - logI1) * (logT2 - logT1)) / (logI2 - logI1)</span>
+<span class="cstat-no" title="statement not covered" >        return Math.pow(10, logT)</span>
       }
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return null;</span>
+<span class="cstat-no" title="statement not covered" >    return null</span>
   }
 &nbsp;
   /**
@@ -1104,11 +1117,11 @@ class FaultAnimationEngine {
    * @returns {Array} Breakers en la ruta
    */
 <span class="fstat-no" title="function not covered" >  ex</span>tractBreakersFromPath(graph, path) {
-    const breakers = <span class="cstat-no" title="statement not covered" >[];</span>
+    const breakers = <span class="cstat-no" title="statement not covered" >[]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (const edge of path) {</span>
       // Buscar breaker en el nodo source del edge
-      const node = <span class="cstat-no" title="statement not covered" >graph.nodes.find(<span class="fstat-no" title="function not covered" >n </span>=&gt; <span class="cstat-no" title="statement not covered" >n.id === edge.source)</span>;</span>
+      const node = <span class="cstat-no" title="statement not covered" >graph.nodes.find(<span class="fstat-no" title="function not covered" >n </span>=&gt; <span class="cstat-no" title="statement not covered" >n.id === edge.source)</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (node &amp;&amp; node.type === 'breaker') {</span>
 <span class="cstat-no" title="statement not covered" >        breakers.push({</span>
@@ -1117,12 +1130,12 @@ class FaultAnimationEngine {
           pickup: node.data?.pickup,
           instantaneous: node.data?.instantaneous,
           curve: node.data?.curve,
-          position: 'upstream'
-        });
+          position: 'upstream',
+        })
       }
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return breakers;</span>
+<span class="cstat-no" title="statement not covered" >    return breakers</span>
   }
 &nbsp;
   /**
@@ -1137,57 +1150,57 @@ class FaultAnimationEngine {
       fault: {
         nodeId: fault.nodeId,
         Icc: fault.Icc,
-        startTime: 0
+        startTime: 0,
       },
       flow: [],
       trips: [],
-      totalDuration: 0
-    };
+      totalDuration: 0,
+    }
 &nbsp;
     // Generar eventos de flujo
-    let currentTime = <span class="cstat-no" title="statement not covered" >0;</span> // current (A)
+    let currentTime = <span class="cstat-no" title="statement not covered" >0 </span>// current (A)
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; path.length; i++) {</span>
-      const edge = <span class="cstat-no" title="statement not covered" >path[i];</span>
+      const edge = <span class="cstat-no" title="statement not covered" >path[i]</span>
 <span class="cstat-no" title="statement not covered" >      sequence.flow.push({</span>
         edgeId: edge.id,
         source: edge.source,
         target: edge.target,
         startTime: currentTime,
         duration: this.animationSpeed,
-        intensity: fault.Icc
-      });
-<span class="cstat-no" title="statement not covered" >      currentTime += this.animationSpeed; </span>// current (A)
+        intensity: fault.Icc,
+      })
+<span class="cstat-no" title="statement not covered" >      currentTime += this.animationSpeed </span>// current (A)
     }
 &nbsp;
     // Generar eventos de disparo
-    const tripTimes = <span class="cstat-no" title="statement not covered" >this.calculateTripTimes(breakers, fault.Icc);</span>
+    const tripTimes = <span class="cstat-no" title="statement not covered" >this.calculateTripTimes(breakers, fault.Icc)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (const breaker of tripTimes) {</span>
 <span class="cstat-no" title="statement not covered" >      if (breaker.willTrip) {</span>
-        const tripTimeMs = <span class="cstat-no" title="statement not covered" >breaker.tripTime * 1000;</span> // Convertir a ms
+        const tripTimeMs = <span class="cstat-no" title="statement not covered" >breaker.tripTime * 1000 </span>// Convertir a ms
 <span class="cstat-no" title="statement not covered" >        sequence.trips.push({</span>
           breakerId: breaker.id,
           rating: breaker.rating,
           tripTime: breaker.tripTime,
           startTime: tripTimeMs,
-          willTrip: true
-        });
+          willTrip: true,
+        })
       }
     }
 &nbsp;
     // Ordenar por tiempo
-<span class="cstat-no" title="statement not covered" >    sequence.trips.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.startTime - b.startTime)</span>;</span>
+<span class="cstat-no" title="statement not covered" >    sequence.trips.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.startTime - b.startTime)</span></span>
 &nbsp;
     // Calcular duración total
-    const lastFlow = <span class="cstat-no" title="statement not covered" >sequence.flow[sequence.flow.length - 1];</span>
-    const lastTrip = <span class="cstat-no" title="statement not covered" >sequence.trips[sequence.trips.length - 1];</span>
+    const lastFlow = <span class="cstat-no" title="statement not covered" >sequence.flow[sequence.flow.length - 1]</span>
+    const lastTrip = <span class="cstat-no" title="statement not covered" >sequence.trips[sequence.trips.length - 1]</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    sequence.totalDuration = Math.max(</span>
       lastFlow ? lastFlow.startTime + lastFlow.duration : 0,
       lastTrip ? lastTrip.startTime + 1000 : 0
-    );
+    )
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return sequence;</span>
+<span class="cstat-no" title="statement not covered" >    return sequence</span>
   }
 &nbsp;
   /**
@@ -1198,14 +1211,16 @@ class FaultAnimationEngine {
    * @returns {Object} Resultado de simulación
    */
 <span class="fstat-no" title="function not covered" >  si</span>mulateFault(graph, nodeId, Icc) {
-    const fault = <span class="cstat-no" title="statement not covered" >this.createFaultEvent(nodeId, Icc);</span>
-    const path = <span class="cstat-no" title="statement not covered" >this.getUpstreamPath(graph, nodeId);</span>
-    const breakers = <span class="cstat-no" title="statement not covered" >this.extractBreakersFromPath(graph, path);</span>
-    const sequence = <span class="cstat-no" title="statement not covered" >this.generateAnimationSequence(fault, path, breakers);</span>
+    const fault = <span class="cstat-no" title="statement not covered" >this.createFaultEvent(nodeId, Icc)</span>
+    const path = <span class="cstat-no" title="statement not covered" >this.getUpstreamPath(graph, nodeId)</span>
+    const breakers = <span class="cstat-no" title="statement not covered" >this.extractBreakersFromPath(graph, path)</span>
+    const sequence = <span class="cstat-no" title="statement not covered" >this.generateAnimationSequence(fault, path, breakers)</span>
 &nbsp;
     // Determinar qué breaker dispara primero
-    const firstTrip = <span class="cstat-no" title="statement not covered" >sequence.trips.find(<span class="fstat-no" title="function not covered" >t </span>=&gt; <span class="cstat-no" title="statement not covered" >t.willTrip)</span>;</span>
-    const firstTripper = <span class="cstat-no" title="statement not covered" >firstTrip ? breakers.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === firstTrip.breakerId)</span> : null;</span>
+    const firstTrip = <span class="cstat-no" title="statement not covered" >sequence.trips.find(<span class="fstat-no" title="function not covered" >t </span>=&gt; <span class="cstat-no" title="statement not covered" >t.willTrip)</span></span>
+    const firstTripper = <span class="cstat-no" title="statement not covered" >firstTrip</span>
+      ? breakers.find(<span class="fstat-no" title="function not covered" >b </span>=&gt; <span class="cstat-no" title="statement not covered" >b.id === firstTrip.breakerId)</span>
+      : null
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       fault,
@@ -1215,8 +1230,8 @@ class FaultAnimationEngine {
       firstTripper,
       totalBreakers: breakers.length,
       trippedBreakers: sequence.trips.filter(<span class="fstat-no" title="function not covered" >t </span>=&gt; <span class="cstat-no" title="statement not covered" >t.willTrip)</span>.length,
-      status: firstTripper ? 'TRIPPED' : 'NO_TRIP'
-    };
+      status: firstTripper ? 'TRIPPED' : 'NO_TRIP',
+    }
   }
 &nbsp;
   /**
@@ -1225,8 +1240,8 @@ class FaultAnimationEngine {
    * @returns {Array} Lista de eventos con timestamps
    */
 <span class="fstat-no" title="function not covered" >  ge</span>nerateFrontendEvents(simulation) {
-    const events = <span class="cstat-no" title="statement not covered" >[];</span>
-    const { sequence, fault } = <span class="cstat-no" title="statement not covered" >simulation;</span>
+    const events = <span class="cstat-no" title="statement not covered" >[]</span>
+    const { sequence, fault } = <span class="cstat-no" title="statement not covered" >simulation</span>
 &nbsp;
     // Evento inicial de falla
 <span class="cstat-no" title="statement not covered" >    events.push({</span>
@@ -1236,9 +1251,9 @@ class FaultAnimationEngine {
       timestamp: 0,
       data: {
         color: 'red',
-        status: 'FAULT'
-      }
-    });
+        status: 'FAULT',
+      },
+    })
 &nbsp;
     // Eventos de flujo
 <span class="cstat-no" title="statement not covered" >    for (const flow of sequence.flow) {</span>
@@ -1253,9 +1268,9 @@ class FaultAnimationEngine {
         data: {
           stroke: 'red',
           strokeWidth: Math.min(5, Math.log10(flow.intensity) * 0.5),
-          animated: true
-        }
-      });
+          animated: true,
+        },
+      })
     }
 &nbsp;
     // Eventos de disparo
@@ -1267,9 +1282,9 @@ class FaultAnimationEngine {
         data: {
           color: 'orange',
           label: 'TRIPPED',
-          status: 'OPEN'
-        }
-      });
+          status: 'OPEN',
+        },
+      })
     }
 &nbsp;
     // Evento final
@@ -1277,14 +1292,14 @@ class FaultAnimationEngine {
       type: 'SIMULATION_END',
       timestamp: sequence.totalDuration,
       data: {
-        status: 'COMPLETE'
-      }
-    });
+        status: 'COMPLETE',
+      },
+    })
 &nbsp;
     // Ordenar por timestamp
-<span class="cstat-no" title="statement not covered" >    events.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.timestamp - b.timestamp)</span>;</span>
+<span class="cstat-no" title="statement not covered" >    events.sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.timestamp - b.timestamp)</span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return events;</span>
+<span class="cstat-no" title="statement not covered" >    return events</span>
   }
 &nbsp;
   /**
@@ -1294,47 +1309,47 @@ class FaultAnimationEngine {
    * @returns {Object} Estado del sistema
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tSystemStateAt(simulation, time) {
-    const events = <span class="cstat-no" title="statement not covered" >this.generateFrontendEvents(simulation);</span>
+    const events = <span class="cstat-no" title="statement not covered" >this.generateFrontendEvents(simulation)</span>
     const state = <span class="cstat-no" title="statement not covered" >{</span>
       faultActive: false,
       activeFlows: [],
       trippedBreakers: [],
-      completed: false
-    };
+      completed: false,
+    }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    for (const event of events) {</span>
-<span class="cstat-no" title="statement not covered" >      if (event.timestamp &gt; time) <span class="cstat-no" title="statement not covered" >break;</span></span>
+<span class="cstat-no" title="statement not covered" >      if (event.timestamp &gt; time) <span class="cstat-no" title="statement not covered" >break</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      switch (event.type) {</span>
         case 'FAULT_START':
-<span class="cstat-no" title="statement not covered" >          state.faultActive = true;</span>
-<span class="cstat-no" title="statement not covered" >          state.faultNode = event.nodeId;</span>
-<span class="cstat-no" title="statement not covered" >          break;</span>
+<span class="cstat-no" title="statement not covered" >          state.faultActive = true</span>
+<span class="cstat-no" title="statement not covered" >          state.faultNode = event.nodeId</span>
+<span class="cstat-no" title="statement not covered" >          break</span>
 &nbsp;
         case 'FLOW':
 <span class="cstat-no" title="statement not covered" >          if (time &lt;= event.timestamp + event.duration) {</span>
 <span class="cstat-no" title="statement not covered" >            state.activeFlows.push({</span>
               edgeId: event.edgeId,
               intensity: event.intensity,
-              data: event.data
-            });
+              data: event.data,
+            })
           }
-<span class="cstat-no" title="statement not covered" >          break;</span>
+<span class="cstat-no" title="statement not covered" >          break</span>
 &nbsp;
         case 'TRIP':
 <span class="cstat-no" title="statement not covered" >          state.trippedBreakers.push({</span>
             breakerId: event.breakerId,
-            data: event.data
-          });
-<span class="cstat-no" title="statement not covered" >          break;</span>
+            data: event.data,
+          })
+<span class="cstat-no" title="statement not covered" >          break</span>
 &nbsp;
         case 'SIMULATION_END':
-<span class="cstat-no" title="statement not covered" >          state.completed = true;</span>
-<span class="cstat-no" title="statement not covered" >          break;</span>
+<span class="cstat-no" title="statement not covered" >          state.completed = true</span>
+<span class="cstat-no" title="statement not covered" >          break</span>
       }
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return state;</span>
+<span class="cstat-no" title="statement not covered" >    return state</span>
   }
 &nbsp;
   /**
@@ -1344,40 +1359,40 @@ class FaultAnimationEngine {
    * @returns {Object} Resultado de validación
    */
 <span class="fstat-no" title="function not covered" >  va</span>lidateSimulation(graph, nodeId) {
-    const node = <span class="cstat-no" title="statement not covered" >graph.nodes.find(<span class="fstat-no" title="function not covered" >n </span>=&gt; <span class="cstat-no" title="statement not covered" >n.id === nodeId)</span>;</span>
+    const node = <span class="cstat-no" title="statement not covered" >graph.nodes.find(<span class="fstat-no" title="function not covered" >n </span>=&gt; <span class="cstat-no" title="statement not covered" >n.id === nodeId)</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (!node) {</span>
 <span class="cstat-no" title="statement not covered" >      return {</span>
         valid: false,
-        error: 'Nodo no encontrado'
-      };
+        error: 'Nodo no encontrado',
+      }
     }
 &nbsp;
-    const path = <span class="cstat-no" title="statement not covered" >this.getUpstreamPath(graph, nodeId);</span>
+    const path = <span class="cstat-no" title="statement not covered" >this.getUpstreamPath(graph, nodeId)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (path.length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      return {</span>
         valid: false,
-        error: 'No hay ruta aguas arriba (nodo es fuente)'
-      };
+        error: 'No hay ruta aguas arriba (nodo es fuente)',
+      }
     }
 &nbsp;
-    const breakers = <span class="cstat-no" title="statement not covered" >this.extractBreakersFromPath(graph, path);</span>
+    const breakers = <span class="cstat-no" title="statement not covered" >this.extractBreakersFromPath(graph, path)</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (breakers.length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      return {</span>
         valid: false,
         error: 'No hay breakers en la ruta de protección',
-        warning: 'La falla no será protegida'
-      };
+        warning: 'La falla no será protegida',
+      }
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return {</span>
       valid: true,
       pathLength: path.length,
       breakerCount: breakers.length,
-      message: 'Simulación válida'
-    };
+      message: 'Simulación válida',
+    }
   }
 &nbsp;
   /**
@@ -1386,14 +1401,14 @@ class FaultAnimationEngine {
    */
 <span class="fstat-no" title="function not covered" >  ca</span>ncelAnimation(faultId) {
 <span class="cstat-no" title="statement not covered" >    if (this.activeAnimations.has(faultId)) {</span>
-      const animation = <span class="cstat-no" title="statement not covered" >this.activeAnimations.get(faultId);</span>
+      const animation = <span class="cstat-no" title="statement not covered" >this.activeAnimations.get(faultId)</span>
 <span class="cstat-no" title="statement not covered" >      if (animation.interval) {</span>
-<span class="cstat-no" title="statement not covered" >        clearInterval(animation.interval);</span>
+<span class="cstat-no" title="statement not covered" >        clearInterval(animation.interval)</span>
       }
-<span class="cstat-no" title="statement not covered" >      this.activeAnimations.delete(faultId);</span>
-<span class="cstat-no" title="statement not covered" >      return true;</span>
+<span class="cstat-no" title="statement not covered" >      this.activeAnimations.delete(faultId)</span>
+<span class="cstat-no" title="statement not covered" >      return true</span>
     }
-<span class="cstat-no" title="statement not covered" >    return false;</span>
+<span class="cstat-no" title="statement not covered" >    return false</span>
   }
 &nbsp;
   /**
@@ -1402,14 +1417,14 @@ class FaultAnimationEngine {
 <span class="fstat-no" title="function not covered" >  cl</span>earAllAnimations() {
 <span class="cstat-no" title="statement not covered" >    for (const [_faultId, animation] of this.activeAnimations) {</span>
 <span class="cstat-no" title="statement not covered" >      if (animation.interval) {</span>
-<span class="cstat-no" title="statement not covered" >        clearInterval(animation.interval);</span>
+<span class="cstat-no" title="statement not covered" >        clearInterval(animation.interval)</span>
       }
     }
-<span class="cstat-no" title="statement not covered" >    this.activeAnimations.clear();</span>
+<span class="cstat-no" title="statement not covered" >    this.activeAnimations.clear()</span>
   }
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = FaultAnimationEngine;</span>
+<span class="cstat-no" title="statement not covered" >module.exports = FaultAnimationEngine</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -1417,7 +1432,7 @@ class FaultAnimationEngine {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-07T00:07:00.711Z
+                at 2026-05-07T22:38:56.537Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

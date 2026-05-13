@@ -135,20 +135,12 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -177,25 +169,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -214,7 +212,7 @@
  * Fórmula trifásica: ΔV = √3 · I · (R·cosφ + X·sinφ) · L
  */
 &nbsp;
-const { assertPositive } = <span class="cstat-no" title="statement not covered" >require('./guards.js');</span>
+const { assertPositive } = <span class="cstat-no" title="statement not covered" >require('./guards.js')</span>
 &nbsp;
 /**
  * Calcula caída de tensión trifásica
@@ -228,34 +226,29 @@ const { assertPositive } = <span class="cstat-no" title="statement not covered" 
  * @returns {Object} Resultados del cálculo
  * @throws {Error} Si los parámetros son inválidos
  */
-function <span class="fstat-no" title="function not covered" >calcVoltageDrop(</span>{
-  I,
-  V,
-  L,
-  R,
-  X,
-  fp
-}) {
-<span class="cstat-no" title="statement not covered" >  assertPositive('I', I);</span>
-<span class="cstat-no" title="statement not covered" >  assertPositive('V', V);</span>
-<span class="cstat-no" title="statement not covered" >  assertPositive('L', L);</span>
-<span class="cstat-no" title="statement not covered" >  assertPositive('R', R);</span>
-<span class="cstat-no" title="statement not covered" >  assertPositive('X', X);</span>
+function <span class="fstat-no" title="function not covered" >calcVoltageDrop(</span>{ I, V, L, R, X, fp }) {
+<span class="cstat-no" title="statement not covered" >  assertPositive('I', I)</span>
+<span class="cstat-no" title="statement not covered" >  assertPositive('V', V)</span>
+<span class="cstat-no" title="statement not covered" >  assertPositive('L', L)</span>
+<span class="cstat-no" title="statement not covered" >  assertPositive('R', R)</span>
+<span class="cstat-no" title="statement not covered" >  assertPositive('X', X)</span>
 <span class="cstat-no" title="statement not covered" >  if (fp &lt;= 0 || fp &gt; 1) {</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error('Factor de potencia debe estar entre 0 y 1');</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error('Factor de potencia debe estar entre 0 y 1')</span>
   }
 &nbsp;
-  const L_km = <span class="cstat-no" title="statement not covered" >L / 1000;</span>
-  const sinPhi = <span class="cstat-no" title="statement not covered" >Math.sqrt(1 - fp * fp);</span>
+  const L_km = <span class="cstat-no" title="statement not covered" >parseFloat((L / 1000).toFixed(6))</span>
+  const sinPhi = <span class="cstat-no" title="statement not covered" >parseFloat(Math.sqrt(1 - fp * fp).toFixed(6))</span>
 &nbsp;
   // Fórmula trifásica: ΔV = √3 · I · (R·cosφ + X·sinφ) · L
-  const deltaV = <span class="cstat-no" title="statement not covered" >Math.sqrt(3) * I * (R * fp + X * sinPhi) * L_km;</span>
-  const percent = <span class="cstat-no" title="statement not covered" >(deltaV / V) * 100;</span>
+  const deltaV = <span class="cstat-no" title="statement not covered" >parseFloat(</span>
+    (Math.sqrt(3) * I * (R * fp + X * sinPhi) * L_km).toFixed(6)
+  )
+  const percent = <span class="cstat-no" title="statement not covered" >parseFloat(((deltaV / V) * 100).toFixed(6))</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     deltaV,
-    percent
-  };
+    percent,
+  }
 }
 &nbsp;
 /**
@@ -265,23 +258,27 @@ function <span class="fstat-no" title="function not covered" >calcVoltageDrop(</
  */
 function <span class="fstat-no" title="function not covered" >checkVoltageDrop(</span>percent) {
 <span class="cstat-no" title="statement not covered" >  if (percent &lt;= 3) {</span>
-<span class="cstat-no" title="statement not covered" >    return { ok: true, level: 'OK', msg: `Caída ${percent.toFixed(2)}% ≤ 3%` };</span>
+<span class="cstat-no" title="statement not covered" >    return { ok: true, level: 'OK', msg: `Caída ${percent.toFixed(2)}% ≤ 3%` }</span>
   }
 <span class="cstat-no" title="statement not covered" >  if (percent &lt;= 5) {</span>
-<span class="cstat-no" title="statement not covered" >    return { ok: true, level: 'LÍMITE', msg: `Caída ${percent.toFixed(2)}% ≤ 5% (límite)` };</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+      ok: true,
+      level: 'LÍMITE',
+      msg: `Caída ${percent.toFixed(2)}% ≤ 5% (límite)`,
+    }
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     ok: false,
     level: 'VIOLACIÓN',
-    msg: `Caída ${percent.toFixed(2)}% &gt; 5% (violación NOM)`
-  };
+    msg: `Caída ${percent.toFixed(2)}% &gt; 5% (violación NOM)`,
+  }
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >module.exports = {</span>
   calcVoltageDrop,
-  checkVoltageDrop
-};
+  checkVoltageDrop,
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -289,7 +286,7 @@ function <span class="fstat-no" title="function not covered" >checkVoltageDrop(<
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-07T00:07:01.082Z
+                at 2026-05-07T22:38:56.789Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -35,9 +35,11 @@ const {
   AMPACITY,
   TEMP_CORRECTION_90C,
   TEMP_FACTOR_90C,
+  TEMP_FACTOR_60C,
+  TEMP_FACTOR_75C,
   GROUPING_FACTOR,
   getAmpacity,
-  getAmpacity75C,
+  getAmpacity75,
 } = require('./catalogs.js')
 const {
   assertElectricalPrecision,
@@ -47,9 +49,9 @@ const {
 
 module.exports = {
   // Ampacity
-  calcAmpacity,
+  calcAmpacity, // 60°C, 75°C, 90°C 
   calcTerminalLimit,
-
+  
   // Design
   calcDesignCurrent,
   finalAmpacity,
@@ -87,9 +89,11 @@ module.exports = {
   AMPACITY,
   TEMP_CORRECTION_90C,
   TEMP_FACTOR_90C,
+  TEMP_FACTOR_60C,
+  TEMP_FACTOR_75C,
   GROUPING_FACTOR,
   getAmpacity,
-  getAmpacity75C,
+  getAmpacity75,
 
   // Guards
   assertElectricalPrecision,

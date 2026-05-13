@@ -41,8 +41,7 @@ export default function LogoDemo() {
         {/* Toggle Activo */}
         <div className="flex items-center justify-between">
           <label className="text-gray-300">Modo Activo</label>
-          <button
-            onClick={() => setActive(!active)}
+          <button onClick={() => setActive(!active)}
             className={`px-4 py-2 rounded ${
               active
                 ? 'bg-blue-600 hover:bg-blue-700'
@@ -56,8 +55,7 @@ export default function LogoDemo() {
         {/* Toggle Sonido */}
         <div className="flex items-center justify-between">
           <label className="text-gray-300">Sonido (Zap)</label>
-          <button
-            onClick={() => setPlaySound(!playSound)}
+          <button onClick={() => setPlaySound(!playSound)}
             className={`px-4 py-2 rounded ${
               playSound
                 ? 'bg-green-600 hover:bg-green-700'
@@ -82,15 +80,7 @@ export default function LogoDemo() {
         </div>
 
         {/* Botón de falla */}
-        <button
-          onClick={triggerFault}
-          disabled={faultDetected}
-          className={`w-full py-3 rounded-lg font-bold text-lg ${
-            faultDetected
-              ? 'bg-red-600 animate-pulse'
-              : 'bg-red-500 hover:bg-red-600'
-          }`}
-        >
+        <button onClick={triggerFault} disabled={faultDetected} className={`w-full py-3 rounded-lg font-bold text-lg ${ faultDetected ? 'bg-red-600 animate-pulse' : 'bg-red-500 hover:bg-red-600' }`}>
           {faultDetected ? '⚡ FALLA DETECTADA ⚡' : '⚡ Simular Falla'}
         </button>
       </div>

@@ -69,4 +69,4 @@ function checkVoltageDrop(percent) {
 module.exports = {
   calcVoltageDrop,
   checkVoltageDrop,
-}
+};

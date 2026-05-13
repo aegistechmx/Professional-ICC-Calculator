@@ -248,17 +248,7 @@ export const ParticleControlPanel = () => {
         <span className="text-sm font-medium text-gray-700">
           Mostrar Partículas
         </span>
-        <button
-          onClick={toggleParticles}
-          className={`
-            px-3 py-1 rounded text-sm font-medium transition-colors
-            ${
-              showParticles
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }
-          `}
-        >
+        <button onClick={toggleParticles} className={` px-3 py-1 rounded text-sm font-medium transition-colors ${ showParticles ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' } `}>
           {showParticles ? 'Activadas' : 'Desactivadas'}
         </button>
       </div>

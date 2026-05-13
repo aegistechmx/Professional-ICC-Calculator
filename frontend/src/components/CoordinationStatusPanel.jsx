@@ -3,9 +3,9 @@
  * Muestra estado visual de coordinación con colores ETAP-style
  */
 
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
-import './CoordinationStatusPanel.css'
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+import './CoordinationStatusPanel.css';
 
 export default function CoordinationStatusPanel({
   coordinationResult,
@@ -181,9 +181,7 @@ export default function CoordinationStatusPanel({
       {/* Historial de iteraciones */}
       {history && history.length > 0 && (
         <div className="history-section">
-          <button
-            className="toggle-btn"
-            onClick={() => setShowHistory(!showHistory)}
+          <button className="toggle-btn" onClick={() => setShowHistory(!showHistory)}
           >
             {showHistory ? '▼' : '▶'} Historial ({history.length} ajustes)
           </button>
@@ -212,9 +210,7 @@ export default function CoordinationStatusPanel({
       {/* Sugerencias */}
       {!isCoordinated && (
         <div className="suggestions-section">
-          <button
-            className="toggle-btn warning"
-            onClick={() => setShowSuggestions(!showSuggestions)}
+          <button className="toggle-btn warning" onClick={() => setShowSuggestions(!showSuggestions)}
           >
             {showSuggestions ? '▼' : '▶'} Sugerencias de Ajuste Manual
           </button>
@@ -242,9 +238,7 @@ export default function CoordinationStatusPanel({
 
       {/* Acciones */}
       <div className="panel-actions">
-        <button
-          className="btn-apply"
-          onClick={() => onApplyChanges?.(breakers)}
+        <button className="btn-apply" onClick={() => onApplyChanges?.(breakers)}
           disabled={isLoading || changes.length === 0}
         >
           {isLoading ? 'Aplicando...' : 'Aplicar Cambios'}
@@ -258,7 +252,47 @@ export default function CoordinationStatusPanel({
 }
 
 CoordinationStatusPanel.propTypes = {
-  coordinationResult: PropTypes.object,
+  coordinationResult: PropTypes.shape({
+    status: PropTypes.string,
+    breakers: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string,
+      TMS: PropTypes.number,
+      pickup: PropTypes.number,
+      instantaneous: PropTypes.number
+    })),
+    originalBreakers: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string,
+      TMS: PropTypes.number,
+      pickup: PropTypes.number,
+      instantaneous: PropTypes.number
+    })),
+    iterations: PropTypes.number,
+    history: PropTypes.arrayOf(PropTypes.shape({
+      iteration: PropTypes.number,
+      pair: PropTypes.string,
+      adjustment: PropTypes.string,
+      values: PropTypes.shape({
+        old: PropTypes.number,
+        new: PropTypes.number,
+        percent: PropTypes.string
+      })
+    })),
+    finalStatus: PropTypes.shape({
+      quality: PropTypes.number,
+      pairs: PropTypes.arrayOf(PropTypes.shape({
+        pair: PropTypes.string,
+        status: PropTypes.string,
+        crossings: PropTypes.number,
+        worstPoint: PropTypes.shape({
+          I: PropTypes.number,
+          tUp: PropTypes.number,
+          tDown: PropTypes.number,
+          deficit: PropTypes.number
+        })
+      }))
+    }),
+    message: PropTypes.string
+  }),
   onApplyChanges: PropTypes.func,
   onReset: PropTypes.func,
   isLoading: PropTypes.bool,

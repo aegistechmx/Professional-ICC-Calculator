@@ -40,6 +40,7 @@ shared/
 - `ICC_READY` - Módulo listo para usar
 - `RESULTS` - Resultados del cálculo
 - `MODEL_LOADED` - Modelo cargado
+- `DEBUG_WARNING` - Advertencias de depuración (precisión, límites físicos, errores de tipo)
 - `STATE_RESPONSE` - Respuesta de estado
 
 ## Uso Básico

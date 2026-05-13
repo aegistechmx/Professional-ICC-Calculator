@@ -61,16 +61,10 @@ export default function SimulationPlayer({ simulationData }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
       <div className="flex items-center gap-4 mb-3">
-        <button
-          onClick={handlePlayPause}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition"
-        >
+        <button onClick={handlePlayPause} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition">
           {isPlaying ? '⏸ Pausa' : '▶ Reproducir'}
         </button>
-        <button
-          onClick={handleReset}
-          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition"
-        >
+        <button onClick={handleReset} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition">
           ↺ Reiniciar
         </button>
         <div className="flex items-center gap-2">

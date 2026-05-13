@@ -302,9 +302,7 @@ export const FaultControlPanel = () => {
           </label>
           <div className="grid grid-cols-2 gap-2">
             {loadNodes.map(node => (
-              <button
-                key={node.id}
-                onClick={() => handleTriggerFault(node.id)}
+              <button key={node.id} onClick={() => handleTriggerFault(node.id)}
                 disabled={simulation.fault === node.id}
                 className={`
                   px-3 py-2 rounded text-sm font-medium transition-colors
@@ -321,18 +319,7 @@ export const FaultControlPanel = () => {
           </div>
         </div>
 
-        <button
-          onClick={clearFault}
-          disabled={!simulation.fault}
-          className={`
-            w-full px-4 py-2 rounded font-medium transition-colors
-            ${
-              !simulation.fault
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
-            }
-          `}
-        >
+        <button onClick={clearFault} disabled={!simulation.fault} className={` w-full px-4 py-2 rounded font-medium transition-colors ${ !simulation.fault ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600' } `}>
           Limpiar Falla
         </button>
       </div>

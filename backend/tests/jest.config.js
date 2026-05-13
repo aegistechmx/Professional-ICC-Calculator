@@ -63,7 +63,7 @@ module.exports = {
   },
   
   // Module name mapping for absolute imports
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@core/(.*)$': '<rootDir>/src/core/$1',
     '^@application/(.*)$': '<rootDir>/src/application/$1',

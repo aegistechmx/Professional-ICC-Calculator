@@ -280,9 +280,9 @@
  * Operaciones atómicas para prevenir race conditions
  */
 &nbsp;
-const MAX_CACHE_SIZE = <span class="cstat-no" title="statement not covered" >1000;</span>
-const cache = <span class="cstat-no" title="statement not covered" >new Map();</span>
-let cacheOperationInProgress = <span class="cstat-no" title="statement not covered" >false;</span>
+const MAX_CACHE_SIZE = <span class="cstat-no" title="statement not covered" >1000</span>
+const cache = <span class="cstat-no" title="statement not covered" >new Map()</span>
+let cacheOperationInProgress = <span class="cstat-no" title="statement not covered" >false</span>
 &nbsp;
 /**
  * Obtiene valor del cache (operación atómica)
@@ -290,14 +290,14 @@ let cacheOperationInProgress = <span class="cstat-no" title="statement not cover
  * @returns {any} Valor cacheado o undefined
  */
 function <span class="fstat-no" title="function not covered" >getCached(</span>key) {
-<span class="cstat-no" title="statement not covered" >  if (!key || typeof key !== 'string') <span class="cstat-no" title="statement not covered" >return undefined;</span></span>
+<span class="cstat-no" title="statement not covered" >  if (!key || typeof key !== 'string') <span class="cstat-no" title="statement not covered" >return undefined</span></span>
 &nbsp;
   // Operación atómica de lectura
 <span class="cstat-no" title="statement not covered" >  try {</span>
-<span class="cstat-no" title="statement not covered" >    return cache.get(key);</span>
+<span class="cstat-no" title="statement not covered" >    return cache.get(key)</span>
   } catch (error) {
     // Log cache read errors silently to avoid console statements
-<span class="cstat-no" title="statement not covered" >    return undefined;</span>
+<span class="cstat-no" title="statement not covered" >    return undefined</span>
   }
 }
 &nbsp;
@@ -307,31 +307,31 @@ function <span class="fstat-no" title="function not covered" >getCached(</span>k
  * @param {any} val - Valor a guardar
  */
 function <span class="fstat-no" title="function not covered" >setCached(</span>key, val) {
-<span class="cstat-no" title="statement not covered" >  if (!key || typeof key !== 'string') <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >  if (!key || typeof key !== 'string') <span class="cstat-no" title="statement not covered" >return</span></span>
 &nbsp;
   // Prevenir race conditions con mutex simple
 <span class="cstat-no" title="statement not covered" >  if (cacheOperationInProgress) {</span>
     // Esperar y reintentar una vez
-<span class="cstat-no" title="statement not covered" >    setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setCached(key, val),</span> 1);</span>
-<span class="cstat-no" title="statement not covered" >    return;</span>
+<span class="cstat-no" title="statement not covered" >    setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >setCached(key, val),</span> 1)</span>
+<span class="cstat-no" title="statement not covered" >    return</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  cacheOperationInProgress = true;</span>
+<span class="cstat-no" title="statement not covered" >  cacheOperationInProgress = true</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // Operación atómica de escritura con LRU eviction
 <span class="cstat-no" title="statement not covered" >    if (cache.size &gt;= MAX_CACHE_SIZE) {</span>
-      const firstKey = <span class="cstat-no" title="statement not covered" >cache.keys().next().value;</span>
+      const firstKey = <span class="cstat-no" title="statement not covered" >cache.keys().next().value</span>
 <span class="cstat-no" title="statement not covered" >      if (firstKey) {</span>
-<span class="cstat-no" title="statement not covered" >        cache.delete(firstKey);</span>
+<span class="cstat-no" title="statement not covered" >        cache.delete(firstKey)</span>
       }
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    cache.set(key, val);</span>
+<span class="cstat-no" title="statement not covered" >    cache.set(key, val)</span>
   } catch (error) {
     // Cache write errors handled silently to avoid console statements
   } finally {
-<span class="cstat-no" title="statement not covered" >    cacheOperationInProgress = false;</span>
+<span class="cstat-no" title="statement not covered" >    cacheOperationInProgress = false</span>
   }
 }
 &nbsp;
@@ -339,7 +339,7 @@ function <span class="fstat-no" title="function not covered" >setCached(</span>k
  * Limpia todo el cache
  */
 function <span class="fstat-no" title="function not covered" >clearCache(</span>) {
-<span class="cstat-no" title="statement not covered" >  cache.clear();</span>
+<span class="cstat-no" title="statement not covered" >  cache.clear()</span>
 }
 &nbsp;
 /**
@@ -348,16 +348,16 @@ function <span class="fstat-no" title="function not covered" >clearCache(</span>
  * @returns {number} Cantidad de entradas eliminadas
  */
 function <span class="fstat-no" title="function not covered" >deleteCachedPattern(</span>pattern) {
-<span class="cstat-no" title="statement not covered" >  if (!pattern || typeof pattern !== 'string') <span class="cstat-no" title="statement not covered" >return 0;</span></span>
+<span class="cstat-no" title="statement not covered" >  if (!pattern || typeof pattern !== 'string') <span class="cstat-no" title="statement not covered" >return 0</span></span>
 &nbsp;
-  let deleted = <span class="cstat-no" title="statement not covered" >0;</span>
+  let deleted = <span class="cstat-no" title="statement not covered" >0</span>
 <span class="cstat-no" title="statement not covered" >  for (const key of cache.keys()) {</span>
 <span class="cstat-no" title="statement not covered" >    if (key.includes(pattern)) {</span>
-<span class="cstat-no" title="statement not covered" >      cache.delete(key);</span>
-<span class="cstat-no" title="statement not covered" >      deleted++;</span>
+<span class="cstat-no" title="statement not covered" >      cache.delete(key)</span>
+<span class="cstat-no" title="statement not covered" >      deleted++</span>
     }
   }
-<span class="cstat-no" title="statement not covered" >  return deleted;</span>
+<span class="cstat-no" title="statement not covered" >  return deleted</span>
 }
 &nbsp;
 /**
@@ -367,8 +367,8 @@ function <span class="fstat-no" title="function not covered" >deleteCachedPatter
 function <span class="fstat-no" title="function not covered" >getCacheStats(</span>) {
 <span class="cstat-no" title="statement not covered" >  return {</span>
     size: cache.size,
-    keys: Array.from(cache.keys())
-  };
+    keys: Array.from(cache.keys()),
+  }
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >module.exports = {</span>
@@ -376,8 +376,8 @@ function <span class="fstat-no" title="function not covered" >getCacheStats(</sp
   setCached,
   clearCache,
   deleteCachedPattern,
-  getCacheStats
-};
+  getCacheStats,
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -385,7 +385,7 @@ function <span class="fstat-no" title="function not covered" >getCacheStats(</sp
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-07T00:07:01.082Z
+                at 2026-05-07T22:38:56.789Z
             </div>
         <script src="../prettify.js"></script>
         <script>

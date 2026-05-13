@@ -286,18 +286,7 @@ const FaultAnimationExample = ({ initialNodes = [], initialEdges = [] }) => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <button
-            onClick={stopAllAnimations}
-            style={{
-              background: '#ef4444',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              width: '100%',
-            }}
-          >
+          <button onClick={stopAllAnimations} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '5px', cursor: 'pointer', width: '100%', }}>
             Detener Animaciones
           </button>
         </div>

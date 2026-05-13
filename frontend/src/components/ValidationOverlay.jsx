@@ -33,10 +33,7 @@ export default function ValidationOverlay() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={clearInvalidConnections}
-              className="text-red-600 hover:text-red-800 text-sm"
-            >
+            <button onClick={clearInvalidConnections} className="text-red-600 hover:text-red-800 text-sm">
               ✕
             </button>
           </div>
@@ -65,10 +62,7 @@ export default function ValidationOverlay() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={clearValidationErrors}
-              className="text-orange-600 hover:text-orange-800 text-sm"
-            >
+            <button onClick={clearValidationErrors} className="text-orange-600 hover:text-orange-800 text-sm">
               ✕
             </button>
           </div>

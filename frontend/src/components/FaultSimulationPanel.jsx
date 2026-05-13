@@ -233,11 +233,7 @@ export default function FaultSimulationPanel({
         {/* Controles */}
         <div className="simulation-controls">
           {!simulando ? (
-            <button
-              className="btn-simulate"
-              onClick={iniciarSimulacion}
-              disabled={!configuracion.nodo}
-            >
+            <button className="btn-simulate" onClick={iniciarSimulacion} disabled={!configuracion.nodo}>
               ▶ Iniciar Simulación
             </button>
           ) : (

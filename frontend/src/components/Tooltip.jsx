@@ -74,10 +74,7 @@ export function ErrorMessage({ message, type = 'error', onClose }) {
           <p className="font-medium">{message}</p>
         </div>
         {onClose && (
-          <button
-            onClick={onClose}
-            className="ml-4 text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} className="ml-4 text-gray-400 hover:text-gray-600">
             ✕
           </button>
         )}
@@ -99,10 +96,7 @@ export function ValidationPanel({ validationResult, onClose }) {
           ⚠️ Problemas Detectados
         </h3>
         {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             ✕
           </button>
         )}

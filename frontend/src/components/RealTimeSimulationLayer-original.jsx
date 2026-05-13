@@ -316,9 +316,7 @@ export const RealTimeSimulationLayer = ({ width = 1200, height = 800 }) => {
           </label>
           <div className="grid grid-cols-2 gap-2">
             {loadNodes.slice(0, 6).map(node => (
-              <button
-                key={node.id}
-                onClick={() => handleFaultTrigger(node.id)}
+              <button key={node.id} onClick={() => handleFaultTrigger(node.id)}
                 disabled={simulation.fault === node.id}
                 className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                   simulation.fault === node.id
@@ -334,15 +332,11 @@ export const RealTimeSimulationLayer = ({ width = 1200, height = 800 }) => {
 
         {/* Acciones de Sistema */}
         <div className="space-y-2">
-          <button
-            onClick={handleReset}
-            className="w-full px-3 py-2 bg-cyan-600 text-white rounded font-medium hover:bg-cyan-500 transition-colors"
-          >
+          <button onClick={handleReset} className="w-full px-3 py-2 bg-cyan-600 text-white rounded font-medium hover:bg-cyan-500 transition-colors">
             Reset Sistema
           </button>
 
-          <button
-            onClick={() => {
+          <button onClick={() => {
               // Test de sonido
               soundSystem.playFaultSound(0.5)
               setTimeout(() => soundSystem.playTripSound(), 200)

@@ -357,21 +357,10 @@ export const AutoLayoutPanel = () => {
           Auto-Layout Eléctrico
         </h3>
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggleAutoLayout}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              ui.autoLayout
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
+          <button onClick={toggleAutoLayout} className={`px-3 py-1 rounded text-sm font-medium transition-colors ${ ui.autoLayout ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }`}>
             {ui.autoLayout ? 'Activado' : 'Desactivado'}
           </button>
-          <button
-            onClick={applyLayout}
-            disabled={isLayouting}
-            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-          >
+          <button onClick={applyLayout} disabled={isLayouting} className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50">
             {isLayouting ? 'Aplicando...' : 'Aplicar Layout'}
           </button>
         </div>
@@ -389,9 +378,7 @@ export const AutoLayoutPanel = () => {
             { value: 'grid', label: 'Grid', icon: ' grid' },
             { value: 'flow-based', label: 'Basado en Flujo', icon: ' flow' },
           ].map(style => (
-            <button
-              key={style.value}
-              onClick={() => setLayoutStyle(style.value)}
+            <button key={style.value} onClick={() => setLayoutStyle(style.value)}
               className={`p-2 rounded border text-sm font-medium transition-colors ${
                 layoutStyle === style.value
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
@@ -443,10 +430,7 @@ export const AutoLayoutPanel = () => {
             />
           </div>
         </div>
-        <button
-          onClick={optimizeSpacing}
-          className="mt-2 text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-        >
+        <button onClick={optimizeSpacing} className="mt-2 text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
           Optimizar Espaciado
         </button>
       </div>
@@ -548,8 +532,7 @@ export const AutoLayoutPanel = () => {
           Presets Rápidos:
         </h4>
         <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => {
+          <button onClick={() => {
               setLayoutStyle('hierarchical')
               setSpacing({ x: 200, y: 150 })
             }}
@@ -557,8 +540,7 @@ export const AutoLayoutPanel = () => {
           >
             Sistema Típico
           </button>
-          <button
-            onClick={() => {
+          <button onClick={() => {
               setLayoutStyle('radial')
               setSpacing({ x: 150, y: 120 })
             }}
@@ -566,8 +548,7 @@ export const AutoLayoutPanel = () => {
           >
             Subestación
           </button>
-          <button
-            onClick={() => {
+          <button onClick={() => {
               setLayoutStyle('grid')
               setSpacing({ x: 180, y: 100 })
             }}
@@ -575,8 +556,7 @@ export const AutoLayoutPanel = () => {
           >
             Panel Industrial
           </button>
-          <button
-            onClick={() => {
+          <button onClick={() => {
               setLayoutStyle('flow-based')
               setSpacing({ x: 250, y: 200 })
             }}

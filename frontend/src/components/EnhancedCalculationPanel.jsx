@@ -299,9 +299,7 @@ const EnhancedCalculationPanel = () => {
             { id: 'harmonics', label: 'Harmonics', icon: '' },
             { id: 'standards', label: 'Standards', icon: ' ' },
           ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
@@ -373,11 +371,7 @@ const EnhancedCalculationPanel = () => {
               Calculate short circuit currents with IEEE 1584 and IEC 60909
               compliance
             </p>
-            <button
-              onClick={runEnhancedICCCalculation}
-              disabled={isCalculating}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
-            >
+            <button onClick={runEnhancedICCCalculation} disabled={isCalculating} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400">
               {isCalculating ? 'Calculating...' : 'Calculate ICC'}
             </button>
           </div>
@@ -391,11 +385,7 @@ const EnhancedCalculationPanel = () => {
             <p className="text-sm text-gray-600 mb-4">
               Analyze voltage levels and power flows with IEEE 141 compliance
             </p>
-            <button
-              onClick={runEnhancedPowerFlow}
-              disabled={isCalculating}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
-            >
+            <button onClick={runEnhancedPowerFlow} disabled={isCalculating} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400">
               {isCalculating ? 'Calculating...' : 'Run Power Flow'}
             </button>
           </div>
@@ -409,11 +399,7 @@ const EnhancedCalculationPanel = () => {
             <p className="text-sm text-gray-600 mb-4">
               Analyze harmonic distortion with IEEE 519 compliance
             </p>
-            <button
-              onClick={runHarmonicAnalysis}
-              disabled={isCalculating}
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-400"
-            >
+            <button onClick={runHarmonicAnalysis} disabled={isCalculating} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-400">
               {isCalculating ? 'Analyzing...' : 'Analyze Harmonics'}
             </button>
           </div>

@@ -4,14 +4,10 @@
 		{
 			"label": "run-tests-and-fix-debug",
 			"type": "shell",
-			"command": "cd \"c:\\Professional ICC Calculator\" && node scripts/run-tests-and-fix.js",
-			"isBackground": false,
-			"problemMatcher": []
-		},
-		{
-			"label": "run-tests-and-fix-debug",
-			"type": "shell",
 			"command": "node scripts/run-tests-and-fix.js",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
 			"isBackground": false,
 			"problemMatcher": []
 		}

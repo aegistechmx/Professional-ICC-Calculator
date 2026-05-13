@@ -107,9 +107,7 @@ export default function AutoLayoutToolbar() {
   return (
     <div className="auto-layout-toolbar">
       {/* Botón principal */}
-      <button
-        className="layout-main-btn"
-        onClick={() => setIsOpen(!isOpen)}
+      <button className="layout-main-btn" onClick={() => setIsOpen(!isOpen)}
         disabled={nodeCount === 0 || applying}
         title="Organizar automáticamente"
       >
@@ -154,11 +152,7 @@ export default function AutoLayoutToolbar() {
 
           <div className="layout-options">
             {/* Opción inteligente */}
-            <button
-              className="layout-option smart"
-              onClick={applySmartLayout}
-              disabled={applying}
-            >
+            <button className="layout-option smart" onClick={applySmartLayout} disabled={applying}>
               <span className="option-icon">🧠</span>
               <div className="option-info">
                 <span className="option-label">Inteligente</span>
@@ -173,10 +167,7 @@ export default function AutoLayoutToolbar() {
 
             {/* Opciones específicas */}
             {LAYOUT_OPTIONS.map(option => (
-              <button
-                key={option.id}
-                className={`layout-option ${option.recommended ? 'recommended' : ''}`}
-                onClick={() => applyLayout(option.id)}
+              <button key={option.id} className={`layout-option ${option.recommended ? 'recommended' : ''}`} onClick={() => applyLayout(option.id)}
                 disabled={applying}
               >
                 <span className="option-icon">{option.icon}</span>

@@ -7,6 +7,8 @@
 const {
   getAmpacity,
   TEMP_FACTOR_90C,
+  TEMP_FACTOR_60C,
+  TEMP_FACTOR_75C,
   GROUPING_FACTOR,
 } = require('./catalogs.js')
 const { assertPositive, assertEnum } = require('./guards.js')
@@ -17,6 +19,7 @@ const { assertPositive, assertEnum } = require('./guards.js')
  * @param {string} params.material - 'Cu' | 'Al'
  * @param {string|number} params.size - Calibre (300, 350, '1/0', etc.)
  * @param {number} params.ambientC - Temperatura ambiente en °C (default 30)
+ * @param {number} params.insulationTempC - Temperatura del aislamiento (75 o 90, default 90)
  * @param {number} params.nConductors - Número de conductores en la misma canalización (default 3)
  * @param {number} params.parallels - Número de conductores en paralelo (default 1)
  * @returns {Object} Resultados del cálculo
@@ -26,6 +29,7 @@ function calcAmpacity({
   material = 'Cu',
   size,
   ambientC = 30,
+  insulationTempC = 90,
   nConductors = 3,
   parallels = 1,
 }) {
@@ -34,16 +38,28 @@ function calcAmpacity({
   assertPositive('nConductors', nConductors)
   assertPositive('parallels', parallels)
 
-  // REGLA NOM: Calcular con 90°C (conductores tipo THHN/THWN)
-  const I_tabla_90C = getAmpacity(material, 90, size) // NUNCA 0
-  const F_temp = TEMP_FACTOR_90C(ambientC)
+  // REGLA NOM: La ampacidad base para correcciones debe ser la del aislamiento del conductor
+  let I_base_tabla;
+  try {
+    I_base_tabla = getAmpacity(material, insulationTempC, size) 
+  } catch (e) {
+    // Fallback de seguridad: si no hay tabla para la temp específica, usar la inmediata inferior
+    const fallbackTemp = insulationTempC > 75 ? 75 : 60;
+    I_base_tabla = getAmpacity(material, fallbackTemp, size)
+  }
+  
+  // Seleccionar factor de corrección según temperatura de aislamiento del cable
+  const F_temp = insulationTempC === 60 ? TEMP_FACTOR_60C(ambientC) :
+                 insulationTempC === 75 ? TEMP_FACTOR_75C(ambientC) : 
+                 TEMP_FACTOR_90C(ambientC)
+
   const F_group = GROUPING_FACTOR(nConductors)
 
   // Corriente corregida por conductor y luego por paralelos
-  const I_corr = I_tabla_90C * F_temp * F_group * parallels
+  const I_corr = parseFloat((I_base_tabla * F_temp * F_group * parallels).toFixed(6))
 
   return {
-    I_tabla: I_tabla_90C,
+    I_tabla: I_base_tabla,
     F_temp,
     F_group,
     parallels,

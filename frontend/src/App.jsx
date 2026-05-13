@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import Editor from './components/Editor'
-import Sidebar from './components/Sidebar'
-import CortocircuitoPage from './modules/cortocircuito/CortocircuitoPage'
-import ICCModule from './components/ICCModule'
-import { useStore } from './store/useStore'
+import { useCallback, useEffect, useState } from 'react';
+import Editor from './components/Editor';
+import ICCModule from './components/ICCModule';
+import Sidebar from './components/Sidebar';
+import CortocircuitoPage from './modules/cortocircuito/CortocircuitoPage';
+import { useStore } from './store/useStore';
 
 function App() {
   const [currentView, setCurrentView] = useState('editor')
@@ -217,8 +217,7 @@ function App() {
 
             {/* Mode toggle */}
             <div className="flex bg-gray-200 rounded-lg p-1">
-              <button
-                onClick={() => setMode('edit')}
+              <button type="button" onClick={() => setMode('edit')}
                 className={`px-4 py-2 rounded-md transition ${
                   mode === 'edit'
                     ? 'bg-blue-600 text-white'
@@ -227,8 +226,7 @@ function App() {
               >
                 Modo Edición
               </button>
-              <button
-                onClick={() => setMode('simulation')}
+              <button type="button" onClick={() => setMode('simulation')}
                 className={`px-4 py-2 rounded-md transition ${
                   mode === 'simulation'
                     ? 'bg-green-600 text-white'
@@ -241,8 +239,7 @@ function App() {
 
             {/* System Mode toggle - NEW: ATS modes */}
             <div className="flex bg-gray-200 rounded-lg p-1">
-              <button
-                onClick={() => setSystemMode('normal')}
+              <button type="button" onClick={() => setSystemMode('normal')}
                 className={`px-4 py-2 rounded-md transition ${
                   systemMode === 'normal'
                     ? 'bg-green-600 text-white'
@@ -252,8 +249,7 @@ function App() {
               >
                 🟢 Normal
               </button>
-              <button
-                onClick={() => setSystemMode('emergency')}
+              <button type="button" onClick={() => setSystemMode('emergency')}
                 className={`px-4 py-2 rounded-md transition ${
                   systemMode === 'emergency'
                     ? 'bg-red-600 text-white'
@@ -266,8 +262,7 @@ function App() {
             </div>
 
             <div className="flex gap-2">
-              <button
-                onClick={() => {
+              <button type="button" onClick={() => {
                   // Esta función se implementará en el componente Editor
                   // Por ahora, mostrar mensaje
                   alert(
@@ -279,25 +274,13 @@ function App() {
               >
                 🗑️ Eliminar
               </button>
-              <button
-                onClick={loadProjectFromFile}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                title="Cargar proyecto desde archivo JSON"
-              >
+              <button type="button" onClick={loadProjectFromFile} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" title="Cargar proyecto desde archivo JSON">
                 📁 Abrir
               </button>
-              <button
-                onClick={handleSaveProject}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                title="Guardar proyecto como archivo JSON"
-              >
+              <button type="button" onClick={handleSaveProject} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition" title="Guardar proyecto como archivo JSON">
                 💾 Guardar
               </button>
-              <button
-                onClick={handleManualSync}
-                className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition flex items-center gap-2"
-                title={`Sincronizar con módulo cortocircuito - ${syncFilename}`}
-              >
+              <button type="button" onClick={handleManualSync} className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition flex items-center gap-2" title={`Sincronizar con módulo cortocircuito - ${syncFilename}`}>
                 🔄{' '}
                 <span className="hidden sm:inline truncate max-w-[150px]">
                   {syncFilename}
@@ -305,41 +288,29 @@ function App() {
               </button>
               {mode === 'edit' && (
                 <>
-                  <button
-                    onClick={() => setCurrentView('cortocircuito')}
+                  <button type="button" onClick={() => setCurrentView('cortocircuito')}
                     className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
                   >
                     Módulo Cortocircuito (React)
                   </button>
-                  <button
-                    onClick={() => setCurrentView('icc-iframe')}
+                  <button type="button" onClick={() => setCurrentView('icc-iframe')}
                     className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
                   >
                     Módulo ICC (iframe)
                   </button>
-                  <button
-                    onClick={calculateICC}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                  >
+                  <button type="button" onClick={calculateICC} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                     Calcular ICC
                   </button>
-                  <button
-                    onClick={handleCortocircuito}
-                    className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition"
-                  >
+                  <button type="button" onClick={handleCortocircuito} className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition">
                     Cortocircuito
                   </button>
-                  <button
-                    onClick={generatePDF}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                  >
+                  <button type="button" onClick={generatePDF} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
                     Generar PDF
                   </button>
                 </>
               )}
               {mode === 'simulation' && (
-                <button
-                  onClick={() => setMode('edit')}
+                <button type="button" onClick={() => setMode('edit')}
                   className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
                 >
                   Volver a Edición
@@ -358,22 +329,13 @@ function App() {
                 <div className="flex items-center gap-4">
                   {/* Playback buttons */}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={rewindPlayback}
-                      className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
-                      title="Rewind to start"
-                    >
+                    <button type="button" onClick={rewindPlayback} className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition" title="Rewind to start">
                       ⏪
                     </button>
-                    <button
-                      onClick={isPlaying ? pausePlayback : playPlayback}
-                      className={`px-4 py-2 ${isPlaying ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded transition`}
-                      title={isPlaying ? 'Pause' : 'Play'}
-                    >
+                    <button type="button" onClick={isPlaying ? pausePlayback : playPlayback} className={`px-4 py-2 ${isPlaying ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded transition`} title={isPlaying ? 'Pause' : 'Play'}>
                       {isPlaying ? '⏸' : '▶'}
                     </button>
-                    <button
-                      onClick={() => stepPlayback(0.01)}
+                    <button type="button" onClick={() => stepPlayback(0.01)}
                       className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
                       title="Step forward"
                     >
@@ -458,8 +420,7 @@ function App() {
             <h1 className="text-xl font-bold text-gray-800">
               ⚡ Módulo de Cortocircuito
             </h1>
-            <button
-              onClick={() => setCurrentView('editor')}
+            <button type="button" onClick={() => setCurrentView('editor')}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
             >
               ← Volver al Editor
@@ -478,14 +439,10 @@ function App() {
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleCortocircuito}
-                className="px-4 py-2 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition"
-              >
+              <button type="button" onClick={handleCortocircuito} className="px-4 py-2 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition">
                 Calcular ICC
               </button>
-              <button
-                onClick={() => setCurrentView('editor')}
+              <button type="button" onClick={() => setCurrentView('editor')}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
               >
                 ← Volver al Editor

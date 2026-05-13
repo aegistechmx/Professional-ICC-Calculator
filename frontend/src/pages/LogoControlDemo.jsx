@@ -51,8 +51,7 @@ export default function LogoControlDemo() {
         <h2 className="text-xl font-semibold mb-4">Controles del Logo</h2>
 
         <div className="flex flex-wrap gap-4">
-          <button
-            onClick={() => {
+          <button onClick={() => {
               setActive(!active)
               sendLogoCommand({ active: !active, fault: false })
             }}
@@ -65,20 +64,11 @@ export default function LogoControlDemo() {
             {active ? '🟢 Activo' : '⚪ Inactivo'}
           </button>
 
-          <button
-            onClick={activateFault}
-            disabled={faultMode}
-            className={`px-6 py-3 rounded-lg font-semibold transition ${
-              faultMode
-                ? 'bg-red-400 cursor-not-allowed'
-                : 'bg-red-600 hover:bg-red-700 text-white'
-            }`}
-          >
+          <button onClick={activateFault} disabled={faultMode} className={`px-6 py-3 rounded-lg font-semibold transition ${ faultMode ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 text-white' }`}>
             {faultMode ? '⚡ FALLA ACTIVA...' : '⚡ Simular Falla'}
           </button>
 
-          <button
-            onClick={() => sendLogoCommand({ active: false, fault: false })}
+          <button onClick={() => sendLogoCommand({ active: false, fault: false })}
             className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
           >
             😴 Apagar
