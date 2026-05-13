@@ -21,6 +21,7 @@ module.exports = function authenticateToken(req, res, next) {
   } catch (error) {
     return res.status(401).json({
       error: 'Token inválido o expirado.',
+      details: { message: error.message },
     })
   }
 }

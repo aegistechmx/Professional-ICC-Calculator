@@ -14,12 +14,12 @@ const crypto = require('crypto')
 let runICC, validateFeeder, _optimizeBreakers, getCached, setCached, runFullAnalysis;
 try {
     runICC = require('./application/services/icc.service').runICC;
-    validateFeeder = require('./core/shortcircuit/protection/validator').validateFeeder;
-    _optimizeBreakers = require('./core/shortcircuit/protection/optimizer').optimizeBreakers; // Corregido
-    const cache = require('./infrastructure/persistence/cache');
+    validateFeeder = require('./engine/validator').validateFeeder;
+    _optimizeBreakers = require('./engine/optimizer').optimizeBreakers;
+    const cache = require('./cache');
     getCached = cache.getCached;
     setCached = cache.setCached;
-    runFullAnalysis = require('./application/services/fullAnalysis').runFullAnalysis;
+    runFullAnalysis = require('./engine/fullAnalysis').runFullAnalysis;
 } catch (e) {
     // eslint-disable-next-line no-console
     console.error('❌ CRITICAL: Error cargando módulos del motor:', e.message);
@@ -149,7 +149,7 @@ app.get('/', (req, res) => {
   `);
 });
 
-app.post('/api/analyze', validateJSONBody, async (req, res) => {
+app.post('/api/analyze', validateJSONBody, (req, res) => {
   try {
     const systemModel = req.body
     const normalized = JSON.stringify(systemModel, Object.keys(systemModel).sort())
@@ -158,7 +158,7 @@ app.post('/api/analyze', validateJSONBody, async (req, res) => {
     const cached = getCached(key)
     if (cached) return sendResponse(res, true, { ...cached, cached: true })
 
-    const result = await runFullAnalysis(systemModel)
+    const result = runFullAnalysis(systemModel)
     setCached(key, result)
     sendResponse(res, true, { ...result, cached: false })
   } catch (error) {
