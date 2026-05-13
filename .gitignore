@@ -11,6 +11,9 @@ node_modules
 dist
 build
 *.log
+frontend/dist/
+reports/
+unused-files-report.json
 
 # OS files
 .DS_Store
@@ -30,6 +33,11 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+backend/perf-output*.txt
+backend/backend/
+backend/server.js
+setup-windsurf.ps1
+frontend/setup-windsurf.bat
 
 # Package manager
 package-lock.json
