@@ -12,6 +12,7 @@ export default function FormICC({ onCalculate }) {
   const [Fcc, setFcc] = useState(1.25)
   const [Icu_kA, setIcu_kA] = useState(35)
   const [Isc_kA, setIsc_kA] = useState(5.38)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -31,8 +32,18 @@ export default function FormICC({ onCalculate }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
-      <h2 className="text-xl font-bold">Datos del Alimentador</h2>
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl">
+      <div className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4 text-slate-100">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold">Datos del Alimentador</h2>
+            <p className="text-xs text-slate-400 mt-1">Vista limpia: conductor, carga y protección. Temperatura, agrupamiento y terminal quedan en Avanzado.</p>
+          </div>
+          <button type="button" onClick={() => setShowAdvanced(!showAdvanced)} className="px-3 py-2 rounded-lg border border-slate-600 text-xs hover:border-amber-400">
+            {showAdvanced ? 'Ocultar avanzado' : 'Mostrar avanzado'}
+          </button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>

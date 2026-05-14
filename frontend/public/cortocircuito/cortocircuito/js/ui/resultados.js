@@ -655,32 +655,47 @@ var UIResultados = (function() {
         tbody.textContent = '';
         var V = parseFloat(document.getElementById('input-tension').value) || 220;
         var Vfase = App.estado.tipoSistema === '3f' ? V / Math.sqrt(3) : V;
-        (puntos || []).forEach(function(p, i) {
+        var puntosImp = (puntos || []).filter(function(p) { return p && (isFinite(p.R) || isFinite(p.X) || isFinite(p.Z)); });
+        if (puntosImp.length === 0) {
+            var trEmpty = document.createElement('tr');
+            var tdEmpty = document.createElement('td');
+            tdEmpty.colSpan = 5;
+            tdEmpty.className = 'text-[--text-muted] text-xs py-2';
+            tdEmpty.textContent = 'Sin datos de impedancia acumulada para este cálculo.';
+            trEmpty.appendChild(tdEmpty);
+            tbody.appendChild(trEmpty);
+            return;
+        }
+        puntosImp.forEach(function(p, i) {
+            var R = Number(p.R || p.r || 0);
+            var X = Number(p.X || p.x || 0);
+            var Z = Number(p.Z || Math.sqrt(R * R + X * X));
             var tr = document.createElement('tr');
 
             var td1 = document.createElement('td');
             var span1 = document.createElement('span');
             span1.className = 'text-[--amber] font-mono text-xs';
-            span1.textContent = 'P' + i;
+            span1.textContent = p.id || ('P' + i);
             td1.appendChild(span1);
             tr.appendChild(td1);
 
             var td2 = document.createElement('td');
-            td2.textContent = (p.R * 1000).toFixed(3);
+            td2.textContent = (R * 1000).toFixed(3);
             tr.appendChild(td2);
 
             var td3 = document.createElement('td');
-            td3.textContent = (p.X * 1000).toFixed(3);
+            td3.textContent = (X * 1000).toFixed(3);
             tr.appendChild(td3);
 
             var td4 = document.createElement('td');
             td4.className = 'font-semibold text-[--cyan]';
-            td4.textContent = (p.Z * 1000).toFixed(3);
+            td4.textContent = (Z * 1000).toFixed(3);
             tr.appendChild(td4);
 
             var td5 = document.createElement('td');
             td5.textContent = Vfase.toFixed(1);
             tr.appendChild(td5);
+            tbody.appendChild(tr);
         });
     }
 
@@ -694,7 +709,7 @@ var UIResultados = (function() {
         // ==========================================
         // ÁRBITRO CENTRAL: Decisiones Globales
         // ==========================================
-        var fallasCriticas = puntos.filter(function(p) { return p.decision && p.decision.estadoGlobal === 'FAIL'; });
+        var fallasCriticas = puntos.filter(function(p) { return p.decision && p.decision.estadoGlobal === 'FAIL' && ((p.decision.errores || []).length > 0 || (p.decision.warnings || []).length > 0); });
         
         if (fallasCriticas.length > 0) {
             recs.push('<div class="mb-4">');

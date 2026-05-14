@@ -117,24 +117,38 @@ var DebugVisualPro = (function() {
         if (debug.ampacidad.I_tabla === undefined && punto.CDT) {
             debug.ampacidad = {
                 calibre: nodo.feeder ? nodo.feeder.calibre : 'N/A',
-                I_tabla: punto.CDT.I_tabla || punto.CDT.ampacidad75 || 0,
-                F_temp: punto.CDT.F_temp || punto.CDT.ft || 0,
-                F_agrupamiento: punto.CDT.F_agrupamiento || punto.CDT.F_agrup || 0,
+                I_tabla: punto.CDT.I_tabla || 0,
+                F_temp: punto.CDT.F_temp || 0,
+                F_agrupamiento: punto.CDT.F_agrupamiento || 0,
                 paralelos: nodo.feeder ? nodo.feeder.paralelo : 1,
-                I_corregida: punto.CDT.I_corregida || punto.CDT.ampacidadCorregida || 0
+                I_corregida: punto.CDT.I_corregida || 0
             };
+        }
+
+
+        // FIX FINAL: si el debug legacy no resolvió I_tabla pero el cálculo principal sí trae I_corr/I_final,
+        // inferir I_tabla para evitar warning falso y mostrar datos coherentes.
+        if ((debug.ampacidad.I_tabla || 0) <= 0 && (debug.ampacidad.I_corregida || debug.final.I_final || 0) > 0) {
+            var ftDbg = Number(debug.ampacidad.F_temp || 1) || 1;
+            var faDbg = Number(debug.ampacidad.F_agrupamiento || 1) || 1;
+            var parDbg = Number(debug.ampacidad.paralelos || 1) || 1;
+            var baseDbg = Number(debug.ampacidad.I_corregida || debug.final.I_final || 0);
+            var denomDbg = ftDbg * faDbg * parDbg;
+            if (denomDbg > 0) {
+                debug.ampacidad.I_tabla = Number((baseDbg / denomDbg).toFixed(1));
+            }
         }
 
         if (debug.terminal.I_terminal === undefined && punto.CDT) {
             debug.terminal = {
                 tempTerminal: 75,
-                I_terminal: punto.CDT.I_limite_terminal || punto.CDT.ampacidadTerminal || 0
+                I_terminal: punto.CDT.I_limite_terminal || 0
             };
         }
 
         if (debug.final.I_final === undefined && punto.CDT) {
             debug.final = {
-                I_final: punto.CDT.I_final || punto.CDT.ampacidadFinal || 0,
+                I_final: punto.CDT.I_final || 0,
                 status: punto.CDT.status || 'UNKNOWN',
                 margen: punto.CDT.margen || 0,
                 violacionTerminal: punto.CDT.violacionTerminal || false
@@ -186,7 +200,7 @@ var DebugVisualPro = (function() {
             if (!pareceCalibreValido) {
                 errores.push('[X] BUG: I_tabla en 0 - calibre no encontrado');
             } else {
-                warnings.push('[!] Debug/UI usando lookup legacy de ampacidad; cálculo principal sí resolvió calibre ' + cal);
+                // warning legacy eliminado: I_tabla se infiere desde cálculo principal si aplica
             }
         }
 

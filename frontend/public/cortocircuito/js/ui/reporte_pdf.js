@@ -260,9 +260,13 @@ var UIReportePDF = (function() {
             var Vimp = parseFloat(document.getElementById('input-tension').value) || 220;
             var Vfase = App.estado.tipoSistema === '3f' ? Vimp / Math.sqrt(3) : Vimp;
             var headersImp = [['Punto', 'R (mOhm)', 'X (mOhm)', 'Z (mOhm)', 'V fase (V)']];
-            var dataImp = (App.estado.resultados || []).map(function(p, i) {
-                return ['P' + i, (p.R * 1000).toFixed(3), (p.X * 1000).toFixed(3), (p.Z * 1000).toFixed(3), Vfase.toFixed(1)];
+            var dataImp = (App.estado.resultados || []).filter(function(p) { return p && (isFinite(p.R) || isFinite(p.X) || isFinite(p.Z)); }).map(function(p, i) {
+                var R = Number(p.R || p.r || 0);
+                var X = Number(p.X || p.x || 0);
+                var Z = Number(p.Z || Math.sqrt(R * R + X * X));
+                return [p.id || ('P' + i), (R * 1000).toFixed(3), (X * 1000).toFixed(3), (Z * 1000).toFixed(3), Vfase.toFixed(1)];
             });
+            if (dataImp.length === 0) dataImp = [['—', 'Sin datos', 'Sin datos', 'Sin datos', Vfase.toFixed(1)]];
             y = agregarTabla('IMPEDANCIAS ACUMULADAS', headersImp, dataImp);
 
             // --- Motores (si hay) ---

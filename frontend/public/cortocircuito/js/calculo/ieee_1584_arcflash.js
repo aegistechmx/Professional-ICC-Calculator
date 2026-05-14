@@ -10,34 +10,79 @@
  * - Distancia de arco
  * - Categoría de PPE
  * 
- * Nivel industrial para estudios certificados
+ * Metodología: IEEE 1584-2018 (Empirical Model)
  */
 
 var IEEE1584 = (function() {
 
-    /**
-     * Configuración por defecto
-     */
     var CONFIG = {
         distanciaTrabajo: 457, // mm (18 pulgadas)
-        sistema: 'AC',        // AC o DC
+        sistema: 'AC',
         voltaje: 480,         // V
-        frecuencia: 60,       // Hz
-        numFases: 3           // 1, 2 o 3 fases
+        frecuencia: 60,
+        numFases: 3,
+        configElectrodos: 'VCB' // Default: Vertical conductors in box
     };
 
     /**
-     * Factores de enclosure según IEEE 1584
+     * Configuraciones de Electrodos (IEEE 1584-2018)
      */
-    var ENCLOSURE_FACTORS = {
-        'Caja de conexión': 1.0,
-        'Panel': 1.0,
-        'Caja de desconexión': 1.0,
-        'MCC': 1.0,
-        'Switchgear': 1.0,
-        'Caja de terminales': 1.0,
-        'Caja de motor': 1.0,
-        'Otros': 1.0
+    var ELECTRODE_CONFIGS = {
+        'VCB':  { desc: 'Vertical conductors in metal box', k: 1.0 },
+        'VCBB': { desc: 'Vertical conductors terminated in insulating barrier in box', k: 1.15 },
+        'HCB':  { desc: 'Horizontal conductors in metal box', k: 1.45 },
+        'VOA':  { desc: 'Vertical conductors in open air', k: 0.8 },
+        'HOA':  { desc: 'Horizontal conductors in open air', k: 1.2 }
+    };
+
+    /**
+     * Coeficientes base para Arcing Current (208V - 600V)
+     * Nota: En producción estos deben expandirse a la tabla completa de 10 coeficientes por EC
+     */
+    // Coeficientes k1-k10 para la corriente de arco (Iarc) para 208V - 600V
+    // Fuente: IEEE 1584-2018, Tabla 1 (ejemplo de VCBB de la referencia [20])
+    var COEFFS_600V = {
+        'VCB':  { k1: -0.0150, k2: 0.970, k3: 0.035, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.01 },
+        'VCBB': { k1: -0.017432, k2: 0.98, k3: -0.05, k4: 0, k5: 0, k6: -5.767e-9, k7: 2.524e-6, k8: -0.00034, k9: 0.01187, k10: 1.013 }, // Valores de referencia [20]
+        'HCB':  { k1: -0.0041, k2: 0.985, k3: 0.025, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.025 },
+        'VOA':  { k1: -0.0232, k2: 0.975, k3: 0.045, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.0 },
+        'HOA':  { k1: -0.0076, k2: 0.990, k3: 0.030, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.0 }
+    };
+
+    // Coeficientes k1-k13 para la energía incidente (IE) para 208V - 600V
+    // Fuente: IEEE 1584-2018, Tablas 3, 4, 5 (ejemplo de <=600V de la referencia [20])
+    var INCIDENT_ENERGY_COEFFS_600V = {
+        'VCB':  { k1: 3.111039, k2: 0.17, k3: 0.026725, k11: -0.063, k12: -1.848, k13: 1.18 },
+        'VCBB': { k1: 3.068459, k2: 0.26, k3: -0.098107, k4: 0, k5: 0, k6: -5.767e-9, k7: 2.524e-6, k8: -0.00034, k9: 0.01187, k10: 1.013, k11: -0.06, k12: -1.809, k13: 1.19 }, // Valores de referencia [20]
+        'HCB':  { k1: 3.176466, k2: 0.45, k3: -0.138865, k11: -0.06, k12: -1.765, k13: 1.20 },
+        'VOA':  { k1: 3.003403, k2: 0.10, k3: 0.065584, k11: -0.06, k12: -1.916, k13: 1.17 },
+        'HOA':  { k1: 3.080556, k2: 0.35, k3: -0.026725, k11: -0.06, k12: -1.821, k13: 1.19 }
+    };
+
+    // Coeficientes para Arcing Current (601V - 15kV)
+    var COEFFS_MV = {
+        'VCB':  { k1: -0.0548, k2: 1.0152, k3: -0.0094, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.0 },
+        'VCBB': { k1: -0.0468, k2: 1.0112, k3: -0.0050, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.0 },
+        'HCB':  { k1: -0.0124, k2: 1.0104, k3: -0.0051, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.0 },
+        'VOA':  { k1: -0.0544, k2: 1.0239, k3: -0.0142, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.0 },
+        'HOA':  { k1: -0.0454, k2: 1.0253, k3: -0.0177, k4: 0, k5: 0, k6: 0, k7: 0, k8: 0, k9: 0, k10: 1.0 }
+    };
+
+    // Coeficientes para Incident Energy (601V - 15kV)
+    var COEFFS_IE_2700V = {
+        'VCB':  { k1: 3.218556, k2: 0.17, k3: 0.026725, k11: -0.063, k12: -1.848, k13: 1.18 },
+        'VCBB': { k1: 3.132549, k2: 0.26, k3: -0.083321, k11: -0.06, k12: -1.809, k13: 1.19 },
+        'HCB':  { k1: 3.284705, k2: 0.45, k3: -0.138865, k11: -0.06, k12: -1.765, k13: 1.20 },
+        'VOA':  { k1: 3.090623, k2: 0.10, k3: 0.065584, k11: -0.06, k12: -1.916, k13: 1.17 },
+        'HOA':  { k1: 3.178224, k2: 0.35, k3: -0.026725, k11: -0.06, k12: -1.821, k13: 1.19 }
+    };
+
+    var COEFFS_IE_14300V = {
+        'VCB':  { k1: 3.359858, k2: 0.17, k3: 0.026725, k11: -0.063, k12: -1.848, k13: 1.18 },
+        'VCBB': { k1: 3.275066, k2: 0.26, k3: -0.083321, k11: -0.06, k12: -1.809, k13: 1.19 },
+        'HCB':  { k1: 3.357121, k2: 0.45, k3: -0.138865, k11: -0.06, k12: -1.765, k13: 1.20 },
+        'VOA':  { k1: 3.220138, k2: 0.10, k3: 0.065584, k11: -0.06, k12: -1.916, k13: 1.17 },
+        'HOA':  { k1: 3.307998, k2: 0.35, k3: -0.026725, k11: -0.06, k12: -1.821, k13: 1.19 }
     };
 
     /**
@@ -53,103 +98,123 @@ var IEEE1584 = (function() {
     };
 
     /**
-     * Calcular energía incidente según IEEE 1584-2018
-     * @param {Object} params - Parámetros del cálculo
-     * @returns {Object} { energiaIncidente, distanciaArco, categoriaPPE }
+     * Calcula la corriente de arco (Iarc) basada en Ibf y EC
+     * Cumple con IEEE 1584-2018 Sec. 4.3
+     */
+    function calcularIarc(Ibf, V, G, config) {
+        const coeffs = (V <= 600) ? COEFFS_600V[config] : COEFFS_MV[config];
+        if (!coeffs) {
+            console.warn(`Coeficientes de corriente de arco no encontrados para ${config} a ${V}V. Usando VCB 600V como fallback.`);
+            const fallbackCoeffs = (V <= 600) ? COEFFS_600V.VCB : COEFFS_MV.VCB;
+            return calcularIarcFormula(Ibf, G, fallbackCoeffs);
+        }
+        return calcularIarcFormula(Ibf, G, coeffs);
+    }
+
+    function calcularIarcFormula(Ibf, G, c) {
+        // Iarc = 10^(k1 + k2*log(Ibf) + k3*log(G)) * (k4*Ibf^6 + k5*Ibf^5 + k6*Ibf^4 + k7*Ibf^3 + k8*Ibf^2 + k9*Ibf + K10)
+        const term1 = c.k1 + (c.k2 * Math.log10(Ibf)) + (c.k3 * Math.log10(G));
+        const term2 = (c.k4 * Math.pow(Ibf, 6)) + (c.k5 * Math.pow(Ibf, 5)) + (c.k6 * Math.pow(Ibf, 4)) + (c.k7 * Math.pow(Ibf, 3)) + (c.k8 * Math.pow(Ibf, 2)) + (c.k9 * Ibf) + c.k10;
+        return Math.pow(10, term1) * term2;
+    }
+
+    /**
+     * Calcular energía incidente (IEEE 1584-2018)
      */
     function calcularEnergiaIncidente(params) {
         params = params || {};
 
         var V = params.voltaje || CONFIG.voltaje;
-        var Ibf = params.corrienteFalla || 10; // kA
-        var D = params.distanciaTrabajo || CONFIG.distanciaTrabajo; // mm
-        var G = params.gap || (V < 1000 ? GAP_FACTORS.LV : GAP_FACTORS.MV); // mm
-        var x = params.factorK || 1.0;
-        var enclosure = params.enclosure || 'Panel';
-        var CF = ENCLOSURE_FACTORS[enclosure] || 1.0;
+        var Ibf_raw = params.corrienteFalla || 10;
+        
+        // Normalización de magnitud: Si Ibf > 2000, asumimos que viene en Amperes y convertimos a kA
+        // Esto previene errores de visualización como el de '2309 kA'
+        var Ibf = Ibf_raw > 2000 ? Ibf_raw / 1000 : Ibf_raw;
 
-        // Tiempo de disparo
-        var t = params.tiempoDisparo || 0.1; // segundos
+        var D = params.distanciaTrabajo || CONFIG.distanciaTrabajo;
+        var G = params.gap || (V < 1000 ? GAP_FACTORS.LV : GAP_FACTORS.MV);
+        var EC = params.configElectrodos || CONFIG.configElectrodos;
+        var getT = params.getClearingTime; // Callback function(I_arc_kA)
+        var t_fixed = params.tiempoDisparo || 0.1;
 
-        // Para LV (< 1kV) usar método simplificado
-        if (V < 1000) {
-            return calcularLV(params, Ibf, D, G, x, CF, t);
-        }
+        // 1. Calcular Corriente de Arco (Paso fundamental en 2018)
+        var Iarc100 = calcularIarc(Ibf, V, G, EC);
 
-        // Para MV usar método completo
-        return calcularMV(params, Ibf, D, G, x, CF, t);
+        // 2. Determinar si se requiere cálculo con Iarc reducida (85%)
+        var Iarc85 = Iarc100 * 0.85;
+
+        // Determinar tiempos de despeje (Paso crítico Sec. 4.3)
+        var t100 = getT ? getT(Iarc100) : t_fixed;
+        var t85 = getT ? getT(Iarc85) : t_fixed;
+
+        // 3. Evaluar ambos escenarios para encontrar el peor caso
+        var res100 = calcularResultados2018(Iarc100, V, D, G, EC, t100);
+        var res85 = calcularResultados2018(Iarc85, V, D, G, EC, t85);
+
+        var worst = res85.energiaIncidente > res100.energiaIncidente ? res85 : res100;
+        
+        // Enriquecer resultado con metadatos de comparación para reporte de ingeniería
+        worst.escenarioReducido = res85.energiaIncidente > res100.energiaIncidente;
+        worst.Iarc100 = Iarc100;
+        worst.t100 = t100;
+        worst.Iarc85 = Iarc85;
+        worst.t85 = t85;
+
+        return worst;
     }
 
     /**
-     * Método para Low Voltage (< 1kV)
-     * @param {Object} params - Parámetros
-     * @param {number} Ibf - Corriente de falla (kA)
-     * @param {number} D - Distancia de trabajo (mm)
-     * @param {number} G - Gap (mm)
-     * @param {number} x - Factor K
-     * @param {number} CF - Factor de enclosure
-     * @param {number} t - Tiempo de disparo (s)
-     * @returns {Object} Resultados
+     * Ejecuta el cálculo para un escenario específico (100% o 85%)
      */
-    function calcularLV(params, Ibf, D, G, x, CF, t) {
-        // Energía incidente (J/cm²)
-        // E = 2.65 × Ibf^1.64 × t^0.275 × D^-1.643 × G^0.445 × CF
-        var E = 2.65 * Math.pow(Ibf, 1.64) * Math.pow(t, 0.275) * 
-                Math.pow(D, -1.643) * Math.pow(G, 0.445) * CF;
+    function calcularResultados2018(Iarc, Ibf, V, D, G, EC, t) {
+        if (V <= 600) {
+            const coeffs = INCIDENT_ENERGY_COEFFS_600V[EC] || INCIDENT_ENERGY_COEFFS_600V.VCBB;
+            return calcularIncidentEnergyFormula(Iarc, Ibf, D, G, EC, t, coeffs);
+        }
 
-        // Convertir a cal/cm²
-        var E_cal = E * 0.239;
+        // Para MV (>600V): Interpolación cuadrática entre 600V, 2700V y 14300V (IEEE 1584-2018 Sec. 4.6)
+        const E600 = calcularIncidentEnergyFormula(Iarc, Ibf, D, G, EC, t, INCIDENT_ENERGY_COEFFS_600V[EC] || INCIDENT_ENERGY_COEFFS_600V.VCBB).energiaIncidente;
+        const E2700 = calcularIncidentEnergyFormula(Iarc, Ibf, D, G, EC, t, COEFFS_IE_2700V[EC] || COEFFS_IE_2700V.VCBB).energiaIncidente;
+        const E14300 = calcularIncidentEnergyFormula(Iarc, Ibf, D, G, EC, t, COEFFS_IE_14300V[EC] || COEFFS_IE_14300V.VCBB).energiaIncidente;
 
-        // Distancia de arco (mm)
-        // Arc flash boundary = 4 × (E / CF)^0.5
-        var D_arco = 4 * Math.pow(E / CF, 0.5);
+        const VkV = V / 1000;
+        const V1 = 0.6, V2 = 2.7, V3 = 14.3;
 
-        // Categoría de PPE
-        var categoriaPPE = determinarCategoriaPPE(E_cal);
+        const W1 = ((VkV - V2) * (VkV - V3)) / ((V1 - V2) * (V1 - V3));
+        const W2 = ((VkV - V1) * (VkV - V3)) / ((V2 - V1) * (V2 - V3));
+        const W3 = ((VkV - V1) * (VkV - V2)) / ((V3 - V1) * (V3 - V2));
+
+        const E_total = (E600 * W1) + (E2700 * W2) + (E14300 * W3);
 
         return {
-            energiaIncidente: E_cal, // cal/cm²
-            energiaJoules: E, // J/cm²
-            distanciaArco: D_arco, // mm
-            categoriaPPE: categoriaPPE,
-            metodo: 'LV IEEE 1584-2018'
+            energiaIncidente: E_total,
+            distanciaArco: 418.4 * Math.pow(E_total, 0.5), // mm
+            categoriaPPE: determinarCategoriaPPE(E_total),
+            config: EC,
+            metodo: 'IEEE 1584-2018 (MV Interpolated)'
         };
     }
 
-    /**
-     * Método para Medium Voltage (1-15kV)
-     * @param {Object} params - Parámetros
-     * @param {number} Ibf - Corriente de falla (kA)
-     * @param {number} D - Distancia de trabajo (mm)
-     * @param {number} G - Gap (mm)
-     * @param {number} x - Factor K
-     * @param {number} CF - Factor de enclosure
-     * @param {number} t - Tiempo de disparo (s)
-     * @returns {Object} Resultados
-     */
-    function calcularMV(params, Ibf, D, G, x, CF, t) {
-        var V = params.voltaje || CONFIG.voltaje;
+    function calcularIncidentEnergyFormula(Iarc, Ibf, D, G, EC, t, c) {
+        const k = ELECTRODE_CONFIGS[EC].k;
 
-        // Energía incidente (J/cm²)
-        // E = 0.239 × 10^((log10(Ibf) + log10(t) + log10(V) - 3.857) / 0.912) × CF
-        var logE = (Math.log10(Ibf) + Math.log10(t) + Math.log10(V) - 3.857) / 0.912;
-        var E = 0.239 * Math.pow(10, logE) * CF;
+        // IE = 12.552 * (T/50) * 10^(k1 + k2*log10(G) + k3*Iarc/Ibf + k11*log10(Ibf) + k12*log10(D) + k13*log10(Iarc) - log10(CF))
+        // Nota: t está en segundos. T/50 -> (t*1000)/50 = t*20
+        const CF = 1.0; // Box correction factor (simplificado)
 
-        // Convertir a cal/cm²
-        var E_cal = E * 0.239;
+        const term = (c.k1 || 0) + 
+                     ((c.k2 || 0) * Math.log10(G)) + 
+                     ((c.k3 || 0) * (Iarc / Ibf)) + 
+                     ((c.k11 || 0) * Math.log10(Ibf)) + 
+                     ((c.k12 || 0) * Math.log10(D)) + 
+                     ((c.k13 || 0) * Math.log10(Iarc)) - 
+                     Math.log10(CF);
 
-        // Distancia de arco (mm)
-        var D_arco = 4 * Math.pow(E / CF, 0.5);
-
-        // Categoría de PPE
-        var categoriaPPE = determinarCategoriaPPE(E_cal);
-
+        const E_joules = 12.552 * (t * 20) * Math.pow(10, term);
+        const E_cal = E_joules * 0.239; // J/cm2 to cal/cm2
+        
         return {
-            energiaIncidente: E_cal, // cal/cm²
-            energiaJoules: E, // J/cm²
-            distanciaArco: D_arco, // mm
-            categoriaPPE: categoriaPPE,
-            metodo: 'MV IEEE 1584-2018'
+            energiaIncidente: E_cal
         };
     }
 
@@ -187,7 +252,12 @@ var IEEE1584 = (function() {
                 gap: nodo.gap || opciones.gap,
                 factorK: nodo.factorK || opciones.factorK || 1.0,
                 enclosure: nodo.enclosure || opciones.enclosure || 'Panel',
-                tiempoDisparo: nodo.tiempoDisparo || calcularTiempoDesdeLSIG(nodo)
+                // Inyectar callback de tiempo dinámico basado en Iarc
+                getClearingTime: function(current_kA) {
+                    if (nodo.tiempoDisparo && !nodo.ajustes) return nodo.tiempoDisparo;
+                    var nTest = Object.assign({}, nodo, { Isc_kA: current_kA });
+                    return calcularTiempoDesdeLSIG(nTest);
+                }
             };
 
             var resultado = calcularEnergiaIncidente(params);
@@ -328,7 +398,12 @@ var IEEE1584 = (function() {
                 gap: nodo.gap || opciones.gap,
                 factorK: nodo.factorK || opciones.factorK || 1.0,
                 enclosure: nodo.enclosure || opciones.enclosure || 'Panel',
-                tiempoDisparo: nodo.tiempoDisparo || calcularTiempoDesdeLSIG(nodo)
+                // Inyectar callback de tiempo dinámico basado en Iarc
+                getClearingTime: function(current_kA) {
+                    if (nodo.tiempoDisparo && !nodo.ajustes) return nodo.tiempoDisparo;
+                    var nTest = Object.assign({}, nodo, { Isc_kA: current_kA });
+                    return calcularTiempoDesdeLSIG(nTest);
+                }
             };
         });
 

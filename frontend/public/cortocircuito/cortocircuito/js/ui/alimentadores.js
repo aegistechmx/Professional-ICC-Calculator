@@ -78,7 +78,7 @@ var UIAlimentadores = (function() {
 
         // Buscar calibre mínimo adecuado
         var calibreMin = null;
-        var calibres = CONSTANTES.CALIBRES.slice().reverse();
+        var calibres = CONSTANTES.CALIBRES.slice();
 
         for (var i = 0; i < calibres.length; i++) {
             var ampBase = (material === 'cobre') ? 
@@ -144,7 +144,7 @@ var UIAlimentadores = (function() {
         if (sugerencia.subdimensionado && sugerencia.calibreSugerido) {
             return warningNeutro + '<div class="flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg border border-[--border] bg-[--surface]">' +
                 '<i class="fas fa-exclamation-triangle text-[--red] text-[0.7rem]"></i>' +
-                '<span class="text-[0.7rem] text-[--red]">¡ADVERTENCIA! Calibre ' + f.calibre + ' insuficiente. Usar mínimo ' + sugerencia.calibreSugerido + ' (' + sugerencia.ampAjustada.toFixed(0) + 'A para ' + icarga + 'A)</span>' +
+                '<span class="text-[0.7rem] text-[--red]">¡ADVERTENCIA! Calibre ' + f.calibre + ' insuficiente para la carga de diseño. Ejecuta Auto-Corregir Total o revisa conductor/terminal. Candidato mínimo estimado: ' + sugerencia.calibreSugerido + '.</span>' +
                 '</div>';
         }
         

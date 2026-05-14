@@ -36,10 +36,18 @@ var CaidaTension = (function() {
 
         var n = Math.max(1, feeder.paralelo || 1);
         var L = Math.max(0, feeder.longitud || 0);
+        var temp = feeder.tempAmbiente || 30;
+        var material = feeder.material || 'cobre';
 
         // R y X del tramo en ohms
-        var R = (datos.R * L / 1000) / n;
+        var R_base = (datos.R * L / 1000) / n;
         var X = (datos.X * L / 1000) / n;
+
+        // Corregir resistencia por temperatura (NOM-001 Art. 310)
+        // Formula: R2 = R1 * (T_inf + T2) / (T_inf + T1)
+        // T_inf: Cobre = 234.5, Aluminio = 225
+        var T_inf = (material === 'cobre') ? 234.5 : 225;
+        var R = R_base * (T_inf + temp) / (T_inf + 75); // Asumiendo datos.R @ 75C
 
         // Componentes de potencia
         var cosFi = Math.min(1, Math.max(0, fp));

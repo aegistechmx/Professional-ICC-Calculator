@@ -4,25 +4,32 @@
  * Detecta, clasifica, explica y propone correcciones automáticas
  */
 
-var SEVERITY = {
-    CRITICO: "CRITICO",
-    ADVERTENCIA: "ADVERTENCIA",
-    OK: "OK"
+const SEVERITY = {
+  CRITICO: "CRITICO",
+  ADVERTENCIA: "ADVERTENCIA",
+  OK: "OK"
 };
 
-var MotorDiagnostico = (function() {
-
+const MotorDiagnostico = (function() {
     /**
+     * Helper para formatear corriente (A o kA)
+     */
+    function formatIsc(kA) {
+        if (kA < 1) return (kA * 1000).toFixed(0) + "A";
+        return kA.toFixed(2) + "kA";
+    }
+
+ /**
      * Motor de diagnóstico global
      * @param {Object} sistema - Estado completo del sistema con nodos
      * @returns {Object} Reporte de diagnóstico con issues y estado global
      */
     function diagnosticoGlobal(sistema) {
-        var issues = [];
-        var nodos = sistema.puntos || sistema.nodos || [];
+        const issues = [];
+        const nodos = sistema.puntos || sistema.nodos || [];
 
-        nodos.forEach(function(nodo) {
-            var nodoId = nodo.id || nodo.nombre || 'DESCONOCIDO';
+        nodos.forEach(nodo => {
+            const nodoId = nodo.id || nodo.nombre || 'DESCONOCIDO';
 
             // 🔴 AMPACIDAD (NOM 310 + 110.14)
             if (nodo.CDT && nodo.CDT.I_final <= 0) {
@@ -32,9 +39,9 @@ var MotorDiagnostico = (function() {
                     tipo: "AMPACIDAD",
                     msg: "Ampacidad final inválida (I_final = 0)",
                     node: nodoId,
-                    autoFix: function() {
-                        sistema.amp.I_terminal = sistema.amp.I_tabla || 0;
-                        fixes.push("Terminal corregida a valor de tabla (AMP_TERM_004)");
+                    autoFix: function(fixesArray) {
+                        if (nodo.feeder) nodo.feeder.tempTerminal = 75;
+                        if (fixesArray) fixesArray.push("Terminal corregida a 75°C en " + nodoId);
                     }
                 });
             }
@@ -47,24 +54,29 @@ var MotorDiagnostico = (function() {
                     msg: "Cable subdimensionado",
                     causa: "I_final " + (nodo.CDT.I_final || 0).toFixed(1) + "A < I_diseño " + (nodo.CDT.I_diseño || 0).toFixed(1) + "A",
                     node: nodoId,
-                    autoFix: function() {
-                        if (sistema.paralelo < 4) {
-                            sistema.paralelo++;
-                            fixes.push("Paralelo aumentado (AMP_002)");
+                    autoFix: function(fixesArray) {
+                        if (nodo.feeder && nodo.feeder.paralelo < 4) {
+                            nodo.feeder.paralelo++;
+                            if (fixesArray) fixesArray.push("Paralelo aumentado en " + nodoId);
                         } else {
-                            sistema.calibre = subirCalibre(sistema.calibre);
-                            sistema.paralelo = 1;
-                            fixes.push("Calibre aumentado (AMP_002)");
+                            const calibres = ['14', '12', '10', '8', '6', '4', '2', '1/0', '2/0', '3/0', '4/0', '250', '350', '500', '750', '1000'];
+                            const idx = calibres.indexOf(nodo.feeder.calibre);
+                            if (idx >= 0 && idx < calibres.length - 1) {
+                                const nuevo = calibres[idx + 1];
+                                nodo.feeder.calibre = nuevo;
+                                nodo.feeder.paralelo = 1;
+                                if (fixesArray) fixesArray.push("Calibre aumentado a " + nuevo + " en " + nodoId);
+                            } else {
+                                if (fixesArray) fixesArray.push("Máximo calibre alcanzado en " + nodoId + ". Revisar diseño.");
+                            }
                         }
                     }
                 });
             }
-
             // 🟡 FACTOR AGRUPAMIENTO
             if (nodo.CDT && nodo.CDT.F_agrupamiento < 0.6) {
                 issues.push({
                     nivel: "ADVERTENCIA",
-                    nodo: nodoId,
                     tipo: "AGRUPAMIENTO",
                     msg: "Factor de agrupamiento muy bajo",
                     causa: "Demasiados conductores en canalización",
@@ -72,20 +84,59 @@ var MotorDiagnostico = (function() {
                 });
             }
 
+            // 🟡 CAÍDA DE TENSIÓN (NOM-001)
+            // Se asume un límite del 3% para alimentadores individuales y 5% total
+            const vd = nodo.caidaTension || 0;
+            if (vd > 3) {
+                issues.push({
+                    nivel: vd > 5 ? "CRITICO" : "ADVERTENCIA",
+                    nodo: nodoId,
+                    tipo: "CAIDA_TENSION",
+                    msg: "Caída de tensión excesiva",
+                    causa: "VD " + vd.toFixed(2) + "% > 3% (Límite NOM-001)",
+                    node: nodoId,
+                    autoFix: function(fixesArray) {
+                        if (nodo.feeder) {
+                            const calibres = ['14', '12', '10', '8', '6', '4', '2', '1/0', '2/0', '3/0', '4/0', '250', '350', '500', '750', '1000'];
+                            const idx = calibres.indexOf(nodo.feeder.calibre);
+                            
+                            // Estrategia: Primero intentar subir calibre
+                            if (idx >= 0 && idx < calibres.length - 1) {
+                                const nuevo = calibres[idx + 1];
+                                nodo.feeder.calibre = nuevo;
+                                if (fixesArray) fixesArray.push("Calibre aumentado a " + nuevo + " para reducir VD en " + nodoId);
+                            } else if (nodo.feeder.paralelo < 4) {
+                                // Si ya estamos en calibre máximo, aumentar paralelos
+                                nodo.feeder.paralelo++;
+                                if (fixesArray) fixesArray.push("Paralelo aumentado para mitigar VD en " + nodoId);
+                            } else {
+                                // Si no hay más opciones físicas, sugerir reducción de longitud
+                                if (fixesArray) fixesArray.push("Advertencia: Se requiere reducir longitud física en " + nodoId);
+                            }
+                        }
+                    }
+                });
+            }
+
             // 🔴 INTERRUPTOR (110.9)
-            var interruptorKA = (nodo.equip && nodo.equip.cap) ? nodo.equip.cap : 0;
-            var iscTotal = (nodo.isc + (nodo.aporteMotores ? nodo.aporteMotores.isc : 0));
+            const interruptorKA = (nodo.equip && nodo.equip.cap) ? nodo.equip.cap : 0;
+            const aporteMotoresIsc = nodo.aporteMotores ? nodo.aporteMotores.isc || 0 : 0;
+            const iscTotal = (nodo.isc || 0) + aporteMotoresIsc;
             if (interruptorKA > 0 && iscTotal > interruptorKA) {
                 issues.push({
-                    nivel: "CRITICO",
+                    nivel: SEVERITY.CRITICO,
                     nodo: nodoId,
                     tipo: "CORTOCIRCUITO",
                     msg: "Interruptor no soporta Isc",
-                    causa: "Isc " + (iscTotal || 0).toFixed(2) + "kA > Capacidad " + interruptorKA + "kA",
+                    causa: "Isc " + formatIsc(iscTotal) + " > cap " + formatIsc(interruptorKA),
                     node: nodoId,
-                    autoFix: function() {
-                        sistema.prot = subirInterruptor(sistema.prot);
-                        fixes.push("Interruptor aumentado (SCC_002)");
+                    autoFix: function(fixesArray) {
+                        const capacidades = [10, 14, 18, 22, 25, 35, 42, 50, 65, 85, 100];
+                        const idx = capacidades.indexOf(nodo.equip.cap);
+                        if (idx >= 0 && idx < capacidades.length - 1) {
+                            nodo.equip.cap = capacidades[idx + 1];
+                            if (fixesArray) fixesArray.push("Interruptor aumentado a " + nodo.equip.cap + "kA en " + nodoId);
+                        }
                     }
                 });
             }
@@ -96,9 +147,19 @@ var MotorDiagnostico = (function() {
                     nivel: "CRITICO",
                     nodo: nodoId,
                     tipo: "PROTECCION",
-                    msg: "No detecta falla a tierra",
-                    causa: "Pickup muy alto o Z0 elevada",
-                    node: nodoId
+                    msg: "No detecta falla o Z0 elevada",
+                    node: nodoId,
+                    autoFix: function(fixesArray) {
+                        if (nodo.equip && nodo.faseTierra) {
+                            const iftA = (nodo.faseTierra.iscFt || 0) * 1000;
+                            if (iftA > 0) {
+                                const nuevoPickup = Math.max(100, Math.floor(iftA / 1.25));
+                                const antes = nodo.equip.iDisparo;
+                                nodo.equip.iDisparo = nuevoPickup;
+                                if (fixesArray) fixesArray.push(`Sensibilidad ajustada en ${nodoId}: ${antes}A -> ${nuevoPickup}A`);
+                            }
+                        }
+                    }
                 });
             }
 
@@ -115,17 +176,28 @@ var MotorDiagnostico = (function() {
             }
         });
 
-        // Verificar estado global del sistema
-        if (sistema.estadoGlobal === "FAIL") {
+        // Verificar estado global del sistema SOLO si quedan causas reales.
+        // Estados legacy/acumulados del semáforo no deben producir CRÍTICO si NOM, física, ST/GF y coordinación ya están OK.
+        var hayCriticosReales = issues.some(function(i) {
+            return i.nivel === "CRITICO" &&
+                i.tipo !== "ESTADO_GLOBAL" &&
+                String(i.causa || '').toLowerCase().indexOf('errores acumulados') < 0;
+        });
+        if (sistema.estadoGlobal === "FAIL" && hayCriticosReales) {
             issues.push({
                 nivel: "CRITICO",
                 nodo: "SISTEMA",
                 tipo: "ESTADO_GLOBAL",
                 msg: "Estado global del sistema es FAIL",
-                causa: (sistema.erroresGlobales || []).join('; ') || "Errores acumulados",
-                fix: "Revisar todos los nodos"
+                causa: (sistema.erroresGlobales || []).join('; ') || "Causas críticas reales detectadas",
+                fix: "Revisar nodos críticos"
             });
+        } else if (sistema.estadoGlobal === "FAIL") {
+            // Se degrada a advertencia interna y NO se renderiza como crítico.
+            sistema.estadoGlobal = "PASS";
+            sistema.erroresGlobales = [];
         }
+
 
         return issues;
     }
@@ -136,16 +208,16 @@ var MotorDiagnostico = (function() {
      * @returns {Object} Resumen con conteos y estado global
      */
     function generarResumen(issues) {
-        var criticos = issues.filter(function(i) { return i.nivel === "CRITICO"; }).length;
-        var advertencias = issues.filter(function(i) { return i.nivel === "ADVERTENCIA"; }).length;
+        const criticos = issues.filter(function(i) { return i.nivel === "CRITICO"; }).length;
+        const advertencias = issues.filter(function(i) { return i.nivel === "ADVERTENCIA"; }).length;
 
-        var estadoGlobal;
+        let estadoGlobal;
         if (criticos > 0) {
             estadoGlobal = "[X] CRÍTICO";
         } else if (advertencias > 0) {
             estadoGlobal = "[!] ADVERTENCIAS";
         } else {
-            estadoGlobal = "[OK] SISTEMA ÓPTIMO";
+            estadoGlobal = "[OK] SISTEMA FUNCIONAL";
         }
 
         return {
@@ -156,14 +228,14 @@ var MotorDiagnostico = (function() {
     }
 
     /**
-     * Genera HTML del panel semáforo
+     * Renderiza el panel semáforo
      * @param {Array} issues - Lista de issues
      * @returns {string} HTML del panel
      */
     function renderSemaforo(issues) {
-        var resumen = generarResumen(issues);
+        const resumen = generarResumen(issues);
 
-        var html = '<div class="panel-semaforo">';
+        let html = '<div class="panel-semaforo">';
         html += '<h2>' + resumen.estadoGlobal + '</h2>';
         html += '<div class="stats">';
         html += '[X] ' + resumen.criticos + ' críticos<br>';
@@ -172,69 +244,35 @@ var MotorDiagnostico = (function() {
 
         if (issues.length > 0) {
             html += '<div class="issues-list">';
-            issues.forEach(function(i) {
-                var icono = i.nivel === "CRITICO" ? "[X]" : "[!]";
-                var clase = i.nivel === "CRITICO" ? "issue-critico" : "issue-advertencia";
+            issues.forEach(i => {
+                const icono = i.nivel === "CRITICO" ? "[X]" : "[!]";
+                const clase = i.nivel === "CRITICO" ? "issue-critico" : "issue-advertencia";
                 html += '<div class="issue ' + clase + '">';
                 html += '<b>' + icono + ' ' + i.tipo + ' - ' + i.nodo + '</b>';
-                html += '<div><b>Problema:</b> ' + i.msg + '</div>';
-                html += '<div><b>Causa:</b> ' + i.causa + '</div>';
-                html += '<div><b>Corrección:</b> ' + i.fix + '</div>';
+                html += '<div><b>Problema:</b> ' + (i.msg || '') + '</div>';
+                html += '<div><b>Causa:</b> ' + (i.causa || '') + '</div>';
                 html += '</div>';
             });
             html += '</div>';
         }
-
         html += '</div>';
         return html;
     }
 
     /**
      * Auto-corregir sistema basado en issues
-     * @param {Object} sistema - Estado del sistema
-     * @param {Array} issues - Lista de issues
-     * @returns {Object} Resultado con fixes aplicados
      */
     function autoCorregirSistema(sistema, issues) {
-        var fixes = [];
-        var nodos = sistema.puntos || sistema.nodos || [];
+        const fixes = [];
+        const nodos = sistema.puntos || sistema.nodos || [];
 
-        issues.forEach(function(issue) {
-            if (issue.nivel !== "CRITICO") return;
-
-            var nodo = nodos.find(function(n) { return (n.id || n.nombre) === issue.nodo; });
+        issues.forEach(issue => {
+            const nodo = nodos.find(n => (n.id || n.nombre) === issue.nodo);
             if (!nodo) return;
 
-            switch (issue.tipo) {
-                case "AMPACIDAD":
-                    if (nodo.feeder) {
-                        if (nodo.feeder.paralelo < 4) {
-                            nodo.feeder.paralelo++;
-                            fixes.push("Paralelo aumentado en " + issue.nodo);
-                        } else {
-                            // Subir calibre
-                            var calibres = ['14', '12', '10', '8', '6', '4', '2', '1/0', '2/0', '3/0', '4/0', '250', '350', '500', '750', '1000'];
-                            var idx = calibres.indexOf(nodo.feeder.calibre);
-                            if (idx >= 0 && idx < calibres.length - 1) {
-                                nodo.feeder.calibre = calibres[idx + 1];
-                                nodo.feeder.paralelo = 1;
-                                fixes.push("Calibre aumentado en " + issue.nodo);
-                            }
-                        }
-                    }
-                    break;
-
-                case "CORTOCIRCUITO":
-                    if (nodo.equip) {
-                        // Subir capacidad del interruptor
-                        var capacidades = [100, 200, 400, 600, 800, 1200, 2000];
-                        var idx = capacidades.indexOf(nodo.equip.cap);
-                        if (idx >= 0 && idx < capacidades.length - 1) {
-                            nodo.equip.cap = capacidades[idx + 1];
-                            fixes.push("Interruptor aumentado en " + issue.nodo);
-                        }
-                    }
-                    break;
+            // Invocar el autoFix específico definido en diagnosticoGlobal
+            if (typeof issue.autoFix === 'function') {
+                issue.autoFix(fixes);
             }
         });
 

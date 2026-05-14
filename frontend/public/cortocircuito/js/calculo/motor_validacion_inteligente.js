@@ -1,8 +1,23 @@
 /**
- * motor_validacion_inteligente.js — Motor de validación inteligente y auto-corrección
- * Detecta incoherencias físicas, normativas y ofrece correcciones automáticas
+ * motor_validacion_inteligente.js — Motor de validación inteligente [DEPRECATED]
+ * 
+ * ⚠️ DEPRECATED: Este archivo está obsoleto y será eliminado en una versión futura.
+ * 
+ * ✅ USAR EN SU LUGAR: js/core/domain/validation.engine.js
+ *    - ValidationEngine.runAll() para validación completa
+ *    - ValidationEngine.validatePhysicalConstraints() para validación física
+ *    - MotorAutocorreccion.aplicarCorreccionesDesdeValidacion() para auto-corrección
+ * 
+ * 📚 Migración:
+ *    - MotorValidacionInteligente.validarSistemaCompleto() → ValidationEngine.runAll(ctx)
+ *    - MotorValidacionInteligente.validarFisicaSistema() → ValidationEngine.validatePhysicalConstraints(ctx)
+ *    - MotorValidacionInteligente.autoCorregir() → MotorAutocorreccion.aplicarCorreccionesDesdeValidacion()
+ * 
+ * @deprecated Desde versión 2.0.0 - Usar ValidationEngine
+ * @see js/core/domain/validation.engine.js
+ * @see js/calculo/motor_autocorreccion.js (nuevo método aplicarCorreccionesDesdeValidacion)
  */
-var MotorValidacionInteligente = (function() {
+var MotorValidacionInteligente = (function () {
 
     /**
      * Valida consistencia física de un punto del sistema
@@ -265,7 +280,7 @@ var MotorValidacionInteligente = (function() {
 
         var puntos = estado.puntos || [];
 
-        puntos.forEach(function(punto, index) {
+        puntos.forEach(function (punto, index) {
             var id = punto.id || ('P' + index);
 
             // Validación física

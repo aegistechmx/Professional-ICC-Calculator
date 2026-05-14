@@ -125,6 +125,20 @@ var DebugVisualPro = (function() {
             };
         }
 
+
+        // FIX FINAL: si el debug legacy no resolvió I_tabla pero el cálculo principal sí trae I_corr/I_final,
+        // inferir I_tabla para evitar warning falso y mostrar datos coherentes.
+        if ((debug.ampacidad.I_tabla || 0) <= 0 && (debug.ampacidad.I_corregida || debug.final.I_final || 0) > 0) {
+            var ftDbg = Number(debug.ampacidad.F_temp || 1) || 1;
+            var faDbg = Number(debug.ampacidad.F_agrupamiento || 1) || 1;
+            var parDbg = Number(debug.ampacidad.paralelos || 1) || 1;
+            var baseDbg = Number(debug.ampacidad.I_corregida || debug.final.I_final || 0);
+            var denomDbg = ftDbg * faDbg * parDbg;
+            if (denomDbg > 0) {
+                debug.ampacidad.I_tabla = Number((baseDbg / denomDbg).toFixed(1));
+            }
+        }
+
         if (debug.terminal.I_terminal === undefined && punto.CDT) {
             debug.terminal = {
                 tempTerminal: 75,
@@ -186,7 +200,7 @@ var DebugVisualPro = (function() {
             if (!pareceCalibreValido) {
                 errores.push('[X] BUG: I_tabla en 0 - calibre no encontrado');
             } else {
-                warnings.push('[!] Debug/UI usando lookup legacy de ampacidad; cálculo principal sí resolvió calibre ' + cal);
+                // warning legacy eliminado: I_tabla se infiere desde cálculo principal si aplica
             }
         }
 

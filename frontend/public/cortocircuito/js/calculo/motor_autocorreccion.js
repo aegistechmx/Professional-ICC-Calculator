@@ -4,7 +4,7 @@
  * Itera hasta converger, aplicando corrección mínima necesaria
  */
 
-var MotorAutocorreccion = (function() {
+var MotorAutocorreccion = (function () {
 
     /**
      * Prioridad de riesgo eléctrico real (orden ingeniero)
@@ -404,7 +404,7 @@ var MotorAutocorreccion = (function() {
         }
 
         // 🔴 Prioridad: críticos primero
-        let criticos = issues.filter(function(i) { return i.nivel === "CRITICO"; });
+        let criticos = issues.filter(function (i) { return i.nivel === "CRITICO"; });
 
         // Orden tipo ingeniero (seguridad primero)
         criticos.sort(prioridadIngenieria);
@@ -441,7 +441,7 @@ var MotorAutocorreccion = (function() {
      * Aplica corrección específica según tipo de issue
      */
     function aplicarCorreccion(sistema, issue, log) {
-        let nodo = sistema.nodos ? sistema.nodos.find(function(n) { return (n.id || n.nombre) === issue.nodo; }) : null;
+        let nodo = sistema.nodos ? sistema.nodos.find(function (n) { return (n.id || n.nombre) === issue.nodo; }) : null;
         if (!nodo) return;
 
         switch (issue.tipo) {
@@ -479,16 +479,16 @@ var MotorAutocorreccion = (function() {
                 if (nodo.equip) {
                     // Prioridad: Usar corriente de falla real (ajustada por desbalance si existe)
                     const iftA = (nodo.faseTierra ? (nodo.faseTierra.iscFt_ajustado || nodo.faseTierra.iscFt || 0) : 0) * 1000;
-                    
+
                     if (iftA > 0) {
                         const factorSensibilidad = 1.25; // Margen requerido por Art. 230.95 / IEEE
                         const antes = nodo.equip.iDisparo || 0;
                         // Calculamos el pickup máximo que vería la falla con seguridad
                         let nuevoPickup = Math.floor(iftA / factorSensibilidad);
-                        
+
                         // Mantener un suelo de 100A para evitar disparos por desbalances menores de carga
                         nuevoPickup = Math.max(100, nuevoPickup);
-                        
+
                         nodo.equip.iDisparo = nuevoPickup;
                         log.push(`Fix Tierra: ${issue.nodo} → pickup ${antes.toFixed(0)}A -> ${nuevoPickup}A (Sensibilidad para If=${iftA.toFixed(0)}A)`);
                     } else if (nodo.equip.iDisparo) {
@@ -513,12 +513,207 @@ var MotorAutocorreccion = (function() {
         }
     }
 
+    /**
+     * === NUEVO: Aplica correcciones basadas en resultados de ValidationEngine ===
+     * Este método consume el resultado de ValidationEngine.runAll() en lugar de hacer validación propia
+     * @param {Object} sistema - Sistema con nodos
+     * @param {Object} validationResult - Resultado de ValidationEngine.runAll() o Orchestrator.validarSistema()
+     * @returns {Object} Sistema corregido y log de cambios
+     */
+    function aplicarCorreccionesDesdeValidacion(sistema, validationResult) {
+        let log = [];
+        let cambios = [];
+
+        if (!validationResult || !validationResult.errors) {
+            log.push("⚠️ No hay resultados de validación para aplicar");
+            return { sistema: sistema, cambios: cambios, log: log };
+        }
+
+        console.log("[MotorAutocorreccion] Aplicando correcciones desde ValidationEngine");
+
+        // Procesar cada error del resultado de validación
+        validationResult.errors.forEach(function (error) {
+            // Encontrar el nodo correspondiente
+            let nodo = null;
+            if (error.data && error.data.nodeId) {
+                nodo = sistema.nodos ? sistema.nodos.find(function (n) { return n.id === error.data.nodeId; }) : null;
+            }
+
+            // Si no se encontró por ID, intentar buscar en el contexto
+            if (!nodo && error.ctx && error.ctx.node) {
+                nodo = error.ctx.node;
+            }
+
+            if (!nodo) {
+                log.push("⚠️ No se encontró nodo para error: " + error.code);
+                return;
+            }
+
+            // Aplicar corrección según el código de error
+            switch (error.code) {
+                case ValidationEngine.CODES.ICC_SUPERA_CAPACIDAD:
+                case ValidationEngine.CODES.CAPACIDAD_INTERRUPTIVA_INSUFICIENTE:
+                    if (nodo.equip && error.data) {
+                        let capacidadActual = nodo.equip.cap || 0;
+                        let iscRequerido = error.data.isc || error.data.isc;
+                        let nuevaCapacidad = seleccionarCapacidadSuperior(capacidadActual, iscRequerido);
+
+                        if (nuevaCapacidad > capacidadActual) {
+                            nodo.equip.cap = nuevaCapacidad;
+                            let cambio = {
+                                tipo: 'CAPACIDAD_INTERRUPTIVA',
+                                nodo: nodo.id,
+                                anterior: capacidadActual,
+                                nuevo: nuevaCapacidad,
+                                razon: error.message
+                            };
+                            cambios.push(cambio);
+                            log.push("🔧 " + nodo.id + ": Capacidad " + capacidadActual + "kA → " + nuevaCapacidad + "kA (Isc=" + (iscRequerido?.toFixed(2) || 'N/A') + "kA)");
+                        }
+                    }
+                    break;
+
+                case ValidationEngine.CODES.SOBRECARGA_CONDUCTOR:
+                    if (nodo.feeder || nodo) {
+                        let calibreActual = nodo.calibre || nodo.feeder?.calibre;
+                        let nuevoCalibre = subirCalibre(calibreActual);
+
+                        if (nodo.feeder) {
+                            nodo.feeder.calibre = nuevoCalibre;
+                            if (nodo.feeder.paralelo > 1) {
+                                nodo.feeder.paralelo = 1; // Resetear paralelos al subir calibre
+                            }
+                        } else {
+                            nodo.calibre = nuevoCalibre;
+                        }
+
+                        let cambio = {
+                            tipo: 'AMPACIDAD',
+                            nodo: nodo.id,
+                            anterior: calibreActual,
+                            nuevo: nuevoCalibre,
+                            razon: error.message
+                        };
+                        cambios.push(cambio);
+                        log.push("🔧 " + nodo.id + ": Calibre " + calibreActual + " → " + nuevoCalibre + " (" + error.data?.deficit?.toFixed(1) + "A deficit)");
+                    }
+                    break;
+
+                case ValidationEngine.CODES.PROTECCION_NO_SENSIBLE_TIERRA:
+                    if (nodo.equip && error.data) {
+                        let pickupAnterior = nodo.equip.iDisparo || 0;
+                        let nuevaCorrienteFalla = error.data.fault || 0;
+                        let nuevoPickup = Math.max(100, Math.floor(nuevaCorrienteFalla / 1.25));
+
+                        nodo.equip.iDisparo = nuevoPickup;
+
+                        let cambio = {
+                            tipo: 'PICKUP_TIERRA',
+                            nodo: nodo.id,
+                            anterior: pickupAnterior,
+                            nuevo: nuevoPickup,
+                            razon: error.message
+                        };
+                        cambios.push(cambio);
+                        log.push("🔧 " + nodo.id + ": Pickup tierra " + pickupAnterior + "A → " + nuevoPickup + "A (If=" + nuevaCorrienteFalla?.toFixed(0) + "A)");
+                    }
+                    break;
+
+                case ValidationEngine.CODES.FACTOR_AGRUPAMIENTO_NO_APLICADO:
+                    // Sugerir cambio a charola si hay muchos conductores
+                    if (nodo.feeder && nodo.feeder.canalizacion === "conduit") {
+                        nodo.feeder.canalizacion = "charola";
+                        let cambio = {
+                            tipo: 'CANALIZACION',
+                            nodo: nodo.id,
+                            anterior: 'conduit',
+                            nuevo: 'charola',
+                            razon: error.message
+                        };
+                        cambios.push(cambio);
+                        log.push("🔧 " + nodo.id + ": Conduit → Charola (" + error.data?.conductors + " conductores)");
+                    }
+                    break;
+
+                case ValidationEngine.CODES.CAIDA_EXCESIVA:
+                    // Para caída de tensión excesiva, aumentar calibre
+                    if (nodo.feeder || nodo) {
+                        let calibreActual = nodo.calibre || nodo.feeder?.calibre;
+                        let nuevoCalibre = subirCalibre(calibreActual);
+
+                        if (nodo.feeder) {
+                            nodo.feeder.calibre = nuevoCalibre;
+                        } else {
+                            nodo.calibre = nuevoCalibre;
+                        }
+
+                        let cambio = {
+                            tipo: 'CAIDA_TENSION',
+                            nodo: nodo.id,
+                            anterior: calibreActual,
+                            nuevo: nuevoCalibre,
+                            razon: error.message
+                        };
+                        cambios.push(cambio);
+                        log.push("🔧 " + nodo.id + ": Calibre " + calibreActual + " → " + nuevoCalibre + " (caída " + error.data?.drop?.toFixed(2) + "% > 5%)");
+                    }
+                    break;
+
+                default:
+                    log.push("⚠️ " + nodo.id + ": Error no auto-corregible - " + error.code + " - " + error.message);
+                    break;
+            }
+        });
+
+        // Procesar warnings (sugerencias)
+        if (validationResult.warnings) {
+            validationResult.warnings.forEach(function (warning) {
+                // Los warnings no bloquean, pero podemos loguearlos
+                if (warning.code === ValidationEngine.CODES.CRUCE_TCC) {
+                    log.push("⚠️ Coordinación TCC necesita revisión manual");
+                }
+            });
+        }
+
+        console.log("[MotorAutocorreccion] Correcciones aplicadas: " + cambios.length);
+
+        return {
+            sistema: sistema,
+            cambios: cambios,
+            log: log,
+            stats: {
+                totalErrors: validationResult.errors?.length || 0,
+                totalWarnings: validationResult.warnings?.length || 0,
+                appliedFixes: cambios.length
+            }
+        };
+    }
+
+    /**
+     * Helper: Selecciona capacidad de interruptor superior
+     */
+    function seleccionarCapacidadSuperior(actual, requerido) {
+        const capacidades = [10, 18, 25, 35, 42, 65, 100, 150, 200];
+
+        // Encontrar la primera capacidad que cumpla con el requerido
+        for (let i = 0; i < capacidades.length; i++) {
+            if (capacidades[i] > requerido && capacidades[i] > actual) {
+                return capacidades[i];
+            }
+        }
+
+        // Si no se encontró, usar el doble del requerido redondeado
+        return Math.ceil(requerido * 2 / 10) * 10;
+    }
+
     return {
         motorSistemaV1: motorSistemaV1,
         autoAmpacidadFULL: autoAmpacidadFULL,
         normalizarInput: normalizarInput,
         autoCorregirInteligente: autoCorregirInteligente,
-        prioridadIngenieria: prioridadIngenieria
+        prioridadIngenieria: prioridadIngenieria,
+        // === NUEVO: Método que consume ValidationEngine ===
+        aplicarCorreccionesDesdeValidacion: aplicarCorreccionesDesdeValidacion
     };
 })();
 

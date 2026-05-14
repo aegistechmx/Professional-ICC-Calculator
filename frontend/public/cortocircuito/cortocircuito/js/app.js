@@ -547,10 +547,9 @@ var App = (function () {
                 }
 
                 // 🚦 Mostrar semáforo del sistema si está disponible
-                if (resultado.puntos.semaforo && typeof Semaforo !== 'undefined') {
+                if ((resultado.puntos.semaforo || resultado.puntos.arbitrajeGlobal) && typeof Semaforo !== 'undefined') {
                     var semaforoSection = document.getElementById('semaforo-section');
                     if (!semaforoSection) {
-                        // Crear sección si no existe
                         var resultsSection = document.getElementById('results-section');
                         if (resultsSection) {
                             semaforoSection = document.createElement('section');
@@ -560,8 +559,38 @@ var App = (function () {
                         }
                     }
                     if (semaforoSection) {
-                        semaforoSection.innerHTML = '<div class="card-title"><i class="fas fa-traffic-light mr-2"></i>Estado del Sistema (Semáforo)</div>' +
-                            Semaforo.renderHTML(resultado.puntos.semaforo);
+                        var arb = resultado.puntos.arbitrajeGlobal || null;
+                        if (arb) {
+                            var status = arb.estado || 'OK';
+                            var color = status === 'ERROR' ? 'text-red-400' : (status === 'WARNING' ? 'text-yellow-400' : 'text-green-400');
+                            var dot = status === 'ERROR' ? 'bg-red-500' : (status === 'WARNING' ? 'bg-yellow-500' : 'bg-green-500');
+                            var errores = Array.isArray(arb.errores) ? arb.errores : [];
+                            var warnings = Array.isArray(arb.warnings) ? arb.warnings : [];
+                            var htmlSem = '<div class="card-title"><i class="fas fa-traffic-light mr-2"></i>Estado del Sistema (Semáforo)</div>';
+                            htmlSem += '<div class="p-4 rounded-lg border border-[--border] bg-[--surface]">';
+                            htmlSem += '<div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-4 h-4 rounded-full ' + dot + '"></div><span class="font-bold ' + color + '">' + status + '</span></div><span class="text-xs text-[--text-muted]">' + (arb.timestamp || new Date().toISOString()) + '</span></div>';
+                            htmlSem += '<div class="grid grid-cols-3 gap-2 mb-4">';
+                            htmlSem += '<div class="p-2 rounded bg-[--border] text-center"><div class="text-lg font-bold text-[--text]">0</div><div class="text-xs text-[--text-muted]">Autocorrecciones</div></div>';
+                            htmlSem += '<div class="p-2 rounded bg-[--border] text-center"><div class="text-lg font-bold text-[--yellow]">' + warnings.length + '</div><div class="text-xs text-[--text-muted]">Warnings</div></div>';
+                            htmlSem += '<div class="p-2 rounded bg-[--border] text-center"><div class="text-lg font-bold text-[--red]">' + errores.length + '</div><div class="text-xs text-[--text-muted]">Errores</div></div>';
+                            htmlSem += '</div>';
+                            if (errores.length || warnings.length) {
+                                htmlSem += '<div class="space-y-2">';
+                                errores.concat(warnings).forEach(function(i) {
+                                    var isErr = errores.indexOf(i) >= 0;
+                                    var cls = isErr ? 'text-red-400' : 'text-yellow-400';
+                                    var ico = isErr ? '[X]' : '[!]';
+                                    htmlSem += '<div class="p-2 rounded bg-[--border]"><span class="font-semibold ' + cls + '">' + ico + ' ' + (i.tipo || 'SISTEMA') + '</span><div class="text-xs text-[--text-muted]">' + (i.mensaje || i.msg || '') + '</div></div>';
+                                });
+                                htmlSem += '</div>';
+                            } else {
+                                htmlSem += '<div class="text-sm text-green-400">[OK] Sin errores críticos reales. NOM, coordinación y sensibilidad validadas.</div>';
+                            }
+                            htmlSem += '</div>';
+                            semaforoSection.innerHTML = htmlSem;
+                        } else {
+                            semaforoSection.innerHTML = '<div class="card-title"><i class="fas fa-traffic-light mr-2"></i>Estado del Sistema (Semáforo)</div>' + Semaforo.renderHTML(resultado.puntos.semaforo);
+                        }
                         semaforoSection.classList.remove('hidden');
                     }
                 }

@@ -159,6 +159,34 @@
         }
     </script>
     <link rel="stylesheet" href="css/estilos.css">
+
+<style id="icc-default-wizard-style">
+  .icc-wizard-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:9999;padding:18px}
+  .icc-wizard-backdrop.open{display:flex}
+  .icc-wizard{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#0f172a;border:1px solid #334155;border-radius:22px;box-shadow:0 25px 80px rgba(0,0,0,.55);color:#e5e7eb}
+  .icc-wizard-head{position:sticky;top:0;background:linear-gradient(135deg,#0f172a,#111827 55%,#083344);border-bottom:1px solid #334155;padding:18px 22px;z-index:2}
+  .icc-wizard-title{font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:10px}
+  .icc-wizard-sub{font-size:.78rem;color:#94a3b8;margin-top:4px}
+  .icc-wizard-steps{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+  .icc-step-pill{font-size:.68rem;border:1px solid #334155;border-radius:999px;padding:5px 9px;color:#94a3b8;background:#111827}
+  .icc-step-pill.active{color:#67e8f9;border-color:#0891b2;background:rgba(8,145,178,.16)}
+  .icc-wizard-body{padding:20px 22px}
+  .icc-wizard-step{display:none}.icc-wizard-step.active{display:block}
+  .icc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+  .icc-card-option{border:1px solid #334155;background:#111827;border-radius:16px;padding:13px;cursor:pointer;transition:.15s;min-height:76px}
+  .icc-card-option:hover{border-color:#06b6d4;transform:translateY(-1px)}
+  .icc-card-option.selected{border-color:#22c55e;background:rgba(34,197,94,.12)}
+  .icc-card-option b{display:block;font-size:.88rem}.icc-card-option span{font-size:.7rem;color:#94a3b8}
+  .icc-field{display:flex;flex-direction:column;gap:5px}.icc-field label{font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .icc-field input,.icc-field select{background:#020617;border:1px solid #334155;border-radius:10px;padding:9px;color:#e5e7eb;outline:none}
+  .icc-field input:focus,.icc-field select:focus{border-color:#06b6d4}
+  .icc-wizard-actions{display:flex;justify-content:space-between;gap:10px;position:sticky;bottom:0;background:#0f172a;border-top:1px solid #334155;padding:14px 22px}
+  .icc-wizard-actions .right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .icc-wizard-btn{border:1px solid #334155;background:#111827;color:#e5e7eb;border-radius:11px;padding:9px 13px;font-size:.78rem;font-weight:700}
+  .icc-wizard-btn.primary{background:#0891b2;border-color:#06b6d4;color:white}.icc-wizard-btn.success{background:#16a34a;border-color:#22c55e;color:white}.icc-wizard-btn:hover{filter:brightness(1.08)}
+  .icc-validation-list{font-size:.8rem;line-height:1.8}.icc-validation-list .ok{color:#86efac}.icc-validation-list .warn{color:#facc15}.icc-validation-list .err{color:#fca5a5}
+</style>
+
 </head>
 <body>
 
@@ -207,6 +235,10 @@
                 <button onclick="UIExportar.csv()" class="btn-sm" title="Exportar CSV">
                     <i class="fas fa-file-csv text-[0.65rem]"></i>
                 </button>
+                
+                <button onclick="ICCDefaultWizard.open()" class="btn-sm bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-500" title="Cargar default con asistente inicial">
+                    <i class="fas fa-wand-magic-sparkles text-[0.65rem]"></i> <span class="hidden sm:inline">Cargar default</span>
+                </button>
                 <button onclick="App.saveProfile()" class="btn-sm" title="Guardar como perfil por defecto">
                     <i class="fas fa-user-cog text-[0.65rem]"></i> <span class="hidden sm:inline">Guardar Perfil</span>
                 </button>
@@ -222,6 +254,25 @@
 
     <!-- Main -->
     <main class="max-w-7xl mx-auto px-4 py-6" id="app">
+
+        <section class="ui-hero no-print" id="ui-hero-compact">
+            <div class="ui-hero-title"><i class="fas fa-bolt"></i> Modo ingeniería limpio</div>
+            <p class="ui-hero-sub">Pantalla principal enfocada en lo que sí se usa diario: sistema, fuente, transformador, alimentadores, autocorrección y resultados. Los módulos finos quedan en Avanzado.</p>
+            <div class="ui-chip-row">
+                <span class="ui-chip ok"><i class="fas fa-check-circle"></i> Conductores + protecciones</span>
+                <span class="ui-chip ok"><i class="fas fa-shield-alt"></i> ST/GF/LSIG</span>
+                <span class="ui-chip warn"><i class="fas fa-sliders-h"></i> Avanzado oculto</span>
+            </div>
+            <div class="ui-actions">
+                
+                <button type="button" class="btn-ghost" onclick="ICCDefaultWizard.open()"><i class="fas fa-wand-magic-sparkles mr-1"></i> Cargar default</button>
+                <button type="button" class="btn-ghost" onclick="UICompact.toggleAdvanced()"><i class="fas fa-layer-group mr-1"></i><span id="ui-advanced-label">Mostrar avanzado</span></button>
+                <button type="button" class="btn-ghost" onclick="App.autoCorregirTotal ? App.autoCorregirTotal() : App.autoCorregir()"><i class="fas fa-magic mr-1"></i> Autocorregir total</button>
+                <button type="button" class="btn-ghost" onclick="App.calculate()"><i class="fas fa-calculator mr-1"></i> Calcular</button>
+            </div>
+        </section>
+        <div class="advanced-hint no-print"><i class="fas fa-info-circle text-[--cyan]"></i> Módulos avanzados ocultos: C.D.T., motores, capacitores, armónicos, desbalance, X0 y detalles IEEE. Actívalos con “Mostrar avanzado”.</div>
+
         <div class="print-module">
             <div class="print-header"></div>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -264,6 +315,7 @@
                 <!-- Datos de Fuente -->
                 <section class="card">
                     <div class="card-title"><i class="fas fa-plug"></i> Datos de Fuente</div>
+                        <div class="compact-only engineering-note no-print"><strong>Datos mínimos:</strong> zona/Isc, transformador y tensión. X/R, secuencia cero, retorno de tierra e IEEE quedan como avanzado.</div>
                     <div id="modo-conocido">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -289,7 +341,7 @@
                                 <input type="number" id="input-isc-fuente" name="input-isc-fuente" value="25" min="0.01" step="0.01" oninput="App.clearResults()" placeholder="Auto por zona" title="Valores típicos de cortocircuito en media tensión. Confirmar con CFE para diseño definitivo.">
                                 <p class="text-xs text-[--text-muted] mt-1">Isc de red en MT (se transformará a BT automáticamente)</p>
                                 <p id="isc-equivalente-bt" class="text-xs text-[--cyan] mt-1 hidden">Isc equivalente en BT: <span id="isc-bt-valor">--</span> kA</p>
-                                <div id="fault-types-display" class="mt-2 p-2 bg-[--bg-secondary] rounded hidden">
+                                <div id="fault-types-display" class="mt-2 p-2 bg-[--bg-secondary] rounded hidden source-detail">
                                     <p class="text-xs font-semibold text-[--text-muted] mb-1">Análisis de Fallas (IEEE Std 399):</p>
                                     <p class="text-xs text-[--text]">3F: <span id="fault-3f">--</span> kA | L-G: <span id="fault-lg">--</span> kA</p>
                                     <p class="text-xs text-[--text]">L-L: <span id="fault-ll">--</span> kA | L-L-G: <span id="fault-llg">--</span> kA</p>
@@ -392,6 +444,7 @@
                         <button class="btn-sm" onclick="App.addFeeder()"><i class="fas fa-plus text-[0.6rem]"></i> Agregar</button>
                     </div>
                     <div id="feeders-container"></div>
+                        <div class="engineering-note no-print"><strong>Tip:</strong> si un conductor queda corto por NOM, usa <b>Auto-Corregir Total</b>. El motor primero corrige conductor/terminal y después ajusta protección; TCC no debe subir breakers si la ampacidad no cumple.</div>
                     <p class="text-xs text-[--text-muted] mt-2">
                         <i class="fas fa-info-circle text-[--cyan]"></i>
                         Cada tramo incluye el conductor, datos de carga y el equipo en el punto destino.
@@ -399,7 +452,7 @@
                 </section>
 
                 <!-- C.D.T. (Capacidad de Diseño Térmico) — Parámetros -->
-                <section class="card" id="section-cdt">
+                <section class="card advanced-section" id="section-cdt">
                     <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('cdt-content',this)">
                         <div class="card-title mb-0"><i class="fas fa-thermometer-half"></i> C.D.T. (Capacidad de Diseño Térmico) <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Parámetros</span></div>
                         <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
@@ -418,7 +471,7 @@
                 </section>
 
                 <!-- Motores (aporte en falla) — Sección 4 -->
-                <section class="card" id="section-motores">
+                <section class="card advanced-section" id="section-motores">
                     <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('motores-content',this)">
                         <div class="card-title mb-0"><i class="fas fa-cogs"></i> Aporte de Motores en Falla <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional</span></div>
                         <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
@@ -433,7 +486,7 @@
                 </section>
 
                 <!-- Capacitores — Sección 8 -->
-                <section class="card" id="section-capacitores">
+                <section class="card advanced-section" id="section-capacitores">
                     <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('capacitores-content',this)">
                         <div class="card-title mb-0"><i class="fas fa-bolt"></i> Banco de Capacitores <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional</span></div>
                         <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
@@ -451,7 +504,7 @@
                 </section>
 
                 <!-- Contexto de Carga (Cuadros) -->
-                <section class="card" id="section-load-context">
+                <section class="card advanced-section" id="section-load-context">
                     <button class="w-full text-left flex items-center justify-between" onclick="App.toggleCollapse('load-context-content',this)">
                         <div class="card-title mb-0"><i class="fas fa-balance-scale"></i> Contexto de Carga Real <span class="text-[0.6rem] font-normal text-[--text-muted] ml-2">Opcional - Desde Cuadros</span></div>
                         <i class="fas fa-chevron-down text-[--text-muted] text-xs transition-transform duration-300"></i>
@@ -944,5 +997,120 @@
         });
     </script>
     <script src="js/testEngine.js?v=1"></script>
+
+<div id="icc-default-wizard" class="icc-wizard-backdrop no-print" aria-hidden="true">
+  <div class="icc-wizard" role="dialog" aria-modal="true" aria-labelledby="icc-wizard-title">
+    <div class="icc-wizard-head">
+      <div class="icc-wizard-title" id="icc-wizard-title"><i class="fas fa-sliders-h"></i> Asistente Inicial de Ingeniería</div>
+      <div class="icc-wizard-sub">Configura rápidamente el sistema eléctrico base antes de iniciar el cálculo.</div>
+      <div class="icc-wizard-steps" id="icc-wizard-steps"></div>
+    </div>
+    <div class="icc-wizard-body">
+      <section class="icc-wizard-step active" data-step="0">
+        <h3 class="text-lg font-bold mb-3">Paso 1 — Sistema</h3>
+        <div class="icc-grid" data-group="sistema">
+          <div class="icc-card-option" data-value="1f-2h"><b>1F-2H</b><span>Monofásico 2 hilos</span></div>
+          <div class="icc-card-option" data-value="1f-3h"><b>1F-3H</b><span>Monofásico 3 hilos</span></div>
+          <div class="icc-card-option" data-value="3f-3h"><b>3F-3H</b><span>Trifásico sin neutro</span></div>
+          <div class="icc-card-option selected" data-value="3f-4h"><b>3F-4H</b><span>Trifásico con neutro</span></div>
+          <div class="icc-card-option" data-value="3f-4h-t"><b>3F-4H + Tierra</b><span>Neutro + conductor tierra</span></div>
+          <div class="icc-card-option" data-value="3f-4h-tn"><b>3F-4H + Tierra + Neutro separado</b><span>TN-S / neutro separado</span></div>
+        </div>
+      </section>
+      <section class="icc-wizard-step" data-step="1">
+        <h3 class="text-lg font-bold mb-3">Paso 2 — Voltaje</h3>
+        <div class="icc-grid mb-4" data-group="voltaje">
+          <div class="icc-card-option selected" data-value="220"><b>127/220 V</b><span>3F baja tensión</span></div>
+          <div class="icc-card-option" data-value="220"><b>220 V</b><span>LL nominal</span></div>
+          <div class="icc-card-option" data-value="480"><b>277/480 V</b><span>Comercial/industrial</span></div>
+          <div class="icc-card-option" data-value="480"><b>480 V</b><span>LL nominal</span></div>
+          <div class="icc-card-option" data-value="custom"><b>Personalizado</b><span>Captura manual</span></div>
+        </div>
+        <div class="icc-grid">
+          <div class="icc-field"><label>Voltaje línea-línea</label><input id="wiz-voltaje" type="number" value="220"></div>
+          <div class="icc-field"><label>Frecuencia</label><input id="wiz-frecuencia" type="number" value="60"></div>
+        </div>
+      </section>
+      <section class="icc-wizard-step" data-step="2">
+        <h3 class="text-lg font-bold mb-3">Paso 3 — Ambiente</h3>
+        <div class="icc-grid">
+          <div class="icc-field"><label>Temperatura ambiente °C</label><input id="wiz-temp" type="number" value="30"></div>
+          <div class="icc-field"><label>Material conductor</label><select id="wiz-material"><option value="cobre">Cobre</option><option value="aluminio">Aluminio</option></select></div>
+          <div class="icc-field"><label>Canalización</label><select id="wiz-canal"><option value="acero">Acero</option><option value="pvc">PVC</option><option value="charola">Charola</option></select></div>
+          <div class="icc-field"><label>Conductores activos CCC</label><input id="wiz-ccc" type="number" value="3" min="1"></div>
+          <div class="icc-field"><label>Agrupamiento</label><select id="wiz-agrup-modo"><option value="auto">Automático</option><option value="manual">Manual</option></select></div>
+          <div class="icc-field"><label>Factor manual</label><input id="wiz-agrup-factor" type="number" value="1.00" step="0.01" min="0.1" max="1"></div>
+        </div>
+      </section>
+      <section class="icc-wizard-step" data-step="3">
+        <h3 class="text-lg font-bold mb-3">Paso 4 — Fuente / Transformador</h3>
+        <div class="icc-grid">
+          <div class="icc-field"><label>kVA</label><input id="wiz-kva" type="number" value="150"></div>
+          <div class="icc-field"><label>%Z</label><input id="wiz-z" type="number" value="5.75" step="0.01"></div>
+          <div class="icc-field"><label>V primario</label><input id="wiz-vp" type="number" value="13200"></div>
+          <div class="icc-field"><label>V secundario</label><input id="wiz-vs" type="number" value="220"></div>
+          <div class="icc-field"><label>X/R</label><input id="wiz-xr" type="number" value="18" step="0.1"></div>
+          <div class="icc-field"><label>Aterrizaje</label><select id="wiz-aterr"><option value="yg_solido">Yg sólido</option><option value="delta">Delta</option><option value="yg_resistivo">Resistencia</option></select></div>
+        </div>
+      </section>
+      <section class="icc-wizard-step" data-step="4">
+        <h3 class="text-lg font-bold mb-3">Paso 5 — Protección base</h3>
+        <div class="icc-grid">
+          <div class="icc-field"><label>Tipo</label><select id="wiz-prot-tipo"><option value="sin_equipo">Sin equipo</option><option value="breaker">Breaker</option><option value="fusible">Fusible</option><option value="mccb">MCCB</option><option value="lsig">LSIG</option></select></div>
+          <div class="icc-field"><label>Capacidad interruptiva kA</label><input id="wiz-icu" type="number" value="25"></div>
+          <div class="icc-field"><label>Disparo instantáneo A</label><input id="wiz-inst" type="number" value="0"></div>
+          <div class="icc-field"><label>Pickup base A</label><input id="wiz-pickup" type="number" value="0"></div>
+        </div>
+      </section>
+      <section class="icc-wizard-step" data-step="5">
+        <h3 class="text-lg font-bold mb-3">Paso 6 — Validación inicial</h3>
+        <div class="icc-validation-list" id="icc-wizard-validation"></div>
+      </section>
+    </div>
+    <div class="icc-wizard-actions">
+      <button class="icc-wizard-btn" onclick="ICCDefaultWizard.close()">Cancelar</button>
+      <div class="right">
+        <button class="icc-wizard-btn" onclick="ICCDefaultWizard.prev()">Atrás</button>
+        <button class="icc-wizard-btn" onclick="ICCDefaultWizard.next()">Siguiente</button>
+        <button class="icc-wizard-btn primary" onclick="ICCDefaultWizard.apply()">Aplicar default</button>
+        <button class="icc-wizard-btn success" onclick="ICCDefaultWizard.saveProfile()">Guardar como perfil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="icc-default-wizard-script">
+(function(){
+  if(window.ICCDefaultWizard) return;
+  var step=0,total=6;
+  var state={sistema:'3f-4h',voltaje:220,temp:30,material:'cobre',canal:'acero',ccc:3,agrupModo:'auto',agrupFactor:1,kva:150,z:5.75,vp:13200,vs:220,xr:18,aterr:'yg_solido',protTipo:'sin_equipo',icu:25,inst:0,pickup:0};
+  function q(id){return document.getElementById(id)}
+  function setVal(id,val){var el=q(id); if(!el) return; el.value=val; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true}));}
+  function clickGroup(group,value){document.querySelectorAll('[data-group="'+group+'"] .icc-card-option').forEach(function(x){x.classList.toggle('selected',x.dataset.value===String(value));});}
+  function syncState(){
+    state.voltaje=Number(q('wiz-voltaje')&&q('wiz-voltaje').value)||220; state.temp=Number(q('wiz-temp')&&q('wiz-temp').value)||30;
+    state.material=(q('wiz-material')&&q('wiz-material').value)||'cobre'; state.canal=(q('wiz-canal')&&q('wiz-canal').value)||'acero';
+    state.ccc=Number(q('wiz-ccc')&&q('wiz-ccc').value)||3; state.agrupModo=(q('wiz-agrup-modo')&&q('wiz-agrup-modo').value)||'auto'; state.agrupFactor=Number(q('wiz-agrup-factor')&&q('wiz-agrup-factor').value)||1;
+    state.kva=Number(q('wiz-kva')&&q('wiz-kva').value)||150; state.z=Number(q('wiz-z')&&q('wiz-z').value)||5.75; state.vp=Number(q('wiz-vp')&&q('wiz-vp').value)||13200; state.vs=Number(q('wiz-vs')&&q('wiz-vs').value)||state.voltaje; state.xr=Number(q('wiz-xr')&&q('wiz-xr').value)||18; state.aterr=(q('wiz-aterr')&&q('wiz-aterr').value)||'yg_solido';
+    state.protTipo=(q('wiz-prot-tipo')&&q('wiz-prot-tipo').value)||'sin_equipo'; state.icu=Number(q('wiz-icu')&&q('wiz-icu').value)||0; state.inst=Number(q('wiz-inst')&&q('wiz-inst').value)||0; state.pickup=Number(q('wiz-pickup')&&q('wiz-pickup').value)||0;
+  }
+  function renderSteps(){var box=q('icc-wizard-steps'); if(!box) return; box.innerHTML=['Sistema','Voltaje','Ambiente','Fuente/Trafo','Protección','Validación'].map(function(s,i){return '<span class="icc-step-pill '+(i===step?'active':'')+'">'+(i+1)+'. '+s+'</span>';}).join(''); document.querySelectorAll('.icc-wizard-step').forEach(function(x){x.classList.toggle('active',Number(x.dataset.step)===step);}); if(step===5) validate();}
+  function validate(){syncState(); var msgs=[]; msgs.push('<div class="ok">✔ Sistema '+state.sistema+' configurado</div>'); msgs.push('<div class="ok">✔ Voltaje base '+state.voltaje+' V</div>'); msgs.push(state.temp>40?'<div class="warn">⚠ Temperatura alta: aplicar corrección NOM</div>':'<div class="ok">✔ Temperatura ambiente normal</div>'); msgs.push(state.agrupModo==='manual'?'<div class="warn">⚠ Agrupamiento manual: se respetará valor capturado</div>':'<div class="ok">✔ Agrupamiento automático activo</div>'); msgs.push(state.aterr==='yg_solido'?'<div class="warn">⚠ Yg sólido: validar GFP/LSIG NOM 230.95</div>':'<div class="ok">✔ Aterrizaje configurado</div>'); var el=q('icc-wizard-validation'); if(el) el.innerHTML=msgs.join('');}
+  function apply(){syncState(); try{ if(window.App){ if(state.sistema.indexOf('1f')===0 && App.setTipo) App.setTipo('1f'); else if(App.setTipo) App.setTipo('3f'); if(App.setVoltage) App.setVoltage(state.voltaje); }}catch(e){}
+    setVal('input-tension',state.voltaje); setVal('input-xr-fuente',state.xr); setVal('input-trafo-z',state.z); setVal('input-trafo-vp',state.vp); setVal('input-trafo-vs',state.vs); setVal('input-trafo-vs-custom',state.vs); setVal('input-trafo-aterr',state.aterr); setVal('cdt-temp-input',state.temp);
+    var kva=q('input-trafo-kva'); if(kva){kva.value=String(state.kva); kva.dispatchEvent(new Event('change',{bubbles:true}));}
+    try{localStorage.setItem('icc-default-wizard-last',JSON.stringify(state));}catch(e){}
+    try{ if(window.UIToast&&UIToast.show) UIToast.show('Default aplicado desde asistente inicial','success'); else if(window.UIToast&&UIToast.success) UIToast.success('Default aplicado'); }catch(e){}
+    if(window.App&&App.clearResults) App.clearResults(); close(); }
+  function saveProfile(){apply(); try{ if(window.App&&App.saveProfile) App.saveProfile(); }catch(e){} }
+  function open(){var el=q('icc-default-wizard'); if(el){el.classList.add('open'); el.setAttribute('aria-hidden','false'); renderSteps();}}
+  function close(){var el=q('icc-default-wizard'); if(el){el.classList.remove('open'); el.setAttribute('aria-hidden','true');}}
+  document.addEventListener('click',function(ev){var opt=ev.target.closest&&ev.target.closest('.icc-card-option'); if(!opt) return; var group=opt.parentElement&&opt.parentElement.dataset.group; if(!group) return; clickGroup(group,opt.dataset.value); if(group==='sistema') state.sistema=opt.dataset.value; if(group==='voltaje'){ if(opt.dataset.value!=='custom') {state.voltaje=Number(opt.dataset.value)||220; setVal('wiz-voltaje',state.voltaje);} }});
+  window.ICCDefaultWizard={open:open,close:close,next:function(){syncState(); step=Math.min(total-1,step+1);renderSteps();},prev:function(){step=Math.max(0,step-1);renderSteps();},apply:apply,saveProfile:saveProfile,validate:validate};
+  document.addEventListener('DOMContentLoaded',function(){ renderSteps(); try{var last=JSON.parse(localStorage.getItem('icc-default-wizard-last')||'null'); if(last) Object.assign(state,last);}catch(e){} });
+})();
+</script>
+
 </body>
 </html>

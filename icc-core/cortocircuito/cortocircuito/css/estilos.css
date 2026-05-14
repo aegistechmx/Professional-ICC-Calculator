@@ -96,3 +96,15 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
     .badge-none{background:#e5e7eb;color:#6b7280}
     #diagram-container{border:1px solid #ccc}
 }
+
+/* UI v2 - Interfaz compacta industrial */
+.ui-hero{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(34,211,238,.06));border:1px solid var(--border-light);border-radius:16px;padding:18px;margin-bottom:18px;box-shadow:0 16px 40px rgba(0,0,0,.18)}
+.ui-hero-title{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;color:var(--text);display:flex;align-items:center;gap:10px}
+.ui-hero-sub{font-size:.78rem;color:var(--text-muted);margin-top:4px;line-height:1.45}
+.ui-chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.ui-chip{font-size:.68rem;padding:4px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted)}
+.ui-chip.ok{border-color:rgba(52,211,153,.35);color:var(--green);background:rgba(52,211,153,.08)}.ui-chip.warn{border-color:rgba(250,204,21,.35);color:var(--yellow);background:rgba(250,204,21,.08)}
+.ui-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--border-light);color:var(--text);font-size:.75rem;padding:8px 11px;border-radius:9px;cursor:pointer;transition:all .2s}.btn-ghost:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.advanced-section{opacity:.92}.advanced-section .card-title{color:var(--cyan)}.ui-advanced-hidden .advanced-section{display:none!important}.ui-advanced-hidden .advanced-hint{display:block}.advanced-hint{display:none;background:rgba(34,211,238,.06);border:1px dashed rgba(34,211,238,.22);border-radius:12px;padding:11px 14px;color:var(--text-muted);font-size:.76rem;margin-bottom:14px}
+.engineering-note{border-left:3px solid var(--amber);background:rgba(245,158,11,.07);padding:10px 12px;border-radius:10px;font-size:.75rem;color:var(--text-muted);line-height:1.5;margin-top:10px}.engineering-note strong{color:var(--text)}
+.input-helper{font-size:.68rem;color:var(--text-muted);margin-top:4px;line-height:1.35}.source-detail{transition:all .2s}.ui-advanced-hidden .source-detail{display:none!important}.compact-only{display:none}.ui-advanced-hidden .compact-only{display:block}
+@media(max-width:900px){.ui-hero{padding:14px}.ui-hero-title{font-size:.95rem}.ui-actions{gap:6px}}

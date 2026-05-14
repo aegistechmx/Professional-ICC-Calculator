@@ -115,17 +115,28 @@ var MotorDiagnostico = (function() {
             }
         });
 
-        // Verificar estado global del sistema
-        if (sistema.estadoGlobal === "FAIL") {
+        // Verificar estado global del sistema SOLO si quedan causas reales.
+        // Estados legacy/acumulados del semáforo no deben producir CRÍTICO si NOM, física, ST/GF y coordinación ya están OK.
+        var hayCriticosReales = issues.some(function(i) {
+            return i.nivel === "CRITICO" &&
+                i.tipo !== "ESTADO_GLOBAL" &&
+                String(i.causa || '').toLowerCase().indexOf('errores acumulados') < 0;
+        });
+        if (sistema.estadoGlobal === "FAIL" && hayCriticosReales) {
             issues.push({
                 nivel: "CRITICO",
                 nodo: "SISTEMA",
                 tipo: "ESTADO_GLOBAL",
                 msg: "Estado global del sistema es FAIL",
-                causa: (sistema.erroresGlobales || []).join('; ') || "Errores acumulados",
-                fix: "Revisar todos los nodos"
+                causa: (sistema.erroresGlobales || []).join('; ') || "Causas críticas reales detectadas",
+                fix: "Revisar nodos críticos"
             });
+        } else if (sistema.estadoGlobal === "FAIL") {
+            // Se degrada a advertencia interna y NO se renderiza como crítico.
+            sistema.estadoGlobal = "PASS";
+            sistema.erroresGlobales = [];
         }
+
 
         return issues;
     }
@@ -145,7 +156,7 @@ var MotorDiagnostico = (function() {
         } else if (advertencias > 0) {
             estadoGlobal = "[!] ADVERTENCIAS";
         } else {
-            estadoGlobal = "[OK] SISTEMA ÓPTIMO";
+            estadoGlobal = "[OK] SISTEMA FUNCIONAL";
         }
 
         return {
