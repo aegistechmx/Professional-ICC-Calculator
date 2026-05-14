@@ -15,6 +15,13 @@ build
 frontend/dist/
 reports/
 unused-files-report.json
+coverage/
+lcov.info
+playwright-report/
+test-results/
+logs/
+.cache/
+.vite/
 
 # OS files
 .DS_Store
@@ -34,6 +41,10 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+*.bak
+*.bak-*
+*_BACKUP/
+*DUP_BACKUP/
 backend/perf-output*.txt
 backend/backend/
 backend/backend.zip
