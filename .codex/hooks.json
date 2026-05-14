@@ -1,0 +1,82 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--pre-tool--backup-before-edit\" && ./.codex/hooks/pre-tool-backup-before-edit-pretooluse-posttooluse-1-1.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--performance--performance-monitor\" && ./.codex/hooks/performance-performance-monitor-pretooluse-pretooluse-1-1.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--development-tools--lint-on-save\" && ./.codex/hooks/development-tools-lint-on-save-posttooluse-posttooluse-1-1.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--post-tool--format-javascript-files\" && ./.codex/hooks/post-tool-format-javascript-files-posttooluse-posttooluse-1-1.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--development-tools--change-tracker\" && ./.codex/hooks/development-tools-change-tracker-posttooluse-posttooluse-1-1.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--development-tools--change-tracker\" && ./.codex/hooks/development-tools-change-tracker-posttooluse-posttooluse-2-1.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--performance--performance-monitor\" && ./.codex/hooks/performance-performance-monitor-posttooluse-posttooluse-1-1.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:\\\\Professional ICC Calculator\\\\.codex\\\\hooks\\\\aitmpl-codex--monitoring--desktop-notification-on-stop\" && ./.codex/hooks/monitoring-desktop-notification-on-stop-stop-stop-1-1.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
