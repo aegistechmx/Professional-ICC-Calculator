@@ -1,0 +1,165 @@
+/**
+ * capacitores.js — FASE 8
+ * Aporte de corriente de banco de capacitores durante un cortocircuito.
+ *
+ * Durante los primeros ciclos de la falla, el banco de capacitores se descarga produciendo una
+ * corriente de alta frecuencia y alta magnitud que se suma al cortocircuito simétrico.
+ *
+ * Metodologia:
+ *   I_cap = Vcaida * sqrt(2) / Xc
+ *   donde Xc = Vcaida^2 / Q_banco  (reactancia del banco)
+ *   Xc del capacitor: depende del tipo (electrolítico: ~2-3% del impedance, instalación típica: Xc ≈ V²/Q × 0.025)
+ *
+ * Solo afecta la corriente pico asimétrica (no la simétrica, el capacitor se descarga en ~1/2 ciclo).
+ * Se modela como un pulso exponencial: I_cap(t) = I_cap0 × e^(-t/Tc)
+ * Donde Tc = Xc / (2 × π × f)
+ * I_cap0 = Vcaida × sqrt(2) / Xc
+ *
+ * El aporte pico se suma como: I_pico_total = I_pico_red + I_pico_cap
+ * No se suma a Isc simétrico porque el capacitor se descarga antes del primer cero de la onda.
+ *
+ * Referencia: IEEE Std 399 (Brown Book) Cap. 5.5, IEC 60909
+ */
+var CalculoCapacitores = (function() {
+
+    /**
+     * Constante: frecuencia del sistema (Hz)
+     */
+    var F_SISTEMA = 60;
+
+    /**
+     * Constante: reactancia típica de instalación (fracción de Xc nominal)
+     * Xc_instalacion ≈ 0.025 × V²/Q (teórico: 1/(2πfC) → ajuste por instalación real)
+     */
+    var XC_FACTOR_INSTALACION = 0.025;
+
+    /**
+     * Calcula el aporte del banco de capacitores
+     * @param {number} kvar     - Potencia reactiva del banco en kVAr
+     * @param {number} Vcaida   - Tension del banco en V
+     * @param {number} distancia - Distancia al punto de falla en metros (0 = en el punto)
+     * @param {number} XcManual - Reactancia del banco en ohms (0 = calcular automáticamente)
+     * @returns {Object} { R, X, iCap0, Tc, iCap0_mA, iCapAmp, iCapPico, iCapPicoAmp }
+     */
+    function aporte(kvar, Vcaida, distancia, XcManual) {
+        if (!kvar || kvar <= 0 || !Vcaida || Vcaida <= 0) {
+            return { R: 0, X: 0, iCap0: 0, Tc: 0, iCap0_mA: 0, iCapAmp: 0, iCapPicoAmp: 0 };
+        }
+
+        var S_mva = kvar; // kVA (para simplificar, se usa directamente)
+        var V_kV = Vcaida / 1000;
+        var Xc;
+        if (XcManual && XcManual > 0) {
+            Xc = XcManual;
+        } else {
+            // Xc ≈ (Vcaida^2 / (kvar × 1000)) × XC_FACTOR_INSTALACION
+            Xc = (Vcaida * Vcaida / (S_mva * 1000)) * XC_FACTOR_INSTALACION;
+            // Asegurar que Xc sea razonable
+            if (Xc < 0.01) Xc = 0.01;
+        }
+
+        // Resistencia de alimentador (usando los conductores del alimentador hasta el punto)
+        var R_alim = 0;
+        var feeders = [];
+        if (App.estado.nodos && App.estado.nodos.length > 0) {
+            var nodosOrdenados = Impedancias.ordenarPorNivel(App.estado.nodos);
+            for (var i = 1; i < nodosOrdenados.length; i++) {
+                var nodo = nodosOrdenados[i];
+                if (nodo.feeder) feeders.push(nodo.feeder);
+            }
+        }
+        if (distancia > 0 && feeders && feeders.length > 0) {
+            var factor = App.estado.tipoSistema === '3f' ? Math.sqrt(3) : 2;
+            var V = parseFloat(document.getElementById('input-tension').value) || 220;
+            var R_acc = 0, X_acc = 0;
+            var numTramos = Math.min(feeders.length, 8); // Máximo 8 tramos para cálculo de Z del alimentador
+            for (var i = 0; i < numTramos; i++) {
+                var datos = CONDUCTORES[feeders[i].material] &&
+                            CONDUCTORES[feeders[i].canalizacion] &&
+                            CONDUCTORES[feeders[i].calibre];
+                if (!datos) break;
+                var n = Math.max(1, feeders[i].paralelo || 1);
+                var L = feeders[i].longitud || 0;
+                R_acc += (datos.R * L / 1000) / n;
+                X_acc += (datos.X * L / 1000) / n;
+            }
+            R_alim = R_acc;
+            // Si no hay datos, estimar con un valor mínimo
+            if (R_alim < 0.001) R_alim = 0.01;
+        }
+
+        // Constante de tiempo del capacitor
+        var Tc = Xc / (2 * Math.PI * F_SISTEMA); // Segundos
+        if (Tc < 0.001) Tc = 0.001;
+
+        // Corriente inicial de descarga (pico del pulso)
+        var iCap0 = Vcaida * Math.SQRT2 / Xc; // Amperes
+        var iCap0_mA = iCap0 * 1000; // miliamperes (para la curva de descarga)
+        var iCapAmp = iCap0 / 1000; // kA (para sumar al pico)
+
+        // Corriente pico del capacitor (en el primer cero de la onda de la corriente)
+        var iCapPicoAmp = iCap0 * 1.42; // Factor de pico de capacitor (~1.42, IEEE 399 Cap. 5.5)
+        // Nota: hay varias referencias: 1.42, √2, 1.33; uso 1.42 como promedio conservador
+
+        return {
+            R: R_alim,
+            X: Xc,
+            iCap0: iCapAmp,
+            Tc: Tc,
+            iCap0_mA: iCap0_mA,
+            iCapAmp: iCapAmp,
+            iCapPicoAmp: iCapPicoAmp,
+            S_mva: S_mva,
+            Vcaida: Vcaida,
+            Xc: Xc,
+            Tc_ms: Tc * 1000
+        };
+    }
+
+    /**
+     * Calcula el aporte de capacitor y lo agrega al pico asimétrico de cada punto
+     * @returns {Array} Array de longitud numPuntos con { iCapPicoAmp, iCapPicoTotal, iCapPicoMotores }
+     */
+    function calcularPorPunto(numPuntos) {
+        var kvar = parseFloat(document.getElementById('input-cap-kvar')?.value) || 0;
+        var Vcaida = parseFloat(document.getElementById('input-cap-tension')?.value) || 0;
+        var capSection = document.getElementById('capacitores-content');
+        var distancia = (capSection && capSection.style.display !== 'none') ? parseFloat(document.getElementById('input-cap-distancia')?.value) || 0 : 0;
+
+        if (!kvar || kvar <= 0 || !Vcaida || Vcaida <= 0 || distancia < 0) {
+            return Array(numPuntos).fill({ iCapPicoAmp: 0, iCapPicoTotal: 0, iCapPicoMotores: 0 });
+        }
+
+        var datosAporte = aporte(kvar, Vcaida, distancia);
+        var resultados = [];
+        var iCapPicoTotal = 0;
+        var iCapPicoMotores = 0;
+        var iCapPicoAmp = datosAporte.iCapPicoAmp;
+
+        // El capacitor aporta a TODOS los puntos (es paralelo en el bus, afecta el primer cero)
+        for (var i = 0; i < numPuntos; i++) {
+            var ipMotores = 0;
+            if (App.estado.resultados && App.estado.resultados[i] && App.estado.resultados[i].aporteMotores) {
+                ipMotores = App.estado.resultados[i].aporteMotores.iAportePico || 0;
+            }
+            iCapPicoTotal = iCapPicoAmp + ipMotores;
+            resultados.push({
+                iCapPicoAmp: iCapPicoAmp,
+                iCapPicoTotal: iCapPicoTotal,
+                iCapPicoMotores: ipMotores
+            });
+        }
+        return resultados;
+    }
+
+    return {
+        aporte: aporte,
+        calcularPorPunto: calcularPorPunto,
+        F_SISTEMA: F_SISTEMA,
+        XC_FACTOR_INSTALACION: XC_FACTOR_INSTALACION
+    };
+})();
+
+if (typeof window !== 'undefined') {
+    window.CalculoCapacitores = CalculoCapacitores;
+}
