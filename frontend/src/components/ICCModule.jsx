@@ -19,7 +19,7 @@ const ICCModule = forwardRef(function ICCModuleInternal(
   // Origen seguro para postMessage
   const moduleUrl =
     import.meta.env.VITE_ICC_STANDALONE_URL ||
-    (import.meta.env.PROD ? '/cortocircuito/index.html' : 'http://localhost:3002')
+    '/cortocircuito/index.html'
   const targetOrigin = moduleUrl.startsWith('http')
     ? new URL(moduleUrl).origin
     : window.location.origin

@@ -284,6 +284,23 @@ var TCCViewerInteractivo = (function() {
         if (!semaforoDiv) return;
 
         var html = '<div class="space-y-2">';
+
+        // Evita contradicciones entre el visor gráfico y el motor real.
+        // Si existe resultado central, la UI consume esa fuente única de verdad.
+        var finalCoord = (typeof window !== 'undefined') ? window.__ICC_COORDINATION_FINAL : null;
+        if (finalCoord && finalCoord.fuente === 'motor_coordinacion_real') {
+            var iconoCentral = finalCoord.ok ? '🟢' : '🔴';
+            var colorCentral = finalCoord.ok ? 'text-green-400' : 'text-red-400';
+            html += '<div class="p-2 rounded bg-[--border]">';
+            html += '<div class="font-semibold ' + colorCentral + '">' + iconoCentral + ' Estado central: ' + finalCoord.estado + '</div>';
+            html += '<div class="text-xs text-[--text-muted]">' + finalCoord.mensaje + '</div>';
+            if (!finalCoord.ok && finalCoord.totalCruces > 0) {
+                html += '<div class="text-xs text-[--red] mt-1">Cruces centrales: ' + finalCoord.totalCruces + '</div>';
+            }
+            html += '</div>';
+            semaforoDiv.innerHTML = html + '</div>';
+            return;
+        }
         
         for (var i = 0; i < nodosTCC.length - 1; i++) {
             var up = nodosTCC[i];

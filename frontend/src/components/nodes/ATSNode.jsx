@@ -16,7 +16,29 @@ export default function ATSNode({ data, selected }) {
     <div
       className={`bg-white border-2 rounded-lg p-3 min-w-[150px] shadow-md ${getModeColor(mode)} ${selected ? 'ring-2 ring-blue-500' : ''}`}
     >
-      <Handle type="target" position="top" className="w-3 h-3 bg-gray-500" />
+      {/* Entradas ATS: Normal (TR->IP) y Emergencia (GEN->IP GEN) */}
+      <Handle
+        id="normal"
+        type="target"
+        position="top"
+        className="w-3 h-3 bg-green-600"
+        style={{ left: 30 }}
+      />
+      <Handle
+        id="emergency"
+        type="target"
+        position="top"
+        className="w-3 h-3 bg-orange-600"
+        style={{ left: 120 }}
+      />
+      {/* Fallback: permitir conectar a ATS aunque el usuario arrastre desde abajo */}
+      <Handle
+        id="input"
+        type="target"
+        position="bottom"
+        className="w-3 h-3 bg-gray-500"
+        style={{ left: 75 }}
+      />
 
       <div className="flex items-center gap-2">
         <svg width="40" height="40" viewBox="0 0 40 40">

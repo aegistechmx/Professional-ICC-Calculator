@@ -1093,6 +1093,8 @@ var App = (function () {
                     paralelo: f.paralelo || 1,
                     cargaA: f.cargaA || 0,
                     cargaFP: f.cargaFP || 0.9,
+                    numConductores: f.numConductores || 3,
+                    tempAmbiente: f.tempAmbiente || 30,
                     equipTipo: (nodo.equip && nodo.equip.tipo) || '',
                     equipModelo: (nodo.equip && nodo.equip.modelo) || '',
                     equipCap: (nodo.equip && nodo.equip.cap) || 0,

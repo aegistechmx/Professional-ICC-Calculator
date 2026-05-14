@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "Professional ICC Calculator - Electrical system analysis tool",
   "scripts": {
-    "start": "concurrently \"npm run backend\" \"npm run frontend\" \"npm run standalone\"",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
     "backend": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
-    "standalone": "node scripts/static-server.js 3002 icc-core/cortocircuito",
     "build": "cd frontend && npm run build",
     "preview": "cd frontend && npm run preview",
     "analyze": "cd frontend && npm run analyze",

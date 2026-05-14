@@ -358,6 +358,53 @@ export const useStore = create((set, get) => ({
   setMode: mode => set({ mode }),
   setSystemMode: systemMode => set({ systemMode }), // NEW: setter for system mode
 
+  // Cargar configuración por defecto del proyecto (NEW)
+  applyDefaultProjectConfig: defaults => {
+    const preset = defaults || {}
+    const temp = Number.isFinite(preset.tempAmbiente) ? preset.tempAmbiente : 30
+    const nConductores = Number.isFinite(preset.nConductores)
+      ? preset.nConductores
+      : 5
+    const primario = Number.isFinite(preset.primario) ? preset.primario : 13800
+    const secundario = Number.isFinite(preset.secundario)
+      ? preset.secundario
+      : 480
+
+    const { nodes, edges } = get()
+
+    const updatedNodes = (nodes || []).map(node => {
+      const next = { ...node, data: { ...(node.data || {}) } }
+      const params = { ...(next.data.parameters || {}) }
+
+      if (node.type === 'transformer') {
+        params.primario = primario
+        params.secundario = secundario
+      }
+
+      // Alinear voltajes de equipos comunes al secundario
+      if (node.type === 'panel') params.tension = secundario
+      if (node.type === 'generator') params.voltaje = secundario
+      if (node.type === 'load') params.voltaje = secundario
+      if (node.type === 'motor') params.voltaje = secundario
+
+      next.data.parameters = params
+      return next
+    })
+
+    const updatedEdges = (edges || []).map(edge => ({
+      ...edge,
+      data: {
+        ...(edge.data || {}),
+        temp,
+        numConductores: nConductores,
+      },
+    }))
+
+    set({ nodes: updatedNodes, edges: updatedEdges })
+    saveToStorage('icc-nodes', updatedNodes)
+    saveToStorage('icc-edges', updatedEdges)
+  },
+
   // Validation management (NEW)
   setValidationErrors: errors =>
     set({ validationErrors: errors, lastValidationTime: Date.now() }),

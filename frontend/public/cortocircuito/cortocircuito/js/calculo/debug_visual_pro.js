@@ -117,24 +117,24 @@ var DebugVisualPro = (function() {
         if (debug.ampacidad.I_tabla === undefined && punto.CDT) {
             debug.ampacidad = {
                 calibre: nodo.feeder ? nodo.feeder.calibre : 'N/A',
-                I_tabla: punto.CDT.I_tabla || 0,
-                F_temp: punto.CDT.F_temp || 0,
-                F_agrupamiento: punto.CDT.F_agrupamiento || 0,
+                I_tabla: punto.CDT.I_tabla || punto.CDT.ampacidad75 || 0,
+                F_temp: punto.CDT.F_temp || punto.CDT.ft || 0,
+                F_agrupamiento: punto.CDT.F_agrupamiento || punto.CDT.F_agrup || 0,
                 paralelos: nodo.feeder ? nodo.feeder.paralelo : 1,
-                I_corregida: punto.CDT.I_corregida || 0
+                I_corregida: punto.CDT.I_corregida || punto.CDT.ampacidadCorregida || 0
             };
         }
 
         if (debug.terminal.I_terminal === undefined && punto.CDT) {
             debug.terminal = {
                 tempTerminal: 75,
-                I_terminal: punto.CDT.I_limite_terminal || 0
+                I_terminal: punto.CDT.I_limite_terminal || punto.CDT.ampacidadTerminal || 0
             };
         }
 
         if (debug.final.I_final === undefined && punto.CDT) {
             debug.final = {
-                I_final: punto.CDT.I_final || 0,
+                I_final: punto.CDT.I_final || punto.CDT.ampacidadFinal || 0,
                 status: punto.CDT.status || 'UNKNOWN',
                 margen: punto.CDT.margen || 0,
                 violacionTerminal: punto.CDT.violacionTerminal || false

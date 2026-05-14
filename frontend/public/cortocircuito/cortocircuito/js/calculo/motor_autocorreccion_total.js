@@ -30,8 +30,16 @@ var MotorAutocorreccionTotal = (function() {
         var res = Motor.ejecutar();
         var puntos = res.puntos;
 
-        // 3) Corregir por dominio
+        // 3) Corregir por dominio con jerarquía real de ingeniería:
+        //    carga → conductor/terminales → protección → tierra → TCC.
+        //    Nunca se debe subir protección o coordinar TCC si el conductor sigue fuera de NOM.
         corregirCDT(estado, puntos, cambios);
+
+        // Recalcular una vez después de cambiar conductor/paralelos para que los módulos
+        // siguientes trabajen con ampacidad final real, no con estado viejo.
+        res = Motor.ejecutar();
+        puntos = res.puntos || puntos;
+
         corregirInterruptores(estado, puntos, cambios);
         corregirTierra(estado, puntos, cambios);
         corregirTCC(estado, cambios);
@@ -134,21 +142,67 @@ var MotorAutocorreccionTotal = (function() {
             var f = n.feeder;
             if (!f) return;
 
-            if (p.CDT.status === 'FAIL' || p.CDT.margen < CFG.margenMinCDT * 100) {
+            var requiereCorreccion = p.CDT.status === 'FAIL' ||
+                p.CDT.I_final < (p.CDT.I_diseño || 0) ||
+                p.CDT.violacionTerminal ||
+                p.CDT.margen < CFG.margenMinCDT * 100;
 
-                // 1) subir paralelos
-                if (f.paralelo < CFG.maxParalelos) {
-                    f.paralelo++;
-                    cambios.push('Nodo ' + n.id + ': +paralelo (' + f.paralelo + ')');
-                    return;
-                }
+            if (!requiereCorreccion) return;
 
-                // 2) subir calibre
-                var next = siguienteCalibre(f.calibre);
-                if (next) {
-                    f.calibre = next;
-                    cambios.push('Nodo ' + n.id + ': calibre→' + next);
+            var load = {
+                I_cont: f.cargaA || 0,
+                I_no_cont: 0,
+                esContinua: true,
+                Fcc: 1.25
+            };
+
+            var baseCable = {
+                calibre: f.calibre || '4/0',
+                temperaturaAislamiento: f.temperaturaAislamiento || 75,
+                temperaturaAmbiente: f.tempAmbiente || f.temperaturaAmbiente || 30,
+                numConductores: f.numConductores || 3,
+                paralelos: f.paralelo || 1,
+                F_agrupamiento: f.F_agrupamiento,
+                canalizacion: f.canalizacion || 'acero',
+                tempTerminal: 75
+            };
+
+            var mejor = null;
+            if (typeof AmpacidadReal !== 'undefined' && AmpacidadReal.buscarConductorMinimo) {
+                for (var par = baseCable.paralelos; par <= CFG.maxParalelos; par++) {
+                    var cableTest = Object.assign({}, baseCable, { paralelos: par });
+                    var candidato = AmpacidadReal.buscarConductorMinimo(load, cableTest);
+                    if (candidato && candidato.status === 'PASS') {
+                        mejor = Object.assign({ paralelos: par }, candidato);
+                        break;
+                    }
                 }
+            }
+
+            if (mejor) {
+                if (f.calibre !== mejor.calibre) {
+                    cambios.push('Nodo ' + n.id + ': conductor NOM ' + f.calibre + ' → ' + mejor.calibre +
+                        ' (I_final=' + (mejor.I_final || 0).toFixed(1) + 'A, I_diseño=' + (mejor.I_diseño || 0).toFixed(1) + 'A)');
+                    f.calibre = mejor.calibre;
+                }
+                if ((f.paralelo || 1) !== mejor.paralelos) {
+                    cambios.push('Nodo ' + n.id + ': paralelos ' + (f.paralelo || 1) + ' → ' + mejor.paralelos);
+                    f.paralelo = mejor.paralelos;
+                }
+                return;
+            }
+
+            // Fallback: crecimiento ordenado, pero siempre conductor antes que breaker.
+            if ((f.paralelo || 1) < CFG.maxParalelos) {
+                f.paralelo = (f.paralelo || 1) + 1;
+                cambios.push('Nodo ' + n.id + ': +paralelo (' + f.paralelo + ') por ampacidad NOM');
+                return;
+            }
+
+            var next = siguienteCalibre(f.calibre);
+            if (next) {
+                f.calibre = next;
+                cambios.push('Nodo ' + n.id + ': calibre→' + next + ' por ampacidad NOM');
             }
         });
     }
@@ -176,9 +230,17 @@ var MotorAutocorreccionTotal = (function() {
                 }
             }
 
-            // coherencia con conductor
+            // Coherencia con conductor: la protección no debe exceder la ampacidad final.
             if (n.feeder && n.feeder.cargaA) {
-                n.equip.iNominal = Math.max(n.feeder.cargaA * 1.25, n.equip.iNominal || 0);
+                var Idiseno = n.feeder.cargaA * 1.25;
+                if (p.CDT && p.CDT.I_final && p.CDT.I_final < Idiseno) {
+                    cambios.push('Nodo ' + n.id + ': protección NO escalada; primero corregir conductor (I_final=' + p.CDT.I_final.toFixed(1) + 'A < I_diseño=' + Idiseno.toFixed(1) + 'A)');
+                    return;
+                }
+                n.equip.iNominal = Math.max(Idiseno, n.equip.iNominal || 0);
+                if (p.CDT && p.CDT.I_final) {
+                    n.equip.iNominal = Math.min(n.equip.iNominal, p.CDT.I_final);
+                }
             }
         });
     }

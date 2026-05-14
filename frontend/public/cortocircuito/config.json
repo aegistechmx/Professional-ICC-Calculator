@@ -145,7 +145,7 @@
     "temperature_coefficient_al": 0.00403
   },
   "api_config": {
-    "base_url": "http://localhost:3002",
+    "base_url": "",
     "timeout": 30000,
     "retries": 3,
     "retry_delay": 1000

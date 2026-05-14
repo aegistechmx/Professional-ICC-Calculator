@@ -154,7 +154,8 @@ var Motor = (function() {
 
         if (App.estado.modo === 'conocido') {
             var iscEl = document.getElementById('input-isc-conocido');
-            var isc = iscEl ? parseFloat(iscEl.value) * 1000 : 0;
+            var isc_val = iscEl ? parseFloat(iscEl.value) : 0;
+            var isc = isc_val > 500 ? isc_val : isc_val * 1000; // Si > 500, asumimos que ya ingresó Amperios
             var z = Impedancias.deFuenteIsc(leerTension(), isc, CONSTANTES.XR_FUENTE_DEFAULT, factor);
             R = z.R; X = z.X;
         } else {
@@ -333,7 +334,13 @@ var Motor = (function() {
         // 🔥 FIX: Forzar modelo de breaker para nodos sin equipo
         for (var nb = 0; nb < puntos.length; nb++) {
             var puntoActual = puntos[nb];
-            // Buscar el nodo correspondiente por ID para asegurar consistencia
+            
+            // Normalización final: Si el valor de isc es > 500, es Amperios y debemos pasarlo a kA
+            if (puntoActual.isc > 500) {
+                puntoActual.isc = puntoActual.isc / 1000;
+                puntoActual.ipeak = puntoActual.ipeak / 1000;
+            }
+
             var nodoBase = App.estado.nodos.find(function(n) { return n.id === puntoActual.id; });
             
             if (!nodoBase) {
@@ -414,6 +421,18 @@ var Motor = (function() {
                 puntos[c2].ipeakConMotores += datosCap.iCapPico / 1000;
                 puntos[c2].aporteMotores = datosCap;
             }
+        }
+
+        // [VD] Calcular caída de tensión acumulada (NOM-001 Art. 210-19)
+        if (typeof CaidaTension !== 'undefined') {
+            var resultadosVD = CaidaTension.calcularAcumulada(App.estado.nodos, V, tipoSistema);
+            resultadosVD.forEach(function(resVd) {
+                var p = puntos.find(function(item) { return item.id === resVd.id; });
+                if (p) {
+                    p.caidaTension = resVd.caidaPct;
+                    p.caidaV = resVd.caidaV;
+                }
+            });
         }
 
         // Validaciones NOM-001-SEDE-2012
@@ -541,7 +560,7 @@ var Motor = (function() {
                 balanceado: true,
                 modo: 'industrial',
                 margen: (sugerencia.margen / 100) + 1, // Convertir porcentaje a factor (ej: 27% -> 1.27)
-                caidaTension: 0, // Se calcula separadamente
+                caidaTension: puntos[i].caidaTension || 0,
                 tieneNeutro: true,
                 neutroContado: true,
                 esMonofasico: false,
@@ -683,6 +702,12 @@ var Motor = (function() {
 
             // Adjuntar resultado al sistema
             puntos.coordinacionReal = resultadoCoordinacionReal;
+
+            // Fuente única de verdad para UI/PDF/TCC: el motor real decide el estado final.
+            puntos.coordinacionFinal = normalizarCoordinacionFinal(resultadoCoordinacionReal, puntos.coordinacionTCC, resultadoDiseno);
+            if (typeof window !== 'undefined') {
+                window.__ICC_COORDINATION_FINAL = puntos.coordinacionFinal;
+            }
 
             // Registrar errores en semáforo si está disponible
             if (ctxSemaforo && resultadoCoordinacionReal.validacionFinal && Array.isArray(resultadoCoordinacionReal.validacionFinal.cruces)) {
@@ -885,6 +910,37 @@ var Motor = (function() {
         return resultado;
     }
 
+    function normalizarCoordinacionFinal(real, visual, diseno) {
+        var cruces = [];
+        var fuente = 'visual_tcc';
+        var estado = 'SIN_DATOS';
+
+        if (real && real.validacionFinal) {
+            fuente = 'motor_coordinacion_real';
+            cruces = Array.isArray(real.validacionFinal.cruces) ? real.validacionFinal.cruces : [];
+            estado = real.validacionFinal.ok ? 'COORDINADO' : 'NO_COORDINADO';
+        } else if (visual) {
+            fuente = 'tcc_visual';
+            cruces = Array.isArray(visual.cruces) ? visual.cruces : [];
+            estado = cruces.length === 0 ? 'COORDINADO' : 'NO_COORDINADO';
+        }
+
+        var disenoOk = diseno && (diseno.estadoGlobal === 'OK' || diseno.estadoGlobal === 'COORDINADO');
+        if (estado === 'SIN_DATOS' && disenoOk) estado = 'COORDINADO';
+
+        return {
+            fuente: fuente,
+            estado: estado,
+            ok: estado === 'COORDINADO',
+            cruces: cruces,
+            totalCruces: cruces.length,
+            timestamp: new Date().toISOString(),
+            mensaje: estado === 'COORDINADO' ?
+                'Coordinación validada por motor central' :
+                'Revisar cruces detectados por motor central'
+        };
+    }
+
     function ejecutarFallaMinima(puntosMax) {
         var tipoSistema = App.estado.tipoSistema;
         var factor = tipoSistema === '3f' ? Math.sqrt(3) : 2;
@@ -919,6 +975,13 @@ var Motor = (function() {
      * @returns {Object} Sugerencia de conductor con ampacidad corregida
      */
     function sugerirConductor(cargaA, material, canalizacion, longitud, paralelos, calibreExistente, isc, nodo) {
+        // Normalizar material para búsqueda en catálogo (ej: "Cobre (Cu)" -> "cobre")
+        var mat = (material || 'cobre').toLowerCase();
+        if (mat.includes('cobre') || mat.includes('cu')) mat = 'cobre';
+        if (mat.includes('aluminio') || mat.includes('al')) mat = 'aluminio';
+
+        material = mat; // Usar el material normalizado en el resto de la función
+
         // Leer parámetros C.D.T. de los inputs si están disponibles
         var fccInput = parseFloat(document.getElementById('cdt-fcc-input')?.value);
         var tempInput = parseFloat(document.getElementById('cdt-temp-input')?.value);
@@ -1225,17 +1288,11 @@ var Motor = (function() {
         }
 
         // Actualizar CDT en el punto
-        // Normalizar formato de resultado (CoreAmpacidad vs AmpacidadReal)
-        var I_final = resultado.I_final || resultado.ampacidadFinal || 0;
+        // Normalizar formato de resultado para consistencia entre motores (prevenir undefined)
+        var I_final = resultado.I_final || resultado.ampacidadFinal || resultado.I_corregida || 0;
         var I_corregida = resultado.I_corregida || resultado.ampacidadCorregida || 0;
-        var I_terminal = resultado.I_terminal || resultado.ampacidadTerminal || 0;
-        var I_tabla = resultado.I_tabla || resultado.ampacidad75 || 0;
-        
-        // Adaptar resultado al formato esperado por el sistema
-        var I_final = resultado.I_final || resultado.I_corregida;
-        var I_corregida = resultado.I_corregida;
-        var I_terminal = resultado.I_terminal || resultado.I_final;
-        var I_tabla = resultado.I_tabla || resultado.I_base75;
+        var I_terminal = resultado.I_terminal || resultado.ampacidadTerminal || I_final || 0;
+        var I_tabla = resultado.I_tabla || resultado.ampacidad75 || resultado.I_base75 || 0;
         
         return {
             calibre: resultado.calibre,

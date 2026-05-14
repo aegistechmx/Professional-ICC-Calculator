@@ -16,6 +16,7 @@ import 'reactflow/dist/style.css'
 
 import { useGraphStore } from '../store/graphStore'
 import { useAutoCalculate } from '../hooks/useAutoCalculate'
+import { validateConnection } from '../utils/validation'
 import SourceNode from './nodes/SourceNode'
 import LoadNode from './nodes/LoadNode'
 import TransformerNode from './nodes/TransformerNode'
@@ -107,6 +108,18 @@ export default function ElectricalEditor() {
   // Manejar conexión de nodos
   const onConnect = useCallback(
     params => {
+      const sourceNode = reactFlowNodes.find(n => n.id === params.source)
+      const targetNode = reactFlowNodes.find(n => n.id === params.target)
+
+      if (sourceNode && targetNode) {
+        if (!validateConnection(sourceNode.type, targetNode.type)) {
+          alert(
+            `Conexión inválida: ${sourceNode.type} → ${targetNode.type}\n\nRegla ATS:\n- TR/GEN deben pasar por IP antes del ATS\n- ATS solo recibe entrada desde breaker (IP/IP GEN)\n- ATS sale hacia breaker o panel`
+          )
+          return
+        }
+      }
+
       const newEdge = {
         id: `edge-${Date.now()}`,
         source: params.source,
@@ -121,7 +134,7 @@ export default function ElectricalEditor() {
 
       addEdge(newEdge)
     },
-    [addEdge, config]
+    [addEdge, config, reactFlowNodes]
   )
 
   // Manejar selección de nodos

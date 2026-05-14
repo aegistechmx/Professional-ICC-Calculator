@@ -7,10 +7,11 @@
  * Based on electrical hierarchy and common engineering practices
  */
 const CONNECTION_RULES = {
-  transformer: ['breaker', 'panel', 'ats'], // Puede conectar a ATS
-  generator: ['breaker', 'panel', 'ats'], // Puede conectar a ATS
+  transformer: ['breaker', 'panel'], // Debe pasar por IP antes del ATS
+  generator: ['breaker', 'panel'], // Debe pasar por IP GEN antes del ATS
   ats: ['breaker', 'panel'], // ATS alimenta breakers y panels
-  breaker: ['panel', 'load', 'motor'], // Salida - NO puede alimentar generators
+  generator_ats: ['breaker', 'panel'], // ATS integrado (fuente auxiliar) alimenta breakers y panels
+  breaker: ['ats', 'panel', 'load', 'motor'], // Puede alimentar ATS (como entrada Normal/Emergencia)
   panel: ['panel', 'breaker', 'load', 'motor'], // Allow panel -> panel for subpanels
   load: [],
   motor: [],
@@ -26,6 +27,16 @@ export function validateConnection(sourceType, targetType) {
   // Nadie puede alimentar a un generador (es fuente)
   if (targetType === 'generator') {
     return false
+  }
+
+  // ATS solo acepta entradas desde interruptores (IP / IP GEN)
+  if (targetType === 'ats') {
+    return sourceType === 'breaker'
+  }
+
+  // Generator ATS (ATS integrado) solo acepta entradas desde IP / IP GEN
+  if (targetType === 'generator_ats') {
+    return sourceType === 'breaker'
   }
 
   const validTargets = CONNECTION_RULES[sourceType] || []

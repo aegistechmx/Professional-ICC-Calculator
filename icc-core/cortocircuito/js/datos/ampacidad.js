@@ -35,18 +35,20 @@ var AMPACIDAD = {
     },
     aluminio: {
         acero: {
-            '14':{amp:0,tam:0},'12':{amp:0,tam:0},'10':{amp:0,tam:0},'8':{amp:0,tam:0},
-            '6':{amp:0,tam:0},'4':{amp:0,tam:0},'2':{amp:0,tam:0},'1':{amp:0,tam:0},
-            '1/0':{amp:0,tam:0},'2/0':{amp:0,tam:0},'3/0':{amp:0,tam:0},'4/0':{amp:0,tam:0},
-            '250':{amp:0,tam:0},'300':{amp:0,tam:0},'350':{amp:0,tam:0},'400':{amp:0,tam:0},
-            '500':{amp:0,tam:0},'600':{amp:0,tam:0},'750':{amp:0,tam:0},'1000':{amp:0,tam:0}
+            '14':{amp:0,tam:2.1},'12':{amp:15,tam:3.3},'10':{amp:25,tam:5.3},'8':{amp:30,tam:8.4},
+            '6':{amp:40,tam:13.3},'4':{amp:55,tam:21.2},'2':{amp:75,tam:33.6},'1':{amp:85,tam:42.4},
+            '1/0':{amp:100,tam:53.5},'2/0':{amp:115,tam:67.4},'3/0':{amp:130,tam:85},
+            '4/0':{amp:150,tam:107.2},'250':{amp:170,tam:127},'300':{amp:190,tam:152},
+            '350':{amp:210,tam:177},'400':{amp:225,tam:203},'500':{amp:260,tam:253},
+            '600':{amp:285,tam:304},'750':{amp:320,tam:385},'1000':{amp:375,tam:507}
         },
         pvc: {
-            '14':{amp:0,tam:0},'12':{amp:0,tam:0},'10':{amp:0,tam:0},'8':{amp:0,tam:0},
-            '6':{amp:0,tam:0},'4':{amp:0,tam:0},'2':{amp:0,tam:0},'1':{amp:0,tam:0},
-            '1/0':{amp:0,tam:0},'2/0':{amp:0,tam:0},'3/0':{amp:0,tam:0},'4/0':{amp:0,tam:0},
-            '250':{amp:0,tam:0},'300':{amp:0,tam:0},'350':{amp:0,tam:0},'400':{amp:0,tam:0},
-            '500':{amp:0,tam:0},'600':{amp:0,tam:0},'750':{amp:0,tam:0},'1000':{amp:0,tam:0}
+            '14':{amp:0,tam:2.1},'12':{amp:15,tam:3.3},'10':{amp:25,tam:5.3},'8':{amp:30,tam:8.4},
+            '6':{amp:40,tam:13.3},'4':{amp:55,tam:21.2},'2':{amp:75,tam:33.6},'1':{amp:85,tam:42.4},
+            '1/0':{amp:100,tam:53.5},'2/0':{amp:115,tam:67.4},'3/0':{amp:130,tam:85},
+            '4/0':{amp:150,tam:107.2},'250':{amp:170,tam:127},'300':{amp:190,tam:152},
+            '350':{amp:210,tam:177},'400':{amp:225,tam:203},'500':{amp:260,tam:253},
+            '600':{amp:285,tam:304},'750':{amp:320,tam:385},'1000':{amp:375,tam:507}
         }
     }
 };
@@ -56,7 +58,19 @@ var AMPACIDAD = {
  * @returns {Object|null} { ampacidad, tamConductor }
  */
 function getAmpacidad(material, canalizacion, calibre) {
-    var datos = AMPACIDAD[material] && AMPACIDAD[material][canalizacion] && AMPACIDAD[material][canalizacion][calibre];
+    // Normalizar material para búsqueda (ej: "Cobre (Cu)" -> "cobre")
+    var mat = (material || 'cobre').toLowerCase();
+    if (mat.includes('cobre') || mat.includes('cu')) mat = 'cobre';
+    if (mat.includes('aluminio') || mat.includes('al')) mat = 'aluminio';
+
+    // Normalizar canalización (ej: "conduit" -> "acero")
+    var cond = (canalizacion || 'acero').toLowerCase();
+    if (cond.includes('pvc')) cond = 'pvc';
+    if (cond.includes('acero') || cond.includes('conduit') || cond.includes('emt')) cond = 'acero';
+
+    var cal = String(calibre);
+
+    var datos = AMPACIDAD[mat] && AMPACIDAD[mat][cond] && AMPACIDAD[mat][cond][cal];
     return datos || null;
 }
 
@@ -83,51 +97,53 @@ function sugerirCalibre(icarga, v, material, canalizacion, numConductores, tempA
     var factorN = {1: 1.0, 2: 0.8, 3: 0.7};
     var factorNumConductores = factorN[numConductores] || 1;
 
-    // Factor de corrección por temperatura (NOM-001 Tabla 310.15)
-    // Simplificado: lineal entre 30°C (factor 1.0) y valores mayores
-    var factorTemp;
-    if (tempAmbiente <= 30) {
-        factorTemp = 1.0;
-    } else if (tempAmbiente <= 35) {
-        factorTemp = 0.96;
-    } else if (tempAmbiente <= 40) {
-        factorTemp = 0.91;
-    } else if (tempAmbiente <= 45) {
-        factorTemp = 0.87;
-    } else if (tempAmbiente <= 50) {
-        factorTemp = 0.82;
-    } else if (tempAmbiente <= 55) {
-        factorTemp = 0.76;
-    } else if (tempAmbiente <= 60) {
-        factorTemp = 0.71;
-    } else if (tempAmbiente <= 65) {
-        factorTemp = 0.65;
-    } else if (tempAmbiente <= 70) {
-        factorTemp = 0.58;
-    } else {
-        factorTemp = 0.50;
+    // Factor de corrección por temperatura (NOM-001 Tabla 310.15) corregido a columna 90C
+    var factorTemp = 1.0;
+    if (typeof CONSTANTES !== 'undefined' && CONSTANTES.FACTOR_TEMPERATURA) {
+        var tempKey = 'default';
+        var keys = Object.keys(CONSTANTES.FACTOR_TEMPERATURA);
+        for (var k = 0; k < keys.length; k++) {
+            if (keys[k] === 'default') continue;
+            var range = keys[k].split('-');
+            if (tempAmbiente >= parseInt(range[0]) && tempAmbiente <= parseInt(range[1])) {
+                tempKey = keys[k];
+                break;
+            }
+        }
+        factorTemp = CONSTANTES.FACTOR_TEMPERATURA[tempKey]['90'] || CONSTANTES.FACTOR_TEMPERATURA.default;
     }
 
     var calibres = CONSTANTES.CALIBRES;
     var resultados = [];
 
-    for (var i = 0; i < calibres.length; i++) {
-        var datos = getAmpacidad(material, canalizacion, calibres[i]);
-        if (!datos || datos.ampacidad <= 0) continue;
+    // Determinar temperatura base segun carga (NOM-001 Art. 110.14C)
+    // < 100A usa columna de 60°C, >= 100A usa columna de 75°C
+    var limiteTransicion = CONSTANTES.TEMP_CONDUCTOR_POR_CORRIENTE || 100;
+    var tempRating = (icarga < limiteTransicion) ? '60' : '75';
+    var tablaAmp = (material.toLowerCase().includes('al')) ? CONSTANTES.AMPACIDAD_AL : CONSTANTES.AMPACIDAD_CU;
 
-        // Ampacidad ajustada por temperatura y número de conductores
-        var ampAjustada = datos.ampacidad * factorTemp * factorNumConductores;
+    for (var i = 0; i < calibres.length; i++) {
+        var calibre = calibres[i];
+        var datos = getAmpacidad(material, canalizacion, calibre);
+        if (!datos) continue;
+
+        // Obtener ampacidad base segun transicion de temperatura (prioriza datos de CONSTANTES)
+        var ampBase = (tablaAmp && tablaAmp[tempRating]) ? (tablaAmp[tempRating][calibre] || datos.amp) : datos.amp;
+        if (ampBase <= 0) continue;
+
+        // Ampacidad ajustada por temperatura ambiente (columna 90C) y agrupamiento
+        var ampAjustada = ampBase * factorTemp * factorNumConductores;
 
         if (ampAjustada >= icarga) {
             resultados.push({
-                calibre: calibres[i],
-                ampacidad: datos.ampacidad,
+                calibre: calibre,
+                ampacidad: ampBase,
                 ampAjustada: ampAjustada,
-                tamConductor: datos.tamConductor,
+                tamConductor: datos.tam,
                 factorTemp: factorTemp,
                 factorNumCond: factorNumConductores,
                 margen: ((ampAjustada / icarga - 1) * 100),
-                calibreActual: calibres[i]
+                calibreActual: calibre
             });
         }
     }
@@ -135,19 +151,23 @@ function sugerirCalibre(icarga, v, material, canalizacion, numConductores, tempA
     // Si no encontró ninguno, sugerir el más grande disponible
     if (resultados.length === 0) {
         for (var j = calibres.length - 1; j >= 0; j--) {
-            var d = getAmpacidad(material, canalizacion, calibres[j]);
-            if (d && d.ampacidad > 0) {
-                resultados.push({
-                    calibre: calibres[j],
-                    ampacidad: d.ampacidad,
-                    ampAjustada: d.ampacidad * factorTemp * factorNumConductores,
-                    tamConductor: d.tamConductor,
-                    factorTemp: factorTemp,
-                    factorNumCond: factorNumConductores,
-                    margen: ((d.ampacidad * factorTemp * factorNumConductores / icarga - 1) * 100),
-                    calibreActual: calibres[j]
-                });
-                break;
+            var calibreFallback = calibres[j];
+            var d = getAmpacidad(material, canalizacion, calibreFallback);
+            if (d) {
+                var ampBaseFallback = (tablaAmp && tablaAmp[tempRating]) ? (tablaAmp[tempRating][calibreFallback] || d.amp) : d.amp;
+                if (ampBaseFallback > 0) {
+                    resultados.push({
+                        calibre: calibreFallback,
+                        ampacidad: ampBaseFallback,
+                        ampAjustada: ampBaseFallback * factorTemp * factorNumConductores,
+                        tamConductor: d.tam,
+                        factorTemp: factorTemp,
+                        factorNumCond: factorNumConductores,
+                        margen: ((ampBaseFallback * factorTemp * factorNumConductores / icarga - 1) * 100),
+                        calibreActual: calibreFallback
+                    });
+                    break;
+                }
             }
         }
     }
@@ -187,7 +207,7 @@ function sugerirTodosAlimentadores() {
             continue;
         }
 
-        var opciones = sugerirCalibre(ic, V, f.material, f.canalizacion, 1, 30);
+        var opciones = sugerirCalibre(ic, V, f.material, f.canalizacion, f.numConductores || 1, f.tempAmbiente || 30);
         if (opciones.length > 0) {
             var mejor = opciones[0]; // El primero ya es el más pequeño que cumple
             var mismoCalibre = mejor.calibre === f.calibre;

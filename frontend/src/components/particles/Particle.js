@@ -4,6 +4,8 @@
  * Representa el flujo de corriente a lo largo de un camino
  */
 
+let particleCreatedAtCounter = 0
+
 export class Particle {
   /**
    * @param {Array} path - Array de puntos [{x, y}] del camino
@@ -22,7 +24,7 @@ export class Particle {
     this.maxTrailLength = options.trailLength || 5
     this.turbulence = options.turbulence || 0
     this.alive = true
-    this.createdAt = Date.now()
+    this.createdAt = Date.now() + particleCreatedAtCounter++
     this.lifespan = options.lifespan || 5000 // ms
   }
 

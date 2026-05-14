@@ -128,7 +128,7 @@ async function main() {
     logSection('ICORE-ICC - INICIO COMPLETO DEL SISTEMA');
 
     // Verificar puertos
-    const ports = { frontend: 5173, backend: 3001, standalone: 3002 };
+    const ports = { frontend: 5173, backend: 3001 };
     for (const [service, port] of Object.entries(ports)) {
         const available = await isPortAvailable(port);
         if (!available) {
@@ -143,14 +143,10 @@ async function main() {
         // Frontend
         await startProcess('FRONTEND', frontendDir, NPM_CMD, ['run', 'dev'], ports.frontend);
 
-        // Iniciar el servidor estático para el módulo standalone
-        await startProcess('STANDALONE', rootDir, NPM_CMD, ['run', 'standalone'], ports.standalone);
-
         log('\n🔍 Realizando Health Checks (con reintentos)...', 'yellow');
         const checks = [
             { name: 'Backend API', url: `http://localhost:${ports.backend}/api/health` },
             { name: 'Frontend App', url: `http://localhost:${ports.frontend}` },
-            { name: 'Standalone Calc', url: `http://localhost:${ports.standalone}` },
             { name: 'Módulo Integrado', url: `http://localhost:${ports.frontend}/cortocircuito/index.html` }
         ];
 
@@ -169,7 +165,7 @@ async function main() {
         log(`   Frontend (Editor)     → http://localhost:${ports.frontend}`, 'bright');
         log(`   Backend API           → http://localhost:${ports.backend}`, 'bright');
         if (fs.existsSync(cortocircuitoDir)) {
-            log(`   Calculadora Standalone → http://localhost:${ports.standalone}`, 'bright');
+            log(`   Módulo ICC integrado → http://localhost:${ports.frontend}/cortocircuito/index.html`, 'bright');
         }
 
         log('\n📌 Presiona Ctrl+C para detener todos los servicios', 'yellow');

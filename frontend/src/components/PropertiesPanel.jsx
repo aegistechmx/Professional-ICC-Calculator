@@ -223,7 +223,9 @@ export default function PropertiesPanel() {
                         border: `1px solid ${selectedNode.data.results.isc ? getICCColor(selectedNode.data.results.isc / 1000) : '#6b7280'}`,
                       }}
                     >
-                      {selectedNode.data.results.isc?.toFixed(2) || 'N/A'}
+                      {selectedNode.data.results.isc
+                        ? (selectedNode.data.results.isc / 1000).toFixed(2)
+                        : 'N/A'}
                     </span>
                   </div>
                   {selectedNode.data.results.I_diseño && (

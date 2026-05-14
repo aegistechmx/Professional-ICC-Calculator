@@ -35,18 +35,20 @@ var AMPACIDAD = {
     },
     aluminio: {
         acero: {
-            '14':{amp:0,tam:0},'12':{amp:0,tam:0},'10':{amp:0,tam:0},'8':{amp:0,tam:0},
-            '6':{amp:0,tam:0},'4':{amp:0,tam:0},'2':{amp:0,tam:0},'1':{amp:0,tam:0},
-            '1/0':{amp:0,tam:0},'2/0':{amp:0,tam:0},'3/0':{amp:0,tam:0},'4/0':{amp:0,tam:0},
-            '250':{amp:0,tam:0},'300':{amp:0,tam:0},'350':{amp:0,tam:0},'400':{amp:0,tam:0},
-            '500':{amp:0,tam:0},'600':{amp:0,tam:0},'750':{amp:0,tam:0},'1000':{amp:0,tam:0}
+            '14':{amp:0,tam:2.1},'12':{amp:15,tam:3.3},'10':{amp:25,tam:5.3},'8':{amp:30,tam:8.4},
+            '6':{amp:40,tam:13.3},'4':{amp:55,tam:21.2},'2':{amp:75,tam:33.6},'1':{amp:85,tam:42.4},
+            '1/0':{amp:100,tam:53.5},'2/0':{amp:115,tam:67.4},'3/0':{amp:130,tam:85},
+            '4/0':{amp:150,tam:107.2},'250':{amp:170,tam:127},'300':{amp:190,tam:152},
+            '350':{amp:210,tam:177},'400':{amp:225,tam:203},'500':{amp:260,tam:253},
+            '600':{amp:285,tam:304},'750':{amp:320,tam:385},'1000':{amp:375,tam:507}
         },
         pvc: {
-            '14':{amp:0,tam:0},'12':{amp:0,tam:0},'10':{amp:0,tam:0},'8':{amp:0,tam:0},
-            '6':{amp:0,tam:0},'4':{amp:0,tam:0},'2':{amp:0,tam:0},'1':{amp:0,tam:0},
-            '1/0':{amp:0,tam:0},'2/0':{amp:0,tam:0},'3/0':{amp:0,tam:0},'4/0':{amp:0,tam:0},
-            '250':{amp:0,tam:0},'300':{amp:0,tam:0},'350':{amp:0,tam:0},'400':{amp:0,tam:0},
-            '500':{amp:0,tam:0},'600':{amp:0,tam:0},'750':{amp:0,tam:0},'1000':{amp:0,tam:0}
+            '14':{amp:0,tam:2.1},'12':{amp:15,tam:3.3},'10':{amp:25,tam:5.3},'8':{amp:30,tam:8.4},
+            '6':{amp:40,tam:13.3},'4':{amp:55,tam:21.2},'2':{amp:75,tam:33.6},'1':{amp:85,tam:42.4},
+            '1/0':{amp:100,tam:53.5},'2/0':{amp:115,tam:67.4},'3/0':{amp:130,tam:85},
+            '4/0':{amp:150,tam:107.2},'250':{amp:170,tam:127},'300':{amp:190,tam:152},
+            '350':{amp:210,tam:177},'400':{amp:225,tam:203},'500':{amp:260,tam:253},
+            '600':{amp:285,tam:304},'750':{amp:320,tam:385},'1000':{amp:375,tam:507}
         }
     }
 };
@@ -56,7 +58,18 @@ var AMPACIDAD = {
  * @returns {Object|null} { ampacidad, tamConductor }
  */
 function getAmpacidad(material, canalizacion, calibre) {
-    var datos = AMPACIDAD[material] && AMPACIDAD[material][canalizacion] && AMPACIDAD[material][canalizacion][calibre];
+    // Normalizar material y canalización para búsqueda (ej: "Cobre (Cu)" -> "cobre", "conduit" -> "acero")
+    var mat = (material || 'cobre').toLowerCase();
+    if (mat.includes('cobre') || mat.includes('cu')) mat = 'cobre';
+    if (mat.includes('aluminio') || mat.includes('al')) mat = 'aluminio';
+
+    var cond = (canalizacion || 'acero').toLowerCase();
+    if (cond.includes('pvc')) cond = 'pvc';
+    if (cond.includes('acero') || cond.includes('conduit') || cond.includes('emt')) cond = 'acero';
+
+    var cal = String(calibre);
+
+    var datos = AMPACIDAD[mat] && AMPACIDAD[mat][cond] && AMPACIDAD[mat][cond][cal];
     return datos || null;
 }
 
@@ -187,7 +200,7 @@ function sugerirTodosAlimentadores() {
             continue;
         }
 
-        var opciones = sugerirCalibre(ic, V, f.material, f.canalizacion, 1, 30);
+        var opciones = sugerirCalibre(ic, V, f.material, f.canalizacion, f.numConductores || 1, f.tempAmbiente || 30);
         if (opciones.length > 0) {
             var mejor = opciones[0]; // El primero ya es el más pequeño que cumple
             var mismoCalibre = mejor.calibre === f.calibre;

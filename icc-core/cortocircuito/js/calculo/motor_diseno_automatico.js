@@ -595,14 +595,15 @@ var MotorDisenoAutomatico = (function() {
         // PASO 2: Detectar curvas idénticas
         resultado.deteccionCurvas = detectarCurvasIguales(resultado.escalonamiento.nodos);
 
-        // Si hay errores críticos, detener
-        if (resultado.deteccionCurvas.estado === 'ERROR') {
+        var tieneErroresCriticos = resultado.deteccionCurvas.estado === 'ERROR';
+
+        // Si hay errores críticos, mantener estado ERROR pero continuar para generar TCC editable
+        if (tieneErroresCriticos) {
             resultado.estadoGlobal = 'ERROR';
             resultado.recomendaciones.push({
                 tipo: 'CRITICO',
                 mensaje: 'Breakers idénticos en cascada. Escalone frames manualmente o use diseño automático.'
             });
-            return resultado;
         }
 
         // PASO 3: Coordinación TCC
@@ -635,7 +636,9 @@ var MotorDisenoAutomatico = (function() {
         // Evaluar estado global
         var selectividadOK = resultado.validacionSelectividad.every(function(v) { return v.selectiva; });
         
-        if (selectividadOK) {
+        if (tieneErroresCriticos) {
+            resultado.estadoGlobal = 'ERROR';
+        } else if (selectividadOK) {
             resultado.estadoGlobal = 'OK';
             resultado.recomendaciones.push({
                 tipo: 'EXITO',

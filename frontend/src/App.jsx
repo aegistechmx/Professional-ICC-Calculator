@@ -40,6 +40,10 @@ function App() {
   const setNodes = useStore(state => state.setNodes)
   const setEdges = useStore(state => state.setEdges)
   const buildStandaloneModel = useStore(state => state.buildStandaloneModel)
+  const applyDefaultProjectConfig = useStore(
+    state => state.applyDefaultProjectConfig
+  )
+  const [defaultPreset, setDefaultPreset] = useState('mx_13800_480_5w')
 
   // Sincronización bidireccional con módulo cortocircuito (solo manual)
   useEffect(() => {
@@ -91,6 +95,27 @@ function App() {
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
   }
+
+  const handleApplyDefaultConfig = useCallback(() => {
+    if (defaultPreset === 'mx_13800_480_5w') {
+      applyDefaultProjectConfig({
+        primario: 13800,
+        secundario: 480,
+        nConductores: 5, // 3F + N + T
+        tempAmbiente: 30,
+      })
+      return
+    }
+
+    if (defaultPreset === 'mx_13800_220_5w') {
+      applyDefaultProjectConfig({
+        primario: 13800,
+        secundario: 220,
+        nConductores: 5, // 3F + N + T
+        tempAmbiente: 30,
+      })
+    }
+  }, [applyDefaultProjectConfig, defaultPreset])
 
   // Load project from JSON file
   const loadProjectFromFile = useCallback(() => {
@@ -177,13 +202,11 @@ function App() {
       // Forzar guardado inmediato en localStorage
       localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes))
       localStorage.setItem('icc-sync-edges', JSON.stringify(edges))
-      const model = buildStandaloneModel()
+      const model = typeof buildStandaloneModel === 'function'
+        ? buildStandaloneModel()
+        : { nodes, edges, source: 'fallback-sync-model' }
       localStorage.setItem('icc-sync-model', JSON.stringify(model))
-      localStorage.setItem('icc-sync-filename', String(filename))
-      localStorage.setItem(
-        'icc-sync-filename',
-        String(localStorage.getItem('icc-sync-filename'))
-      )
+      localStorage.setItem('icc-sync-filename', `${filename}`)
       localStorage.setItem('icc-sync-timestamp', new Date().toISOString())
 
       // Actualizar estado local
@@ -217,7 +240,9 @@ function App() {
 
   const handleCalculateICC = useCallback(async () => {
     try {
-      const model = buildStandaloneModel()
+      const model = typeof buildStandaloneModel === 'function'
+        ? buildStandaloneModel()
+        : { nodes, edges, source: 'fallback-sync-model' }
       setStandaloneModel(model)
       localStorage.setItem('icc-sync-model', JSON.stringify(model))
       localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes))
@@ -316,12 +341,33 @@ function App() {
               </button>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button type="button" onClick={handleDeleteSelected}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
                 title="Eliminar elementos seleccionados (o presiona DELETE)"
               >
                 🗑️ Eliminar
+              </button>
+              <select
+                value={defaultPreset}
+                onChange={e => setDefaultPreset(e.target.value)}
+                className="px-3 py-2 border rounded text-sm bg-white"
+                title="Cargar configuración por defecto del proyecto"
+              >
+                <option value="mx_13800_480_5w">
+                  Default: 13.8kV→480V, 3F+N+T
+                </option>
+                <option value="mx_13800_220_5w">
+                  Default: 13.8kV→220V, 3F+N+T
+                </option>
+              </select>
+              <button
+                type="button"
+                onClick={handleApplyDefaultConfig}
+                className="px-4 py-2 bg-slate-700 text-white rounded hover:bg-slate-800 transition"
+                title="Aplicar configuración por defecto al proyecto actual"
+              >
+                ⚙️ Cargar Default
               </button>
               <button type="button" onClick={loadProjectFromFile} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" title="Cargar proyecto desde archivo JSON">
                 📁 Abrir

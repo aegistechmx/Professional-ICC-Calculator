@@ -684,6 +684,12 @@ var Motor = (function() {
             // Adjuntar resultado al sistema
             puntos.coordinacionReal = resultadoCoordinacionReal;
 
+            // Fuente única de verdad para UI/PDF/TCC: el motor real decide el estado final.
+            puntos.coordinacionFinal = normalizarCoordinacionFinal(resultadoCoordinacionReal, puntos.coordinacionTCC, resultadoDiseno);
+            if (typeof window !== 'undefined') {
+                window.__ICC_COORDINATION_FINAL = puntos.coordinacionFinal;
+            }
+
             // Registrar errores en semáforo si está disponible
             if (ctxSemaforo && resultadoCoordinacionReal.validacionFinal && Array.isArray(resultadoCoordinacionReal.validacionFinal.cruces)) {
                 resultadoCoordinacionReal.validacionFinal.cruces.forEach(function(c) {
@@ -883,6 +889,37 @@ var Motor = (function() {
         }, "info");
         
         return resultado;
+    }
+
+    function normalizarCoordinacionFinal(real, visual, diseno) {
+        var cruces = [];
+        var fuente = 'visual_tcc';
+        var estado = 'SIN_DATOS';
+
+        if (real && real.validacionFinal) {
+            fuente = 'motor_coordinacion_real';
+            cruces = Array.isArray(real.validacionFinal.cruces) ? real.validacionFinal.cruces : [];
+            estado = real.validacionFinal.ok ? 'COORDINADO' : 'NO_COORDINADO';
+        } else if (visual) {
+            fuente = 'tcc_visual';
+            cruces = Array.isArray(visual.cruces) ? visual.cruces : [];
+            estado = cruces.length === 0 ? 'COORDINADO' : 'NO_COORDINADO';
+        }
+
+        var disenoOk = diseno && (diseno.estadoGlobal === 'OK' || diseno.estadoGlobal === 'COORDINADO');
+        if (estado === 'SIN_DATOS' && disenoOk) estado = 'COORDINADO';
+
+        return {
+            fuente: fuente,
+            estado: estado,
+            ok: estado === 'COORDINADO',
+            cruces: cruces,
+            totalCruces: cruces.length,
+            timestamp: new Date().toISOString(),
+            mensaje: estado === 'COORDINADO' ?
+                'Coordinación validada por motor central' :
+                'Revisar cruces detectados por motor central'
+        };
     }
 
     function ejecutarFallaMinima(puntosMax) {

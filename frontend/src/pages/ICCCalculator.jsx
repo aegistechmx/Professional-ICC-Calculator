@@ -36,6 +36,15 @@ export default function ICCCalculator() {
     modoCalculo: 'conocido',
   })
 
+  // Helper para formatear corriente con cambio de unidad dinámico (kA <-> A)
+  const formatCurrent = useCallback((val) => {
+    if (val === undefined || val === null || isNaN(val)) return '0 A';
+    const num = Number(val);
+    // Si es menor a 1 kA, mostrar en Amperios
+    if (num < 1) return `${(num * 1000).toFixed(0)} A`;
+    return `${num.toFixed(2)} kA`;
+  }, []);
+
   // Datos para listas desplegables
   const zonasElectricas = [
     {
@@ -152,11 +161,35 @@ export default function ICCCalculator() {
   }, [])
 
   // Manejar refresco del módulo
-  const handleRefresh = useCallback(data => {
+  const handleRefresh = useCallback(eventData => {
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console
-      console.log('Módulo ICC refrescado:', data)
+      console.log('Módulo ICC refrescado o sincronizado:', eventData)
     }
+
+    // Si recibimos datos durante el refresco, es una sincronización (Sync)
+    // Debemos actualizar el estado de React para que coincida con el módulo HTML
+    if (eventData && (eventData.nodos || eventData.fuente || eventData.tension)) {
+      // Actualizar modelo de sistema
+      setSystemModel(prev => ({
+        ...prev,
+        ...eventData
+      }));
+
+      // Sincronizar también el formulario de configuración (equipmentConfig)
+      if (eventData.fuente || eventData.tension) {
+        setEquipmentConfig(prev => ({
+          ...prev,
+          tension: eventData.tension || prev.tension,
+          iscConocido: eventData.fuente?.iscConocido || prev.iscConocido,
+          trafoKva: eventData.fuente?.trafoKva || prev.trafoKva,
+          trafoZ: eventData.fuente?.trafoZ || prev.trafoZ,
+          modoCalculo: eventData.modo || prev.modoCalculo
+        }));
+      }
+      return; // Salir sin borrar resultados si hay datos válidos
+    }
+
     setResults(null)
     setFaultDetected(false)
   }, [])
@@ -870,28 +903,16 @@ export default function ICCCalculator() {
                     <div className="mt-2 space-y-1 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">I3F:</span>
-                        <span className="font-medium">{punto.I3F || 0} A</span>
+                        <span className="font-medium">{formatCurrent(punto.I3F)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">I2F:</span>
-                        <span className="font-medium">{punto.I2F || 0} A</span>
+                        <span className="font-medium">{formatCurrent(punto.I2F)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">If-tierra:</span>
                         <span className="font-medium">
-                          {punto.IfTierra || 0} A
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Validación:</span>
-                        <span
-                          className={`font-medium ${
-                            punto.validacion?.ok
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                          }`}
-                        >
-                          {punto.validacion?.ok ? 'OK' : 'Error'}
+                          {formatCurrent(punto.IfTierra || punto.If_tierra || 0)}
                         </span>
                       </div>
                     </div>

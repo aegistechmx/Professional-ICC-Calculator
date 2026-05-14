@@ -121,13 +121,20 @@ var MotorAmpacidadNOM = (function () {
      * @returns {number} Ampacidad base
      */
     function getAmpacidadTabla(calibre, material, tempAislamiento) {
+        calibre = String(calibre).trim();
+
+        // Normalizar material (ej: "Cobre (Cu)" -> "cobre", "Al" -> "aluminio")
+        var mat = String(material || "cobre").toLowerCase();
+        if (mat.includes("cobre") || mat.includes("cu")) mat = "cobre";
+        if (mat.includes("aluminio") || mat === "al") mat = "aluminio";
+
         if (typeof CONDUCTORES_NOM !== 'undefined') {
-            return CONDUCTORES_NOM[material]?.[calibre]?.[tempAislamiento];
+            return CONDUCTORES_NOM[mat]?.[calibre]?.[tempAislamiento];
         }
 
         // Fallback a datos legacy si CONDUCTORES_NOM no está disponible
         if (typeof AmpacidadReal !== 'undefined' && AmpacidadReal.tablaAmpacidad) {
-            return AmpacidadReal.tablaAmpacidad[material]?.[tempAislamiento]?.[calibre];
+            return AmpacidadReal.tablaAmpacidad[mat]?.[tempAislamiento]?.[calibre];
         }
 
         throw new Error("Tabla de ampacidad no disponible");
