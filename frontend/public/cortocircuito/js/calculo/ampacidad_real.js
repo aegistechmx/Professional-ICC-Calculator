@@ -28,6 +28,18 @@ var AmpacidadReal = (function() {
     /**
      * Helper: clamp valor entre min y max
      */
+    
+    function normalizarCalibreNOM(calibre) {
+        return String(calibre == null ? '' : calibre)
+            .trim()
+            .toUpperCase()
+            .replace(/\s+/g, '')
+            .replace(/AWG/g, '')
+            .replace(/KCMIL|MCM/g, '')
+            .replace(/CU|AL/g, '')
+            .replace(/^0$/, '1/0');
+    }
+
     function clamp(v, min, max) {
         return Math.max(min, Math.min(max, v));
     }
@@ -103,7 +115,7 @@ var AmpacidadReal = (function() {
      */
     function normalizarNodo(nodo) {
         return {
-            calibre: nodo.calibre || '4/0',
+            calibre: normalizarCalibreNOM(nodo.calibre || (nodo.feeder && nodo.feeder.calibre) || '4/0'),
             temperaturaAislamiento: nodo.temperaturaAislamiento || 75,
             temperaturaAmbiente: getTempAmbiente(nodo.temperaturaAmbiente),
             numConductores: nodo.numConductores || 3,
@@ -243,34 +255,55 @@ var AmpacidadReal = (function() {
      * @returns {Object} { F, fuente, warning }
      */
     function resolverAgrupamiento(cable, config) {
-        // Prioridad 1: Si el usuario define F_agrupamiento manualmente válido
-        if (cable.F_agrupamiento != null && !isNaN(cable.F_agrupamiento) && cable.F_agrupamiento > 0) {
-            var ccc_manual = cable.numConductores || calcularCCC(config);
+        cable = cable || {};
+        config = config || {};
+
+        var cccCalculado = calcularCCC(config);
+        var ccc = (cable.numConductores && cable.numConductores > 0) ? cable.numConductores : cccCalculado;
+        var F_nom = factorAgrupamiento(ccc);
+        var F_manual = Number(cable.F_agrupamiento);
+
+        // Prioridad 1: factor manual válido SOLO si es coherente con CCC/NOM.
+        // Si no coincide, se autocorrige para evitar falsos cálculos y la prueba
+        // "Agrupamiento inconsistente" debe reportar AUTO_CORREGIDO.
+        if (cable.F_agrupamiento != null && !isNaN(F_manual) && F_manual > 0) {
+            var tolerancia = 0.001;
+            if (Math.abs(F_manual - F_nom) <= tolerancia) {
+                return {
+                    F: F_manual,
+                    fuente: 'MANUAL_VALIDO',
+                    ccc: ccc,
+                    F_nom: F_nom,
+                    warning: null
+                };
+            }
+
             return {
-                F: cable.F_agrupamiento,
-                fuente: 'MANUAL',
-                ccc: ccc_manual
+                F: F_nom,
+                fuente: 'AUTO_CORREGIDO',
+                ccc: ccc,
+                F_manual: F_manual,
+                F_nom: F_nom,
+                warning: 'Factor de agrupamiento manual inconsistente: ' + F_manual + ' → ' + F_nom + ' para ' + ccc + ' conductores portadores de corriente'
             };
         }
 
-        // Prioridad 2: Si el usuario define numConductores manualmente, usarlo directamente
+        // Prioridad 2: si el usuario define numConductores, calcular factor NOM desde ese valor.
         if (cable.numConductores && cable.numConductores > 0) {
-            var F_manual = factorAgrupamiento(cable.numConductores);
             return {
-                F: F_manual,
+                F: F_nom,
                 fuente: 'MANUAL_NUM_CONDUCTORES',
-                ccc: cable.numConductores
+                ccc: ccc,
+                F_nom: F_nom
             };
         }
 
-        // Prioridad 3: Usar CCC calculado
-        var ccc = calcularCCC(config);
-        var F_auto = factorAgrupamiento(ccc);
-
+        // Prioridad 3: usar CCC calculado desde el sistema.
         return {
-            F: F_auto,
+            F: F_nom,
             fuente: 'AUTO',
-            ccc: ccc
+            ccc: ccc,
+            F_nom: F_nom
         };
     }
 
@@ -347,7 +380,7 @@ var AmpacidadReal = (function() {
      */
     function ampacidadBase(calibre, temperaturaAislamiento) {
         // Normalizar calibre: trim y asegurar string
-        var calibreKey = String(calibre).trim();
+        var calibreKey = normalizarCalibreNOM(calibre);
         var ampacidades = tablaAmpacidad[calibreKey];
 
         if (!ampacidades) {
@@ -916,7 +949,7 @@ var AmpacidadReal = (function() {
             tempKey = '75';
         }
 
-        var I_terminal = tablaTerminales[material][tempKey][calibre];
+        var I_terminal = tablaTerminales[material][tempKey][normalizarCalibreNOM(calibre)];
 
         if (!I_terminal || I_terminal <= 0) {
             console.warn('[X] I_terminal no encontrado en tabla para calibre ' + calibre + ' @ ' + tempTerminal + '°C - usando I_tabla como fallback');

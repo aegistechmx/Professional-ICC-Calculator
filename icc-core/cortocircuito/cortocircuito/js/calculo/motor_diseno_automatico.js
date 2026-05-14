@@ -423,87 +423,40 @@ var MotorDisenoAutomatico = (function() {
      * @returns {Object} Resultado del ajuste TCC
      */
     function coordinarTCC(nodos) {
-        var resultado = {
-            nodos: [],
-            ajustes: [],
-            estado: 'OK'
-        };
-
-        for (var i = 0; i < nodos.length - 1; i++) {
-            var up = nodos[i];
-            var down = nodos[i + 1];
-
-            // Parámetros TCC base (si existen)
-            var tccUp = up.tcc || {
-                longDelay: 0,
-                shortDelay: 0,
-                pickup: up.breakerIn || 0,
-                instantaneous: (up.breakerIn || 0) * 10
+        var resultado = { nodos: [], ajustes: [], estado: 'OK' };
+        if (!nodos || nodos.length === 0) return resultado;
+        var orden = nodos.map(function(n, idx) {
+            var base = Object.assign({}, n);
+            base.tcc = normalizarTCC(base.tcc || { longDelay: 2.4, shortDelay: 0.20, pickup: base.breakerIn || 100, shortPickup: (base.breakerIn || 100) * 6, instantaneous: (base.breakerIn || 100) * 10 }, base.breakerIn || 100);
+            base.tcc.curveFamily = seleccionarFamiliaCurva(idx, nodos.length, base);
+            base.tcc.curveLabel = FAMILIAS_TCC[base.tcc.curveFamily].label;
+            return base;
+        });
+        for (var i = orden.length - 2; i >= 0; i--) {
+            var up = orden[i];
+            var down = orden[i + 1];
+            var antes = Object.assign({}, up.tcc);
+            var limiteAmpacidad = up.I_diseño && up.breakerIn ? Math.max(up.breakerIn, up.I_diseño) : Infinity;
+            if (up.bloqueoNOM) limiteAmpacidad = up.breakerIn || limiteAmpacidad;
+            var pickupPropuesto = Math.max(up.breakerIn || 0, (down.tcc.pickup || down.breakerIn || 0) * 1.20);
+            if (isFinite(limiteAmpacidad)) pickupPropuesto = Math.min(pickupPropuesto, limiteAmpacidad);
+            up.tcc = {
+                longDelay: Math.min(12, Math.max(antes.longDelay || 0, (down.tcc.longDelay || 2.4) + 0.50)),
+                shortDelay: Math.min(1.0, Math.max(antes.shortDelay || 0, (down.tcc.shortDelay || 0.20) + 0.10)),
+                pickup: Math.max(1, pickupPropuesto || antes.pickup || up.breakerIn || 100),
+                shortPickup: Math.max((pickupPropuesto || up.breakerIn || 100) * 4, (down.tcc.shortPickup || (down.tcc.pickup || 100) * 6) * 1.15),
+                instantaneous: down.tcc.instantaneous === 'OFF' ? 'OFF' : Math.max((antes.instantaneous || 0), (down.tcc.instantaneous || (down.tcc.pickup || 100) * 10) * 1.25),
+                curveFamily: seleccionarFamiliaCurva(i, orden.length, up),
+                curveLabel: FAMILIAS_TCC[seleccionarFamiliaCurva(i, orden.length, up)].label
             };
-
-            var tccDown = down.tcc || {
-                longDelay: 0,
-                shortDelay: 0,
-                pickup: down.breakerIn || 0,
-                instantaneous: (down.breakerIn || 0) * 10
-            };
-
-            // Normalizar TCC para asegurar configuración físicamente válida
-            tccUp = normalizarTCC(tccUp, up.breakerIn || 400);
-            tccDown = normalizarTCC(tccDown, down.breakerIn || 400);
-
-            // Ajustar upstream basado en downstream
-            var tccUpNuevo = {
-                longDelay: tccDown.longDelay + 0.4,    // +400ms para selectividad térmica
-                shortDelay: tccDown.shortDelay + 0.1,  // +100ms para selectividad magnética
-                pickup: tccDown.pickup * 1.25,         // 25% más alto
-                shortPickup: (tccDown.shortPickup || tccDown.pickup * 6) * 1.2,
-                instantaneous: tccDown.instantaneous === 'OFF' ? 'OFF' : tccDown.instantaneous * 1.5,
-                curveFamily: seleccionarFamiliaCurva(i, nodos.length, up),
-                curveLabel: FAMILIAS_TCC[seleccionarFamiliaCurva(i, nodos.length, up)].label
-            };
-
-            // Registrar ajustes
-            resultado.ajustes.push({
-                nodoUp: up.id,
-                nodoDown: down.id,
-                antes: tccUp,
-                despues: tccUpNuevo
-            });
-
-            resultado.nodos.push(Object.assign({}, up, {
-                id: up.id,
-                tcc: tccUpNuevo
-            }));
+            if (up.bloqueoNOM) { up.tcc.pickup = Math.min(up.tcc.pickup, up.breakerIn || up.tcc.pickup); up.tcc.instantaneous = 'OFF'; }
+            resultado.ajustes.push({ nodoUp: up.id, nodoDown: down.id, antes: antes, despues: up.tcc });
         }
-
-        // Agregar último nodo (downstream más lejano) sin cambios
-        if (nodos.length > 0) {
-            var ultimo = nodos[nodos.length - 1];
-            var tccUltimo = ultimo.tcc || {
-                longDelay: 0,
-                shortDelay: 0,
-                pickup: ultimo.breakerIn || 0,
-                instantaneous: (ultimo.breakerIn || 0) * 10
-            };
-            // Normalizar TCC del último nodo
-            tccUltimo = normalizarTCC(tccUltimo, ultimo.breakerIn || 400);
-            if (!tccUltimo.curveFamily) {
-                tccUltimo.curveFamily = seleccionarFamiliaCurva(nodos.length - 1, nodos.length, ultimo);
-                tccUltimo.curveLabel = FAMILIAS_TCC[tccUltimo.curveFamily].label;
-            }
-            resultado.nodos.push(Object.assign({}, ultimo, {
-                id: ultimo.id,
-                tcc: tccUltimo
-            }));
-        }
-
-        if (resultado.ajustes.length > 0) {
-            resultado.estado = 'AJUSTES_PENDIENTES';
-        }
-
+        resultado.nodos = orden;
+        resultado.estado = resultado.ajustes.length > 0 ? 'AJUSTES_PENDIENTES' : 'OK';
         return resultado;
     }
+
 
     /**
      * PASO 3 — Bloqueo de instantáneo para selectividad
@@ -584,6 +537,11 @@ var MotorDisenoAutomatico = (function() {
         var tUp = calcularTiempoTCC(up.tcc, corriente);
         var tDown = calcularTiempoTCC(down.tcc, corriente);
 
+        if (!isFinite(tUp) && !isFinite(tDown)) {
+            return { corriente: corriente, tUp: tUp, tDown: tDown, ratio: Infinity, selectiva: true, selectividadMinima: 1.3, mensaje: 'Sin disparo en zona evaluada' };
+        }
+        if (!isFinite(tUp) && isFinite(tDown)) tUp = 10000;
+        if (!isFinite(tDown) || tDown <= 0) tDown = 0.01;
         var ratio = tUp / tDown;
         var selectividadMinima = 1.3;
 

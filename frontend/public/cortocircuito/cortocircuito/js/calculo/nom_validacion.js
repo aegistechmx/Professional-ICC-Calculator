@@ -240,9 +240,10 @@ var NOMValidacion = (function() {
         var errores = [];
         var factorCarga = config.factorCarga || config.Fcc || 1.25;
         var requerido = config.iDiseno || config.I_diseno || config.I_diseño || 0;
-        var margenDiseno = requerido > 0 ? (config.ampacidadFinal || 0) / requerido : config.margen;
-        
-        if (config.modo === 'industrial' && factorCarga < 1.25 && margenDiseno < 1) {
+        var ampFinal = config.ampacidadFinal || config.I_final || 0;
+        var margenDiseno = requerido > 0 ? ampFinal / requerido : (config.margen || 1);
+        // Solo advertir cuando realmente falta el 125% o la ampacidad queda corta.
+        if (config.modo === 'industrial' && factorCarga < 1.25 && margenDiseno < 1.25) {
             errores.push({
                 type: 'WARNING',
                 code: 'NO_SAFETY_FACTOR',

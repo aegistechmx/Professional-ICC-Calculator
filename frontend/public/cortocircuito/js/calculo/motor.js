@@ -843,10 +843,11 @@ var Motor = (function() {
                 var iDisparo = (nodo.equip && nodo.equip.iDisparo) ? nodo.equip.iDisparo : 0;
                 var If_tierra = punto.faseTierra.iscFt * 1000;
                 
-                if (If_tierra < iDisparo) {
+                var evalTierra = evaluarProteccionMultizona(nodo.equip || {}, If_tierra, 'ground');
+                if (!evalTierra.sensible) {
                     resultado.estadoGlobal = "FAIL";
                     resultado.severidad = Math.max(resultado.severidad, 5);
-                    resultado.errores.push("FALLA A TIERRA (CRÍTICO NOM 230.95): If_tierra=" + If_tierra.toFixed(1) + "A < iDisparo=" + iDisparo + "A");
+                    resultado.errores.push("FALLA A TIERRA (CRÍTICO NOM 230.95): If_tierra=" + If_tierra.toFixed(1) + "A < pickup efectivo " + evalTierra.zona + "=" + (evalTierra.pickup || iDisparo).toFixed(0) + "A");
                 }
             }
 
@@ -1029,6 +1030,37 @@ var Motor = (function() {
         };
     }
 
+
+    /**
+     * Evalúa sensibilidad real por zonas (LT/ST/INST/GF) para LSIG/MCCB.
+     */
+    function evaluarProteccionMultizona(equip, corrienteA, modo) {
+        equip = equip || {};
+        corrienteA = Number(corrienteA) || 0;
+        if (corrienteA <= 0) return { sensible: false, zona: 'SIN_CORRIENTE', pickup: 0, margen: 0 };
+        var In = Number(equip.iNominal || equip.amp || equip.cap || equip.frame || 0);
+        var ltPickup = Number(equip.longPickup || equip.pickup || equip.pickupLT || In || (equip.iDisparo ? equip.iDisparo / 10 : 0));
+        var stPickup = Number(equip.shortPickup || equip.pickupST || (ltPickup ? ltPickup * 6 : 0));
+        var inst = equip.instantaneous === 'OFF' ? Infinity : Number(equip.instantaneous || equip.iDisparo || 0);
+        var gfPickup = Number(equip.ground_pickup || equip.pickupTierra || equip.Ig || 0);
+        var candidatos = [];
+        if (modo === 'ground') {
+            if (gfPickup > 0 && gfPickup <= 1 && In > 0) gfPickup = gfPickup * In;
+            if (!gfPickup && equip.tieneGFP && corrienteA > 0) gfPickup = Math.min(corrienteA * 0.8, In > 0 ? In * 0.4 : corrienteA * 0.8);
+            if (gfPickup > 0) candidatos.push({ zona: 'GF', pickup: gfPickup });
+        }
+        if (inst > 0 && isFinite(inst)) candidatos.push({ zona: 'INST', pickup: inst });
+        if (stPickup > 0) candidatos.push({ zona: 'ST', pickup: stPickup });
+        if (ltPickup > 0) candidatos.push({ zona: 'LT', pickup: ltPickup });
+        var mejor = null;
+        candidatos.forEach(function(c) { if (corrienteA >= c.pickup && (!mejor || c.pickup > mejor.pickup)) mejor = c; });
+        if (!mejor) {
+            var minPickup = candidatos.reduce(function(a, c) { return !a || c.pickup < a.pickup ? c : a; }, null);
+            return { sensible: false, zona: minPickup ? minPickup.zona : 'SIN_AJUSTE', pickup: minPickup ? minPickup.pickup : 0, margen: minPickup ? ((corrienteA - minPickup.pickup) / minPickup.pickup * 100) : 0 };
+        }
+        return { sensible: true, zona: mejor.zona, pickup: mejor.pickup, margen: ((corrienteA - mejor.pickup) / mejor.pickup * 100) };
+    }
+
     function ejecutarFallaMinima(puntosMax) {
         var tipoSistema = App.estado.tipoSistema;
         var factor = tipoSistema === '3f' ? Math.sqrt(3) : 2;
@@ -1042,13 +1074,10 @@ var Motor = (function() {
             var xr = p.X > 1e-6 ? p.X / p.R : 999;
             var ipeakMin = Impedancias.corrientePico(iscMin * 1000, xr) / 1000;
             var iDisparo = (p.equip && p.equip.iDisparo) ? p.equip.iDisparo : 0;
-            var sensible = false;
-            var margen = 0;
-            if (iDisparo > 0 && iscMin > 0) {
-                sensible = iscMin * 1000 > iDisparo;
-                margen = ((iscMin * 1000 - iDisparo) / iDisparo * 100);
-            }
-            resultados.push({ iscMin: iscMin, ipeakMin: ipeakMin, iDisparo: iDisparo, sensible: sensible, margen: margen });
+            var evaluacion = evaluarProteccionMultizona(p.equip || {}, iscMin * 1000, 'phase');
+            var sensible = evaluacion.sensible;
+            var margen = isFinite(evaluacion.margen) ? evaluacion.margen : 0;
+            resultados.push({ iscMin: iscMin, ipeakMin: ipeakMin, iDisparo: iDisparo, sensible: sensible, margen: margen, zona: evaluacion.zona, pickupEfectivo: evaluacion.pickup });
         }
         return resultados;
     }
@@ -1232,7 +1261,7 @@ var Motor = (function() {
                         paralelos: cableConfig.paralelos,
                         terminal: 75
                     });
-                    resultado = seleccion.detalle;
+                    resultado = Object.assign({ calibre: seleccion.calibre, I_final: seleccion.ampacidad, I_tabla: seleccion.I_base || seleccion.I_base75, I_base75: seleccion.I_base75, I_diseño: cargaA * Fcc, margen: seleccion.porcentajeMargen, status: 'PASS' }, seleccion.detalle || {});
                     console.log("[ConductorSelector] Resultado seleccionarConductor:", {
                         calibre: seleccion.calibre,
                         I_final: seleccion.ampacidad
@@ -1369,17 +1398,19 @@ var Motor = (function() {
         }
 
         // Actualizar CDT en el punto
-        // Normalizar formato de resultado (CoreAmpacidad vs AmpacidadReal)
-        var I_final = resultado.I_final || resultado.ampacidadFinal || 0;
-        var I_corregida = resultado.I_corregida || resultado.ampacidadCorregida || 0;
-        var I_terminal = resultado.I_terminal || resultado.ampacidadTerminal || 0;
-        var I_tabla = resultado.I_tabla || resultado.ampacidad75 || 0;
-        
-        // Adaptar resultado al formato esperado por el sistema
-        var I_final = resultado.I_final || resultado.I_corregida;
-        var I_corregida = resultado.I_corregida;
-        var I_terminal = resultado.I_terminal || resultado.I_final;
-        var I_tabla = resultado.I_tabla || resultado.I_base75;
+        // Normalizar formato de resultado (CoreAmpacidad vs AmpacidadReal) sin ampacidad fantasma.
+        var I_tabla = Number(resultado.I_tabla || resultado.I_base75 || resultado.I_base || resultado.ampacidad75 || 0);
+        var I_corregida = Number(resultado.I_corregida || resultado.ampacidadCorregida || resultado.I_final || 0);
+        var I_terminal = Number(resultado.I_terminal || resultado.ampacidadTerminal || resultado.I_final || 0);
+        var I_final = Number(resultado.I_final || resultado.ampacidadFinal || Math.min(I_corregida || Infinity, I_terminal || Infinity) || 0);
+        var I_disenoSalida = Number(resultado.I_diseño || resultado.I_diseno || (cargaA * Fcc));
+        if (!I_tabla || I_tabla <= 0) {
+            throw new Error('I_tabla inválida para calibre ' + (resultado.calibre || calibreExistente || 'N/A') + '. Revisar catálogo NOM/normalización de calibre.');
+        }
+        if (!I_final || I_final <= 0 || !isFinite(I_final)) {
+            throw new Error('Ampacidad final inválida para calibre ' + (resultado.calibre || calibreExistente || 'N/A') + ': ' + I_final);
+        }
+        var margenTermico = I_disenoSalida > 0 ? ((I_final - I_disenoSalida) / I_disenoSalida * 100) : 0;
         
         return {
             calibre: resultado.calibre,
@@ -1400,12 +1431,12 @@ var Motor = (function() {
             F_temp: resultado.F_temp || 1.0,
             F_agrupamiento: resultado.F_agrup || resultado.F_agrupamiento || 1.0,
             status: resultado.status || (resultado.valido ? 'PASS' : 'FAIL'),
-            margen: resultado.margen || 0,
-            deficit: resultado.deficit || 0,
+            margen: isFinite(margenTermico) ? margenTermico : 0,
+            deficit: Math.max(0, I_disenoSalida - I_final),
             violacionTerminal: resultado.violacionTerminal || false,
             sinFactor125: resultado.sinFactor125 || false,
             agrupamientoInfo: resultado.agrupamientoInfo || null,
-            I_diseño: resultado.I_diseño || (cargaA * Fcc)
+            I_diseño: I_disenoSalida
         };
     }
 
@@ -1999,7 +2030,8 @@ var Motor = (function() {
                 // =========================
                 if (p.faseTierra && p.faseTierra.iscFt > 0) {
                     var iDisparo = (nodo.equip && nodo.equip.iDisparo) ? nodo.equip.iDisparo : 0;
-                    if (p.faseTierra.iscFt * 1000 < iDisparo) {
+                    var evalTierraLegacy = evaluarProteccionMultizona(nodo.equip || {}, p.faseTierra.iscFt * 1000, 'ground');
+                    if (!evalTierraLegacy.sensible) {
                         var ajuste = mejorarSensibilidadTierra(p, nodo);
 
                         cambiosIteracion.push({

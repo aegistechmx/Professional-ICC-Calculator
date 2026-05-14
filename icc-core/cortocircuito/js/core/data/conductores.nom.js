@@ -52,6 +52,17 @@ var CONDUCTORES_NOM = {
   }
 };
 
+function normalizarCalibreNOM(calibre) {
+  return String(calibre == null ? '' : calibre)
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '')
+    .replace(/AWG/g, '')
+    .replace(/KCMIL|MCM/g, '')
+    .replace(/CU|AL/g, '')
+    .replace(/^0$/, '1/0');
+}
+
 /**
  * Factor de temperatura según NOM-001-SEDE-2012 Tabla 310.15(B)(2)(a)
  * @param {number} tempAmbiente - Temperatura ambiente (°C)
@@ -147,7 +158,7 @@ function aplicarLimiteTerminal(I_corregida, tempTerminal, base75) {
  * @returns {Object} Resultado de ampacidad
  */
 function ampacidadNOM(params) {
-  const calibre = String(params.calibre); // Normalizar a string
+  const calibre = normalizarCalibreNOM(params.calibre); // Normalizar AWG/kcmil
   const material = params.material || "cobre";
   const aislamiento = params.aislamiento || 75;
   const tempAmbiente = params.tempAmbiente || 30;
@@ -190,9 +201,11 @@ function ampacidadNOM(params) {
   
   // Aplicar límite de terminal
   const base75 = CONDUCTORES_NOM[material]?.[calibre]?.[75] || base;
-  const I_final = aplicarLimiteTerminal(I_corregida, tempTerminal, base75);
+  const I_final = aplicarLimiteTerminal(I_corregida, tempTerminal, base75 * paralelos);
   
   return {
+    calibre: calibre,
+    I_tabla: base,
     I_base: base,
     I_base75: base75,
     I_corregida: I_corregida,

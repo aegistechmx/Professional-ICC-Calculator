@@ -26,6 +26,12 @@ var MotorAutocorreccionTotal = (function() {
         // 1) Inferencias físicas (auto)
         inferirInstalacion(estado, cambios);
 
+        // 1.5) Autocorrector explícito conductor/protección antes de TCC.
+        // Mantiene la prioridad NOM: nunca subir breaker si el conductor no cumple.
+        if (typeof AutoCorrectorConductoresProtecciones !== 'undefined') {
+            AutoCorrectorConductoresProtecciones.aplicar(estado, cambios);
+        }
+
         // 2) Recalcular ONCE
         var res = Motor.ejecutar();
         var puntos = res.puntos;
@@ -190,11 +196,14 @@ var MotorAutocorreccionTotal = (function() {
                 return;
             }
 
-            if ((f.paralelo || 1) < CFG.maxParalelos) {
+            var IdisenoFallback = (f.cargaA || 0) * 1.25;
+            var maxParFisico = limiteParalelosFisico(IdisenoFallback);
+            if ((f.paralelo || 1) < maxParFisico) {
                 f.paralelo = (f.paralelo || 1) + 1;
                 cambios.push('Nodo ' + n.id + ': +paralelo (' + f.paralelo + ') por ampacidad NOM');
                 return;
             }
+            cambios.push('Nodo ' + n.id + ': requiere rediseño físico de alimentador; no se agregan paralelos no razonables para I_diseño=' + IdisenoFallback.toFixed(1) + 'A');
         });
     }
 
@@ -220,9 +229,10 @@ var MotorAutocorreccionTotal = (function() {
     }
 
     function limiteParalelosFisico(Idiseno) {
+        // Evita soluciones físicamente ridículas tipo 3/4 paralelos #8 para alimentadores de 100–125A.
         if (Idiseno <= 225) return 1;
-        if (Idiseno <= 400) return 2;
-        if (Idiseno <= 800) return 3;
+        if (Idiseno <= 500) return 2;
+        if (Idiseno <= 900) return 3;
         return CFG.maxParalelos;
     }
 
@@ -329,7 +339,7 @@ var MotorAutocorreccionTotal = (function() {
                 cambios.push('Nodo ' + n.id + ': iDisparo→' + (n.equip.iDisparo || 0).toFixed(0) + 'A');
             }
 
-            if (tipoAterrizaje === 'yg_solido' && n.equip && !n.equip.tieneGFP) {
+            if (tipoAterrizaje === 'yg_solido' && n.equip && !n.equip.tieneGFP && !n.equip.soportaGFP) {
                 n.equip.tieneGFP = true;
                 n.equip.soportaGFP = true;
                 n.equip.tipo = 'LSIG';

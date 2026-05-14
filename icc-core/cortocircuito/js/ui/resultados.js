@@ -511,7 +511,8 @@ var UIResultados = (function() {
         for (var i = 0; i < puntos.length; i++) {
             var p = puntos[i]; var fm = fallaMin[i]; var td = p.equip && p.equip.iDisparo > 0;
             var cls = !td?'badge-none':(fm.sensible?'badge-ok':'badge-danger');
-            var txt = !td?'Sin dato':(fm.sensible?'OK (+'+fm.margen.toFixed(0)+'%)':'NO VE FALLA');
+            var zona = fm && fm.zona ? (' vía ' + fm.zona) : '';
+            var txt = !td?'Sin dato':(fm.sensible?'OK' + zona + ' (+'+fm.margen.toFixed(0)+'%)':'NO VE FALLA');
             var icon = !td?'fa-minus-circle':(fm.sensible?'fa-check':'fa-times-circle');
             var tr = document.createElement('tr');
 
@@ -570,6 +571,12 @@ var UIResultados = (function() {
             var ratioNum = ft.iscFt > 0 ? (ft.iscFt / p.isc) : 0;
             var clsRatio = ratioNum < 0.5 ? 'text-[--green]' : (ratioNum < 0.8 ? 'text-[--yellow]' : 'text-[--orange]');
             var iDisparo = p.equip && p.equip.iDisparo > 0 ? p.equip.iDisparo : 0;
+            var IfTierraA = (ft.iscFt || 0) * 1000;
+            var gfPickup = p.equip ? Number(p.equip.pickupTierra || p.equip.ground_pickup || p.equip.Ig || 0) : 0;
+            if (gfPickup > 0 && gfPickup <= 1 && p.equip && (p.equip.iNominal || p.equip.amp || p.equip.frame)) {
+                gfPickup = gfPickup * Number(p.equip.iNominal || p.equip.amp || p.equip.frame);
+            }
+            var pickupEfectivo = gfPickup || iDisparo;
             var tr = document.createElement('tr');
 
             var td1 = document.createElement('td');
@@ -608,15 +615,15 @@ var UIResultados = (function() {
             tr.appendChild(td7);
 
             var td8 = document.createElement('td');
-            if (iDisparo > 0 && ft.iscFt < 0.2 * iDisparo) {
+            if (pickupEfectivo > 0 && IfTierraA < pickupEfectivo) {
                 var spanSens = document.createElement('span');
                 spanSens.className = 'text-[--red] font-semibold';
                 spanSens.textContent = 'NO SENSIBLE';
                 td8.appendChild(spanSens);
-            } else if (iDisparo > 0) {
+            } else if (pickupEfectivo > 0) {
                 var spanSens = document.createElement('span');
                 spanSens.className = 'text-[--green]';
-                spanSens.textContent = 'OK';
+                spanSens.textContent = gfPickup ? 'OK vía GF' : 'OK';
                 td8.appendChild(spanSens);
             } else {
                 td8.textContent = '—';

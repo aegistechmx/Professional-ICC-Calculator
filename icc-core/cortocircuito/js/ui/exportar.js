@@ -75,7 +75,7 @@ var UIExportar = (function() {
                         p.isc.toFixed(3),
                         fm.iscMin.toFixed(3),
                         td ? p.equip.iDisparo.toFixed(0) : '-',
-                        td ? (fm.sensible ? 'SI (+' + fm.margen.toFixed(0) + '%)' : 'NO VE FALLA') : 'Sin dato'
+                        td ? (fm.sensible ? 'SI' + (fm.zona ? ' vía ' + fm.zona : '') + ' (+' + fm.margen.toFixed(0) + '%)' : 'NO VE FALLA') : 'Sin dato'
                     ].join(sep));
                 });
                 lineas.push('');
@@ -313,7 +313,7 @@ var UIExportar = (function() {
                 p.isc.toFixed(3),
                 fm.iscMin.toFixed(3),
                 td ? p.equip.iDisparo.toFixed(0) : '-',
-                td ? (fm.sensible ? 'SI (+' + fm.margen.toFixed(0) + '%)' : 'NO VE FALLA') : 'Sin dato'
+                td ? (fm.sensible ? 'SI' + (fm.zona ? ' vía ' + fm.zona : '') + ' (+' + fm.margen.toFixed(0) + '%)' : 'NO VE FALLA') : 'Sin dato'
             ]);
         });
 

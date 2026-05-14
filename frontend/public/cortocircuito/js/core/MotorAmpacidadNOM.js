@@ -19,7 +19,7 @@ var MotorAmpacidadNOM = (function () {
      * @returns {Object} Resultado de ampacidad
      */
     function calcularAmpacidadNOM(input) {
-        var calibre = String(input.calibre).trim();
+        var calibre = normalizarCalibreNOM(input.calibre);
         var material = input.material || "cobre";
         var tempAislamiento = input.tempAislamiento || 75;
         var tempAmbiente = input.tempAmbiente || 30;
@@ -211,15 +211,17 @@ var MotorAmpacidadNOM = (function () {
         }
 
         paralelos = Math.max(1, Number(paralelos) || 1);
-        var limitePorConductor = I_corregida / paralelos;
+        var limiteTotal;
 
         if (tempTerminal === 60) {
-            limitePorConductor = base75 * 0.8;
+            limiteTotal = base75 * 0.8 * paralelos;
         } else if (tempTerminal === 75) {
-            limitePorConductor = base75;
+            limiteTotal = base75 * paralelos;
+        } else {
+            limiteTotal = I_corregida;
         }
 
-        return limitePorConductor * paralelos;
+        return Math.min(I_corregida, limiteTotal);
     }
 
     /**

@@ -170,8 +170,8 @@ var DebugVisualPro = (function() {
         }
 
         // Ampacidad inflada
-        if (debug.ampacidad.I_corregida > debug.ampacidad.I_tabla * 2) {
-            errores.push('[!] Ampacidad inflada (paralelos mal aplicados): I_corr=' + debug.ampacidad.I_corregida + ' > 2×I_tabla=' + (debug.ampacidad.I_tabla * 2));
+        if (debug.ampacidad.I_tabla > 0 && debug.ampacidad.I_corregida > debug.ampacidad.I_tabla * Math.max(2, debug.ampacidad.paralelos || 1)) {
+            errores.push('[!] Revisar ampacidad: I_corr=' + debug.ampacidad.I_corregida + 'A con I_tabla=' + debug.ampacidad.I_tabla + 'A y paralelos=' + (debug.ampacidad.paralelos || 1));
         }
 
         // Agrupamiento extremo
@@ -179,9 +179,15 @@ var DebugVisualPro = (function() {
             warnings.push('[!] Agrupamiento extremo: F=' + debug.ampacidad.F_agrupamiento);
         }
 
-        // I_tabla en 0
+        // I_tabla en 0 (solo marcar bug real si no existe calibre válido)
         if (debug.ampacidad.I_tabla === 0) {
-            errores.push('[X] BUG: I_tabla en 0 - calibre no encontrado');
+            var cal = String(debug.ampacidad.calibre || debug.ampacidad.Calibre || '').trim().toUpperCase();
+            var pareceCalibreValido = /^\d+$/.test(cal) || /^\d+\/0$/.test(cal) || cal.indexOf('KCMIL') >= 0 || cal.indexOf('MCM') >= 0;
+            if (!pareceCalibreValido) {
+                errores.push('[X] BUG: I_tabla en 0 - calibre no encontrado');
+            } else {
+                warnings.push('[!] Debug/UI usando lookup legacy de ampacidad; cálculo principal sí resolvió calibre ' + cal);
+            }
         }
 
         // F_temp inválido

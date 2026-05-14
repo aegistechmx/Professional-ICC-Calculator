@@ -6,6 +6,18 @@
 
 var MotorAmpacidadNOM = (function() {
     
+    function normalizarCalibreNOM(calibre) {
+        return String(calibre == null ? '' : calibre)
+            .trim()
+            .toUpperCase()
+            .replace(/\s+/g, '')
+            .replace(/AWG/g, '')
+            .replace(/KCMIL|MCM/g, '')
+            .replace(/CU|AL/g, '')
+            .replace(/^0$/, '1/0');
+    }
+
+
     /**
      * Calcular ampacidad según NOM-001-SEDE-2012
      * @param {Object} input - Datos de entrada
@@ -19,7 +31,7 @@ var MotorAmpacidadNOM = (function() {
      * @returns {Object} Resultado de ampacidad
      */
     function calcularAmpacidadNOM(input) {
-        var calibre = String(input.calibre).trim();
+        var calibre = normalizarCalibreNOM(input.calibre);
         var material = input.material || "cobre";
         var tempAislamiento = input.tempAislamiento || 75;
         var tempAmbiente = input.tempAmbiente || 30;
@@ -123,12 +135,12 @@ var MotorAmpacidadNOM = (function() {
      */
     function getAmpacidadTabla(calibre, material, tempAislamiento) {
         if (typeof CONDUCTORES_NOM !== 'undefined') {
-            return CONDUCTORES_NOM[material]?.[calibre]?.[tempAislamiento];
+            return CONDUCTORES_NOM[material]?.[normalizarCalibreNOM(calibre)]?.[tempAislamiento];
         }
         
         // Fallback a datos legacy si CONDUCTORES_NOM no está disponible
         if (typeof AmpacidadReal !== 'undefined' && AmpacidadReal.tablaAmpacidad) {
-            return AmpacidadReal.tablaAmpacidad[material]?.[tempAislamiento]?.[calibre];
+            return AmpacidadReal.ampacidadBase ? AmpacidadReal.ampacidadBase(normalizarCalibreNOM(calibre), tempAislamiento) : null;
         }
         
         throw new Error("Tabla de ampacidad no disponible");

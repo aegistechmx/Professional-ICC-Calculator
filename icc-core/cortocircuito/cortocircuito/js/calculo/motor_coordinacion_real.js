@@ -194,6 +194,10 @@ var MotorCoordinacionReal = (function() {
 
                 // 2. Ajustar pickup (25% más alto que downstream)
                 var pickupNuevo = down.tcc.pickup * 1.25;
+                var pickupMaxNOM = up.CDT && up.CDT.I_final ? up.CDT.I_final : Infinity;
+                if (pickupNuevo > pickupMaxNOM) {
+                    pickupNuevo = Math.max(up.tcc.pickup || 0, Math.min(pickupMaxNOM, up.breaker ? up.breaker.frame : pickupMaxNOM));
+                }
                 if (up.tcc.pickup !== pickupNuevo) {
                     resultado.cambios.push({
                         nodo: up.id,
@@ -274,79 +278,37 @@ var MotorCoordinacionReal = (function() {
     function validarCoordinacion(nodos) {
         var cruces = [];
         var ok = true;
-        var restriccionesNOM = nodos.filter(function(n) { return n.restriccionNOM; }).map(function(n) {
-            return {
-                nodo: n.id,
-                tipo: n.restriccionNOM.tipo,
-                mensaje: n.restriccionNOM.mensaje,
-                severidad: 'CRITICO'
-            };
-        });
-
-        if (restriccionesNOM.length > 0) {
-            ok = false;
-        }
-
+        var restriccionesNOM = (nodos || []).filter(function(n) { return n.restriccionNOM; }).map(function(n) { return { nodo: n.id, tipo: n.restriccionNOM.tipo, mensaje: n.restriccionNOM.mensaje, severidad: 'CRITICO' }; });
+        if (restriccionesNOM.length > 0) ok = false;
         for (var i = 0; i < nodos.length - 1; i++) {
-            var up = nodos[i];
-            var down = nodos[i + 1];
-
+            var up = nodos[i], down = nodos[i + 1];
             if (!up.tcc || !down.tcc) continue;
-
             if (up.breaker && down.breaker && up.breaker.frame === down.breaker.frame) {
-                cruces.push({
-                    par: up.id + ' → ' + down.id,
-                    corriente: down.breaker.frame,
-                    tUp: 0,
-                    tDown: 0,
-                    ratio: 0,
-                    selectividadMinima: 1.3,
-                    severidad: 'CRITICO',
-                    tipo: 'FRAME_IDENTICO',
-                    mensaje: 'Breakers con mismo frame en cascada (' + up.breaker.frame + 'A)'
-                });
+                cruces.push({ par: up.id + ' → ' + down.id, corriente: down.breaker.frame, tUp: 0, tDown: 0, ratio: 0, selectividadMinima: 1.3, severidad: 'CRITICO', tipo: 'FRAME_IDENTICO', mensaje: 'Breakers con mismo frame en cascada (' + up.breaker.frame + 'A). Requiere LSIG/ZSI/fusible limitador o cambio de frame/familia.' });
                 ok = false;
                 continue;
             }
-
-            // Validar a múltiples corrientes (escala log)
-            var corrientesPrueba = [];
-            for (var I = 100; I <= 50000; I *= 1.2) {
-                corrientesPrueba.push(I);
-            }
-
-            for (var j = 0; j < corrientesPrueba.length; j++) {
-                var I = corrientesPrueba[j];
+            var pickupMin = Math.max(Number(up.tcc.pickup || 0), Number(down.tcc.pickup || 0), 1);
+            var iscDown = Number(down.isc || down.Isc || down.iscMax || 0);
+            if (iscDown > 0 && iscDown < 1000) iscDown *= 1000;
+            var maxEval = Math.min(Math.max(pickupMin * 12, iscDown || pickupMin * 20), 50000);
+            var peor = null;
+            for (var I = pickupMin * 1.05; I <= maxEval; I *= 1.35) {
                 var tUp = calcularTiempoTCC(up.tcc, I);
                 var tDown = calcularTiempoTCC(down.tcc, I);
-
-                // Regla: t_up >= t_down * 1.3
-                if (!isFinite(tUp) || !isFinite(tDown) || tDown <= 0) continue;
+                if (!isFinite(tDown) || tDown <= 0) continue;
+                if (!isFinite(tUp)) tUp = 10000;
                 var ratio = tUp / tDown;
                 var selectividadMinima = 1.3;
-
                 if (ratio < selectividadMinima && tUp < 10000 && tDown < 10000) {
-                    cruces.push({
-                        par: up.id + ' → ' + down.id,
-                        corriente: I,
-                        tUp: tUp,
-                        tDown: tDown,
-                        ratio: ratio,
-                        selectividadMinima: selectividadMinima,
-                        severidad: ratio < 1.0 ? 'CRITICO' : 'WARNING'
-                    });
-                    ok = false;
+                    if (!peor || ratio < peor.ratio) peor = { par: up.id + ' → ' + down.id, corriente: I, tUp: tUp, tDown: tDown, ratio: ratio, selectividadMinima: selectividadMinima, severidad: ratio < 1.0 ? 'CRITICO' : 'WARNING' };
                 }
             }
+            if (peor) { cruces.push(peor); ok = false; }
         }
-
-        return {
-            ok: ok,
-            cruces: cruces,
-            restriccionesNOM: restriccionesNOM,
-            estado: ok ? 'COORDINADO' : 'NO_COORDINADO'
-        };
+        return { ok: ok, cruces: cruces, restriccionesNOM: restriccionesNOM, estado: ok ? 'COORDINADO' : 'NO_COORDINADO' };
     }
+
 
     /**
      * Calcular tiempo TCC usando curvas reales del catálogo

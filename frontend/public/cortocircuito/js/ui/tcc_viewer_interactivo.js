@@ -293,6 +293,9 @@ var TCCViewerInteractivo = (function() {
             var colorCentral = finalCoord.ok ? 'text-green-400' : 'text-red-400';
             html += '<div class="p-2 rounded bg-[--border]">';
             html += '<div class="font-semibold ' + colorCentral + '">' + iconoCentral + ' Estado central: ' + finalCoord.estado + '</div>';
+            if (finalCoord.estado !== 'COORDINADO') {
+                html += '<div class="text-xs text-[--text-muted] mt-1">Estrategia sugerida: resolver NOM primero; después usar LSIG/ZSI, cambio de frame/familia o fusible limitador para pares no selectivos.</div>';
+            }
             html += '<div class="text-xs text-[--text-muted]">' + finalCoord.mensaje + '</div>';
             if (!finalCoord.ok && finalCoord.totalCruces > 0) {
                 html += '<div class="text-xs text-[--red] mt-1">Cruces centrales: ' + finalCoord.totalCruces + '</div>';

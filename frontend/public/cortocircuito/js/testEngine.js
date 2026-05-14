@@ -178,9 +178,13 @@ var TestEngine = (function() {
                     detalle: res
                 });
             } catch (e) {
+                var tiempoError = performance.now() - inicio;
                 resultados.push({
                     nombre: test.nombre,
                     status: "ERROR",
+                    tiempo: tiempoError.toFixed(2),
+                    duration: Number(tiempoError.toFixed(2)),
+                    elapsedMs: Number(tiempoError.toFixed(2)),
                     error: e.message
                 });
             }
@@ -189,34 +193,50 @@ var TestEngine = (function() {
         clearInterval(freezeMonitor);
 
         // Validación global del sistema
+        var inicioValidacionIng = performance.now();
         try {
             if (typeof Motor !== 'undefined') {
                 var sistema = Motor.ejecutar();
                 var erroresIng = validarIngenieria(sistema);
+                var tiempoValidacionIng = (performance.now() - inicioValidacionIng).toFixed(2);
 
                 if (erroresIng.length > 0) {
                     resultados.push({
                         nombre: "Validación ingeniería",
                         status: "FAIL",
+                        tiempo: tiempoValidacionIng,
+                        duration: Number(tiempoValidacionIng),
+                        elapsedMs: Number(tiempoValidacionIng),
                         errores: erroresIng
                     });
                 } else {
                     resultados.push({
                         nombre: "Validación ingeniería",
-                        status: "OK"
+                        status: "OK",
+                        tiempo: tiempoValidacionIng,
+                        duration: Number(tiempoValidacionIng),
+                        elapsedMs: Number(tiempoValidacionIng)
                     });
                 }
             } else {
+                var tiempoSkipIng = (performance.now() - inicioValidacionIng).toFixed(2);
                 resultados.push({
                     nombre: "Validación ingeniería",
                     status: "SKIP",
+                    tiempo: tiempoSkipIng,
+                    duration: Number(tiempoSkipIng),
+                    elapsedMs: Number(tiempoSkipIng),
                     error: "Motor no cargado"
                 });
             }
         } catch (e) {
+            var tiempoErrorIng = (performance.now() - inicioValidacionIng).toFixed(2);
             resultados.push({
                 nombre: "Validación ingeniería",
                 status: "ERROR",
+                tiempo: tiempoErrorIng,
+                duration: Number(tiempoErrorIng),
+                elapsedMs: Number(tiempoErrorIng),
                 error: e.message
             });
         }
@@ -282,7 +302,7 @@ var TestEngine = (function() {
                         '<i class="fas ' + icon + ' ' + color + '"></i>' +
                         '<div class="flex-1">' +
                         '<div class="text-sm font-semibold ' + color + '">' + r.nombre + '</div>' +
-                        '<div class="text-xs text-[--text-muted]">Tiempo: ' + r.tiempo + 'ms</div>' +
+                        '<div class="text-xs text-[--text-muted]">Tiempo: ' + (r.tiempo != null ? r.tiempo : ((r.elapsedMs != null ? r.elapsedMs : 0).toFixed ? (r.elapsedMs || 0).toFixed(2) : r.elapsedMs)) + 'ms</div>' +
                         (r.error ? '<div class="text-xs text-[--red] mt-1">' + r.error + '</div>' : '') +
                         (r.errores ? '<div class="text-xs text-[--red] mt-1">' + r.errores.join(', ') + '</div>' : '') +
                         '</div>' +

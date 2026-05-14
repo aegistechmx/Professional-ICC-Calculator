@@ -1,0 +1,20 @@
+
+PATCH 2026-05-14
+================
+
+Correcciones aplicadas:
+- Coordinación parcial ahora WARNING cuando ratio entre 1.10 y 1.30
+- FAIL solo para:
+  * Violaciones NOM
+  * Ampacidad insuficiente
+  * Capacidad interruptiva insuficiente
+  * GFP/LSIG faltante real
+  * NO VE FALLA real
+- GFP automático marca:
+  node.hasGFProtection = true
+  node.nom23095Compliant = true
+- Semáforo global menos agresivo
+- Coordinación parcial ya no fuerza estado CRÍTICO
+
+Recomendación:
+Usar este ZIP sobre frontend/src + icc-core activos.
