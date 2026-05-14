@@ -62,7 +62,8 @@ var MotorAmpacidadNOM = (function() {
         
         // 5. LÍMITE DE TERMINAL (NOM 110.14(C))
         var I_base75 = getAmpacidadTabla(calibre, material, 75);
-        var I_terminal = aplicarLimiteTerminal(I_corregida, tempTerminal, I_base75);
+        var I_terminal = aplicarLimiteTerminal(I_corregida, tempTerminal, I_base75, paralelos);
+        var I_final = Math.min(I_corregida, I_terminal);
         
         return {
             calibre: calibre,
@@ -74,7 +75,7 @@ var MotorAmpacidadNOM = (function() {
             paralelos: paralelos,
             I_corregida: I_corregida,
             I_terminal: I_terminal,
-            I_final: I_terminal,
+            I_final: I_final,
             violacionTerminal: I_corregida > I_terminal
         };
     }
@@ -197,20 +198,21 @@ var MotorAmpacidadNOM = (function() {
      * @param {number} base75 - Ampacidad base a 75°C
      * @returns {number} Ampacidad con límite terminal
      */
-    function aplicarLimiteTerminal(I_corregida, tempTerminal, base75) {
+    function aplicarLimiteTerminal(I_corregida, tempTerminal, base75, paralelos) {
         if (!base75 || base75 <= 0) {
             return I_corregida;
         }
-        
+
+        paralelos = Math.max(1, Number(paralelos) || 1);
+        var limitePorConductor = I_corregida / paralelos;
+
         if (tempTerminal === 60) {
-            return Math.min(I_corregida, base75 * 0.8);
+            limitePorConductor = base75 * 0.8;
+        } else if (tempTerminal === 75) {
+            limitePorConductor = base75;
         }
-        
-        if (tempTerminal === 75) {
-            return Math.min(I_corregida, base75);
-        }
-        
-        return I_corregida;
+
+        return limitePorConductor * paralelos;
     }
     
     /**

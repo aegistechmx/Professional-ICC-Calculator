@@ -1020,13 +1020,20 @@ var UIResultados = (function() {
         content.textContent = '';
 
         if (!resultado || resultado.cambios.length === 0) {
+            var arbitraje = (typeof window !== 'undefined') ? window.__ICC_GLOBAL_ARBITRATION : null;
             var okDiv = document.createElement('div');
-            okDiv.className = 'flex items-center gap-2 px-3 py-2 rounded-lg bg-[--green]/10 border border-[--green]';
+            okDiv.className = arbitraje && !arbitraje.ok ?
+                'flex items-center gap-2 px-3 py-2 rounded-lg bg-[--yellow]/10 border border-[--yellow]' :
+                'flex items-center gap-2 px-3 py-2 rounded-lg bg-[--green]/10 border border-[--green]';
             var okIcon = document.createElement('i');
-            okIcon.className = 'fas fa-check-circle text-[--green]';
+            okIcon.className = arbitraje && !arbitraje.ok ?
+                'fas fa-exclamation-triangle text-[--yellow]' :
+                'fas fa-check-circle text-[--green]';
             var okText = document.createElement('span');
-            okText.className = 'text-[--green] text-sm';
-            okText.textContent = 'El sistema ya cumple con todos los criterios. No se requieren correcciones.';
+            okText.className = arbitraje && !arbitraje.ok ? 'text-[--yellow] text-sm' : 'text-[--green] text-sm';
+            okText.textContent = arbitraje && !arbitraje.ok ?
+                'No hay correcciones automáticas nuevas, pero el árbitro global mantiene ' + arbitraje.estado + ': ' + arbitraje.resumen + '.' :
+                'El sistema ya cumple con todos los criterios. No se requieren correcciones.';
             okDiv.appendChild(okIcon);
             okDiv.appendChild(okText);
             content.appendChild(okDiv);
@@ -1036,7 +1043,10 @@ var UIResultados = (function() {
         var headerDiv = document.createElement('div');
         headerDiv.className = 'mb-4 p-3 rounded-lg bg-[--cyan]/10 border border-[--cyan]';
         // Note: innerHTML is safe here as variables are internally generated, but we escape for safety
-        headerDiv.innerHTML = '<p class="text-sm text-[--cyan] font-semibold"><i class="fas fa-cogs mr-1"></i> Estado: ' + String(resultado.estado).replace(/</g, '&lt;').replace(/>/g, '&gt;') + ' | Iteraciones: ' + resultado.iteraciones + ' | Confianza: ' + (resultado.nivelConfianza * 100).toFixed(0) + '%</p>';
+        var nivelConfianza = Number(resultado.nivelConfianza);
+        if (!isFinite(nivelConfianza)) nivelConfianza = Number(resultado.confianza);
+        if (!isFinite(nivelConfianza)) nivelConfianza = 0;
+        headerDiv.innerHTML = '<p class="text-sm text-[--cyan] font-semibold"><i class="fas fa-cogs mr-1"></i> Estado: ' + String(resultado.estado).replace(/</g, '&lt;').replace(/>/g, '&gt;') + ' | Iteraciones: ' + resultado.iteraciones + ' | Confianza: ' + (nivelConfianza * 100).toFixed(0) + '%</p>';
         content.appendChild(headerDiv);
 
         var cambiosDiv = document.createElement('div');

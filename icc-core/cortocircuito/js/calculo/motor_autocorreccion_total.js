@@ -42,7 +42,7 @@ var MotorAutocorreccionTotal = (function() {
 
         corregirInterruptores(estado, puntos, cambios);
         corregirTierra(estado, puntos, cambios);
-        corregirTCC(estado, cambios);
+        corregirTCC(estado, cambios, puntos);
 
         // 4) Validar
         var v = ValidadorSistema.validarTodo(estado);
@@ -167,17 +167,7 @@ var MotorAutocorreccionTotal = (function() {
                 tempTerminal: 75
             };
 
-            var mejor = null;
-            if (typeof AmpacidadReal !== 'undefined' && AmpacidadReal.buscarConductorMinimo) {
-                for (var par = baseCable.paralelos; par <= CFG.maxParalelos; par++) {
-                    var cableTest = Object.assign({}, baseCable, { paralelos: par });
-                    var candidato = AmpacidadReal.buscarConductorMinimo(load, cableTest);
-                    if (candidato && candidato.status === 'PASS') {
-                        mejor = Object.assign({ paralelos: par }, candidato);
-                        break;
-                    }
-                }
-            }
+            var mejor = buscarMejorConductorFisico(load, baseCable);
 
             if (mejor) {
                 if (f.calibre !== mejor.calibre) {
@@ -193,18 +183,64 @@ var MotorAutocorreccionTotal = (function() {
             }
 
             // Fallback: crecimiento ordenado, pero siempre conductor antes que breaker.
+            var next = siguienteCalibre(f.calibre);
+            if (next) {
+                f.calibre = next;
+                cambios.push('Nodo ' + n.id + ': calibre→' + next + ' por ampacidad NOM');
+                return;
+            }
+
             if ((f.paralelo || 1) < CFG.maxParalelos) {
                 f.paralelo = (f.paralelo || 1) + 1;
                 cambios.push('Nodo ' + n.id + ': +paralelo (' + f.paralelo + ') por ampacidad NOM');
                 return;
             }
-
-            var next = siguienteCalibre(f.calibre);
-            if (next) {
-                f.calibre = next;
-                cambios.push('Nodo ' + n.id + ': calibre→' + next + ' por ampacidad NOM');
-            }
         });
+    }
+
+    function buscarMejorConductorFisico(load, baseCable) {
+        if (typeof AmpacidadReal === 'undefined' || !AmpacidadReal.buscarConductorMinimo) return null;
+
+        var Idiseno = (load.I_no_cont || 0) + (load.I_cont || 0) * (load.Fcc || 1.25);
+        var maxParalelos = limiteParalelosFisico(Idiseno);
+        var mejor = null;
+
+        for (var par = 1; par <= maxParalelos; par++) {
+            var cableTest = Object.assign({}, baseCable, { paralelos: par });
+            var candidato = AmpacidadReal.buscarConductorMinimo(load, cableTest);
+            if (!candidato || candidato.status !== 'PASS') continue;
+
+            var puntaje = puntuarConductorFisico(candidato, par, Idiseno);
+            if (!mejor || puntaje < mejor.puntajeFisico) {
+                mejor = Object.assign({ paralelos: par, puntajeFisico: puntaje }, candidato);
+            }
+        }
+
+        return mejor;
+    }
+
+    function limiteParalelosFisico(Idiseno) {
+        if (Idiseno <= 225) return 1;
+        if (Idiseno <= 400) return 2;
+        if (Idiseno <= 800) return 3;
+        return CFG.maxParalelos;
+    }
+
+    function puntuarConductorFisico(candidato, paralelos, Idiseno) {
+        var IFinal = candidato.I_final || Idiseno;
+        var ratio = Idiseno > 0 ? IFinal / Idiseno : 1;
+        var penalizacionParalelo = Math.pow(paralelos - 1, 2) * 10000;
+        var penalizacionSobredimension = Math.abs(ratio - 1.2) * 1000;
+        var penalizacionCalibre = indiceCalibre(candidato.calibre) * 10;
+        return penalizacionParalelo + penalizacionSobredimension + penalizacionCalibre;
+    }
+
+    function indiceCalibre(calibre) {
+        var orden = ['14', '12', '10', '8', '6', '4', '3', '2', '1', '1/0', '2/0', '3/0', '4/0',
+            '250', '300', '350', '400', '500', '600', '700', '750', '800', '900', '1000',
+            '1250', '1500', '1750', '2000'];
+        var idx = orden.indexOf(String(calibre));
+        return idx >= 0 ? idx : orden.length;
     }
 
     // =========================
@@ -233,8 +269,11 @@ var MotorAutocorreccionTotal = (function() {
 
             // Sensibilidad mínima (Falla 3F): iDisparo debe ser menor que Isc_min en el punto.
             // Si iDisparo es mayor, el interruptor "NO VE FALLA" en el reporte.
-            if (p.iscMin && n.equip.iDisparo) {
-                var iscMinA = p.iscMin * 1000;
+            var iscMinKA = p.iscMin || p.Isc_min || p.isc_min ||
+                (p.fallaMinima && p.fallaMinima.iscMin) ||
+                (p.isc ? p.isc * 0.95 : 0);
+            if (iscMinKA && n.equip.iDisparo) {
+                var iscMinA = iscMinKA * 1000;
                 if (iscMinA > 0 && n.equip.iDisparo >= iscMinA) {
                     n.equip.iDisparo = Math.max(CFG.minDisparo, iscMinA * 0.8);
                     cambios.push(
@@ -272,6 +311,8 @@ var MotorAutocorreccionTotal = (function() {
 
             var I3F = p.isc * 1000;
             var IFT = (p.faseTierra.iscFt || 0) * 1000;
+            var tipoAterrizaje = typeof leerTipoAterrizamiento === 'function' ? leerTipoAterrizamiento() :
+                ((typeof App !== 'undefined' && App.estado && App.estado.ctx && App.estado.ctx.system && App.estado.ctx.system.groundingType) || 'yg_solido');
 
             // 🔥 Modelo Z0 realista si está muy bajo
             if (IFT < 0.1 * I3F) {
@@ -287,18 +328,34 @@ var MotorAutocorreccionTotal = (function() {
                 n.equip.iDisparo = Math.max(CFG.minDisparo, IFT * 0.5);
                 cambios.push('Nodo ' + n.id + ': iDisparo→' + (n.equip.iDisparo || 0).toFixed(0) + 'A');
             }
+
+            if (tipoAterrizaje === 'yg_solido' && n.equip && !n.equip.tieneGFP) {
+                n.equip.tieneGFP = true;
+                n.equip.soportaGFP = true;
+                n.equip.tipo = 'LSIG';
+                n.equip.pickupTierra = Math.max(CFG.minDisparo, IFT * 0.3);
+                n.equip.ground_pickup = n.equip.pickupTierra;
+                n.equip.ground_delay = n.equip.ground_delay || 0.2;
+                cambios.push('Nodo ' + n.id + ': GFP/LSIG activado por NOM 230.95 (Ig=' + n.equip.pickupTierra.toFixed(0) + 'A)');
+            }
         });
     }
 
     // =========================
     // 📉 TCC
     // =========================
-    function corregirTCC(estado, cambios) {
+    function corregirTCC(estado, cambios, puntos) {
         var nodos = estado.nodos || [];
+        var puntosPorId = {};
+        (puntos || []).forEach(function(p) { puntosPorId[p.id] = p; });
         var cabecerasCorregidas = new Set();
         nodos.forEach(function(n) {
             var up = findNodo(estado, n.parentId);
             if (!up || cabecerasCorregidas.has(up.id)) return;
+            if (tieneRestriccionNOM(puntosPorId[up.id]) || tieneRestriccionNOM(puntosPorId[n.id])) {
+                cambios.push('TCC: coordinación bloqueada en ' + up.id + ' hasta resolver ampacidad/terminal');
+                return;
+            }
             cabecerasCorregidas.add(up.id);
 
             // Asegurar separación mínima de 0.1s respecto al hijo
@@ -360,6 +417,10 @@ var MotorAutocorreccionTotal = (function() {
         return (ws || []).filter(function(w, i, arr) {
             return arr.indexOf(w) === i && !/default 3 conductores/.test(w);
         });
+    }
+
+    function tieneRestriccionNOM(p) {
+        return !!(p && p.CDT && (p.CDT.violacionTerminal || p.CDT.I_final < (p.CDT.I_diseño || 0)));
     }
 
     return {

@@ -1,23 +1,9 @@
 /**
- * nom_validacion.js — Motor de validación NOM-001-SEDE-2012 [DEPRECATED]
- * 
- * ⚠️ DEPRECATED: Este archivo está obsoleto y será eliminado en una versión futura.
- * 
- * ✅ USAR EN SU LUGAR: js/core/domain/validation.engine.js
- *    - ValidationEngine.runAll() para validación completa
- *    - ValidationEngine.validateAmpacity() para validación específica
- *    - ValidationEngine.CODES para códigos de error estandarizados
- * 
- * 📚 Migración:
- *    - NOMValidacion.validarTodo(config) → ValidationEngine.runAll(ctx)
- *    - NOMValidacion.validarAmpacidad(config) → ValidationEngine.validateAmpacity(ctx)
- *    - Resultados ahora están normalizados con { errors, warnings, info, valid, summary }
- * 
- * @deprecated Desde versión 2.0.0 - Usar ValidationEngine
- * @see js/core/domain/validation.engine.js
+ * nom_validacion.js — Motor de validación NOM-001-SEDE-2012
+ * Validaciones críticas, warnings y sistema de severidad para cumplimiento normativo
  */
 
-var NOMValidacion = (function () {
+var NOMValidacion = (function() {
 
     /**
      * Niveles de severidad
@@ -33,21 +19,23 @@ var NOMValidacion = (function () {
      */
     function validarAmpacidad(config) {
         var errores = [];
-
-        if (config.iCarga > config.ampacidadFinal) {
+        var requerido = config.iDiseno || config.I_diseno || config.I_diseño ||
+            ((config.iCarga || 0) * (config.factorCarga || config.Fcc || 1.25));
+        
+        if (requerido > config.ampacidadFinal) {
             errores.push({
                 type: 'ERROR',
                 code: 'AMPACITY_FAIL',
                 message: 'CONDUCTOR SUBDIMENSIONADO',
                 severity: SEVERITY.ERROR,
                 data: {
-                    requerido: config.iCarga,
+                    requerido: requerido,
                     disponible: config.ampacidadFinal,
-                    deficit: config.iCarga - config.ampacidadFinal
+                    deficit: requerido - config.ampacidadFinal
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -56,7 +44,7 @@ var NOMValidacion = (function () {
      */
     function validarTemperaturaTerminal(config) {
         var errores = [];
-
+        
         if (config.ampacidadCorregida > config.ampacidadTerminal) {
             errores.push({
                 type: 'ERROR',
@@ -70,7 +58,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -79,7 +67,7 @@ var NOMValidacion = (function () {
      */
     function validarUso90C(config) {
         var errores = [];
-
+        
         if (config.usa90C && config.ampacidadFinal > config.ampacidad75) {
             errores.push({
                 type: 'ERROR',
@@ -92,7 +80,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -101,11 +89,11 @@ var NOMValidacion = (function () {
      */
     function validarCapacidadInterruptiva(config) {
         var errores = [];
-
+        
         if (config.icc && config.interruptorKA) {
             var iccA = config.icc;
             var capacidadA = config.interruptorKA * 1000;
-
+            
             if (iccA > capacidadA) {
                 errores.push({
                     type: 'ERROR',
@@ -120,7 +108,7 @@ var NOMValidacion = (function () {
                 });
             }
         }
-
+        
         return errores;
     }
 
@@ -129,10 +117,10 @@ var NOMValidacion = (function () {
      */
     function validarFactorAgrupamiento(config) {
         var errores = [];
-
+        
         var numConductores = config.numConductores || 3;
         var fc = config.fc || 1.0;
-
+        
         if (numConductores > 3 && fc === 1.0) {
             errores.push({
                 type: 'ERROR',
@@ -146,7 +134,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -155,7 +143,7 @@ var NOMValidacion = (function () {
      */
     function validarNeutro(config) {
         var errores = [];
-
+        
         if (config.tieneNeutro && !config.neutroContado) {
             if (config.esMonofasico || config.tieneArmonicos) {
                 errores.push({
@@ -171,7 +159,7 @@ var NOMValidacion = (function () {
                 });
             }
         }
-
+        
         return errores;
     }
 
@@ -180,9 +168,9 @@ var NOMValidacion = (function () {
      */
     function validarAgrupamientoExcesivo(config) {
         var errores = [];
-
+        
         var numConductores = config.numConductores || 3;
-
+        
         if (numConductores >= 10) {
             errores.push({
                 type: 'WARNING',
@@ -195,7 +183,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -204,9 +192,9 @@ var NOMValidacion = (function () {
      */
     function validarTemperaturaAlta(config) {
         var errores = [];
-
+        
         var temperatura = config.temperatura || 30;
-
+        
         if (temperatura > 40) {
             errores.push({
                 type: 'WARNING',
@@ -219,7 +207,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -228,7 +216,7 @@ var NOMValidacion = (function () {
      */
     function validarParalelos(config) {
         var errores = [];
-
+        
         if (config.paralelos > 1 && !config.balanceado) {
             errores.push({
                 type: 'WARNING',
@@ -241,7 +229,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -250,20 +238,24 @@ var NOMValidacion = (function () {
      */
     function validarFactorSeguridad(config) {
         var errores = [];
-
-        if (config.modo === 'industrial' && config.margen < 1.25) {
+        var factorCarga = config.factorCarga || config.Fcc || 1.25;
+        var requerido = config.iDiseno || config.I_diseno || config.I_diseño || 0;
+        var margenDiseno = requerido > 0 ? (config.ampacidadFinal || 0) / requerido : config.margen;
+        
+        if (config.modo === 'industrial' && factorCarga < 1.25 && margenDiseno < 1) {
             errores.push({
                 type: 'WARNING',
                 code: 'NO_SAFETY_FACTOR',
                 message: 'SIN FACTOR DE SEGURIDAD (125%)',
                 severity: SEVERITY.WARNING,
                 data: {
-                    margen: config.margen,
+                    margen: margenDiseno,
+                    factorCarga: factorCarga,
                     esperado: 1.25
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -272,7 +264,7 @@ var NOMValidacion = (function () {
      */
     function validarCaidaTension(config) {
         var errores = [];
-
+        
         if (config.caidaTension > 3) {
             errores.push({
                 type: 'WARNING',
@@ -285,7 +277,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -294,10 +286,10 @@ var NOMValidacion = (function () {
      */
     function validarFactorTemperatura(config) {
         var errores = [];
-
+        
         var temperatura = config.temperatura || 30;
         var ft = config.ft || 1.0;
-
+        
         if (temperatura !== 30 && ft === 1.0) {
             errores.push({
                 type: 'ERROR',
@@ -324,7 +316,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -360,7 +352,7 @@ var NOMValidacion = (function () {
      */
     function validarSobredimensionamiento(config) {
         var errores = [];
-
+        
         if (config.ampacidadFinal > config.iCarga * 2) {
             errores.push({
                 type: 'INFO',
@@ -374,7 +366,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -383,14 +375,14 @@ var NOMValidacion = (function () {
      */
     function validarNeutroContexto(config) {
         var errores = [];
-
+        
         if (!config.loadContext || !config.loadContext.phases) {
             return errores;
         }
-
+        
         var In = config.loadContext.phases.In || 0;
         var neutralAmpacity = config.neutralAmpacity || 0;
-
+        
         if (In > neutralAmpacity && neutralAmpacity > 0) {
             errores.push({
                 type: 'WARNING',
@@ -405,7 +397,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -414,14 +406,14 @@ var NOMValidacion = (function () {
      */
     function validarArmonicos(config) {
         var errores = [];
-
+        
         if (!config.loadContext || !config.loadContext.harmonics) {
             return errores;
         }
-
+        
         var In_harm = config.loadContext.harmonics.In_harm || 0;
         var THDi = config.loadContext.harmonics.THDi || 0;
-
+        
         if (In_harm > 0 || THDi > 0.05) {
             errores.push({
                 type: 'WARNING',
@@ -434,7 +426,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -443,13 +435,13 @@ var NOMValidacion = (function () {
      */
     function validarDesbalance(config) {
         var errores = [];
-
+        
         if (!config.loadContext || !config.loadContext.system) {
             return errores;
         }
-
+        
         var unbalance = config.loadContext.system.unbalance || 0;
-
+        
         if (unbalance > 0.15) {
             errores.push({
                 type: 'WARNING',
@@ -462,7 +454,7 @@ var NOMValidacion = (function () {
                 }
             });
         }
-
+        
         return errores;
     }
 
@@ -471,7 +463,7 @@ var NOMValidacion = (function () {
      */
     function validarTodo(config) {
         var errores = [];
-
+        
         // Validaciones críticas (bloquean cálculo)
         errores = errores.concat(validarAmpacidad(config));
         errores = errores.concat(validarTemperaturaTerminal(config));
@@ -479,7 +471,7 @@ var NOMValidacion = (function () {
         errores = errores.concat(validarCapacidadInterruptiva(config));
         errores = errores.concat(validarFactorAgrupamiento(config));
         errores = errores.concat(validarFactorTemperatura(config));
-
+        
         // Validaciones importantes (warnings)
         errores = errores.concat(validarNeutro(config));
         errores = errores.concat(validarAgrupamientoExcesivo(config));
@@ -487,15 +479,15 @@ var NOMValidacion = (function () {
         errores = errores.concat(validarParalelos(config));
         errores = errores.concat(validarFactorSeguridad(config));
         errores = errores.concat(validarCaidaTension(config));
-
+        
         // Validaciones de contexto de carga (warnings)
         errores = errores.concat(validarNeutroContexto(config));
         errores = errores.concat(validarArmonicos(config));
         errores = errores.concat(validarDesbalance(config));
-
+        
         // Validaciones de optimización (info)
         errores = errores.concat(validarSobredimensionamiento(config));
-
+        
         return {
             status: tieneErroresCriticos(errores) ? 'ERROR' : 'OK',
             errores: errores,
@@ -507,7 +499,7 @@ var NOMValidacion = (function () {
      * Verifica si hay errores críticos
      */
     function tieneErroresCriticos(errores) {
-        return errores.some(function (e) {
+        return errores.some(function(e) {
             return e.type === 'ERROR';
         });
     }
@@ -516,10 +508,10 @@ var NOMValidacion = (function () {
      * Genera resumen de validaciones
      */
     function generarResumen(errores) {
-        var criticos = errores.filter(function (e) { return e.type === 'ERROR'; }).length;
-        var warnings = errores.filter(function (e) { return e.type === 'WARNING'; }).length;
-        var info = errores.filter(function (e) { return e.type === 'INFO'; }).length;
-
+        var criticos = errores.filter(function(e) { return e.type === 'ERROR'; }).length;
+        var warnings = errores.filter(function(e) { return e.type === 'WARNING'; }).length;
+        var info = errores.filter(function(e) { return e.type === 'INFO'; }).length;
+        
         return {
             total: errores.length,
             criticos: criticos,
@@ -534,7 +526,7 @@ var NOMValidacion = (function () {
     function mostrarValidaciones(resultado, containerId) {
         var container = document.getElementById(containerId);
         if (!container) return;
-
+        
         if (resultado.errores.length === 0) {
             container.innerHTML = '<div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[--green]/10 border border-[--green]">' +
                 '<i class="fas fa-check-circle text-[--green]"></i>' +
@@ -542,34 +534,34 @@ var NOMValidacion = (function () {
                 '</div>';
             return;
         }
-
+        
         container.innerHTML = '';
-
-        (resultado.errores || []).forEach(function (error) {
+        
+        (resultado.errores || []).forEach(function(error) {
             var bgColor = error.type === 'ERROR' ? 'bg-[--red]/10 border-[--red]' :
-                error.type === 'WARNING' ? 'bg-[--orange]/10 border-[--orange]' :
-                    'bg-[--cyan]/10 border-[--cyan]';
+                          error.type === 'WARNING' ? 'bg-[--orange]/10 border-[--orange]' :
+                          'bg-[--cyan]/10 border-[--cyan]';
             var textColor = error.type === 'ERROR' ? 'text-[--red]' :
-                error.type === 'WARNING' ? 'text-[--orange]' :
-                    'text-[--cyan]';
+                           error.type === 'WARNING' ? 'text-[--orange]' :
+                           'text-[--cyan]';
             var icon = error.type === 'ERROR' ? 'fa-times-circle' :
-                error.type === 'WARNING' ? 'fa-exclamation-triangle' :
-                    'fa-info-circle';
-
+                      error.type === 'WARNING' ? 'fa-exclamation-triangle' :
+                      'fa-info-circle';
+            
             var errorDiv = document.createElement('div');
             errorDiv.className = 'flex items-start gap-2 px-3 py-2 rounded-lg border ' + bgColor;
-
+            
             var iconEl = document.createElement('i');
             iconEl.className = 'fas ' + icon + ' ' + textColor + ' mt-0.5';
-
+            
             var contentDiv = document.createElement('div');
             contentDiv.className = 'flex-1';
-
+            
             var messageSpan = document.createElement('span');
             messageSpan.className = textColor + ' font-semibold text-sm';
             messageSpan.textContent = error.message || 'Error desconocido';
             contentDiv.appendChild(messageSpan);
-
+            
             if (error.data) {
                 var dataDiv = document.createElement('div');
                 dataDiv.className = 'text-xs text-[--text-muted] mt-1';
@@ -583,7 +575,7 @@ var NOMValidacion = (function () {
                 dataDiv.textContent = dataText;
                 contentDiv.appendChild(dataDiv);
             }
-
+            
             errorDiv.appendChild(iconEl);
             errorDiv.appendChild(contentDiv);
             container.appendChild(errorDiv);

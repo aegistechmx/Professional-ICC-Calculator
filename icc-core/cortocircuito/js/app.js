@@ -3,7 +3,7 @@
  */
 
 // Conditional logging utility
-var Debug = (function() {
+var Debug = (function () {
     var isDevelopment = true; // Set to false in production
 
     function log() {
@@ -28,7 +28,7 @@ var Debug = (function() {
         log: log,
         warn: warn,
         error: error,
-        setDevelopmentMode: function(mode) {
+        setDevelopmentMode: function (mode) {
             isDevelopment = mode;
         }
     };
@@ -38,17 +38,17 @@ var Debug = (function() {
  * Clase de error tipificado para cálculos
  * Permite diferenciar tipos de error para manejo específico
  */
-var CalculoError = (function() {
+var CalculoError = (function () {
     function CalculoError(code, message) {
         this.name = 'CalculoError';
         this.code = code;
         this.message = message;
         this.stack = (new Error()).stack;
     }
-    
+
     CalculoError.prototype = Object.create(Error.prototype);
     CalculoError.prototype.constructor = CalculoError;
-    
+
     // Códigos de error estandarizados
     CalculoError.CODES = {
         VALIDACION: 'VALIDACION_FAIL',
@@ -57,7 +57,7 @@ var CalculoError = (function() {
         CALCULO: 'CALCULO_FAIL',
         ENTRADA: 'ENTRADA_INVALIDA'
     };
-    
+
     return CalculoError;
 })();
 
@@ -66,7 +66,7 @@ if (typeof window !== 'undefined') {
     window.CalculoError = CalculoError;
 }
 
-var App = (function() {
+var App = (function () {
 
     var estado = {
         modo: 'conocido',
@@ -142,23 +142,23 @@ var App = (function() {
             'Curvas'
         ];
         var dependenciasUI = ['UIAlimentadores', 'UIMotores', 'UIDiagrama', 'UIResultados',
-                               'UICoordonograma', 'UIConfiguracion', 'UIEquipos', 'UIToast'];
+            'UICoordonograma', 'UIConfiguracion', 'UIEquipos', 'UIToast'];
 
-        var faltantesCalculo = dependenciasCalculo.filter(function(dep) {
+        var faltantesCalculo = dependenciasCalculo.filter(function (dep) {
             return typeof window[dep] === 'undefined';
         });
 
-        var faltantesCalculoOpcionales = dependenciasCalculoOpcionales.filter(function(dep) {
+        var faltantesCalculoOpcionales = dependenciasCalculoOpcionales.filter(function (dep) {
             return typeof window[dep] === 'undefined';
         });
 
-        var faltantesUI = dependenciasUI.filter(function(dep) {
+        var faltantesUI = dependenciasUI.filter(function (dep) {
             return typeof window[dep] === 'undefined';
         });
 
         if (faltantesCalculo.length > 0) {
             console.error('Módulos de cálculo faltantes:', faltantesCalculo);
-            faltantesCalculo.forEach(function(dep) {
+            faltantesCalculo.forEach(function (dep) {
                 console.error('  -', dep, 'typeof:', typeof window[dep]);
             });
             return false;
@@ -171,25 +171,25 @@ var App = (function() {
         if (faltantesUI.length > 0) {
             console.warn('Módulos de UI faltantes (opcional):', faltantesUI);
         }
-        
+
         // Verificar capacidades reales, no solo existencia
         console.assert(typeof Motor?.ejecutar === 'function', 'Motor.ejecutar debe ser una función');
         console.assert(typeof Convert?.A_to_kA === 'function', 'Convert.A_to_kA debe ser una función');
         console.assert(typeof Impedancias?.magnitud === 'function', 'Impedancias.magnitud debe ser una función');
         console.assert(typeof LoadContext?.validateContext === 'function', 'LoadContext.validateContext debe ser una función');
-        
+
         // Verificar que leerContextoCarga no ha sido sobrescrito
         console.assert(typeof leerContextoCarga === 'function', 'leerContextoCarga debe ser una función');
-        
+
         return true;
     }
 
     function actualizarEstadoContexto() {
         var ctx = leerContextoCarga();
         var statusDiv = document.getElementById('load-context-status');
-        
+
         if (!statusDiv) return;
-        
+
         if (!ctx) {
             statusDiv.innerHTML = '<span class="text-xs text-[--text-muted]">Sin contexto: modo ideal balanceado</span>';
             return;
@@ -205,10 +205,10 @@ var App = (function() {
         // Aplicar contexto al estado
         try {
             LoadContext.applyLoadContext(estado, ctx);
-            
+
             var summary = LoadContext.getContextSummary(estado);
             var unbalancePct = (ctx.system.unbalance * 100).toFixed(1);
-            
+
             statusDiv.innerHTML = '<span class="text-xs text-[--green]"><i class="fas fa-check-circle mr-1"></i>Datos de operación real aplicados</span>' +
                 '<span class="text-xs text-[--text-muted] ml-2">Ia: ' + ctx.phases.Ia + 'A, Ib: ' + ctx.phases.Ib + 'A, Ic: ' + ctx.phases.Ic + 'A, In: ' + ctx.phases.In + 'A | Desbalance: ' + unbalancePct + '%</span>';
 
@@ -227,7 +227,7 @@ var App = (function() {
             UIToast.mostrar('La tensión debe ser un número positivo', 'error');
             return false;
         }
-        
+
         var iscFuente = document.getElementById('input-isc-fuente');
         if (estado.modo === 'desconocido' && iscFuente && iscFuente.value !== '') {
             var iscVal = parseFloat(iscFuente.value);
@@ -236,7 +236,7 @@ var App = (function() {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -246,103 +246,126 @@ var App = (function() {
             UIToast.mostrar('Error: Módulos necesarios no cargados. Recargue la página.', 'error');
             return;
         }
-        
+
         try {
-            // Poblar dropdowns
-            poblarDropdownZonas();
-            poblarDropdownCapacidadesTrafo();
-        
-        // Cargar perfil de usuario si existe (tiene prioridad sobre legacy)
-        if (typeof Profile !== 'undefined' && Profile.loadToUI) {
-            var profile = Profile.getProfile();
-            if (typeof Profile.validateProfile === 'function' && Profile.validateProfile(profile)) {
-                Profile.loadToUI();
+            // Poblar dropdowns con logging de debug
+            Debug.log('[App.init] Iniciando poblado de dropdowns');
+
+            // Verificar si los elementos existen antes de poblar
+            var zonaSelect = document.getElementById('input-zona-electrica');
+            var kvaSelect = document.getElementById('input-trafo-kva');
+
+            Debug.log('[App.init] Elementos encontrados:', {
+                zonaSelect: !!zonaSelect,
+                kvaSelect: !!kvaSelect,
+                CONSTANTES: typeof CONSTANTES !== 'undefined'
+            });
+
+            if (zonaSelect) {
+                poblarDropdownZonas();
+                Debug.log('[App.init] Dropdown de zonas poblado');
             } else {
-                console.warn('Perfil inválido o incompleto, usando valores por defecto');
+                Debug.warn('[App.init] No se encontró input-zona-electrica');
             }
-        } else {
-            // Solo cargar legacy config si no hay perfil
-            var guardado = localStorage.getItem('calculadora_cortocircuito_config');
-            if (guardado) {
-                try {
-                    var config = JSON.parse(guardado);
-                    estado.modo = config.modo || 'conocido';
-                    estado.tipoSistema = config.tipoSistema || '3f';
-                    var tensionInput = document.getElementById('input-tension');
-                    if (tensionInput) tensionInput.value = config.tension || 220;
-                    var zonaInput = document.getElementById('input-zona-electrica');
-                    if (zonaInput) {
-                        zonaInput.value = config.zona || '';
-                        if (config.zona) {
-                            actualizarIscPorZona();
+
+            if (kvaSelect) {
+                poblarDropdownCapacidadesTrafo();
+                Debug.log('[App.init] Dropdown de kVA poblado');
+            } else {
+                Debug.warn('[App.init] No se encontró input-trafo-kva');
+            }
+
+            // Cargar perfil de usuario si existe (tiene prioridad sobre legacy)
+            if (typeof Profile !== 'undefined' && Profile.loadToUI) {
+                var profile = Profile.getProfile();
+                if (typeof Profile.validateProfile === 'function' && Profile.validateProfile(profile)) {
+                    Profile.loadToUI();
+                } else {
+                    console.warn('Perfil inválido o incompleto, usando valores por defecto');
+                }
+            } else {
+                // Solo cargar legacy config si no hay perfil
+                var guardado = localStorage.getItem('calculadora_cortocircuito_config');
+                if (guardado) {
+                    try {
+                        var config = JSON.parse(guardado);
+                        estado.modo = config.modo || 'conocido';
+                        estado.tipoSistema = config.tipoSistema || '3f';
+                        var tensionInput = document.getElementById('input-tension');
+                        if (tensionInput) tensionInput.value = config.tension || 220;
+                        var zonaInput = document.getElementById('input-zona-electrica');
+                        if (zonaInput) {
+                            zonaInput.value = config.zona || '';
+                            if (config.zona) {
+                                actualizarIscPorZona();
+                            }
                         }
+                    } catch (e) {
+                        console.error('Error cargando configuración legacy:', e);
                     }
-                } catch (e) {
-                    console.error('Error cargando configuración legacy:', e);
                 }
             }
-        }
 
-        UIEquipos.initP0();
-        UIAlimentadores.init();
-        UIMotores.init();
-        UIDiagrama.dibujar();
+            UIEquipos.initP0();
+            UIAlimentadores.init();
+            UIMotores.init();
+            UIDiagrama.dibujar();
 
-        // Campo I disparo para P0 (solo si no existe)
-        var p0Cap = document.getElementById('equip-p0-cap');
-        if (p0Cap && !document.querySelector('[name="equip-p0-idisparo"]')) {
-            var p0Parent = p0Cap.parentElement;
-            if (p0Parent && p0Parent.parentElement) {
-                var idDiv = document.createElement('div');
-                idDiv.className = 'mt-3';
-                idDiv.innerHTML =
-                    '<div class="equip-divider"><span class="equip-divider-label"><i class="fas fa-bolt mr-1"></i> Disparo instantaneo</span></div>' +
-                    '<div class="carga-grid">' +
+            // Campo I disparo para P0 (solo si no existe)
+            var p0Cap = document.getElementById('equip-p0-cap');
+            if (p0Cap && !document.querySelector('[name="equip-p0-idisparo"]')) {
+                var p0Parent = p0Cap.parentElement;
+                if (p0Parent && p0Parent.parentElement) {
+                    var idDiv = document.createElement('div');
+                    idDiv.className = 'mt-3';
+                    idDiv.innerHTML =
+                        '<div class="equip-divider"><span class="equip-divider-label"><i class="fas fa-bolt mr-1"></i> Disparo instantaneo</span></div>' +
+                        '<div class="carga-grid">' +
                         '<div><label class="field-label" for="equip-p0-idisparo">I disparo (A)</label><input type="number" id="equip-p0-idisparo" name="equip-p0-idisparo" value="" min="0" step="1" placeholder="0 = sin dato" oninput="App.clearResults()"></div>' +
                         '<div class="flex items-end col-span-2"><p class="text-[0.65rem] text-[--text-muted] leading-relaxed">Corriente de disparo instantaneo. Se compara contra falla minima para verificar sensibilidad.</p></div>' +
-                    '</div>';
-                p0Parent.parentElement.appendChild(idDiv);
+                        '</div>';
+                    p0Parent.parentElement.appendChild(idDiv);
+                }
             }
-        }
 
-        // Botón de reset
-        var btnCalc = document.querySelector('.btn-primary');
-        if (btnCalc && btnCalc.parentElement) {
-            var resetBtn = document.createElement('button');
-            resetBtn.className = 'btn-sm ml-2';
-            resetBtn.innerHTML = '<i class="fas fa-undo text-[0.65rem"></i> Reiniciar';
-            resetBtn.onclick = resetTodo;
-            btnCalc.parentElement.insertBefore(resetBtn, btnCalc.nextSibling);
-        }
-
-        var timer;
-        window.addEventListener('resize', function() {
-            clearTimeout(timer);
-            timer = setTimeout(UIDiagrama.dibujar, 150);
-        });
-
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (typeof r === 'number') r = [r, r, r, r];
-                var tl=r[0], tr=r[1], br=r[2], bl=r[3];
-                this.moveTo(x + tl, y); this.lineTo(x + w - tr, y);
-                this.quadraticCurveTo(x + w, y, x + w, y + tr);
-                this.lineTo(x + w, y + h - br);
-                this.lineTo(x + bl, y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - bl);
-                this.lineTo(x, y + tl);
-                this.quadraticCurveTo(x, y, x, y + tl, y);
-                this.closePath();
-            };
-        }
-        
-        // Inicializar cálculo automático de resistencia de retorno a tierra
-        setTimeout(function() {
-            if (typeof Motor !== 'undefined' && Motor.actualizarRetornoTierra) {
-                Motor.actualizarRetornoTierra();
+            // Botón de reset
+            var btnCalc = document.querySelector('.btn-primary');
+            if (btnCalc && btnCalc.parentElement) {
+                var resetBtn = document.createElement('button');
+                resetBtn.className = 'btn-sm ml-2';
+                resetBtn.innerHTML = '<i class="fas fa-undo text-[0.65rem"></i> Reiniciar';
+                resetBtn.onclick = resetTodo;
+                btnCalc.parentElement.insertBefore(resetBtn, btnCalc.nextSibling);
             }
-        }, 100);
-        
+
+            var timer;
+            window.addEventListener('resize', function () {
+                clearTimeout(timer);
+                timer = setTimeout(UIDiagrama.dibujar, 150);
+            });
+
+            if (!CanvasRenderingContext2D.prototype.roundRect) {
+                CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                    if (typeof r === 'number') r = [r, r, r, r];
+                    var tl = r[0], tr = r[1], br = r[2], bl = r[3];
+                    this.moveTo(x + tl, y); this.lineTo(x + w - tr, y);
+                    this.quadraticCurveTo(x + w, y, x + w, y + tr);
+                    this.lineTo(x + w, y + h - br);
+                    this.lineTo(x + bl, y + h);
+                    this.quadraticCurveTo(x, y + h, x, y + h - bl);
+                    this.lineTo(x, y + tl);
+                    this.quadraticCurveTo(x, y, x, y + tl, y);
+                    this.closePath();
+                };
+            }
+
+            // Inicializar cálculo automático de resistencia de retorno a tierra
+            setTimeout(function () {
+                if (typeof Motor !== 'undefined' && Motor.actualizarRetornoTierra) {
+                    Motor.actualizarRetornoTierra();
+                }
+            }, 100);
+
         } catch (e) {
             console.error('Error en init:', e);
             UIToast.mostrar('Error al inicializar la aplicación', 'error');
@@ -394,7 +417,7 @@ var App = (function() {
             'input-trafo-vs', 'input-x0-config', 'input-trafo-aterr', 'input-cap-kvar',
             'input-cap-tension', 'capacidadMaxAlimentadores', 'temperatura-ambiente'
         ];
-        elements.forEach(function(id) {
+        elements.forEach(function (id) {
             var el = document.getElementById(id);
             if (el) {
                 if (id === 'input-tension') el.value = 220;
@@ -412,7 +435,7 @@ var App = (function() {
                 else el.value = '';
             }
         });
-        
+
         var equipTipo = document.getElementById('equip-p0-tipo');
         if (equipTipo) equipTipo.value = '';
         var equipModelo = document.getElementById('equip-p0-modelo');
@@ -433,29 +456,29 @@ var App = (function() {
             UIToast.mostrar('Error: Módulos necesarios no cargados', 'error');
             return;
         }
-        
+
         if (!validarEntradas()) {
             return;
         }
-        
+
         // Congelar snapshot del estado para evitar race conditions
         // Si el usuario cambia la UI durante el cálculo, no afectará el resultado
         var estadoSnapshot = JSON.parse(JSON.stringify(estado));
-        
+
         // Aplicar contexto de carga antes de calcular (usando snapshot)
         var ctx = leerContextoCarga();
         if (ctx) {
             estadoSnapshot.ctx = ctx;
         }
-        
+
         var btnCalc = document.querySelector('.btn-primary');
         if (btnCalc) {
             btnCalc.disabled = true;
             btnCalc.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculando...';
         }
-        
+
         // Usar Promise para mejor manejo asíncrono
-        Promise.resolve().then(function() {
+        Promise.resolve().then(function () {
             try {
                 // Validar modo antes de calcular
                 if (estado.modo === 'conocido') {
@@ -496,13 +519,13 @@ var App = (function() {
                 if (typeof Motor === 'undefined') {
                     throw new CalculoError(CalculoError.CODES.DEPENDENCIA, 'Motor module no cargado');
                 }
-                
+
                 // Temporalmente usar el snapshot para el cálculo
                 var estadoOriginal = estado;
                 estado = estadoSnapshot;
-                
+
                 var resultado = Motor.ejecutar();
-                
+
                 // Restaurar estado original y guardar resultados
                 estado = estadoOriginal;
                 if (!resultado || !resultado.puntos || resultado.puntos.length === 0) {
@@ -512,6 +535,11 @@ var App = (function() {
                 UIResultados.mostrar(resultado.puntos);
                 UICoordonograma.dibujar(resultado.puntos);
                 UIDiagrama.dibujar();
+
+                // 🚀 Enviar resultados a React via postMessage
+                if (window.sendResultsToReact && resultado.puntos) {
+                    window.sendResultsToReact(resultado.puntos);
+                }
 
                 // Mostrar validación inteligente si está disponible
                 if (resultado.puntos.validacionInteligente) {
@@ -573,7 +601,7 @@ var App = (function() {
                     if (tccInteractivoSection) {
                         tccInteractivoSection.classList.remove('hidden');
                         // Inicializar visor TCC con resultado de diseño
-                        setTimeout(function() {
+                        setTimeout(function () {
                             TCCViewerInteractivo.cargarDesdeDiseno(resultado.puntos.disenoAutomatico, 'tcc-interactivo-section');
                         }, 200);
                     }
@@ -614,7 +642,7 @@ var App = (function() {
                         var tccCruces = document.getElementById('tcc-cruces');
                         if (tccCruces && tccResultado.cruces) {
                             var crucesHTML = '<div class="space-y-2">';
-                            tccResultado.cruces.forEach(function(c) {
+                            tccResultado.cruces.forEach(function (c) {
                                 var color = c.resultado.conflicto ? 'text-[--red]' : 'text-[--green]';
                                 crucesHTML += '<div class="text-xs ' + color + '">• ' + c.upstream + ' vs ' + c.downstream + ': ' + c.resultado.mensaje + '</div>';
                             });
@@ -654,11 +682,11 @@ var App = (function() {
                 UIToast.mostrar('Cálculo completado correctamente', 'success');
             } catch (e) {
                 console.error('Error en calculate:', e);
-                
+
                 // Manejo específico por tipo de error
                 var mensaje = e.message;
                 var tipo = 'error';
-                
+
                 if (e instanceof CalculoError) {
                     switch (e.code) {
                         case CalculoError.CODES.VALIDACION:
@@ -685,7 +713,7 @@ var App = (function() {
                             mensaje = 'Error: ' + e.message;
                     }
                 }
-                
+
                 UIToast.mostrar(mensaje, tipo);
             } finally {
                 if (btnCalc) {
@@ -720,7 +748,7 @@ var App = (function() {
             btnAuto.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Corrigiendo...';
         }
 
-        Promise.resolve().then(function() {
+        Promise.resolve().then(function () {
             try {
                 if (typeof Motor === 'undefined' || typeof Motor.autoCorregirSistema === 'undefined') {
                     throw new Error('Motor de auto-corrección no disponible');
@@ -735,7 +763,13 @@ var App = (function() {
                     // NO recalcular automáticamente para evitar loop infinito
                     // Usuario debe recalcular manualmente si desea ver efectos
                 } else {
-                    UIToast.mostrar('El sistema ya cumple con todos los criterios', 'success');
+                    var arbitraje = (estado.resultados && estado.resultados.arbitrajeGlobal) ||
+                        (typeof window !== 'undefined' ? window.__ICC_GLOBAL_ARBITRATION : null);
+                    if (arbitraje && !arbitraje.ok) {
+                        UIToast.mostrar('No hay cambios automáticos nuevos, pero el árbitro global mantiene ' + arbitraje.estado, 'warning');
+                    } else {
+                        UIToast.mostrar('El sistema ya cumple con todos los criterios', 'success');
+                    }
                 }
             } catch (e) {
                 console.error('Error en autoCorregir:', e);
@@ -768,7 +802,7 @@ var App = (function() {
             btnTotal.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Corrigiendo...';
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
             try {
                 if (typeof MotorAutocorreccionTotal === 'undefined') {
                     throw new Error('MotorAutocorreccionTotal no cargado');
@@ -785,7 +819,7 @@ var App = (function() {
                         var cambiosHTML = '<div class="mt-4 p-3 bg-[--surface] rounded-lg border border-[--border]">' +
                             '<p class="text-xs font-semibold text-[--cyan] mb-2 uppercase tracking-wider">Cambios Aplicados</p>' +
                             '<div class="space-y-1 max-h-48 overflow-y-auto">' +
-                            resultado.cambios.map(function(c) {
+                            resultado.cambios.map(function (c) {
                                 return '<div class="text-xs text-[--text-muted]">• ' + c + '</div>';
                             }).join('') +
                             '</div>' +
@@ -824,16 +858,16 @@ var App = (function() {
             var tension = parseFloat(document.getElementById('input-tension').value) || 220;
             var modo = estado.modo;
             var tipoSistema = estado.tipoSistema;
-            
+
             // Obtener datos de motores
-            var motores = estado.motores.map(function(m) {
+            var motores = estado.motores.map(function (m) {
                 return {
                     potencia_kw: m.hp * 0.746,
                     voltaje: tension,
                     nombre: 'Motor ' + m.hp + 'HP'
                 };
             });
-            
+
             // Llamar a backend para ICC con motores
             var resultado = await API.iccConMotores({
                 voltaje: tension,
@@ -844,7 +878,7 @@ var App = (function() {
                 motores: motores,
                 generarCurva: true
             });
-            
+
             // Convertir resultado al formato esperado por UI
             var puntos = [{
                 nombre: 'Punto Principal',
@@ -856,13 +890,13 @@ var App = (function() {
                 xr: 0.05 / 0.02,
                 motores: resultado.detalle_motores
             }];
-            
+
             estado.resultados = puntos;
             UIResultados.mostrar(puntos);
             UICoordonograma.dibujar(puntos);
             UIDiagrama.dibujar();
             UIToast.mostrar('Cálculo completado (backend API)', 'success');
-            
+
             return puntos;
         } catch (e) {
             console.error('Error en backend API, usando cálculo local:', e);
@@ -870,7 +904,7 @@ var App = (function() {
             if (typeof Motor === 'undefined') {
                 throw new Error('Motor module no cargado');
             }
-            
+
             var resultado = Motor.ejecutar();
             if (resultado.error) {
                 throw new Error(resultado.error);
@@ -883,7 +917,7 @@ var App = (function() {
             UICoordonograma.dibujar(resultado.puntos);
             UIDiagrama.dibujar();
             UIToast.mostrar('Cálculo completado (fallback local)', 'success');
-            
+
             return resultado.puntos;
         }
     }
@@ -946,7 +980,7 @@ var App = (function() {
      */
     function aplicarContextoCarga() {
         var ctx = leerContextoCarga();
-        
+
         if (!ctx) {
             // Sin contexto: modo ideal
             estado.ctx = null;
@@ -986,13 +1020,13 @@ var App = (function() {
         var summary = LoadContext.getContextSummary(estado);
         var status = LoadContext.getSystemStatus(estado, 0); // 0 = sin ampacidad de neutro específica
 
-        var colorClass = status.color === 'green' ? 'text-[--green]' : 
-                        status.color === 'yellow' ? 'text-[--yellow]' : 
-                        status.color === 'red' ? 'text-[--red]' : 'text-[--text-muted]';
+        var colorClass = status.color === 'green' ? 'text-[--green]' :
+            status.color === 'yellow' ? 'text-[--yellow]' :
+                status.color === 'red' ? 'text-[--red]' : 'text-[--text-muted]';
 
-        var iconClass = status.color === 'green' ? 'fa-check-circle' : 
-                       status.color === 'yellow' ? 'fa-exclamation-triangle' : 
-                       status.color === 'red' ? 'fa-times-circle' : 'fa-info-circle';
+        var iconClass = status.color === 'green' ? 'fa-check-circle' :
+            status.color === 'yellow' ? 'fa-exclamation-triangle' :
+                status.color === 'red' ? 'fa-times-circle' : 'fa-info-circle';
 
         statusDiv.innerHTML = '<span class="text-xs ' + colorClass + '"><i class="fas ' + iconClass + ' mr-1"></i> ' + summary.message + '</span>';
     }
@@ -1008,14 +1042,14 @@ var App = (function() {
                 UIToast.mostrar('Error: UIAlimentadores no cargado. Recargue la página.', 'error');
                 return;
             }
-            
+
             // Check if nodos array exists
             if (!App.estado || !App.estado.nodos) {
                 UIToast.mostrar('Error: Estado del sistema no inicializado. Recargue la página.', 'error');
                 console.error('Estado no inicializado:', App.estado);
                 return;
             }
-            
+
             // Add child to root node (P0)
             UIAlimentadores.agregarHijo('P0');
         } catch (e) {
@@ -1055,7 +1089,7 @@ var App = (function() {
         if (estado.nodos && estado.nodos.length > 0) {
             var nodosOrdenados = Impedancias.ordenarPorNivel(estado.nodos);
             // Skip root node (P0) - it doesn't have a real feeder
-            return nodosOrdenados.slice(1).map(function(nodo) {
+            return nodosOrdenados.slice(1).map(function (nodo) {
                 var f = nodo.feeder || {};
                 return {
                     calibre: f.calibre || '4/0',
@@ -1065,6 +1099,8 @@ var App = (function() {
                     paralelo: f.paralelo || 1,
                     cargaA: f.cargaA || 0,
                     cargaFP: f.cargaFP || 0.9,
+                    numConductores: f.numConductores || 3,
+                    tempAmbiente: f.tempAmbiente || 30,
                     equipTipo: (nodo.equip && nodo.equip.tipo) || '',
                     equipModelo: (nodo.equip && nodo.equip.modelo) || '',
                     equipCap: (nodo.equip && nodo.equip.cap) || 0,
@@ -1100,12 +1136,32 @@ var App = (function() {
     }
 
     function poblarDropdownZonas() {
+        Debug.log('[poblarDropdownZonas] Iniciando función');
+
         var select = document.getElementById('input-zona-electrica');
-        if (!select) return;
-        
+        Debug.log('[poblarDropdownZonas] Elemento select encontrado:', !!select);
+
+        if (!select) {
+            Debug.error('[poblarDropdownZonas] No se encontró el elemento input-zona-electrica');
+            return;
+        }
+
+        // Verificar que CONSTANTES esté disponible
+        if (typeof CONSTANTES === 'undefined') {
+            Debug.error('[poblarDropdownZonas] CONSTANTES no está definido');
+            return;
+        }
+
+        if (!CONSTANTES.ZONAS_ELECTRICAS) {
+            Debug.error('[poblarDropdownZonas] CONSTANTES.ZONAS_ELECTRICAS no está disponible');
+            return;
+        }
+
+        Debug.log('[poblarDropdownZonas] CONSTANTES.ZONAS_ELECTRICAS disponible, zonas:', Object.keys(CONSTANTES.ZONAS_ELECTRICAS).length);
+
         select.innerHTML = '<option value="">Seleccionar zona...</option>';
-        
-        Object.keys(CONSTANTES.ZONAS_ELECTRICAS).forEach(function(key) {
+
+        Object.keys(CONSTANTES.ZONAS_ELECTRICAS).forEach(function (key) {
             var zona = CONSTANTES.ZONAS_ELECTRICAS[key];
             var option = document.createElement('option');
             option.value = key;
@@ -1113,16 +1169,38 @@ var App = (function() {
             option.title = zona.descripción + '\nIsc en MT: ' + zona.isc_primario + ' kA @ ' + (zona.v_primario / 1000) + ' kV\nX/R: ' + zona.xr_típico + '\nRango: ' + zona.isc_mínimo + ' - ' + zona.isc_máximo + ' kA';
             select.appendChild(option);
         });
+
+        Debug.log('[poblarDropdownZonas] Dropdown poblado con', select.options.length - 1, 'opciones');
     }
-    
+
     function poblarDropdownCapacidadesTrafo() {
+        Debug.log('[poblarDropdownCapacidadesTrafo] Iniciando función');
+
         var select = document.getElementById('input-trafo-kva');
-        if (!select) return;
-        
+        Debug.log('[poblarDropdownCapacidadesTrafo] Elemento select encontrado:', !!select);
+
+        if (!select) {
+            Debug.error('[poblarDropdownCapacidadesTrafo] No se encontró el elemento input-trafo-kva');
+            return;
+        }
+
+        // Verificar que CONSTANTES esté disponible
+        if (typeof CONSTANTES === 'undefined') {
+            Debug.error('[poblarDropdownCapacidadesTrafo] CONSTANTES no está definido');
+            return;
+        }
+
+        if (!CONSTANTES.CAPACIDADES_TRAFO_KVA) {
+            Debug.error('[poblarDropdownCapacidadesTrafo] CONSTANTES.CAPACIDADES_TRAFO_KVA no está disponible');
+            return;
+        }
+
+        Debug.log('[poblarDropdownCapacidadesTrafo] CONSTANTES.CAPACIDADES_TRAFO_KVA disponible, capacidades:', CONSTANTES.CAPACIDADES_TRAFO_KVA.length);
+
         var valorActual = select.value || 500;
         select.innerHTML = '';
-        
-        CONSTANTES.CAPACIDADES_TRAFO_KVA.forEach(function(kva) {
+
+        CONSTANTES.CAPACIDADES_TRAFO_KVA.forEach(function (kva) {
             var option = document.createElement('option');
             option.value = kva;
             option.textContent = kva + ' kVA';
@@ -1131,24 +1209,30 @@ var App = (function() {
             }
             select.appendChild(option);
         });
+
+        Debug.log('[poblarDropdownCapacidadesTrafo] Dropdown poblado con', select.options.length, 'opciones');
     }
-    
+
+    // Exponer funciones globalmente para que puedan ser llamadas desde el HTML
+    window.poblarDropdownZonas = poblarDropdownZonas;
+    window.poblarDropdownCapacidadesTrafo = poblarDropdownCapacidadesTrafo;
+
     function actualizarIscPorZona() {
         var selectZona = document.getElementById('input-zona-electrica');
         var inputIsc = document.getElementById('input-isc-fuente');
         var inputXR = document.getElementById('input-xr-fuente');
         var inputTrafoVp = document.getElementById('input-trafo-vp');
         var inputTrafoVs = document.getElementById('input-trafo-vs');
-        
+
         if (!selectZona || !inputIsc || !inputXR) return;
-        
+
         var zonaKey = selectZona.value;
         if (!zonaKey) {
             inputIsc.placeholder = 'Seleccionar zona...';
             inputIsc.title = 'Seleccione una zona para calcular automáticamente';
             return;
         }
-        
+
         var zona = CONSTANTES.ZONAS_ELECTRICAS[zonaKey];
         if (!zona) {
             UIToast.mostrar('Zona eléctrica no válida. Seleccionando valor personalizado.', 'warning');
@@ -1157,7 +1241,7 @@ var App = (function() {
             inputIsc.focus();
             return;
         }
-        
+
         if (zonaKey === 'CUSTOM') {
             inputIsc.placeholder = 'Ingresar valor manual...';
             inputIsc.title = 'Ingrese el valor de Isc fuente manualmente';
@@ -1169,59 +1253,59 @@ var App = (function() {
             inputIsc.value = zona.isc_primario.toFixed(2);
             inputIsc.placeholder = zona.isc_primario.toFixed(2) + ' kA';
             inputIsc.title = zona.nombre + '\n' + zona.descripción + '\n' +
-                        'Isc en MT: ' + zona.isc_primario + ' kA @ ' + (zona.v_primario / 1000) + ' kV\n' +
-                        'X/R: ' + zona.xr_típico + '\n' +
-                        'Rango: ' + zona.isc_mínimo + ' - ' + zona.isc_máximo + ' kA';
-            
+                'Isc en MT: ' + zona.isc_primario + ' kA @ ' + (zona.v_primario / 1000) + ' kV\n' +
+                'X/R: ' + zona.xr_típico + '\n' +
+                'Rango: ' + zona.isc_mínimo + ' - ' + zona.isc_máximo + ' kA';
+
             // Bloquear edición manual cuando se selecciona zona
             inputIsc.disabled = true;
-            
+
             // Usar X/R específico de la zona
             inputXR.value = zona.xr_típico;
             inputXR.title = 'X/R según zona: ' + zona.xr_típico;
-            
+
             // Ajustar V primario del transformador si es necesario
             if (inputTrafoVp && zona.v_primario) {
                 inputTrafoVp.value = zona.v_primario;
                 inputTrafoVp.title = 'V primario según zona: ' + (zona.v_primario / 1000) + ' kV';
             }
-            
+
             // Calcular y mostrar Isc equivalente en BT (REGLA: SIEMPRE en unidades base SI)
             if (inputTrafoVp && inputTrafoVs) {
                 var vPrim = parseFloat(inputTrafoVp.value) || zona.v_primario;  // V (base SI)
                 var vSec = parseFloat(inputTrafoVs.value) || 480;  // V (base SI)
                 var trafoKva = parseFloat(document.getElementById('input-trafo-kva').value) || 500;  // kVA
                 var trafoZ = parseFloat(document.getElementById('input-trafo-z').value) || 5.75;  // %
-                
+
                 // Convertir a unidades base SI
                 var trafoVA = trafoKva * 1000;  // VA (base SI)
-                
+
                 // Calcular impedancia de la fuente en MT (ohm, base SI)
                 var iscPrimario_A = zona.isc_primario * 1000;  // Convertir kA a A
                 var zFuenteMT = (vPrim / Math.sqrt(3)) / iscPrimario_A;  // ohm
-                
+
                 // Ratio de transformación
                 var ratio = vSec / vPrim;
-                
+
                 // Referir impedancia de fuente al secundario (lado común) - ohm
                 var zFuenteBT = zFuenteMT * Math.pow(ratio, 2);
-                
+
                 // Calcular impedancia del transformador con tolerancia ANSI (±7.5%) - ohm
                 var zTrafoNominal = (Math.pow(vSec, 2) / trafoVA) * (trafoZ / 100);  // ohm
                 var zTrafoMin = zTrafoNominal * 0.925;  // -7.5%
                 var zTrafoMax = zTrafoNominal * 1.075;  // +7.5%
-                
+
                 // Caso límite: fuente infinita (relativo al transformador)
                 if (zFuenteBT < zTrafoNominal * 0.01) {
                     zFuenteBT = 0;
                     UIToast.mostrar('⚠️ Fuente considerada infinita (Z_fuente < 1% de Z_trafo)', 'warning');
                 }
-                
+
                 // Separar R y X de fuente usando X/R (IEEE Std 399) - ohm
                 var xrFuente = zona.xr_típico || 18;
                 var rFuenteBT = zFuenteBT / Math.sqrt(1 + Math.pow(xrFuente, 2));  // ohm
                 var xFuenteBT = rFuenteBT * xrFuente;  // ohm
-                
+
                 // X/R del transformador variable según kVA (IEEE Std C37.91)
                 var xrTrafo;
                 if (trafoKva < 500) {
@@ -1230,36 +1314,36 @@ var App = (function() {
                     xrTrafo = 6 + ((trafoKva - 500) / 4500) * 4;  // 6-10 para 500-5000kVA
                 }
                 xrTrafo = Math.max(4, Math.min(10, xrTrafo));  // Limitar rango 4-10
-                
+
                 // Separar R y X del transformador - ohm
                 var rTrafoNominal = zTrafoNominal / Math.sqrt(1 + Math.pow(xrTrafo, 2));  // ohm
                 var xTrafoNominal = rTrafoNominal * xrTrafo;  // ohm
-                
+
                 // Total de impedancias complejas en BT (caso nominal) - ohm
                 // REGLA ESTRICTA: SIEMPRE sumar R y X por separado, nunca magnitudes intermedias
                 var rTotalBT = rFuenteBT + rTrafoNominal;  // ohm
                 var xTotalBT = xFuenteBT + xTrafoNominal;  // ohm
                 var zTotalBT = Math.sqrt(Math.pow(rTotalBT, 2) + Math.pow(xTotalBT, 2));  // ohm
-                
+
                 // Validación crítica: impedancia total inválida
                 if (zTotalBT <= 0) {
                     console.error('ERROR CRÍTICO: Impedancia total inválida (Z_total <= 0)');
                     UIToast.mostrar('❌ ERROR: Impedancia total inválida', 'error');
                     return;
                 }
-                
+
                 // Isc equivalente en BT (caso nominal) - A (base SI)
                 var iscBT_A = vSec / (Math.sqrt(3) * zTotalBT);  // A
-                
+
                 // Isc solo transformador (sin impedancia de red) - A (base SI)
                 var iFla = trafoVA / (Math.sqrt(3) * vSec);  // A
                 var iscTrafoOnly_A = iFla / (trafoZ / 100);  // A
-                
+
                 // Isc mínimo (escenario desfavorable - Z máximos) - A (base SI)
                 var zFuenteMax = zFuenteBT * 1.1;  // red débil - ohm
                 var zTotalMax = zFuenteMax + zTrafoMax;  // ohm
                 var iscMin_A = vSec / (Math.sqrt(3) * zTotalMax);  // A
-                
+
                 // Calcular X/R equivalente en BT (con protección división por cero)
                 var xrTotalBT;
                 if (rTotalBT < 0.0001) {
@@ -1267,38 +1351,38 @@ var App = (function() {
                 } else {
                     xrTotalBT = xTotalBT / rTotalBT;
                 }
-                
+
                 // Validación física: Isc máximo teórico del transformador (más preciso) - A
                 var iscMaxTeorico_A = iscTrafoOnly_A;  // A
-                
+
                 // Validación de Isc anormalmente bajo (relativo a I_FLA) - SIEMPRE en unidades base SI
                 if (iscBT_A < iFla * 2) {
                     console.error('ERROR CRÍTICO: Isc demasiado bajo (' + iscBT_A.toFixed(2) + ' A). I_FLA: ' + iFla.toFixed(2) + ' A');
                     UIToast.mostrar('❌ ERROR: Isc demasiado bajo para este transformador', 'error');
                 }
-                
+
                 // Validación: Isc no puede ser menor que corriente nominal - A
                 if (iscBT_A < iFla) {
                     console.error('ERROR: Isc (' + iscBT_A.toFixed(2) + ' A) menor que corriente nominal (' + iFla.toFixed(2) + ' A)');
                     UIToast.mostrar('❌ ERROR: Isc menor que corriente nominal del transformador', 'error');
                 }
-                
+
                 // Validación física: Isc no puede exceder límite del transformador - A
                 if (iscBT_A > iscTrafoOnly_A * 1.2) {
                     console.error('ERROR: Isc supera límite físico del transformador. Calculado: ' + iscBT_A.toFixed(2) + ' A, Máximo: ' + (iscTrafoOnly_A * 1.2).toFixed(2) + ' A');
                     UIToast.mostrar('❌ ERROR: Isc supera límite físico del transformador', 'error');
                 }
-                
+
                 // Validación: Isc fuera de rango esperado - A
                 var desviacion = Math.abs(iscBT_A - iscMaxTeorico_A) / iscMaxTeorico_A;
                 if (desviacion > 0.5) {
                     console.warn('WARNING: Isc fuera de rango esperado. Calculado: ' + iscBT_A.toFixed(2) + ' A, Esperado: ' + iscMaxTeorico_A.toFixed(2) + ' A, Desviación: ' + (desviacion * 100).toFixed(1) + '%');
                 }
-                
+
                 if (iscBT_A > iscMaxTeorico_A * 1.1) {
                     UIToast.mostrar('⚠️ Isc supera límite físico del transformador (' + Convert.A_to_kA(iscMaxTeorico_A).toFixed(2) + ' kA)', 'warning');
                 }
-                
+
                 // Validación PRO: ratio de rigidez de fuente
                 var ratioRigidez = iscBT_A / iscTrafoOnly_A;
                 if (ratioRigidez < 0.3) {
@@ -1308,14 +1392,14 @@ var App = (function() {
                     console.warn('WARNING: Fuente muy rígida. Ratio: ' + ratioRigidez.toFixed(2));
                     UIToast.mostrar('⚠️ Fuente muy rígida: el transformador domina el cortocircuito (ratio: ' + ratioRigidez.toFixed(2) + ')', 'warning');
                 }
-                
+
                 // Validación de rigidez de fuente
                 if (zFuenteBT > 0 && zFuenteBT < zTrafoNominal * 0.1) {
                     UIToast.mostrar('⚠️ Fuente muy rígida: el transformador domina el cortocircuito (Z_fuente < 10% de Z_trafo)', 'warning');
                 } else if (zFuenteBT > zTrafoNominal * 10) {
                     UIToast.mostrar('⚠️ Fuente débil: caída de tensión significativa (Z_fuente > 10× Z_trafo)', 'warning');
                 }
-                
+
                 // Mostrar en UI con formato profesional (usar formateador de unidades)
                 var iscBtDisplay = document.getElementById('isc-equivalente-bt');
                 var iscBtValor = document.getElementById('isc-bt-valor');
@@ -1326,15 +1410,15 @@ var App = (function() {
                     var iscMin_kA = Convert.A_to_kA(iscMin_A);
                     iscBtValor.textContent = 'Secundario trafo: ' + iscBT_kA.toFixed(2) + ' kA @ ' + vSec + ' V | MT: ' + zona.isc_primario + ' kA @ ' + (vPrim / 1000).toFixed(1) + ' kV | X/R: ' + xrDisplay + ' | Min: ' + iscMin_kA.toFixed(2) + ' kA';
                 }
-                
+
                 // Mostrar advertencia de transformación con ambos valores (convertir para display)
                 var xrToast = xrTotalBT === Infinity ? '∞' : xrTotalBT.toFixed(1);
-                
+
                 // Ejecutar análisis completo de fallas (IEEE Std 399 / IEC 60909)
                 if (typeof FaultAnalysis !== 'undefined') {
                     var groundingType = document.getElementById('input-x0-config') ? document.getElementById('input-x0-config').value : 'yg_solido';
                     var R_tierra = 0;  // Se puede configurar en el futuro
-                    
+
                     var faultNode = FaultAnalysis.buildFaultNode({
                         V_ll: vSec,
                         Z_fuente_BT: { R: rFuenteBT, X: xFuenteBT },
@@ -1342,23 +1426,23 @@ var App = (function() {
                         Z_linea: { R: 0, X: 0 },  // Se agregará cuando se implementen alimentadores
                         XR: xrTotalBT
                     });
-                    
+
                     var faultResults = FaultAnalysis.runFaultAnalysis(faultNode, groundingType, R_tierra);
-                    
+
                     // Validación física de corrientes de falla
                     if (faultResults.I_LLG_A > faultResults.I_3F_A * 1.2) {
                         UIToast.mostrar('⚠ Falla bifásica a tierra inusualmente alta. Verificar configuración de impedancias.', 'warning');
                     }
-                    
+
                     if (faultResults.warnings.length > 0) {
-                        faultResults.warnings.forEach(function(w) {
+                        faultResults.warnings.forEach(function (w) {
                             UIToast.mostrar('⚠ ' + w, 'warning');
                         });
                     }
-                    
+
                     // Guardar resultados en estado para uso posterior
                     App.estado.faultResults = faultResults;
-                    
+
                     // Mostrar tipos de falla en UI
                     var faultDisplay = document.getElementById('fault-types-display');
                     if (faultDisplay) {
@@ -1369,11 +1453,11 @@ var App = (function() {
                         document.getElementById('fault-llg').textContent = Convert.A_to_kA(faultResults.I_LLG_A).toFixed(2);
                     }
                 }
-                
+
                 UIToast.mostrar('⚠️ MT: ' + zona.isc_primario + ' kA @ ' + (vPrim / 1000).toFixed(1) + ' kV → BT: ' + Convert.A_to_kA(iscBT_A).toFixed(2) + ' kA @ ' + vSec + ' V (X/R: ' + xrToast + ', transformado automáticamente)', 'info');
             }
         }
-        
+
         // Limpiar resultados para recalcular
         if (typeof App !== 'undefined' && App.clearResults) {
             App.clearResults();
@@ -1383,13 +1467,15 @@ var App = (function() {
     function setTrafoVs(v, btn) {
         if (typeof UIConfiguracion !== 'undefined' && UIConfiguracion.setTrafoVs) {
             UIConfiguracion.setTrafoVs(v, btn);
+        } else {
+            console.warn('[App] UIConfiguracion no disponible para setTrafoVs');
         }
     }
 
     function actualizarAgrupamientoAuto() {
         var numConductores = parseInt(document.getElementById('cdt-conductores-input')?.value) || 3;
         var agrupamientoInput = document.getElementById('cdt-agrupamiento-input');
-        
+
         // Calcular factor de agrupamiento según NOM-001-SEDE-2012
         var factor = 1.0;
         if (numConductores <= 3) factor = 1.0;
@@ -1399,7 +1485,7 @@ var App = (function() {
         else if (numConductores <= 30) factor = 0.45;
         else if (numConductores <= 40) factor = 0.40;
         else factor = 0.35;
-        
+
         if (agrupamientoInput) {
             agrupamientoInput.value = factor.toFixed(2);
         }
@@ -1407,26 +1493,26 @@ var App = (function() {
 
     function actualizarCDT() {
         if (!estado.resultados || estado.resultados.length === 0) return;
-        
+
         // Leer valores de inputs de parámetros C.D.T.
         var fcc = parseFloat(document.getElementById('cdt-fcc-input')?.value) || 1.25;
         var tempAmbiente = parseFloat(document.getElementById('cdt-temp-input')?.value) || 31;
         var numConductores = parseInt(document.getElementById('cdt-conductores-input')?.value) || 3;
         var fAgrupamientoManual = parseFloat(document.getElementById('cdt-agrupamiento-input')?.value);
-        
+
         // Actualizar contexto con nuevo Fcc
         if (!estado.ctx) estado.ctx = {};
         if (!estado.ctx.system) estado.ctx.system = {};
         estado.ctx.system.Fcc = fcc;
-        
+
         // Actualizar sync con input de contexto principal
         var ctxFccInput = document.getElementById('ctx-fcc');
         if (ctxFccInput) ctxFccInput.value = fcc;
-        
+
         // Recalcular CDT para el primer punto
         var nodo = estado.nodos[0];
         if (!nodo || !nodo.feeder) return;
-        
+
         var f = nodo.feeder;
         var cableConfig = {
             temperaturaAislamiento: 75,
@@ -1434,14 +1520,14 @@ var App = (function() {
             numConductores: numConductores,
             paralelos: f.paralelo || 1
         };
-        
+
         var load = {
             I_cont: f.cargaA,
             I_no_cont: 0,
             esContinua: true,
             Fcc: fcc
         };
-        
+
         var cable = {
             calibre: f.calibre || '4/0',
             temperaturaAislamiento: cableConfig.temperaturaAislamiento,
@@ -1450,9 +1536,9 @@ var App = (function() {
             paralelos: cableConfig.paralelos,
             F_agrupamiento: fAgrupamientoManual // Usar valor manual si se proporciona
         };
-        
+
         var resultado = AmpacidadReal.verificarAmpacidad(load, cable, { temperaturaTerminal: 75 });
-        
+
         // Actualizar CDT en el resultado
         estado.resultados[0].CDT = {
             I_corregida: resultado.I_corregida,
@@ -1464,7 +1550,7 @@ var App = (function() {
             margen: resultado.margen,
             deficit: resultado.deficit
         };
-        
+
         // Actualizar UI
         UIResultados.mostrarAmpacidadReal(estado.resultados);
     }
@@ -1495,7 +1581,7 @@ var App = (function() {
 
     function imprimirModulos() {
         // Fecha dinámica si quieres usarla en UI
-        document.querySelectorAll(".fecha-print").forEach(function(el) {
+        document.querySelectorAll(".fecha-print").forEach(function (el) {
             el.textContent = new Date().toLocaleDateString();
         });
 
@@ -1513,17 +1599,17 @@ var App = (function() {
             return;
         }
 
-        var filename = 'Reporte_Calculo_Electrico_' + new Date().toISOString().slice(0,10) + '.xlsx';
+        var filename = 'Reporte_Calculo_Electrico_' + new Date().toISOString().slice(0, 10) + '.xlsx';
 
         ExcelExportPro.exportarExcel({ puntos: estado.resultados, nodos: estado.nodos, tipoSistema: estado.tipoSistema, tension: estado.tension }, filename)
-            .then(function(exito) {
+            .then(function (exito) {
                 if (exito) {
                     UIToast.mostrar('Excel exportado: ' + filename, 'success');
                 } else {
                     UIToast.mostrar('Error al exportar Excel', 'error');
                 }
             })
-            .catch(function(e) {
+            .catch(function (e) {
                 console.error('Error en exportarExcel:', e);
                 UIToast.mostrar('Error: ' + e.message, 'error');
             });
@@ -1535,7 +1621,7 @@ var App = (function() {
         var logTotal = [];
         var cambiosAplicados = false;
 
-        puntos.forEach(function(punto, index) {
+        puntos.forEach(function (punto, index) {
             var nodo = estado.nodos[index];
             if (!nodo || !nodo.feeder) return;
 
@@ -1660,11 +1746,11 @@ var App = (function() {
         getFeeders: getFeeders,
         onEquipTipoChange: onEquipTipoChange,
         onEquipModeloChange: onEquipModeloChange,
-        setMode: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.setMode : function() {},
-        setTipo: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.setTipo : function() {},
-        setVoltage: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.setVoltage : function() {},
+        setMode: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.setMode : function () { },
+        setTipo: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.setTipo : function () { },
+        setVoltage: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.setVoltage : function () { },
         setTrafoVs: setTrafoVs,
-        toggleCollapse: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.toggleCollapse : function() {},
+        toggleCollapse: typeof UIConfiguracion !== 'undefined' ? UIConfiguracion.toggleCollapse : function () { },
         poblarDropdownZonas: poblarDropdownZonas,
         poblarDropdownCapacidadesTrafo: poblarDropdownCapacidadesTrafo,
         actualizarIscPorZona: actualizarIscPorZona,
@@ -1681,6 +1767,6 @@ if (typeof window !== 'undefined') {
     window.App = App;
 }
 
-document.addEventListener('DOMContentLoaded', function() { 
-        App.init(); 
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    App.init();
+});

@@ -19,17 +19,19 @@ var NOMValidacion = (function() {
      */
     function validarAmpacidad(config) {
         var errores = [];
+        var requerido = config.iDiseno || config.I_diseno || config.I_diseño ||
+            ((config.iCarga || 0) * (config.factorCarga || config.Fcc || 1.25));
         
-        if (config.iCarga > config.ampacidadFinal) {
+        if (requerido > config.ampacidadFinal) {
             errores.push({
                 type: 'ERROR',
                 code: 'AMPACITY_FAIL',
                 message: 'CONDUCTOR SUBDIMENSIONADO',
                 severity: SEVERITY.ERROR,
                 data: {
-                    requerido: config.iCarga,
+                    requerido: requerido,
                     disponible: config.ampacidadFinal,
-                    deficit: config.iCarga - config.ampacidadFinal
+                    deficit: requerido - config.ampacidadFinal
                 }
             });
         }
@@ -236,15 +238,19 @@ var NOMValidacion = (function() {
      */
     function validarFactorSeguridad(config) {
         var errores = [];
+        var factorCarga = config.factorCarga || config.Fcc || 1.25;
+        var requerido = config.iDiseno || config.I_diseno || config.I_diseño || 0;
+        var margenDiseno = requerido > 0 ? (config.ampacidadFinal || 0) / requerido : config.margen;
         
-        if (config.modo === 'industrial' && config.margen < 1.25) {
+        if (config.modo === 'industrial' && factorCarga < 1.25 && margenDiseno < 1) {
             errores.push({
                 type: 'WARNING',
                 code: 'NO_SAFETY_FACTOR',
                 message: 'SIN FACTOR DE SEGURIDAD (125%)',
                 severity: SEVERITY.WARNING,
                 data: {
-                    margen: config.margen,
+                    margen: margenDiseno,
+                    factorCarga: factorCarga,
                     esperado: 1.25
                 }
             });

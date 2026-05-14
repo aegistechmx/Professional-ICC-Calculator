@@ -30,7 +30,7 @@ var CatalogoConductoresNOM = (function() {
         { calibre: "400", ampacidad: 335, area_mm2: 202.7 },
         { calibre: "500", ampacidad: 380, area_mm2: 253.4 },
         { calibre: "600", ampacidad: 420, area_mm2: 304.0 },
-        { calibre: "700", ampacity: 460, area_mm2: 354.7 },
+        { calibre: "700", ampacidad: 460, area_mm2: 354.7 },
         { calibre: "750", ampacidad: 475, area_mm2: 380.0 },
         { calibre: "800", ampacidad: 490, area_mm2: 405.4 },
         { calibre: "900", ampacidad: 520, area_mm2: 456.0 },

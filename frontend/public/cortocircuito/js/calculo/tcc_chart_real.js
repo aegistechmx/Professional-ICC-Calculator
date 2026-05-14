@@ -9,10 +9,45 @@ var TCCChartReal = (function() {
      */
     var CURVA_IEC = {
         NORMAL_INVERSE: { k: 0.14, alpha: 0.02, nombre: 'Normal Inverse' },
+        IEC_STANDARD_INVERSE: { k: 0.14, alpha: 0.02, nombre: 'IEC Standard Inverse' },
         VERY_INVERSE: { k: 13.5, alpha: 1, nombre: 'Very Inverse' },
+        IEC_VERY_INVERSE: { k: 13.5, alpha: 1, nombre: 'IEC Very Inverse' },
         EXTREMELY_INVERSE: { k: 80, alpha: 2, nombre: 'Extremely Inverse' },
+        IEC_EXTREMELY_INVERSE: { k: 80, alpha: 2, nombre: 'IEC Extremely Inverse' },
+        LSIG_ELECTRONIC: { k: 6.0, alpha: 1, nombre: 'LSIG Electronic' },
         LONG_TIME: { k: 120, alpha: 1, nombre: 'Long Time' }
     };
+
+    function curvaPorDefecto(index, total) {
+        if (index === 0) return 'IEC_STANDARD_INVERSE';
+        if (index >= total - 1) return 'IEC_EXTREMELY_INVERSE';
+        return index % 2 === 0 ? 'IEC_VERY_INVERSE' : 'IEC_STANDARD_INVERSE';
+    }
+
+    function resolverCurva(nombre, index, total) {
+        var key = String(nombre || curvaPorDefecto(index, total)).toUpperCase().replace(/[\s-]+/g, '_');
+        if (!nombre || key === 'NORMAL_INVERSE') {
+            key = curvaPorDefecto(index, total);
+        }
+        return CURVA_IEC[key] || CURVA_IEC[curvaPorDefecto(index, total)] || CURVA_IEC.NORMAL_INVERSE;
+    }
+
+    function interpolarTiempo(curva, I) {
+        if (!curva || curva.length === 0 || I <= 0) return Infinity;
+        for (var i = 0; i < curva.length - 1; i++) {
+            var a = curva[i];
+            var b = curva[i + 1];
+            if (I < a.I || I > b.I) continue;
+            var x1 = Math.log10(a.I);
+            var x2 = Math.log10(b.I);
+            var y1 = Math.log10(a.t);
+            var y2 = Math.log10(b.t);
+            var x = Math.log10(I);
+            var ratio = (x - x1) / (x2 - x1 || 1);
+            return Math.pow(10, y1 + (y2 - y1) * ratio);
+        }
+        return Infinity;
+    }
 
     /**
      * Curva TCC inversa (modelo real)
@@ -71,10 +106,17 @@ var TCCChartReal = (function() {
         var minSeparacion = Infinity;
         var puntoCruce = null;
 
-        // Buscar el punto de menor separación
-        for (var i = 0; i < Math.min(curvaA.length, curvaB.length); i++) {
-            var tA = curvaA[i].t;
-            var tB = curvaB[i].t;
+        var minI = Math.max(curvaA[0].I, curvaB[0].I);
+        var maxI = Math.min(curvaA[curvaA.length - 1].I, curvaB[curvaB.length - 1].I);
+        if (maxI <= minI) {
+            return { conflicto: false, mensaje: 'Rangos de corriente sin traslape' };
+        }
+
+        // Buscar el punto de menor separación comparando la misma corriente real
+        for (var i = 0; i < 40; i++) {
+            var Iprueba = Math.pow(10, Math.log10(minI) + (Math.log10(maxI) - Math.log10(minI)) * (i / 39));
+            var tA = interpolarTiempo(curvaA, Iprueba);
+            var tB = interpolarTiempo(curvaB, Iprueba);
 
             if (tA === Infinity || tB === Infinity) continue;
 
@@ -82,7 +124,7 @@ var TCCChartReal = (function() {
 
             if (separacion < minSeparacion) {
                 minSeparacion = separacion;
-                puntoCruce = { I: curvaA[i].I, tA: tA, tB: tB };
+                puntoCruce = { I: Iprueba, tA: tA, tB: tB };
             }
         }
 
@@ -278,15 +320,11 @@ var TCCChartReal = (function() {
         nodos.forEach(function(nodo, index) {
             if (!nodo.equip) return;
 
-            var Ir = nodo.equip.pickup || nodo.equip.cap || 400;
-            var tipoCurva = CURVA_IEC.NORMAL_INVERSE;
+            var Ir = (nodo.tcc && nodo.tcc.pickup) || nodo.equip.pickup || nodo.equip.iNominal || nodo.equip.amp || nodo.equip.cap || 400;
+            var tipoCurva = resolverCurva((nodo.tcc && nodo.tcc.curveFamily) || nodo.equip.tipoCurva, index, nodos.length);
 
-            // Usar curva configurada si existe
-            if (nodo.equip.tipoCurva && CURVA_IEC[nodo.equip.tipoCurva]) {
-                tipoCurva = CURVA_IEC[nodo.equip.tipoCurva];
-            }
-
-            var data = generarDatosTCC(Ir, tipoCurva.k, tipoCurva.alpha);
+            var maxI = nodo.tcc && nodo.tcc.instantaneous !== 'OFF' ? nodo.tcc.instantaneous : Ir * 12;
+            var data = generarDatosTCC(Ir, tipoCurva.k, tipoCurva.alpha, maxI);
 
             var color = index === 0 ? 'red' : // Upstream
                         index === 1 ? 'blue' : // Downstream

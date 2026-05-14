@@ -297,6 +297,9 @@ var TCCViewerInteractivo = (function() {
             if (!finalCoord.ok && finalCoord.totalCruces > 0) {
                 html += '<div class="text-xs text-[--red] mt-1">Cruces centrales: ' + finalCoord.totalCruces + '</div>';
             }
+            if (!finalCoord.ok && finalCoord.restriccionesNOM && finalCoord.restriccionesNOM.length > 0) {
+                html += '<div class="text-xs text-[--red] mt-1">Restricciones NOM: ' + finalCoord.restriccionesNOM.length + '</div>';
+            }
             html += '</div>';
             semaforoDiv.innerHTML = html + '</div>';
             return;
@@ -510,18 +513,39 @@ var TCCViewerInteractivo = (function() {
      * @param {string} containerId - ID del contenedor
      */
     function cargarDesdeDiseno(resultadoDiseno, containerId) {
-        if (!resultadoDiseno || !resultadoDiseno.coordinacionTCC) {
-            console.error('Resultado de diseño inválido');
+        var nodosDiseno = resultadoDiseno && resultadoDiseno.coordinacionTCC &&
+            Array.isArray(resultadoDiseno.coordinacionTCC.nodos) ? resultadoDiseno.coordinacionTCC.nodos : [];
+
+        if ((!nodosDiseno || nodosDiseno.length === 0) && resultadoDiseno && resultadoDiseno.bloqueoInstantaneo &&
+            Array.isArray(resultadoDiseno.bloqueoInstantaneo.nodos)) {
+            nodosDiseno = resultadoDiseno.bloqueoInstantaneo.nodos;
+        }
+
+        if (!nodosDiseno || nodosDiseno.length === 0) {
+            var container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '<div class="p-3 rounded border border-[--yellow] text-xs text-[--yellow]">TCC no disponible: el diseño está bloqueado por NOM o no generó curvas.</div>';
+            }
             return;
         }
 
-        var nodos = resultadoDiseno.coordinacionTCC.nodos.map(function(nodo) {
+        var nodos = nodosDiseno.filter(function(nodo) {
+            return nodo && nodo.tcc;
+        }).map(function(nodo) {
             return {
                 id: nodo.id,
                 breakerIn: nodo.tcc.pickup,
                 tcc: nodo.tcc
             };
         });
+
+        if (nodos.length === 0) {
+            var containerSinCurvas = document.getElementById(containerId);
+            if (containerSinCurvas) {
+                containerSinCurvas.innerHTML = '<div class="p-3 rounded border border-[--yellow] text-xs text-[--yellow]">No hay curvas TCC editables hasta resolver restricciones NOM.</div>';
+            }
+            return;
+        }
 
         inicializar(nodos, containerId);
     }

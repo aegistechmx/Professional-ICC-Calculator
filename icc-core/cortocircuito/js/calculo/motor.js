@@ -154,8 +154,7 @@ var Motor = (function() {
 
         if (App.estado.modo === 'conocido') {
             var iscEl = document.getElementById('input-isc-conocido');
-            var isc_val = iscEl ? parseFloat(iscEl.value) : 0;
-            var isc = isc_val > 500 ? isc_val : isc_val * 1000; // Si > 500, asumimos que ya ingresó Amperios
+            var isc = iscEl ? parseFloat(iscEl.value) * 1000 : 0;
             var z = Impedancias.deFuenteIsc(leerTension(), isc, CONSTANTES.XR_FUENTE_DEFAULT, factor);
             R = z.R; X = z.X;
         } else {
@@ -334,13 +333,7 @@ var Motor = (function() {
         // 🔥 FIX: Forzar modelo de breaker para nodos sin equipo
         for (var nb = 0; nb < puntos.length; nb++) {
             var puntoActual = puntos[nb];
-            
-            // Normalización final: Si el valor de isc es > 500, es Amperios y debemos pasarlo a kA
-            if (puntoActual.isc > 500) {
-                puntoActual.isc = puntoActual.isc / 1000;
-                puntoActual.ipeak = puntoActual.ipeak / 1000;
-            }
-
+            // Buscar el nodo correspondiente por ID para asegurar consistencia
             var nodoBase = App.estado.nodos.find(function(n) { return n.id === puntoActual.id; });
             
             if (!nodoBase) {
@@ -421,18 +414,6 @@ var Motor = (function() {
                 puntos[c2].ipeakConMotores += datosCap.iCapPico / 1000;
                 puntos[c2].aporteMotores = datosCap;
             }
-        }
-
-        // [VD] Calcular caída de tensión acumulada (NOM-001 Art. 210-19)
-        if (typeof CaidaTension !== 'undefined') {
-            var resultadosVD = CaidaTension.calcularAcumulada(App.estado.nodos, V, tipoSistema);
-            resultadosVD.forEach(function(resVd) {
-                var p = puntos.find(function(item) { return item.id === resVd.id; });
-                if (p) {
-                    p.caidaTension = resVd.caidaPct;
-                    p.caidaV = resVd.caidaV;
-                }
-            });
         }
 
         // Validaciones NOM-001-SEDE-2012
@@ -545,6 +526,7 @@ var Motor = (function() {
             
             var configValidacion = {
                 iCarga: f.cargaA,
+                iDiseno: sugerencia.I_diseño,
                 ampacidadFinal: sugerencia.ampacidadFinal,
                 ampacidadCorregida: sugerencia.ampacidadCorregida,
                 ampacidadTerminal: sugerencia.ampacidadTerminal,
@@ -554,13 +536,14 @@ var Motor = (function() {
                 interruptorKA: (nodo.equip && nodo.equip.cap) ? nodo.equip.cap : 0,
                 numConductores: f.numConductores || 3,
                 fc: Fcc || 1.25,
+                factorCarga: Fcc || 1.25,
                 ft: f.tempAmbiente > 30 ? 0.91 : 1.0,
                 temperatura: 31, // Puerto Vallarta default
                 paralelos: f.paralelo || 1,
                 balanceado: true,
                 modo: 'industrial',
                 margen: (sugerencia.margen / 100) + 1, // Convertir porcentaje a factor (ej: 27% -> 1.27)
-                caidaTension: puntos[i].caidaTension || 0,
+                caidaTension: 0, // Se calcula separadamente
                 tieneNeutro: true,
                 neutroContado: true,
                 esMonofasico: false,
@@ -692,8 +675,14 @@ var Motor = (function() {
 
         // Ejecutar motor de coordinación real con catálogo de equipos
         if (typeof MotorCoordinacionReal !== 'undefined' && typeof CatalogoEquiposReal !== 'undefined') {
+            var iscSistemaA = puntosProteccion.reduce(function(max, punto) {
+                var iscNodo = Number(punto.iscConMotores || punto.isc || 0);
+                if (!isFinite(iscNodo) || iscNodo <= 0) return max;
+                var iscA = iscNodo < 1000 ? iscNodo * 1000 : iscNodo;
+                return Math.max(max, iscA);
+            }, 0);
             var resultadoCoordinacionReal = MotorCoordinacionReal.autocorregirSistema(puntosProteccion, {
-                Isc: 20000, // kA por defecto
+                Isc: iscSistemaA || 20000,
                 criterios: {
                     marca_preferida: null,
                     tipo_preferido: 'electronic'
@@ -736,6 +725,13 @@ var Motor = (function() {
                 Debug.log('Validación:', resultadoCoordinacionReal.validacionFinal ? resultadoCoordinacionReal.validacionFinal.estado : 'N/A');
                 Debug.log('═══════════════════════════════════════════════════════════');
             }
+        }
+
+        puntos.arbitrajeGlobal = arbitrarEstadoGlobal(puntos, resultadoDiseno, resultadoCoordinacionReal, ctxSemaforo);
+        puntos.estadoGlobal = puntos.arbitrajeGlobal.estado === 'OK' ? 'PASS' : 'FAIL';
+        puntos.erroresGlobales = puntos.arbitrajeGlobal.errores.map(function(e) { return e.mensaje; });
+        if (typeof window !== 'undefined') {
+            window.__ICC_GLOBAL_ARBITRATION = puntos.arbitrajeGlobal;
         }
 
         // [Solver] Integrar Solver Eléctrico para selección automática de conductor + breaker + TCC
@@ -910,6 +906,87 @@ var Motor = (function() {
         return resultado;
     }
 
+    function arbitrarEstadoGlobal(puntos, diseno, real, semaforo) {
+        var errores = [];
+        var warnings = [];
+        var vistos = {};
+
+        function agregar(lista, tipo, fuente, mensaje, nodo) {
+            if (!mensaje) return;
+            var key = tipo + '|' + fuente + '|' + mensaje + '|' + (nodo || '');
+            if (vistos[key]) return;
+            vistos[key] = true;
+            lista.push({
+                tipo: tipo,
+                fuente: fuente,
+                mensaje: mensaje,
+                nodo: nodo || null
+            });
+        }
+
+        function agregarErroresPunto(punto) {
+            if (!punto || !punto.decision) return;
+            (punto.decision.errores || []).forEach(function(error) {
+                agregar(errores, 'NOM_FISICA', 'evaluarSistema', error, punto.id);
+            });
+            (punto.decision.warnings || []).forEach(function(warning) {
+                agregar(warnings, 'WARNING', 'evaluarSistema', warning, punto.id);
+            });
+        }
+
+        if (puntos && puntos.estadoGlobal === 'FAIL') {
+            agregar(errores, 'ESTADO_GLOBAL', 'motor_base', 'Motor base reporta FAIL', 'SISTEMA');
+        }
+
+        (puntos || []).forEach(agregarErroresPunto);
+
+        if (puntos && puntos.validacionInteligente && !puntos.validacionInteligente.ok) {
+            (puntos.validacionInteligente.errores || []).forEach(function(error) {
+                agregar(errores, 'VALIDACION_INTELIGENTE', 'motor_validacion_inteligente',
+                    error.mensaje || error.descripcion || String(error), error.punto || error.nodo || null);
+            });
+        }
+
+        var coordinacionFinal = puntos ? puntos.coordinacionFinal : null;
+        if (coordinacionFinal && coordinacionFinal.ok === false) {
+            agregar(errores, 'TCC', coordinacionFinal.fuente || 'coordinacion_final',
+                'Coordinación no válida: ' + (coordinacionFinal.totalCruces || 0) + ' cruces y ' +
+                ((coordinacionFinal.restriccionesNOM || []).length) + ' restricciones NOM', 'SISTEMA');
+        }
+
+        if (diseno && diseno.estadoGlobal === 'ERROR') {
+            agregar(errores, 'DISENO_AUTOMATICO', 'motor_diseno_automatico',
+                'Diseño automático en ERROR; no se debe declarar sistema optimizado', 'SISTEMA');
+        } else if (diseno && diseno.estadoGlobal === 'WARNING') {
+            agregar(warnings, 'DISENO_AUTOMATICO', 'motor_diseno_automatico',
+                'Diseño automático con advertencias de selectividad', 'SISTEMA');
+        }
+
+        if (real && real.estadoFinal && real.estadoFinal !== 'COORDINADO') {
+            agregar(errores, 'COORDINACION_REAL', 'motor_coordinacion_real',
+                'Motor de coordinación real: ' + real.estadoFinal, 'SISTEMA');
+        }
+
+        if (semaforo && semaforo.estadoGlobal === 'ERROR') {
+            agregar(errores, 'SEMAFORO', 'semaforo',
+                'Semáforo central en ERROR; revisar nodos críticos', 'SISTEMA');
+        } else if (semaforo && semaforo.estadoGlobal === 'WARNING') {
+            agregar(warnings, 'SEMAFORO', 'semaforo',
+                'Semáforo central con advertencias', 'SISTEMA');
+        }
+
+        var estado = errores.length > 0 ? 'ERROR' : (warnings.length > 0 ? 'WARNING' : 'OK');
+        return {
+            estado: estado,
+            ok: estado === 'OK',
+            severidad: estado === 'ERROR' ? 'CRITICAL' : (estado === 'WARNING' ? 'WARNING' : 'INFO'),
+            resumen: errores.length + ' errores, ' + warnings.length + ' warnings',
+            errores: errores,
+            warnings: warnings,
+            timestamp: new Date().toISOString()
+        };
+    }
+
     function normalizarCoordinacionFinal(real, visual, diseno) {
         var cruces = [];
         var fuente = 'visual_tcc';
@@ -928,16 +1005,27 @@ var Motor = (function() {
         var disenoOk = diseno && (diseno.estadoGlobal === 'OK' || diseno.estadoGlobal === 'COORDINADO');
         if (estado === 'SIN_DATOS' && disenoOk) estado = 'COORDINADO';
 
+        var restriccionesNOM = real && real.validacionFinal && Array.isArray(real.validacionFinal.restriccionesNOM) ?
+            real.validacionFinal.restriccionesNOM : [];
+        if (restriccionesNOM.length > 0 || (real && real.estadoFinal === 'BLOQUEADO_NOM')) {
+            fuente = 'motor_coordinacion_real';
+            estado = 'NO_COORDINADO';
+        }
+        if (diseno && diseno.estadoGlobal === 'ERROR') {
+            estado = 'NO_COORDINADO';
+        }
+
         return {
             fuente: fuente,
             estado: estado,
             ok: estado === 'COORDINADO',
             cruces: cruces,
+            restriccionesNOM: restriccionesNOM,
             totalCruces: cruces.length,
             timestamp: new Date().toISOString(),
             mensaje: estado === 'COORDINADO' ?
                 'Coordinación validada por motor central' :
-                'Revisar cruces detectados por motor central'
+                'Revisar restricciones NOM/TCC antes de coordinar'
         };
     }
 
@@ -975,13 +1063,6 @@ var Motor = (function() {
      * @returns {Object} Sugerencia de conductor con ampacidad corregida
      */
     function sugerirConductor(cargaA, material, canalizacion, longitud, paralelos, calibreExistente, isc, nodo) {
-        // Normalizar material para búsqueda en catálogo (ej: "Cobre (Cu)" -> "cobre")
-        var mat = (material || 'cobre').toLowerCase();
-        if (mat.includes('cobre') || mat.includes('cu')) mat = 'cobre';
-        if (mat.includes('aluminio') || mat.includes('al')) mat = 'aluminio';
-
-        material = mat; // Usar el material normalizado en el resto de la función
-
         // Leer parámetros C.D.T. de los inputs si están disponibles
         var fccInput = parseFloat(document.getElementById('cdt-fcc-input')?.value);
         var tempInput = parseFloat(document.getElementById('cdt-temp-input')?.value);
@@ -1288,11 +1369,17 @@ var Motor = (function() {
         }
 
         // Actualizar CDT en el punto
-        // Normalizar formato de resultado para consistencia entre motores (prevenir undefined)
-        var I_final = resultado.I_final || resultado.ampacidadFinal || resultado.I_corregida || 0;
+        // Normalizar formato de resultado (CoreAmpacidad vs AmpacidadReal)
+        var I_final = resultado.I_final || resultado.ampacidadFinal || 0;
         var I_corregida = resultado.I_corregida || resultado.ampacidadCorregida || 0;
-        var I_terminal = resultado.I_terminal || resultado.ampacidadTerminal || I_final || 0;
-        var I_tabla = resultado.I_tabla || resultado.ampacidad75 || resultado.I_base75 || 0;
+        var I_terminal = resultado.I_terminal || resultado.ampacidadTerminal || 0;
+        var I_tabla = resultado.I_tabla || resultado.ampacidad75 || 0;
+        
+        // Adaptar resultado al formato esperado por el sistema
+        var I_final = resultado.I_final || resultado.I_corregida;
+        var I_corregida = resultado.I_corregida;
+        var I_terminal = resultado.I_terminal || resultado.I_final;
+        var I_tabla = resultado.I_tabla || resultado.I_base75;
         
         return {
             calibre: resultado.calibre,
@@ -1360,9 +1447,12 @@ var Motor = (function() {
             numCambios: resultadoLoop.cambios.length
         }, "info");
 
+        var confianzaSegura = isFinite(validacionFinal.confianza) ? validacionFinal.confianza : 0;
+
         return {
-            estado: validacionFinal.estado,
-            confianza: validacionFinal.confianza,
+            estado: resultadoLoop.cambios.length > 0 ? 'OPTIMIZADO' : validacionFinal.estado,
+            confianza: confianzaSegura,
+            nivelConfianza: confianzaSegura,
             cambios: resultadoLoop.cambios,
             iteraciones: resultadoLoop.iteraciones,
             convergencia: resultadoLoop.convergencia,
@@ -1438,7 +1528,8 @@ var Motor = (function() {
      * @returns {Object} Resultado del loop
      */
     function loopGlobal(sistema, opciones) {
-        var maxIteraciones = 15;
+        // El recálculo interno aún es diferido; repetir con el mismo CDT viejo causa loops.
+        var maxIteraciones = 1;
         var iteracion = 0;
         var cambiosEnIteracion = true;
         var cambios = [];
@@ -1641,52 +1732,17 @@ var Motor = (function() {
 
             // Regla: Terminal
             if (critico.error.includes('terminal')) {
-                var I_diseño = nodo.CDT ? nodo.CDT.I_diseño : (nodo.feeder ? nodo.feeder.cargaA * 1.25 : 0);
+                var solucionTerminal = resolverTerminal(p, nodo);
+                var aplicadaTerminal = aplicarSolucionTerminal(nodo, solucionTerminal);
 
-                if (typeof CatalogoBreakersPro !== 'undefined') {
-                    var breakerTerminal = CatalogoBreakersPro.seleccionarBreaker({
-                        voltaje: leerTension(),
-                        I_diseño: I_diseño,
-                        Isc: p.isc * 1000,
-                        requiereGFP: false,
-                        requiereCoordinacion: true
-                    });
-
-                    if (breakerTerminal) {
-                        var reporte = CatalogoBreakersPro.generarReporte(breakerTerminal, {
-                            voltaje: leerTension(),
-                            I_diseño: I_diseño,
-                            Isc: p.isc * 1000,
-                            requiereGFP: false,
-                            requiereCoordinacion: true
-                        });
-
-                        // MUTAR EL MODELO REAL
-                        if (!nodo.equip) nodo.equip = {};
-                        nodo.equip.cap = breakerTerminal.frame;
-                        nodo.equip.modelo = breakerTerminal.family + " " + breakerTerminal.frame;
-                        nodo.equip.fabricante = breakerTerminal.brand;
-                        nodo.equip.tipo = breakerTerminal.type || "MCCB";
-
-                        cambios.push({
-                            tipo: 'TERMINAL',
-                            punto: critico.punto,
-                            prioridad: 'CRITICA',
-                            accion: 'REEMPLAZO: ' + breakerTerminal.brand + ' ' + breakerTerminal.family + ' ' + breakerTerminal.frame + 'A',
-                            razon: 'Violación de terminal NOM 110.14C - upgrade breaker',
-                            reporte: reporte,
-                            mutacion: true
-                        });
-                    }
-                } else {
-                    cambios.push({
-                        tipo: 'TERMINAL',
-                        punto: critico.punto,
-                        prioridad: 'CRITICA',
-                        accion: 'Subir breaker o dividir circuito',
-                        razon: 'Violación de terminal NOM 110.14C'
-                    });
-                }
+                cambios.push({
+                    tipo: 'TERMINAL_LOCK',
+                    punto: critico.punto,
+                    prioridad: 'CRITICA',
+                    accion: solucionTerminal && solucionTerminal.descripcion ? solucionTerminal.descripcion : 'Bloquear aumento de breaker',
+                    razon: 'Violación de terminal NOM 110.14C - primero corregir conductor/paralelos; breaker bloqueado',
+                    mutacion: aplicadaTerminal
+                });
             }
 
             // Regla: Interruptiva
@@ -1843,9 +1899,14 @@ var Motor = (function() {
             errores = evaluarSistemaCompleto(sistema);
         }
 
-        var estado = errores.criticos.length === 0 && errores.medios.length === 0 ? 'OK' : 'WARNING';
+        errores.criticos = errores.criticos || [];
+        errores.medios = errores.medios || [];
+        errores.bajos = errores.bajos || [];
+
+        var estado = errores.criticos.length > 0 ? 'FAIL' : (errores.medios.length === 0 ? 'OK' : 'WARNING');
         var confianza = 1.0 - (errores.criticos.length * 0.5 + errores.medios.length * 0.2 + errores.bajos.length * 0.1);
         confianza = Math.max(0, Math.min(1, confianza));
+        if (!isFinite(confianza)) confianza = 0;
 
         return {
             estado: estado,
@@ -2073,7 +2134,21 @@ var Motor = (function() {
      * @param {Object} p - Punto del sistema
      * @returns {Object} Solución recomendada
      */
-    function resolverTerminal(p) {
+    function resolverTerminal(p, nodo) {
+        var feeder = nodo && nodo.feeder ? nodo.feeder : {};
+        if (p.CDT && p.CDT.I_final < (p.CDT.I_diseño || 0) && (feeder.paralelo || 1) < 4) {
+            return {
+                opciones: [
+                    'Agregar paralelo',
+                    'Subir calibre',
+                    'Usar terminal adecuada',
+                    'Dividir circuito'
+                ],
+                recomendada: 'aumentar_paralelo',
+                descripcion: 'Agregar conductor en paralelo antes de modificar breaker'
+            };
+        }
+
         if (p.CDT && p.CDT.I_corregida > p.CDT.I_limite_terminal) {
             return {
                 opciones: [
@@ -2082,7 +2157,8 @@ var Motor = (function() {
                     'Usar zapata adecuada',
                     'Dividir en paralelos'
                 ],
-                recomendada: 'subir_calibre'
+                recomendada: 'subir_calibre',
+                descripcion: 'Subir calibre o terminal; breaker queda bloqueado'
             };
         }
         return null;
@@ -2094,9 +2170,21 @@ var Motor = (function() {
      * @param {Object} solucion - Solución a aplicar
      */
     function aplicarSolucionTerminal(nodo, solucion) {
-        if (solucion && solucion.recomendada === 'subir_calibre') {
-            nodo.feeder.calibre = subirCalibre(nodo.feeder.calibre);
+        if (!nodo || !nodo.feeder || !solucion) return false;
+
+        if (solucion.recomendada === 'aumentar_paralelo') {
+            var paraleloActual = nodo.feeder.paralelo || 1;
+            nodo.feeder.paralelo = Math.min(4, paraleloActual + 1);
+            return nodo.feeder.paralelo !== paraleloActual;
         }
+
+        if (solucion.recomendada === 'subir_calibre') {
+            var calibreActual = nodo.feeder.calibre;
+            nodo.feeder.calibre = subirCalibre(nodo.feeder.calibre);
+            return nodo.feeder.calibre !== calibreActual;
+        }
+
+        return false;
     }
 
     /**

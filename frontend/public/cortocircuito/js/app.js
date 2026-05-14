@@ -763,7 +763,13 @@ var App = (function () {
                     // NO recalcular automáticamente para evitar loop infinito
                     // Usuario debe recalcular manualmente si desea ver efectos
                 } else {
-                    UIToast.mostrar('El sistema ya cumple con todos los criterios', 'success');
+                    var arbitraje = (estado.resultados && estado.resultados.arbitrajeGlobal) ||
+                        (typeof window !== 'undefined' ? window.__ICC_GLOBAL_ARBITRATION : null);
+                    if (arbitraje && !arbitraje.ok) {
+                        UIToast.mostrar('No hay cambios automáticos nuevos, pero el árbitro global mantiene ' + arbitraje.estado, 'warning');
+                    } else {
+                        UIToast.mostrar('El sistema ya cumple con todos los criterios', 'success');
+                    }
                 }
             } catch (e) {
                 console.error('Error en autoCorregir:', e);

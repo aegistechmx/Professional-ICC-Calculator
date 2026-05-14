@@ -23,6 +23,34 @@ var MotorDisenoAutomatico = (function() {
         450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000 // MG, PowerPact
     ];
 
+    var FAMILIAS_TCC = {
+        IEC_STANDARD_INVERSE: { k: 0.14, alpha: 0.02, label: 'IEC Standard Inverse' },
+        IEC_VERY_INVERSE: { k: 13.5, alpha: 1, label: 'IEC Very Inverse' },
+        IEC_EXTREMELY_INVERSE: { k: 80, alpha: 2, label: 'IEC Extremely Inverse' },
+        LSIG_ELECTRONIC: { k: 6.0, alpha: 1.0, label: 'LSIG Electronic' }
+    };
+
+    function seleccionarFamiliaCurva(index, total, nodo) {
+        var tipo = nodo && nodo.equip ? String(nodo.equip.tipo || '').toUpperCase() : '';
+        if (tipo.indexOf('LSIG') !== -1 || (nodo && nodo.equip && nodo.equip.tieneGFP)) {
+            return 'LSIG_ELECTRONIC';
+        }
+        if (index === 0) return 'IEC_STANDARD_INVERSE';
+        if (index >= total - 1) return 'IEC_EXTREMELY_INVERSE';
+        return index % 2 === 0 ? 'IEC_VERY_INVERSE' : 'IEC_STANDARD_INVERSE';
+    }
+
+    function obtenerFamiliaCurva(tcc) {
+        var nombre = (tcc && (tcc.curveFamily || tcc.tipoCurva)) || 'IEC_STANDARD_INVERSE';
+        return FAMILIAS_TCC[nombre] || FAMILIAS_TCC.IEC_STANDARD_INVERSE;
+    }
+
+    function normalizarIscA(valor) {
+        var numero = Number(valor);
+        if (!isFinite(numero) || numero <= 0) return 0;
+        return numero < 1000 ? numero * 1000 : numero;
+    }
+
     /**
      * Redondear al frame estándar más cercano (hacia arriba)
      * @param {number} corriente - Corriente de diseño
@@ -109,7 +137,30 @@ var MotorDisenoAutomatico = (function() {
                 (nodo.equip.iNominal || nodo.equip.amp || (nodo.equip.iDisparo ? nodo.equip.iDisparo / 10 : 0) || 0) :
                 0;
             var I_diseño = nodo.CDT ? nodo.CDT.I_diseño : (nodo.feeder ? nodo.feeder.cargaA * 1.25 : 0);
+            var I_final = nodo.CDT ? (nodo.CDT.I_final || nodo.CDT.ampacidadFinal || 0) : 0;
             var breakerNuevo;
+
+            if (nodo.CDT && (nodo.CDT.violacionTerminal || (I_final > 0 && I_diseño > 0 && I_final < I_diseño))) {
+                resultado.estado = 'BLOQUEADO_NOM';
+                resultado.cambios.push({
+                    nodo: nodo.id,
+                    antes: breakerActual,
+                    despues: breakerActual,
+                    razon: 'Bloqueado por ampacidad/terminal NOM'
+                });
+                resultado.nodos.push({
+                    id: nodo.id,
+                    parentId: nodo.parentId || null,
+                    feeder: nodo.feeder || null,
+                    equip: nodo.equip || null,
+                    isc: normalizarIscA(nodo.isc || nodo.Isc || nodo.iscConMotores || nodo.iscMax || 0),
+                    breakerIn: breakerActual || redondearBreaker(I_diseño || 1),
+                    I_diseño: I_diseño,
+                    breakerActual: breakerActual,
+                    bloqueoNOM: true
+                });
+                return;
+            }
 
             var hijos = Impedancias.obtenerHijos(nodo.id, nodos);
 
@@ -139,6 +190,10 @@ var MotorDisenoAutomatico = (function() {
 
             resultado.nodos.push({
                 id: nodo.id,
+                parentId: nodo.parentId || null,
+                feeder: nodo.feeder || null,
+                equip: nodo.equip || null,
+                isc: normalizarIscA(nodo.isc || nodo.Isc || nodo.iscConMotores || nodo.iscMax || 0),
                 breakerIn: breakerNuevo,
                 I_diseño: I_diseño,
                 breakerActual: breakerActual
@@ -402,7 +457,10 @@ var MotorDisenoAutomatico = (function() {
                 longDelay: tccDown.longDelay + 0.4,    // +400ms para selectividad térmica
                 shortDelay: tccDown.shortDelay + 0.1,  // +100ms para selectividad magnética
                 pickup: tccDown.pickup * 1.25,         // 25% más alto
-                instantaneous: tccDown.instantaneous * 1.5  // 50% más alto
+                shortPickup: (tccDown.shortPickup || tccDown.pickup * 6) * 1.2,
+                instantaneous: tccDown.instantaneous === 'OFF' ? 'OFF' : tccDown.instantaneous * 1.5,
+                curveFamily: seleccionarFamiliaCurva(i, nodos.length, up),
+                curveLabel: FAMILIAS_TCC[seleccionarFamiliaCurva(i, nodos.length, up)].label
             };
 
             // Registrar ajustes
@@ -413,10 +471,10 @@ var MotorDisenoAutomatico = (function() {
                 despues: tccUpNuevo
             });
 
-            resultado.nodos.push({
+            resultado.nodos.push(Object.assign({}, up, {
                 id: up.id,
                 tcc: tccUpNuevo
-            });
+            }));
         }
 
         // Agregar último nodo (downstream más lejano) sin cambios
@@ -430,10 +488,14 @@ var MotorDisenoAutomatico = (function() {
             };
             // Normalizar TCC del último nodo
             tccUltimo = normalizarTCC(tccUltimo, ultimo.breakerIn || 400);
-            resultado.nodos.push({
+            if (!tccUltimo.curveFamily) {
+                tccUltimo.curveFamily = seleccionarFamiliaCurva(nodos.length - 1, nodos.length, ultimo);
+                tccUltimo.curveLabel = FAMILIAS_TCC[tccUltimo.curveFamily].label;
+            }
+            resultado.nodos.push(Object.assign({}, ultimo, {
                 id: ultimo.id,
                 tcc: tccUltimo
-            });
+            }));
         }
 
         if (resultado.ajustes.length > 0) {
@@ -460,7 +522,10 @@ var MotorDisenoAutomatico = (function() {
             var up = nodos[i];
             var down = nodos[i + 1];
 
-            var IscUp = up.isc || 0;
+            var IscUp = normalizarIscA(up.isc || up.Isc || up.iscConMotores || up.iscMax || 0);
+            if (!IscUp) {
+                IscUp = normalizarIscA(down.isc || down.Isc || down.iscConMotores || down.iscMax || 0);
+            }
             var instantaneousDown = (down.tcc && down.tcc.instantaneous) ? down.tcc.instantaneous : 
                                      ((down.breakerIn || 0) * 10);
 
@@ -472,7 +537,7 @@ var MotorDisenoAutomatico = (function() {
             };
 
             // Si Isc upstream < instantaneous downstream, bloquear instantáneo upstream
-            if (IscUp < instantaneousDown) {
+            if (IscUp > 0 && instantaneousDown !== 'OFF' && IscUp < instantaneousDown) {
                 tccUp.instantaneous = 'OFF';
                 resultado.bloqueos.push({
                     nodoUp: up.id,
@@ -482,21 +547,21 @@ var MotorDisenoAutomatico = (function() {
                 });
             }
 
-            resultado.nodos.push({
+            resultado.nodos.push(Object.assign({}, up, {
                 id: up.id,
                 tcc: tccUp,
                 Isc: IscUp
-            });
+            }));
         }
 
         // Agregar último nodo
         if (nodos.length > 0) {
             var ultimo = nodos[nodos.length - 1];
-            resultado.nodos.push({
+            resultado.nodos.push(Object.assign({}, ultimo, {
                 id: ultimo.id,
                 tcc: ultimo.tcc,
-                Isc: ultimo.isc || 0
-            });
+                Isc: normalizarIscA(ultimo.isc || ultimo.Isc || ultimo.iscConMotores || ultimo.iscMax || 0)
+            }));
         }
 
         if (resultado.bloqueos.length > 0) {
@@ -546,6 +611,8 @@ var MotorDisenoAutomatico = (function() {
 
         var pickup = tcc.pickup || 100;
         var instantaneous = tcc.instantaneous;
+        var familia = obtenerFamiliaCurva(tcc);
+        var shortPickup = tcc.shortPickup || pickup * 6;
         
         // Si instantáneo está OFF o es número
         var instValue = (instantaneous === 'OFF') ? Infinity : (instantaneous || pickup * 10);
@@ -556,13 +623,12 @@ var MotorDisenoAutomatico = (function() {
         }
 
         // Zona de larga duración (térmica)
-        if (corriente < pickup * 2) {
+        if (corriente < shortPickup) {
             var I_ratio = corriente / pickup;
-            // Curva IEC inversa: t = k / (I^α - 1)
-            var k = 100; // Constante típica
-            var alpha = 0.02; // Exponente típico
-            var tTermico = k / (Math.pow(I_ratio, alpha) - 1);
-            return Math.min(tTermico, 10000); // Máximo 10000s
+            var denominador = Math.pow(I_ratio, familia.alpha) - 1;
+            if (denominador <= 0) return Infinity;
+            var tTermico = (familia.k / denominador) * ((tcc.longDelay || 6) / 6);
+            return Math.min(Math.max(tTermico, tcc.shortDelay || 0.1), 10000);
         }
 
         // Zona de corta duración (magnética)
@@ -596,13 +662,16 @@ var MotorDisenoAutomatico = (function() {
         resultado.deteccionCurvas = detectarCurvasIguales(resultado.escalonamiento.nodos);
 
         var tieneErroresCriticos = resultado.deteccionCurvas.estado === 'ERROR';
+        var tieneBloqueoNOM = resultado.escalonamiento.estado === 'BLOQUEADO_NOM';
 
         // Si hay errores críticos, mantener estado ERROR pero continuar para generar TCC editable
-        if (tieneErroresCriticos) {
+        if (tieneErroresCriticos || tieneBloqueoNOM) {
             resultado.estadoGlobal = 'ERROR';
             resultado.recomendaciones.push({
                 tipo: 'CRITICO',
-                mensaje: 'Breakers idénticos en cascada. Escalone frames manualmente o use diseño automático.'
+                mensaje: tieneBloqueoNOM ?
+                    'NOM bloquea coordinación: resuelva ampacidad/terminal antes de escalonar breakers.' :
+                    'Breakers idénticos en cascada. Escalone frames manualmente o use diseño automático.'
             });
         }
 
@@ -636,7 +705,7 @@ var MotorDisenoAutomatico = (function() {
         // Evaluar estado global
         var selectividadOK = resultado.validacionSelectividad.every(function(v) { return v.selectiva; });
         
-        if (tieneErroresCriticos) {
+        if (tieneErroresCriticos || tieneBloqueoNOM) {
             resultado.estadoGlobal = 'ERROR';
         } else if (selectividadOK) {
             resultado.estadoGlobal = 'OK';

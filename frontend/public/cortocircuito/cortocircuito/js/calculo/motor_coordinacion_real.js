@@ -10,6 +10,51 @@
  */
 
 var MotorCoordinacionReal = (function() {
+    function detectarRestriccionNOM(nodo) {
+        var cdt = nodo.CDT || {};
+        var feeder = nodo.feeder || {};
+        var IDiseno = nodo.I_diseño || cdt.I_diseño || (feeder.cargaA ? feeder.cargaA * 1.25 : 0);
+        var IFinal = cdt.I_final || cdt.ampacidadFinal || 0;
+
+        if (IFinal > 0 && IDiseno > 0 && IFinal < IDiseno) {
+            return {
+                tipo: 'AMPACIDAD_INSUFICIENTE',
+                mensaje: 'NOM antes de TCC: I_final=' + IFinal.toFixed(1) + 'A < I_diseño=' + IDiseno.toFixed(1) + 'A'
+            };
+        }
+
+        if (cdt.violacionTerminal) {
+            return {
+                tipo: 'TERMINAL_110_14C',
+                mensaje: 'NOM 110.14C antes de TCC: corregir terminal/conductor antes de coordinar'
+            };
+        }
+
+        return null;
+    }
+
+    var FAMILIAS_TCC = {
+        IEC_STANDARD_INVERSE: { k: 0.14, alpha: 0.02, label: 'IEC Standard Inverse' },
+        IEC_VERY_INVERSE: { k: 13.5, alpha: 1, label: 'IEC Very Inverse' },
+        IEC_EXTREMELY_INVERSE: { k: 80, alpha: 2, label: 'IEC Extremely Inverse' },
+        LSIG_ELECTRONIC: { k: 6.0, alpha: 1.0, label: 'LSIG Electronic' }
+    };
+
+    function seleccionarFamiliaCurva(index, total, nodo) {
+        var tipo = nodo && nodo.equip && String(nodo.equip.tipo || '').toUpperCase();
+        if (tipo.indexOf('LSIG') !== -1 || (nodo && nodo.equip && nodo.equip.tieneGFP)) {
+            return 'LSIG_ELECTRONIC';
+        }
+        if (index === 0) return 'IEC_STANDARD_INVERSE';
+        if (index >= total - 1) return 'IEC_EXTREMELY_INVERSE';
+        return index % 2 === 0 ? 'IEC_VERY_INVERSE' : 'IEC_STANDARD_INVERSE';
+    }
+
+    function obtenerFamiliaCurva(tcc) {
+        var nombre = (tcc && (tcc.curveFamily || tcc.tipoCurva)) || 'IEC_STANDARD_INVERSE';
+        return FAMILIAS_TCC[nombre] || FAMILIAS_TCC.IEC_STANDARD_INVERSE;
+    }
+
     /**
      * COORDINACIÓN AUTOMÁTICA REAL (Algoritmo ETAP)
      * @param {Array} nodos - Array de nodos del sistema
@@ -31,8 +76,31 @@ var MotorCoordinacionReal = (function() {
         };
 
         // PASO 1: Seleccionar breakers reales para cada nodo
-        nodos.forEach(function(nodo) {
+        nodos.forEach(function(nodo, index) {
             var I_diseño = nodo.I_diseño || (nodo.CDT ? nodo.CDT.I_diseño : 100);
+            var restriccionNOM = detectarRestriccionNOM(nodo);
+            var familiaCurva = seleccionarFamiliaCurva(index, nodos.length, nodo);
+
+            if (restriccionNOM) {
+                resultado.estado = 'BLOQUEADO_NOM';
+                resultado.cambios.push({
+                    nodo: nodo.id,
+                    accion: 'BLOQUEO_NOM',
+                    antes: 'TCC',
+                    despues: 'BLOQUEADO',
+                    razon: restriccionNOM.mensaje
+                });
+                resultado.nodos.push({
+                    id: nodo.id,
+                    I_diseño: I_diseño,
+                    CDT: nodo.CDT || null,
+                    breaker: null,
+                    tcc: null,
+                    curveFamily: familiaCurva,
+                    restriccionNOM: restriccionNOM
+                });
+                return;
+            }
             
             var opciones = CatalogoEquiposReal.seleccionarBreaker({ I_diseño: I_diseño }, criterios);
             var mejor = CatalogoEquiposReal.optimizarPorCostoYCoordinacion(opciones, criterios);
@@ -49,12 +117,16 @@ var MotorCoordinacionReal = (function() {
             resultado.nodos.push({
                 id: nodo.id,
                 I_diseño: I_diseño,
+                CDT: nodo.CDT || null,
                 breaker: mejor || null,
                 tcc: mejor ? {
                     pickup: mejor.frame,
                     longDelay: 6.0,
                     shortDelay: 0.3,
-                    instantaneous: mejor.frame * 10
+                    shortPickup: mejor.frame * 6,
+                    instantaneous: mejor.frame * 10,
+                    curveFamily: familiaCurva,
+                    curveLabel: FAMILIAS_TCC[familiaCurva].label
                 } : null
             });
         });
@@ -73,11 +145,30 @@ var MotorCoordinacionReal = (function() {
                 var up = resultado.nodos[i - 1];
 
                 if (!down.breaker || !up.breaker) continue;
+                if (down.restriccionNOM || up.restriccionNOM) continue;
 
                 // 1. Escalonar frame si necesario
                 if (up.breaker.frame <= down.breaker.frame) {
                     var siguienteFrame = CatalogoEquiposReal.siguienteFrame(down.breaker.frame);
                     if (siguienteFrame !== up.breaker.frame) {
+                        var ampacidadMaxima = up.CDT && up.CDT.I_final ? up.CDT.I_final * 1.25 : Infinity;
+                        if (siguienteFrame > ampacidadMaxima) {
+                            up.restriccionNOM = {
+                                tipo: 'BREAKER_SUPERA_AMPACIDAD',
+                                mensaje: 'Frame propuesto ' + siguienteFrame + 'A excede ampacidad disponible'
+                            };
+                            resultado.estado = 'BLOQUEADO_NOM';
+                            resultado.cambios.push({
+                                nodo: up.id,
+                                accion: 'BLOQUEO_NOM',
+                                antes: up.breaker.frame + 'A',
+                                despues: 'SIN_ESCALAR',
+                                razon: up.restriccionNOM.mensaje,
+                                iteracion: intentos
+                            });
+                            continue;
+                        }
+
                         // Re-seleccionar breaker con nuevo frame
                         var nuevasOpciones = CatalogoEquiposReal.seleccionarBreaker(
                             { I_diseño: siguienteFrame }, 
@@ -183,12 +274,40 @@ var MotorCoordinacionReal = (function() {
     function validarCoordinacion(nodos) {
         var cruces = [];
         var ok = true;
+        var restriccionesNOM = nodos.filter(function(n) { return n.restriccionNOM; }).map(function(n) {
+            return {
+                nodo: n.id,
+                tipo: n.restriccionNOM.tipo,
+                mensaje: n.restriccionNOM.mensaje,
+                severidad: 'CRITICO'
+            };
+        });
+
+        if (restriccionesNOM.length > 0) {
+            ok = false;
+        }
 
         for (var i = 0; i < nodos.length - 1; i++) {
             var up = nodos[i];
             var down = nodos[i + 1];
 
             if (!up.tcc || !down.tcc) continue;
+
+            if (up.breaker && down.breaker && up.breaker.frame === down.breaker.frame) {
+                cruces.push({
+                    par: up.id + ' → ' + down.id,
+                    corriente: down.breaker.frame,
+                    tUp: 0,
+                    tDown: 0,
+                    ratio: 0,
+                    selectividadMinima: 1.3,
+                    severidad: 'CRITICO',
+                    tipo: 'FRAME_IDENTICO',
+                    mensaje: 'Breakers con mismo frame en cascada (' + up.breaker.frame + 'A)'
+                });
+                ok = false;
+                continue;
+            }
 
             // Validar a múltiples corrientes (escala log)
             var corrientesPrueba = [];
@@ -202,6 +321,7 @@ var MotorCoordinacionReal = (function() {
                 var tDown = calcularTiempoTCC(down.tcc, I);
 
                 // Regla: t_up >= t_down * 1.3
+                if (!isFinite(tUp) || !isFinite(tDown) || tDown <= 0) continue;
                 var ratio = tUp / tDown;
                 var selectividadMinima = 1.3;
 
@@ -223,6 +343,7 @@ var MotorCoordinacionReal = (function() {
         return {
             ok: ok,
             cruces: cruces,
+            restriccionesNOM: restriccionesNOM,
             estado: ok ? 'COORDINADO' : 'NO_COORDINADO'
         };
     }
@@ -238,6 +359,8 @@ var MotorCoordinacionReal = (function() {
         var longDelay = tcc.longDelay || 2.0;
         var shortDelay = tcc.shortDelay || 0.1;
         var instantaneous = tcc.instantaneous || (pickup * 10);
+        var shortPickup = tcc.shortPickup || pickup * 6;
+        var familia = obtenerFamiliaCurva(tcc);
 
         // Si corriente < pickup, no dispara
         if (I < pickup) return Infinity;
@@ -247,16 +370,16 @@ var MotorCoordinacionReal = (function() {
             return 0.01;
         }
 
-        // Región de larga duración (térmica) - usar interpolación log-log del catálogo
-        if (instantaneous === 'OFF' || I < instantaneous * 0.8) {
-            var I_multiplo = I / pickup;
-            var curvaBase = CatalogoEquiposReal.obtenerCurva('schneider_powerpact_micrologic_2_0');
-            var t = CatalogoEquiposReal.interpolarLogLog(curvaBase, I_multiplo);
-            return t * longDelay; // Escalar por long delay
+        if (I >= shortPickup) {
+            return shortDelay;
         }
 
-        // Región de corta duración (magnética)
-        return shortDelay;
+        var I_multiplo = I / pickup;
+        var denominador = Math.pow(I_multiplo, familia.alpha) - 1;
+        if (denominador <= 0) return Infinity;
+
+        var tiempo = (familia.k / denominador) * (longDelay / 6);
+        return Math.min(Math.max(tiempo, shortDelay), 10000);
     }
 
     /**
@@ -300,15 +423,18 @@ var MotorCoordinacionReal = (function() {
         });
 
         // PASO 4: Validación final
-        var validacionFinal = validarCoordinacion(resultado.nodos);
+        resultado.nodos = resultadoCoordinacion.nodos;
+        var validacionFinal = validarCoordinacion(resultadoCoordinacion.nodos);
         resultado.pasos.push({
             paso: 4,
             accion: 'VALIDACION_FINAL',
             estado: validacionFinal.estado,
-            mensaje: validacionFinal.cruces.length + ' cruces detectados'
+            mensaje: validacionFinal.cruces.length + ' cruces, ' +
+                ((validacionFinal.restriccionesNOM || []).length) + ' restricciones NOM'
         });
 
-        resultado.estadoFinal = validacionFinal.ok ? 'COORDINADO' : 'PARCIAL_COORDINADO';
+        resultado.estadoFinal = validacionFinal.ok ? 'COORDINADO' :
+            (validacionFinal.restriccionesNOM && validacionFinal.restriccionesNOM.length > 0 ? 'BLOQUEADO_NOM' : 'PARCIAL_COORDINADO');
         resultado.coordinacion = resultadoCoordinacion;
         resultado.validacionFinal = validacionFinal;
 
@@ -371,7 +497,13 @@ var MotorCoordinacionReal = (function() {
             html += '<div class="mb-4">';
             html += '<h4 class="font-semibold mb-2">Validación Final</h4>';
             
-            if (resultado.validacionFinal.cruces.length > 0) {
+            if (resultado.validacionFinal.restriccionesNOM && resultado.validacionFinal.restriccionesNOM.length > 0) {
+                html += '<div class="space-y-1">';
+                resultado.validacionFinal.restriccionesNOM.forEach(function(r) {
+                    html += '<div class="text-xs text-[--red]">[X] ' + r.nodo + ': ' + r.mensaje + '</div>';
+                });
+                html += '</div>';
+            } else if (resultado.validacionFinal.cruces.length > 0) {
                 html += '<div class="space-y-1">';
                 resultado.validacionFinal.cruces.forEach(function(c) {
                     var color = c.severidad === 'CRITICO' ? 'text-[--red]' : 'text-[--yellow]';

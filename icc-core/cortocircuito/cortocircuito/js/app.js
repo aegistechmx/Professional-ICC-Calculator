@@ -247,13 +247,33 @@ var App = (function () {
             return;
         }
 
-        // Inicializar comunicación postMessage con React
-        initPostMessageCommunication();
-
         try {
-            // Poblar dropdowns
-            poblarDropdownZonas();
-            poblarDropdownCapacidadesTrafo();
+            // Poblar dropdowns con logging de debug
+            Debug.log('[App.init] Iniciando poblado de dropdowns');
+
+            // Verificar si los elementos existen antes de poblar
+            var zonaSelect = document.getElementById('input-zona-electrica');
+            var kvaSelect = document.getElementById('input-trafo-kva');
+
+            Debug.log('[App.init] Elementos encontrados:', {
+                zonaSelect: !!zonaSelect,
+                kvaSelect: !!kvaSelect,
+                CONSTANTES: typeof CONSTANTES !== 'undefined'
+            });
+
+            if (zonaSelect) {
+                poblarDropdownZonas();
+                Debug.log('[App.init] Dropdown de zonas poblado');
+            } else {
+                Debug.warn('[App.init] No se encontró input-zona-electrica');
+            }
+
+            if (kvaSelect) {
+                poblarDropdownCapacidadesTrafo();
+                Debug.log('[App.init] Dropdown de kVA poblado');
+            } else {
+                Debug.warn('[App.init] No se encontró input-trafo-kva');
+            }
 
             // Cargar perfil de usuario si existe (tiene prioridad sobre legacy)
             if (typeof Profile !== 'undefined' && Profile.loadToUI) {
@@ -345,12 +365,6 @@ var App = (function () {
                     Motor.actualizarRetornoTierra();
                 }
             }, 100);
-
-            // 🎯 Inicializar logo Icore (estado normal - sin falla)
-            if (typeof renderIcoreLogo !== 'undefined') {
-                renderIcoreLogo('logo', false);
-                Debug.log('[App] Logo Icore inicializado');
-            }
 
         } catch (e) {
             console.error('Error en init:', e);
@@ -522,8 +536,10 @@ var App = (function () {
                 UICoordonograma.dibujar(resultado.puntos);
                 UIDiagrama.dibujar();
 
-                // Enviar resultados a React
-                sendResultsToReact(resultado.puntos);
+                // 🚀 Enviar resultados a React via postMessage
+                if (window.sendResultsToReact && resultado.puntos) {
+                    window.sendResultsToReact(resultado.puntos);
+                }
 
                 // Mostrar validación inteligente si está disponible
                 if (resultado.puntos.validacionInteligente) {
@@ -661,19 +677,6 @@ var App = (function () {
                         panelDiv.innerHTML = panelHTML;
                         panelSection.classList.remove('hidden');
                     }
-
-                    // 🔥 Activar logo animado si hay fallas críticas
-                    if (typeof renderIcoreLogo !== 'undefined') {
-                        var hasCritical = issues.some(function (i) { return i.nivel === 'CRITICO'; });
-                        var hasError = issues.some(function (i) { return i.nivel === 'ERROR'; });
-
-                        if (hasCritical || hasError) {
-                            renderIcoreLogo('logo', true); // Modo falla - animación shock
-                            Debug.log('[App] Logo activado: modo falla crítica detectada');
-                        } else {
-                            renderIcoreLogo('logo', false); // Modo normal
-                        }
-                    }
                 }
 
                 UIToast.mostrar('Cálculo completado correctamente', 'success');
@@ -760,7 +763,13 @@ var App = (function () {
                     // NO recalcular automáticamente para evitar loop infinito
                     // Usuario debe recalcular manualmente si desea ver efectos
                 } else {
-                    UIToast.mostrar('El sistema ya cumple con todos los criterios', 'success');
+                    var arbitraje = (estado.resultados && estado.resultados.arbitrajeGlobal) ||
+                        (typeof window !== 'undefined' ? window.__ICC_GLOBAL_ARBITRATION : null);
+                    if (arbitraje && !arbitraje.ok) {
+                        UIToast.mostrar('No hay cambios automáticos nuevos, pero el árbitro global mantiene ' + arbitraje.estado, 'warning');
+                    } else {
+                        UIToast.mostrar('El sistema ya cumple con todos los criterios', 'success');
+                    }
                 }
             } catch (e) {
                 console.error('Error en autoCorregir:', e);
@@ -1090,6 +1099,8 @@ var App = (function () {
                     paralelo: f.paralelo || 1,
                     cargaA: f.cargaA || 0,
                     cargaFP: f.cargaFP || 0.9,
+                    numConductores: f.numConductores || 3,
+                    tempAmbiente: f.tempAmbiente || 30,
                     equipTipo: (nodo.equip && nodo.equip.tipo) || '',
                     equipModelo: (nodo.equip && nodo.equip.modelo) || '',
                     equipCap: (nodo.equip && nodo.equip.cap) || 0,
@@ -1125,8 +1136,28 @@ var App = (function () {
     }
 
     function poblarDropdownZonas() {
+        Debug.log('[poblarDropdownZonas] Iniciando función');
+
         var select = document.getElementById('input-zona-electrica');
-        if (!select) return;
+        Debug.log('[poblarDropdownZonas] Elemento select encontrado:', !!select);
+
+        if (!select) {
+            Debug.error('[poblarDropdownZonas] No se encontró el elemento input-zona-electrica');
+            return;
+        }
+
+        // Verificar que CONSTANTES esté disponible
+        if (typeof CONSTANTES === 'undefined') {
+            Debug.error('[poblarDropdownZonas] CONSTANTES no está definido');
+            return;
+        }
+
+        if (!CONSTANTES.ZONAS_ELECTRICAS) {
+            Debug.error('[poblarDropdownZonas] CONSTANTES.ZONAS_ELECTRICAS no está disponible');
+            return;
+        }
+
+        Debug.log('[poblarDropdownZonas] CONSTANTES.ZONAS_ELECTRICAS disponible, zonas:', Object.keys(CONSTANTES.ZONAS_ELECTRICAS).length);
 
         select.innerHTML = '<option value="">Seleccionar zona...</option>';
 
@@ -1138,11 +1169,33 @@ var App = (function () {
             option.title = zona.descripción + '\nIsc en MT: ' + zona.isc_primario + ' kA @ ' + (zona.v_primario / 1000) + ' kV\nX/R: ' + zona.xr_típico + '\nRango: ' + zona.isc_mínimo + ' - ' + zona.isc_máximo + ' kA';
             select.appendChild(option);
         });
+
+        Debug.log('[poblarDropdownZonas] Dropdown poblado con', select.options.length - 1, 'opciones');
     }
 
     function poblarDropdownCapacidadesTrafo() {
+        Debug.log('[poblarDropdownCapacidadesTrafo] Iniciando función');
+
         var select = document.getElementById('input-trafo-kva');
-        if (!select) return;
+        Debug.log('[poblarDropdownCapacidadesTrafo] Elemento select encontrado:', !!select);
+
+        if (!select) {
+            Debug.error('[poblarDropdownCapacidadesTrafo] No se encontró el elemento input-trafo-kva');
+            return;
+        }
+
+        // Verificar que CONSTANTES esté disponible
+        if (typeof CONSTANTES === 'undefined') {
+            Debug.error('[poblarDropdownCapacidadesTrafo] CONSTANTES no está definido');
+            return;
+        }
+
+        if (!CONSTANTES.CAPACIDADES_TRAFO_KVA) {
+            Debug.error('[poblarDropdownCapacidadesTrafo] CONSTANTES.CAPACIDADES_TRAFO_KVA no está disponible');
+            return;
+        }
+
+        Debug.log('[poblarDropdownCapacidadesTrafo] CONSTANTES.CAPACIDADES_TRAFO_KVA disponible, capacidades:', CONSTANTES.CAPACIDADES_TRAFO_KVA.length);
 
         var valorActual = select.value || 500;
         select.innerHTML = '';
@@ -1156,7 +1209,13 @@ var App = (function () {
             }
             select.appendChild(option);
         });
+
+        Debug.log('[poblarDropdownCapacidadesTrafo] Dropdown poblado con', select.options.length, 'opciones');
     }
+
+    // Exponer funciones globalmente para que puedan ser llamadas desde el HTML
+    window.poblarDropdownZonas = poblarDropdownZonas;
+    window.poblarDropdownCapacidadesTrafo = poblarDropdownCapacidadesTrafo;
 
     function actualizarIscPorZona() {
         var selectZona = document.getElementById('input-zona-electrica');
@@ -1408,6 +1467,8 @@ var App = (function () {
     function setTrafoVs(v, btn) {
         if (typeof UIConfiguracion !== 'undefined' && UIConfiguracion.setTrafoVs) {
             UIConfiguracion.setTrafoVs(v, btn);
+        } else {
+            console.warn('[App] UIConfiguracion no disponible para setTrafoVs');
         }
     }
 
@@ -1700,109 +1761,6 @@ var App = (function () {
         saveProfile: saveProfile,
         resetProfile: resetProfile
     };
-
-    /**
-     * Inicializar comunicación postMessage con React
-     */
-    function initPostMessageCommunication() {
-        // Notificar a React que el módulo está listo
-        window.parent.postMessage({
-            type: 'ICC_READY',
-            data: { timestamp: Date.now() }
-        }, '*');
-
-        // Escuchar mensajes de React
-        window.addEventListener('message', function (event) {
-            // Validar origen (opcional pero recomendado)
-            // if (event.origin !== window.location.origin) return;
-
-            const { type, data } = event.data;
-
-            switch (type) {
-                case 'LOAD_MODEL':
-                    // Cargar modelo del sistema desde React
-                    if (data && typeof loadSystemModel === 'function') {
-                        loadSystemModel(data);
-                    }
-                    break;
-
-                case 'CALCULATE':
-                    // Ejecutar cálculo desde React
-                    if (typeof calculate === 'function') {
-                        calculate();
-                    }
-                    break;
-
-                case 'RESET':
-                    // Resetear sistema desde React
-                    if (typeof resetTodo === 'function') {
-                        resetTodo();
-                    }
-                    break;
-
-                case 'GET_STATE':
-                    // Enviar estado actual a React
-                    window.parent.postMessage({
-                        type: 'STATE_RESPONSE',
-                        data: {
-                            estado: estado,
-                            resultados: estado.resultados
-                        }
-                    }, '*');
-                    break;
-
-                default:
-                    console.log('Mensaje no reconocido:', type);
-                    break;
-            }
-        });
-    }
-
-    /**
-     * Cargar modelo del sistema desde React
-     */
-    function loadSystemModel(modelData) {
-        try {
-            // Actualizar estado con datos del modelo
-            if (modelData.estado) {
-                Object.assign(estado, modelData.estado);
-            }
-
-            // Actualizar UI si es necesario
-            if (modelData.ui && typeof UIConfiguracion !== 'undefined') {
-                UIConfiguracion.updateFromModel(modelData.ui);
-            }
-
-            // Notificar a React que el modelo se cargó
-            window.parent.postMessage({
-                type: 'MODEL_LOADED',
-                data: { success: true }
-            }, '*');
-
-        } catch (error) {
-            console.error('Error cargando modelo:', error);
-            window.parent.postMessage({
-                type: 'MODEL_LOADED',
-                data: { success: false, error: error.message }
-            }, '*');
-        }
-    }
-
-    /**
-     * Enviar resultados a React después del cálculo
-     */
-    function sendResultsToReact(results) {
-        window.parent.postMessage({
-            type: 'RESULTS',
-            data: results
-        }, '*');
-    }
-
-    // Exponer funciones para uso interno
-    App.initPostMessageCommunication = initPostMessageCommunication;
-    App.loadSystemModel = loadSystemModel;
-    App.sendResultsToReact = sendResultsToReact;
-
 })();
 
 if (typeof window !== 'undefined') {
