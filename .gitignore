@@ -45,6 +45,13 @@ Thumbs.db
 *.bak-*
 *_BACKUP/
 *DUP_BACKUP/
+PATCH_NOTES_*.md
+PATCH_NOTES_FINAL_*.md
+FINAL_*_*.md
+docs/UI_COMPACT_UPDATE_*.md
+frontend/public/logo_compressed.png
+scripts/clean-project*.ps1
+clean-project.ps1
 backend/perf-output*.txt
 backend/backend/
 backend/backend.zip
