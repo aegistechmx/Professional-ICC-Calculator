@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Editor from './components/Editor';
-import ICCModule from './components/ICCModule';
-import Sidebar from './components/Sidebar';
-import CortocircuitoPage from './modules/cortocircuito/CortocircuitoPage';
-import { useStore } from './store/useStore';
+import SimulationAnimationLayer from './components/SimulationAnimationLayer'
+import DefaultEngineeringWizard from './components/DefaultEngineeringWizard'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Editor from './components/Editor'
+import ICCModule from './components/ICCModule'
+import Sidebar from './components/Sidebar'
+import CortocircuitoPage from './modules/cortocircuito/CortocircuitoPage'
+import { useStore } from './store/useStore'
 
 function App() {
   const [currentView, setCurrentView] = useState('editor')
+  const [showWizard, setShowWizard] = useState(true)
   const [syncFilename, setSyncFilename] = useState('Sin sincronizar')
   const [standaloneModel, setStandaloneModel] = useState(null)
   const [pendingStandaloneCalculation, setPendingStandaloneCalculation] =
@@ -202,9 +205,10 @@ function App() {
       // Forzar guardado inmediato en localStorage
       localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes))
       localStorage.setItem('icc-sync-edges', JSON.stringify(edges))
-      const model = typeof buildStandaloneModel === 'function'
-        ? buildStandaloneModel()
-        : { nodes, edges, source: 'fallback-sync-model' }
+      const model =
+        typeof buildStandaloneModel === 'function'
+          ? buildStandaloneModel()
+          : { nodes, edges, source: 'fallback-sync-model' }
       localStorage.setItem('icc-sync-model', JSON.stringify(model))
       localStorage.setItem('icc-sync-filename', `${filename}`)
       localStorage.setItem('icc-sync-timestamp', new Date().toISOString())
@@ -212,17 +216,17 @@ function App() {
       // Actualizar estado local
       setSyncFilename(filename)
       setStandaloneModel(model)
-
     } catch (error) {
       alert('Error en sincronización: ' + error.message)
     }
   }
 
-
   const handleDeleteSelected = useCallback(() => {
     const state = useStore.getState()
     if (state.selectedNode) {
-      if (confirm(`¿Eliminar ${state.selectedNode.type || 'nodo'} seleccionado?`)) {
+      if (
+        confirm(`¿Eliminar ${state.selectedNode.type || 'nodo'} seleccionado?`)
+      ) {
         state.removeNode(state.selectedNode.id)
       }
       return
@@ -240,9 +244,10 @@ function App() {
 
   const handleCalculateICC = useCallback(async () => {
     try {
-      const model = typeof buildStandaloneModel === 'function'
-        ? buildStandaloneModel()
-        : { nodes, edges, source: 'fallback-sync-model' }
+      const model =
+        typeof buildStandaloneModel === 'function'
+          ? buildStandaloneModel()
+          : { nodes, edges, source: 'fallback-sync-model' }
       setStandaloneModel(model)
       localStorage.setItem('icc-sync-model', JSON.stringify(model))
       localStorage.setItem('icc-sync-nodes', JSON.stringify(nodes))
@@ -258,7 +263,9 @@ function App() {
         setPendingStandaloneCalculation(true)
         setCurrentView('icc-iframe')
       }
-      alert(`✅ Cálculo ICC completado${icc ? `: ${Number(icc).toLocaleString()} A` : ''}`)
+      alert(
+        `✅ Cálculo ICC completado${icc ? `: ${Number(icc).toLocaleString()} A` : ''}`
+      )
     } catch (error) {
       alert(error.message || 'Error al calcular ICC')
     }
@@ -286,6 +293,11 @@ function App() {
 
       {/* Canvas del editor */}
       <div className="flex-1 relative">
+        <DefaultEngineeringWizard
+          isOpen={showWizard}
+          onClose={() => setShowWizard(false)}
+        />
+        <SimulationAnimationLayer />
         <Editor />
 
         {/* Barra de herramientas superior */}
@@ -297,7 +309,9 @@ function App() {
 
             {/* Mode toggle */}
             <div className="flex bg-gray-200 rounded-lg p-1">
-              <button type="button" onClick={() => setMode('edit')}
+              <button
+                type="button"
+                onClick={() => setMode('edit')}
                 className={`px-4 py-2 rounded-md transition ${
                   mode === 'edit'
                     ? 'bg-blue-600 text-white'
@@ -306,7 +320,9 @@ function App() {
               >
                 Modo Edición
               </button>
-              <button type="button" onClick={() => setMode('simulation')}
+              <button
+                type="button"
+                onClick={() => setMode('simulation')}
                 className={`px-4 py-2 rounded-md transition ${
                   mode === 'simulation'
                     ? 'bg-green-600 text-white'
@@ -319,7 +335,9 @@ function App() {
 
             {/* System Mode toggle - NEW: ATS modes */}
             <div className="flex bg-gray-200 rounded-lg p-1">
-              <button type="button" onClick={() => setSystemMode('normal')}
+              <button
+                type="button"
+                onClick={() => setSystemMode('normal')}
                 className={`px-4 py-2 rounded-md transition ${
                   systemMode === 'normal'
                     ? 'bg-green-600 text-white'
@@ -329,7 +347,9 @@ function App() {
               >
                 🟢 Normal
               </button>
-              <button type="button" onClick={() => setSystemMode('emergency')}
+              <button
+                type="button"
+                onClick={() => setSystemMode('emergency')}
                 className={`px-4 py-2 rounded-md transition ${
                   systemMode === 'emergency'
                     ? 'bg-red-600 text-white'
@@ -342,7 +362,9 @@ function App() {
             </div>
 
             <div className="flex gap-2 flex-wrap">
-              <button type="button" onClick={handleDeleteSelected}
+              <button
+                type="button"
+                onClick={handleDeleteSelected}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
                 title="Eliminar elementos seleccionados (o presiona DELETE)"
               >
@@ -369,13 +391,28 @@ function App() {
               >
                 ⚙️ Cargar Default
               </button>
-              <button type="button" onClick={loadProjectFromFile} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" title="Cargar proyecto desde archivo JSON">
+              <button
+                type="button"
+                onClick={loadProjectFromFile}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                title="Cargar proyecto desde archivo JSON"
+              >
                 📁 Abrir
               </button>
-              <button type="button" onClick={handleSaveProject} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition" title="Guardar proyecto como archivo JSON">
+              <button
+                type="button"
+                onClick={handleSaveProject}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                title="Guardar proyecto como archivo JSON"
+              >
                 💾 Guardar
               </button>
-              <button type="button" onClick={handleManualSync} className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition flex items-center gap-2" title={`Sincronizar con módulo cortocircuito - ${syncFilename}`}>
+              <button
+                type="button"
+                onClick={handleManualSync}
+                className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700 transition flex items-center gap-2"
+                title={`Sincronizar con módulo cortocircuito - ${syncFilename}`}
+              >
                 🔄{' '}
                 <span className="hidden sm:inline truncate max-w-[150px]">
                   {syncFilename}
@@ -383,29 +420,47 @@ function App() {
               </button>
               {mode === 'edit' && (
                 <>
-                  <button type="button" onClick={() => setCurrentView('cortocircuito')}
+                  <button
+                    type="button"
+                    onClick={() => setCurrentView('cortocircuito')}
                     className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
                   >
                     Módulo Cortocircuito (React)
                   </button>
-                  <button type="button" onClick={() => setCurrentView('icc-iframe')}
+                  <button
+                    type="button"
+                    onClick={() => setCurrentView('icc-iframe')}
                     className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
                   >
                     Módulo ICC (iframe)
                   </button>
-                  <button type="button" onClick={handleCalculateICC} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                  <button
+                    type="button"
+                    onClick={handleCalculateICC}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  >
                     Calcular ICC
                   </button>
-                  <button type="button" onClick={handleCortocircuito} className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition">
+                  <button
+                    type="button"
+                    onClick={handleCortocircuito}
+                    className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition"
+                  >
                     Cortocircuito
                   </button>
-                  <button type="button" onClick={handleGeneratePDF} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                  <button
+                    type="button"
+                    onClick={handleGeneratePDF}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                  >
                     Generar PDF
                   </button>
                 </>
               )}
               {mode === 'simulation' && (
-                <button type="button" onClick={() => setMode('edit')}
+                <button
+                  type="button"
+                  onClick={() => setMode('edit')}
                   className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
                 >
                   Volver a Edición
@@ -424,13 +479,25 @@ function App() {
                 <div className="flex items-center gap-4">
                   {/* Playback buttons */}
                   <div className="flex items-center gap-2">
-                    <button type="button" onClick={rewindPlayback} className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition" title="Rewind to start">
+                    <button
+                      type="button"
+                      onClick={rewindPlayback}
+                      className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+                      title="Rewind to start"
+                    >
                       ⏪
                     </button>
-                    <button type="button" onClick={isPlaying ? pausePlayback : playPlayback} className={`px-4 py-2 ${isPlaying ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded transition`} title={isPlaying ? 'Pause' : 'Play'}>
+                    <button
+                      type="button"
+                      onClick={isPlaying ? pausePlayback : playPlayback}
+                      className={`px-4 py-2 ${isPlaying ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'} text-white rounded transition`}
+                      title={isPlaying ? 'Pause' : 'Play'}
+                    >
                       {isPlaying ? '⏸' : '▶'}
                     </button>
-                    <button type="button" onClick={() => stepPlayback(0.01)}
+                    <button
+                      type="button"
+                      onClick={() => stepPlayback(0.01)}
                       className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
                       title="Step forward"
                     >
@@ -515,7 +582,9 @@ function App() {
             <h1 className="text-xl font-bold text-gray-800">
               ⚡ Módulo de Cortocircuito
             </h1>
-            <button type="button" onClick={() => setCurrentView('editor')}
+            <button
+              type="button"
+              onClick={() => setCurrentView('editor')}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
             >
               ← Volver al Editor
@@ -534,10 +603,16 @@ function App() {
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={handleCalculateICC} className="px-4 py-2 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition">
+              <button
+                type="button"
+                onClick={handleCalculateICC}
+                className="px-4 py-2 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition"
+              >
                 Calcular ICC
               </button>
-              <button type="button" onClick={() => setCurrentView('editor')}
+              <button
+                type="button"
+                onClick={() => setCurrentView('editor')}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
               >
                 ← Volver al Editor
